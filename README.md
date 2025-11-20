@@ -1,63 +1,68 @@
-# Granary Forced Alignment + LLM Segmentation Pipeline
+# Granary → MFA → LLM Segmentation Streaming Dataset Pipeline
 
-This pipeline converts raw audio+text stored in Parquet files into 
-second-level streaming translation segments using:
+This repository contains a full pipeline that converts raw audio-text data
+(from Parquet files and LLM-generated segmentation JSONs) into 
+high-quality **bilingual streaming translation segments**, suitable for
+simultaneous translation models or low-latency MT research.
 
-- Montreal Forced Aligner (MFA)
-- LLM-generated English/Chinese segmentation
-- Audio–text alignment via TextGrid
-- Second-based conservative emission rules
+The pipeline has two layers:
 
-The full process is outlined below.
+1. A **single-utterance demo** (for debugging and validation)
+2. A **full batch processor** (mult.py) — the production pipeline
 
-------------------------------------------------------------
-1. Load audio and text from Parquet
-------------------------------------------------------------
-
-The dataset is stored in HF-style Parquet format:
-
-- Each entry contains:
-  - audio.bytes  (raw WAV bytes)
-  - text         (transcription)
-
-The pipeline:
-- Reads the Parquet file using pandas
-- Extracts raw audio bytes from each row
-- Decodes audio using soundfile
-- Normalizes / cleans text for alignment
-
-Output of this step:  
-In-memory audio + text for each utterance.
+This README documents the final **batch pipeline**.
 
 
-------------------------------------------------------------
-2. Export a corpus compatible with MFA
-------------------------------------------------------------
+============================================================
+1. Data Sources
+============================================================
 
-For each utterance, we generate:
+The pipeline consumes three types of inputs:
 
-- utt_X.wav  (decoded from bytes)
-- utt_X.lab  (cleaned text)
+1. **ASR-only Parquet files**
+   - Contain raw audio bytes + transcripts per utterance
 
-These are placed in:
+2. **MFA forced alignment output**
+   - One TextGrid file per utterance
+   - Must contain at least a "words" tier
+
+3. **LLM segmentation JSONs**
+   - Low-/medium-/high-latency segmentation
+   - English and Chinese chunk sequences:
+        {
+          "low_latency": {
+            "English": [...],
+            "Chinese": [...]
+          },
+          "medium_latency": {...},
+          "high_latency": {...}
+        }
+
+
+============================================================
+2. MFA Corpus Generation (Optional)
+============================================================
+
+Before running MFA, you may generate a corpus:
 
     mfa_corpus/
         utt_0.wav
         utt_0.lab
         utt_1.wav
-        utt_1.lab
         ...
 
-This is the standard corpus format required by Montreal Forced Aligner.
+This step uses:
+- raw audio bytes decoded using soundfile
+- corresponding transcript text written to .lab
+
+(You only generate corpus once; mult.py does NOT repeat this step.)
 
 
-------------------------------------------------------------
-3. Run MFA to obtain forced alignment
-------------------------------------------------------------
+============================================================
+3. Forced Alignment with MFA
+============================================================
 
-MFA is used to produce word-level (and phone-level) timestamps.
-
-Command:
+Run Montreal Forced Aligner:
 
     mfa align \
         <corpus_dir> \
@@ -66,124 +71,182 @@ Command:
         <output_dir> \
         --clean
 
-This creates TextGrid alignment files:
+Result:
 
     mfa_output/
         utt_0.TextGrid
         utt_1.TextGrid
         ...
 
-Each TextGrid contains:
-- "words" tier with (word, start_time, end_time)
-- "phones" tier
+Each TextGrid contains word-level timestamps:
+
+    word, start_time, end_time
 
 
-------------------------------------------------------------
-4. Extract timestamps from TextGrid
-------------------------------------------------------------
+============================================================
+4. Batch Processing with mult.py
+============================================================
 
-We use the TGT library to parse TextGrid:
+`mult.py` is the main production pipeline.
 
-- Load the "words" tier
-- Remove empty words
-- Produce a list of dictionaries:
+It:
+
+- Iterates over **all LLM segmentation JSONs**
+- Loads the corresponding **TextGrid** file
+- Extracts MFA-aligned word timestamps
+- Matches every LLM chunk to the aligned words
+- For each latency level:
+    - low_latency
+    - medium_latency
+    - high_latency
+
+  it constructs a conservative **1-second streaming timeline**
+  and generates bilingual segments.
+
+
+### 4.1 Alignment Quality Filtering
+
+The script supports skipping bad alignments via:
+
+    allowed_ids = good_ids
+
+(e.g., from CTC confidence analysis or earlier filtering)
+
+Only utterances whose TextGrid name appears in `allowed_ids` are processed.
+
+
+============================================================
+5. Chunk → Word Alignment (LLM → MFA)
+============================================================
+
+Each LLM English chunk is normalized and tokenized.
+
+We match chunk tokens to MFA words:
+
+- if a word matches:
+    - chunk.start = earliest matched word.start
+    - chunk.end   = latest matched word.end
+- if no match:
+    - chunk.start = None, chunk.end = None
+
+This step yields:
 
     [
-      {"word": "which", "start": 0.00, "end": 0.11},
-      {"word": "sites", "start": 0.11, "end": 0.45},
+      {"chunk":"which", "start":0.0, "end":0.11},
+      {"chunk":"sites", "start":0.11, "end":0.45},
       ...
     ]
 
-These word-level timestamps are the ground-truth alignment.
 
+============================================================
+6. Streaming Emission Timing (Conservative Rule)
+============================================================
 
-------------------------------------------------------------
-5. Align LLM segmentation chunks to MFA words
-------------------------------------------------------------
+We generate a timeline of emitted chunks:
 
-The LLM JSON segmentation provides English & Chinese chunks:
+Rule:
+> Emit a chunk at second S if the chunk has fully finished  
+> (chunk.end ≤ S + 1.0)
 
-    {
-      "low_latency": {
-        "English": [...],
-        "Chinese": [...]
-      }
-    }
-
-For each English chunk:
-- Normalize text (lowercase, strip punctuation)
-- Tokenize chunk
-- Match tokens to MFA word list
-- Compute chunk start/end time:
-
-      start = earliest matched word start
-      end   = latest matched word end
-
-Output example:
-
-    {"chunk": "which", "start": 0.0, "end": 0.11}
-    {"chunk": "sites", "start": 0.11, "end": 0.45}
-    ...
-
-
-------------------------------------------------------------
-6. Build second-level streaming emission timeline
-------------------------------------------------------------
-
-We apply a *conservative* rule:
-
-    A chunk is emitted at second S iff its end_time <= S + 1.0
-
-This produces:
+Example:
 
     [
-      {"second": 0, "emit": ["which", "sites", "have", ...]},
-      {"second": 1, "emit": ["using", ...]},
-      {"second": 2, "emit": ["how", "did", ...]},
+      {"second":0, "emit":["which","sites","have","you","been"]},
+      {"second":1, "emit":["using"]},
+      {"second":2, "emit":["how","did","the"]},
       ...
     ]
 
-This mirrors a realistic low-latency streaming translation scenario.
+This approximates realistic low-latency translation behavior.
 
 
-------------------------------------------------------------
-7. Construct final bilingual streaming segments
-------------------------------------------------------------
+============================================================
+7. Final Bilingual Segment Construction
+============================================================
 
-We map English chunks → Chinese chunks using the LLM segmentation:
+We map English → Chinese chunks using the LLM JSON:
 
-    eng_to_zh = { eng_chunk : zh_chunk }
+    eng2zh = {eng_chunk: zh_chunk}
 
 For each second:
-- Concatenate English chunks into one string
-- Concatenate corresponding Chinese chunks
-- Produce aligned source–target segments:
+
+- Concatenate emitted English chunks (space-separated)
+- Concatenate emitted Chinese chunks (no spaces)
+
+Output:
 
     {
-      "source": ["which sites have you been ...", ...],
-      "target": ["你最近使用了哪些网站……", ...]
+      "source_low_latency": [...],
+      "target_low_latency": [...],
+      "source_medium_latency": [...],
+      "target_medium_latency": [...],
+      "source_high_latency": [...],
+      "target_high_latency": [...]
     }
 
-This can be used as training data for streaming MT, 
-speech-to-text translation, or simultaneous translation models.
+
+============================================================
+8. Output Format (One file per utterance)
+============================================================
+
+Each processed utterance produces:
+
+    streaming_dataset/utt_000123.json
+
+with contents like:
+
+    {
+      "utt_id": "utt_000123",
+      "original_text": "...",
+      "source_low_latency": [...],
+      "target_low_latency": [...],
+      "source_medium_latency": [...],
+      "target_medium_latency": [...],
+      "source_high_latency": [...],
+      "target_high_latency": [...]
+    }
 
 
-------------------------------------------------------------
-Pipeline Summary
-------------------------------------------------------------
+============================================================
+9. Running the Batch Pipeline
+============================================================
 
-1. Load Parquet audio + text  
-2. Convert raw bytes → WAV  
-3. Generate MFA-style corpus  
-4. Run MFA forced alignment  
-5. Extract word timestamps  
-6. Align LLM chunks to MFA  
-7. Emit per-second streaming segments  
-8. Produce final bilingual training pairs
+Example call:
 
-This pipeline creates high-quality, time-aligned, 
-low-latency translation trajectories from raw audio.
+    python mult.py
 
-------------------------------------------------------------
+Configured with:
+
+    llm_dir       = LLM segmentation directory
+    mfa_dir       = MFA TextGrid directory
+    output_dir    = dataset output directory
+    allowed_ids   = list of reliable TextGrid IDs
+    limit         = optional cap on number of files
+
+
+============================================================
+10. Summary
+============================================================
+
+This pipeline transforms:
+
+    Raw audio + transcripts
+            ↓
+       MFA word-level alignment
+            ↓
+  LLM semantic English/Chinese segmentation
+            ↓
+  Precise chunk → audio alignment
+            ↓
+   Conservative second-based streaming segments
+            ↓
+  Final bilingual streaming translation dataset
+
+The result can be used for:
+
+- Low-latency MT training
+- Simultaneous translation modeling
+- Speech→text translation
+- Alignment-based supervision
 
 End of README
