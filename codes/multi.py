@@ -118,6 +118,7 @@ def process_all(
 ):
     os.makedirs(output_dir, exist_ok=True)
 
+
     llm_files = sorted(os.listdir(llm_dir))
     if limit is not None:
         llm_files = llm_files[:limit]
@@ -130,14 +131,10 @@ def process_all(
 
         utt_id = fname[:-5]   # "utt_000001"
 
-        llm_path = os.path.join(llm_dir, fname)
-   
-        # Actually your files are:
-        #   utt_0.TextGrid, utt_1.TextGrid ...
-        # So simpler:
-        numeric_id = int(utt_id.split("_")[-1])
-        textgrid_name = f"utt_{numeric_id}"
-        textgrid_path = os.path.join(mfa_dir, f"utt_{numeric_id}.TextGrid")
+        # ✅ 这里直接用 padded 形式
+        textgrid_name = utt_id
+        textgrid_path = os.path.join(mfa_dir, f"{utt_id}.TextGrid")
+
 
         # === FILTERING: skip if not in allowed list ===
         if allowed_ids is not None and textgrid_name not in allowed_ids:
@@ -145,6 +142,7 @@ def process_all(
             continue
 
         # Load LLM JSON
+        llm_path = os.path.join(llm_dir, fname)
         with open(llm_path, "r", encoding="utf-8") as f:
             seg_json = json.load(f)
 
@@ -159,7 +157,7 @@ def process_all(
             zh_chunks  = seg_json[level]["Chinese"]
 
             aligned = match_llm_chunks_to_mfa(eng_chunks, mfa_words)
-            print(aligned)
+            # print(aligned)
             timeline = assign_chunks_by_second(aligned)
             src, tgt = build_final_segments(timeline, eng_chunks, zh_chunks)
 
@@ -187,7 +185,7 @@ if __name__ == "__main__":
     process_all(
         llm_dir="/data/user_data/haolingp/outputs/llm_segmentation_json",
         mfa_dir="/data/user_data/haolingp/outputs/mfa_output",
-        output_dir="/data/user_data/haolingp/outputs/streaming_dataset",
+        output_dir="/data/user_data/haolingp/outputs/streaming_dataset_v2",
         allowed_ids=good_ids,
         limit=20     # ← 你可以调整这里
     )

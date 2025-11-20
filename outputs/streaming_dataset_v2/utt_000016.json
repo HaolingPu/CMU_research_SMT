@@ -1,0 +1,34 @@
+{
+  "utt_id": "utt_000016",
+  "original_text": "from University of Toronto Concordia.",
+  "source_low_latency": [
+    "from",
+    "University of Toronto",
+    "Concordia."
+  ],
+  "target_low_latency": [
+    "来自",
+    "多伦多大学",
+    "康考迪亚。"
+  ],
+  "source_medium_latency": [
+    "",
+    "from University of Toronto",
+    "Concordia."
+  ],
+  "target_medium_latency": [
+    "",
+    "来自多伦多大学",
+    "康考迪亚。"
+  ],
+  "source_high_latency": [
+    "",
+    "from University of Toronto",
+    "Concordia."
+  ],
+  "target_high_latency": [
+    "",
+    "来自多伦多大学",
+    "康考迪亚。"
+  ]
+}

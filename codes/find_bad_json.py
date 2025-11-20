@@ -1,22 +1,17 @@
 import os
 import json
+import tgt
 
-def check_llm_segmentation_json(dir_path, save_bad="bad.jsonl", save_good="good.jsonl"):
-    """
-    dir_path: folder containing utt_XXXXXX.json (LLM segmentation outputs)
 
-    Each JSON is expected to contain:
-    {
-        "low_latency": {
-            "English": [...],
-            "Chinese": [...]
-        },
-        "medium_latency": {...},
-        "high_latency": {...}
-    }
+############################################################
+# 1. Check LLM segmentation JSON
+############################################################
+
+def check_llm_segmentation_json(dir_path):
     """
-    bad_cases = []
-    good_cases = []
+    Return dict: { filename → { status, reasons, English_lengths, Chinese_lengths } }
+    """
+    results = {}
 
     files = sorted([f for f in os.listdir(dir_path) if f.endswith(".json")])
 
@@ -26,16 +21,16 @@ def check_llm_segmentation_json(dir_path, save_bad="bad.jsonl", save_good="good.
         try:
             data = json.load(open(full_path))
         except Exception as e:
-            bad_cases.append({
-                "file": fn,
-                "reason": f"JSON load error: {str(e)}"
-            })
+            results[fn] = {
+                "status": "bad",
+                "reasons": [f"JSON load error: {str(e)}"]
+            }
             continue
 
         status = "good"
         reasons = []
+        lengths = {}
 
-        # 三个 level：low, medium, high 都检查
         for level in ["low_latency", "medium_latency", "high_latency"]:
             if level not in data:
                 status = "bad"
@@ -45,50 +40,37 @@ def check_llm_segmentation_json(dir_path, save_bad="bad.jsonl", save_good="good.
             en = data[level].get("English", [])
             zh = data[level].get("Chinese", [])
 
+            lengths[level] = (len(en), len(zh))
+
+            # type check
             if not isinstance(en, list) or not isinstance(zh, list):
                 status = "bad"
                 reasons.append(f"{level}: English/Chinese not list")
                 continue
 
+            # length mismatch
             if len(en) != len(zh):
                 status = "bad"
-                reasons.append(
-                    f"{level}: English len {len(en)} != Chinese len {len(zh)}"
-                )
+                reasons.append(f"{level}: English len {len(en)} != Chinese len {len(zh)}")
 
-        if status == "bad":
-            bad_cases.append({"file": fn, "reasons": reasons})
-        else:
-            good_cases.append(fn)
+        results[fn] = {
+            "status": status,
+            "reasons": reasons,
+            "lengths": lengths
+        }
 
-    # 保存结果
-    with open(save_bad, "w") as f:
-        for item in bad_cases:
-            f.write(json.dumps(item) + "\n")
-
-    with open(save_good, "w") as f:
-        for item in good_cases:
-            f.write(json.dumps({"file": item}) + "\n")
-
-    print("===== SUMMARY =====")
-    print("Total:", len(files))
-    print("Good :", len(good_cases))
-    print("Bad  :", len(bad_cases))
-    print("===================")
-
-    return good_cases, bad_cases
+    return results
 
 
+############################################################
+# 2. Check MFA TextGrid (<unk> filter)
+############################################################
 
-
-
-
-
-import tgt
-
-def filter_unk_textgrids(mfa_dir, save_good="good_list.jsonl", save_bad="bad_list.jsonl"):
-    good = []
-    bad = []
+def check_mfa_textgrids(mfa_dir):
+    """
+    Return dict: { filename → { status, reason } }
+    """
+    results = {}
 
     tg_files = sorted([f for f in os.listdir(mfa_dir) if f.endswith(".TextGrid")])
 
@@ -98,7 +80,7 @@ def filter_unk_textgrids(mfa_dir, save_good="good_list.jsonl", save_bad="bad_lis
         try:
             tg = tgt.read_textgrid(path)
         except:
-            bad.append({"file": tg_file, "reason": "cannot open"})
+            results[tg_file] = {"status": "bad", "reason": "cannot open"}
             continue
 
         words = tg.get_tier_by_name("words").intervals
@@ -106,11 +88,68 @@ def filter_unk_textgrids(mfa_dir, save_good="good_list.jsonl", save_bad="bad_lis
         has_unk = any([w.text.strip() == "<unk>" for w in words])
 
         if has_unk:
-            bad.append({"file": tg_file, "reason": "<unk> present"})
+            results[tg_file] = {"status": "bad", "reason": "<unk> present"}
         else:
-            good.append({"file": tg_file})
+            results[tg_file] = {"status": "good"}
 
-    # 保存结果
+    return results
+
+
+############################################################
+# 3. Merge both filters & save final good/bad jsonl
+############################################################
+
+def merge_filters(llm_dir, mfa_dir, save_good="good.jsonl", save_bad="bad.jsonl"):
+    # Always clear old logs before writing
+    open(save_good, "w").close()
+    open(save_bad, "w").close()
+    
+    # Step 1: get LLM check results
+    llm_results = check_llm_segmentation_json(llm_dir)
+
+    # Step 2: get MFA check results
+    mfa_results = check_mfa_textgrids(mfa_dir)
+
+    good = []
+    bad = []
+
+    # ⚠️ Assume filenames are like: utt_000123.json and utt_000123.TextGrid
+    # Extract base name
+    all_keys = set([fn.replace(".json", "") for fn in llm_results]) | \
+               set([fn.replace(".TextGrid", "") for fn in mfa_results])
+
+    for base in sorted(all_keys):
+        llm_info = llm_results.get(base + ".json", None)
+        mfa_info = mfa_results.get(base + ".TextGrid", None)
+
+        is_good = True
+        reasons = []
+
+        # LLM check
+        if llm_info is None:
+            is_good = False
+            reasons.append("missing LLM JSON")
+        else:
+            if llm_info["status"] == "bad":
+                is_good = False
+                reasons += llm_info["reasons"]
+
+        # MFA check
+        if mfa_info is None:
+            is_good = False
+            reasons.append("missing TextGrid")
+        else:
+            if mfa_info["status"] == "bad":
+                is_good = False
+                reasons.append(mfa_info["reason"])
+
+        # Save to list
+        if is_good:
+            good.append({"file": base})
+        else:
+            bad.append({"file": base, "reasons": reasons})
+
+    # Write output
     with open(save_good, "w") as f:
         for item in good:
             f.write(json.dumps(item) + "\n")
@@ -119,18 +158,19 @@ def filter_unk_textgrids(mfa_dir, save_good="good_list.jsonl", save_bad="bad_lis
         for item in bad:
             f.write(json.dumps(item) + "\n")
 
-    print("===== SUMMARY =====")
-    print("Total:", len(tg_files))
+    print("===== FINAL SUMMARY =====")
+    print("Total:", len(all_keys))
     print("Good :", len(good))
     print("Bad  :", len(bad))
-    print("===================")
+    print("=========================")
 
     return good, bad
 
 
 
-
-
-bad_path = "/data/user_data/haolingp/outputs/bad.jsonl"
-good_path = "/data/user_data/haolingp/outputs/good.jsonl"
-filter_unk_textgrids("/data/user_data/haolingp/outputs/mfa_output",good_path, bad_path)
+merge_filters(
+    llm_dir="/data/user_data/haolingp/outputs/llm_segmentation_json",
+    mfa_dir="/data/user_data/haolingp/outputs/mfa_output",
+    save_good="/data/user_data/haolingp/outputs/good.jsonl",
+    save_bad="/data/user_data/haolingp/outputs/bad.jsonl"
+)

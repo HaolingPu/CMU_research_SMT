@@ -15,6 +15,9 @@ MFA_CORPUS_DIR = "/data/user_data/haolingp/outputs/mfa_corpus_test"
 MFA_OUTPUT_DIR = "/data/user_data/haolingp/outputs/mfa_output"
 LLM_JSON_PATH = "/data/user_data/haolingp/outputs/llm_segmentation_json/utt_000000.json"
 
+#/data/group_data/li_lab/siqiouya/datasets/yodas-granary/data/en000/asr_only
+
+
 os.makedirs(MFA_CORPUS_DIR, exist_ok=True)
 
 MISALIGNMENT_LOG = "/data/user_data/haolingp/outputs/misalignment_log.json"
