@@ -1,0 +1,40 @@
+{
+  "utt_id": "utt_000013",
+  "original_text": "make sure that every time you share something, it's going to add value.",
+  "source_low_latency": [
+    "make sure that",
+    "every time you share",
+    "something, it's going to",
+    "add value."
+  ],
+  "target_low_latency": [
+    "确保那",
+    "每次你分享某样东西时，",
+    "它会增加价值。",
+    ""
+  ],
+  "source_medium_latency": [
+    "make sure that",
+    "",
+    "every time you share something,",
+    "it's going to add value."
+  ],
+  "target_medium_latency": [
+    "务必确保",
+    "",
+    "每次你分享东西时，",
+    "都会带来价值。"
+  ],
+  "source_high_latency": [
+    "",
+    "",
+    "make sure that every time you share something,",
+    "it's going to add value."
+  ],
+  "target_high_latency": [
+    "",
+    "",
+    "务必确保每次你分享东西时，",
+    "都会带来价值。"
+  ]
+}

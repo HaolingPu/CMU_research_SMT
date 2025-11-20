@@ -1,0 +1,44 @@
+{
+  "low_latency": {
+    "English": [
+      "make sure",
+      "that",
+      "every time",
+      "you share",
+      "something,",
+      "it's going to",
+      "add value."
+    ],
+    "Chinese": [
+      "确保",
+      "那",
+      "每次你分享",
+      "某样东西时，",
+      "它会",
+      "增加价值。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "make sure that",
+      "every time you share something,",
+      "it's going to add value."
+    ],
+    "Chinese": [
+      "务必确保",
+      "每次你分享东西时，",
+      "都会带来价值。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "make sure that every time you share something,",
+      "it's going to add value."
+    ],
+    "Chinese": [
+      "务必确保每次你分享东西时，",
+      "都会带来价值。"
+    ]
+  },
+  "input": "make sure that every time you share something, it's going to add value."
+}

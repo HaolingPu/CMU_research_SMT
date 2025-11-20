@@ -1,0 +1,44 @@
+{
+  "low_latency": {
+    "English": [
+      "Which sites",
+      "have you been using",
+      "and",
+      "how",
+      "did the use",
+      "of these technologies",
+      "assist",
+      "your search?"
+    ],
+    "Chinese": [
+      "哪些网站",
+      "你一直在使用",
+      "以及",
+      "如何",
+      "这些技术的使用",
+      "协助了",
+      "你的搜索？"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "Which sites have you been using",
+      "and how did the use of these technologies assist your search?"
+    ],
+    "Chinese": [
+      "你一直在使用的哪些网站",
+      "以及这些技术的使用是如何帮助你的搜索的？"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "Which sites have you been using",
+      "and how did the use of these technologies assist your search?"
+    ],
+    "Chinese": [
+      "你一直在使用的哪些网站？",
+      "以及这些技术的使用是如何帮助你的搜索的？"
+    ]
+  },
+  "input": "Which sites have you been using and how did the use of these technologies assist your search?"
+}

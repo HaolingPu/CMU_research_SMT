@@ -1,0 +1,58 @@
+{
+  "utt_id": "utt_000014",
+  "original_text": "And what tips can you give our students to help them become more visible to recruiters and talent hunters?",
+  "source_low_latency": [
+    "And what tips",
+    "can you give",
+    "our students",
+    "to help them",
+    "become more visible to recruiters",
+    "",
+    "and talent hunters?"
+  ],
+  "target_low_latency": [
+    "而且什么建议",
+    "你能提供",
+    "我们的学生",
+    "以帮助他们",
+    "变得更加显眼给招聘人员",
+    "",
+    "以及人才猎手？"
+  ],
+  "source_medium_latency": [
+    "",
+    "And what tips can you give",
+    "",
+    "our students to help them",
+    "become more visible to recruiters",
+    "",
+    "and talent hunters?"
+  ],
+  "target_medium_latency": [
+    "",
+    "那么你有什么建议可以提供",
+    "",
+    "我们的学生以帮助他们",
+    "在招聘人员面前更加显眼",
+    "",
+    "以及人才猎手？"
+  ],
+  "source_high_latency": [
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "And what tips can you give our students to help them become more visible to recruiters and talent hunters?"
+  ],
+  "target_high_latency": [
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "那么你有什么建议可以提供给我们学生，以帮助他们在招聘人员和人才猎手中更显眼？"
+  ]
+}

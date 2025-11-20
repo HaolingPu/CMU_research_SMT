@@ -1,0 +1,33 @@
+{
+  "low_latency": {
+    "English": [
+      "I",
+      "encourage",
+      "them."
+    ],
+    "Chinese": [
+      "我",
+      "鼓励",
+      "他们。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "I encourage",
+      "them."
+    ],
+    "Chinese": [
+      "我鼓励",
+      "他们。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "I encourage them."
+    ],
+    "Chinese": [
+      "我鼓励他们。"
+    ]
+  },
+  "input": "I encourage them."
+}

@@ -1,0 +1,58 @@
+{
+  "utt_id": "utt_000019",
+  "original_text": "if I'm looking at hiring you for an IT professional, elaborate and make it relevant to what you are looking for.",
+  "source_low_latency": [
+    "if I'm looking",
+    "at hiring you for.",
+    "for an IT professional,",
+    "elaborate and make",
+    "it relevant",
+    "to what",
+    "you are looking"
+  ],
+  "target_low_latency": [
+    "如果我正在考虑",
+    "雇佣你",
+    "作为IT专业人士，",
+    "详细说明并使其相关",
+    "于你所寻找的",
+    "内容。",
+    ""
+  ],
+  "source_medium_latency": [
+    "",
+    "",
+    "if I'm looking at hiring you for an IT professional,",
+    "",
+    "",
+    "",
+    "elaborate and make it relevant to what you are looking for."
+  ],
+  "target_medium_latency": [
+    "",
+    "",
+    "如果我正考虑雇佣你担任IT专业人员，",
+    "",
+    "",
+    "",
+    "请详述并使之与你的目标相关。"
+  ],
+  "source_high_latency": [
+    "",
+    "",
+    "if I'm looking at hiring you for an IT professional,",
+    "",
+    "",
+    "",
+    "elaborate and make it relevant to what you are looking for."
+  ],
+  "target_high_latency": [
+    "",
+    "",
+    "如果我正考虑雇佣你担任IT专业人员，",
+    "",
+    "",
+    "",
+    "请详述并使之与你的目标相关。"
+  ]
+}

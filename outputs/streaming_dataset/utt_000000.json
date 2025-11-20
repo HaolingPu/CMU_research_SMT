@@ -1,0 +1,46 @@
+{
+  "utt_id": "utt_000000",
+  "original_text": "Which sites have you been using and how did the use of these technologies assist your search?",
+  "source_low_latency": [
+    "Which sites",
+    "have you been using and",
+    "how did the use",
+    "of these technologies",
+    "assist your search?"
+  ],
+  "target_low_latency": [
+    "哪些网站",
+    "你一直在使用以及",
+    "如何这些技术的使用",
+    "协助了",
+    "你的搜索？"
+  ],
+  "source_medium_latency": [
+    "",
+    "Which sites have you been using",
+    "",
+    "",
+    "and how did the use of these technologies assist your search?"
+  ],
+  "target_medium_latency": [
+    "",
+    "你一直在使用的哪些网站",
+    "",
+    "",
+    "以及这些技术的使用是如何帮助你的搜索的？"
+  ],
+  "source_high_latency": [
+    "",
+    "Which sites have you been using",
+    "",
+    "",
+    "and how did the use of these technologies assist your search?"
+  ],
+  "target_high_latency": [
+    "",
+    "你一直在使用的哪些网站？",
+    "",
+    "",
+    "以及这些技术的使用是如何帮助你的搜索的？"
+  ]
+}

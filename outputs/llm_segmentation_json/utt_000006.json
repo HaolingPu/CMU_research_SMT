@@ -1,0 +1,33 @@
+{
+  "low_latency": {
+    "English": [
+      "Having a",
+      "LinkedIn profile",
+      "is..."
+    ],
+    "Chinese": [
+      "拥有一个",
+      "领英个人资料",
+      "是……"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "Having a LinkedIn profile",
+      "is..."
+    ],
+    "Chinese": [
+      "拥有一个领英个人资料",
+      "是……"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "Having a LinkedIn profile is..."
+    ],
+    "Chinese": [
+      "拥有一个领英个人资料是……"
+    ]
+  },
+  "input": "Having a LinkedIn profile is..."
+}

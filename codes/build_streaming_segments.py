@@ -11,11 +11,14 @@ import tgt
 ############################################################
 
 PARQUET_PATH = "/data/hf_cache/yodas-granary/data/en000/asr_only/00000000.parquet"
-MFA_CORPUS_DIR = "/data/user_data/haolingp/mfa_corpus_test"
-MFA_OUTPUT_DIR = "/data/user_data/haolingp/mfa_output"
-LLM_JSON_PATH = "/data/user_data/haolingp/llm_segmentation_json/utt_000000.json"
+MFA_CORPUS_DIR = "/data/user_data/haolingp/outputs/mfa_corpus_test"
+MFA_OUTPUT_DIR = "/data/user_data/haolingp/outputs/mfa_output"
+LLM_JSON_PATH = "/data/user_data/haolingp/outputs/llm_segmentation_json/utt_000000.json"
 
 os.makedirs(MFA_CORPUS_DIR, exist_ok=True)
+
+MISALIGNMENT_LOG = "/data/user_data/haolingp/outputs/misalignment_log.json"
+
 
 
 ############################################################
@@ -27,42 +30,52 @@ def export_corpus(parquet_path, corpus_dir, num_samples=10):
     df = df.iloc[:num_samples]
 
     for i, row in df.iterrows():
-        audio_bytes = row["audio"]["bytes"]
+        audio_bytes = row["audio"]["bytes"]  # 二进制数据（wav）
         text = row["text"]
         uttid = f"utt_{i}"
 
         wav_path = os.path.join(corpus_dir, f"{uttid}.wav")
         lab_path = os.path.join(corpus_dir, f"{uttid}.lab")
 
-        audio_file = io.BytesIO(audio_bytes)
-        audio, sr = sf.read(audio_file)
-        sf.write(wav_path, audio, sr)
+        # create wav file from bytes
+        audio_file = io.BytesIO(audio_bytes) # 原始音频字节包装成一个“文件对象”
+        audio, sr = sf.read(audio_file)  #numpy array， sample rate
+        sf.write(wav_path, audio, sr) # 保存成真正的 .wav 文件
 
         with open(lab_path, "w") as f:
             f.write(text)
 
-        print(f"Wrote {wav_path} and {lab_path}")
+        # print(f"Wrote {wav_path} and {lab_path}")
 
     print("Done exporting corpus →", corpus_dir)
+    return df
 
 
 ############################################################
-# 3. 解析 TextGrid → 得到 word-level 时间戳
+# 3. Analyze and fetch each TextGrid → get word-level timeframe
 ############################################################
 
 def load_word_alignment(textgrid_path):
-    tg = tgt.read_textgrid(textgrid_path)
-    words = tg.get_tier_by_name("words").intervals
+    try:
+        tg = tgt.read_textgrid(textgrid_path) 
+        words = tg.get_tier_by_name("words").intervals # 从 "words" tier 取得所有 word intervals
 
-    out = []
-    for w in words:
-        if w.text.strip():
-            out.append({
-                "word": w.text.lower(),
-                "start": w.start_time,
-                "end": w.end_time
-            })
-    return out
+        out = []
+        for w in words:
+            # 跳过空白 label
+            if w.text.strip():
+                out.append({
+                    # "word": w.text.lower(), # 单词 (统一转成小写便于匹配)
+                    "word": w.text,
+                    "start": w.start_time,
+                    "end": w.end_time
+                })
+        
+        return out
+    
+    except Exception as e:
+        print(f"❌ Error loading TextGrid {textgrid_path}: {e}")
+        return None
 
 
 ############################################################
@@ -71,16 +84,30 @@ def load_word_alignment(textgrid_path):
 
 def build_1s_segments(words):
     max_time = words[-1]["end"]
-    t = 0
     segments = []
 
-    while t < max_time:
+
+    i = 0          # 当前扫描到第几个 word
+    n = len(words)
+
+    for sec in range(max_time):
+        sec_start = sec
+        sec_end   = sec + 1
         seg_words = []
-        for w in words:
-            if w["start"] < t+1 and w["end"] > t:
-                seg_words.append(w["word"])
-        segments.append({"second": t, "words": seg_words})
-        t += 1
+
+        # 将指针推进到第一次可能 overlap 的 word
+        while i < n and words[i]["end"] <= sec_start:
+            i += 1
+
+        # 从 i 开始收集本秒的所有 overlap 单词
+        j = i
+        while j < n and words[j]["start"] < sec_end:
+            # overlap 条件：start < sec_end 且 end > sec_start
+            if words[j]["end"] > sec_start:
+                seg_words.append(words[j]["word"])
+            j += 1
+
+        segments.append({"second": sec, "words": seg_words})
     return segments
 
 
@@ -91,7 +118,7 @@ def build_1s_segments(words):
 def normalize_text(s):
     s = s.lower()
     s = re.sub(r"[^a-z ]+", " ", s)
-    return s.strip()
+    return " ".join(s.split())
 
 def match_llm_chunks_to_mfa(llm_chunks, mfa_words):
     mfa_tokens = [normalize_text(w["word"]) for w in mfa_words]
@@ -175,7 +202,7 @@ def build_final_segments(timeline, segmentation_json):
 
 
 ############################################################
-# 8. 主流程
+# 8. main
 ############################################################
 
 def main():

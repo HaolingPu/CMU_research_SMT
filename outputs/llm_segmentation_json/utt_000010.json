@@ -1,0 +1,61 @@
+{
+  "low_latency": {
+    "English": [
+      "minded individuals",
+      "such as yourself",
+      "and people",
+      "that can help",
+      "you connect",
+      "to other individuals",
+      "because once",
+      "you connect",
+      "with them",
+      "you have visibility",
+      "to all of their connections",
+      "and this is how",
+      "you"
+    ],
+    "Chinese": [
+      "有思想的人",
+      "像你这样的人",
+      "以及能够帮助",
+      "你建立联系的人",
+      "让你连接到",
+      "其他人士",
+      "因为一旦",
+      "你与他们建立联系",
+      "你就拥有对他们所有关系的可见性",
+      "而这就是你",
+      "的方式"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "minded individuals such as yourself and people that can help you connect to other individuals",
+      "because once you connect with them",
+      "you have visibility to all of their connections",
+      "and this is how you"
+    ],
+    "Chinese": [
+      "有思想的人，如你这样的个体，以及能帮你与其他人士建立联系的人",
+      "因为一旦你与他们建立联系",
+      "就能看到他们所有关系的网络",
+      "而这正是你实现目标的方式"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "minded individuals such as yourself and people that can help you connect to other individuals",
+      "because once you connect with them",
+      "you have visibility to all of their connections",
+      "and this is how you"
+    ],
+    "Chinese": [
+      "有思想的人，比如你这样的人，以及那些能帮助你与其他人建立联系的人",
+      "因为一旦你与他们建立联系",
+      "你就能看到他们所有关系的网络",
+      "而这正是你实现目标的方式"
+    ]
+  },
+  "input": "minded individuals such as yourself and people that can help you connect to other individuals because once you connect with them you have visibility to all of their connections and this is how you"
+}

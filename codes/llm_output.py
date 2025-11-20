@@ -13,8 +13,8 @@ os.environ["HF_HUB_CACHE"] = "/data/user_data/haolingp/hf_cache/hub"
 os.environ["TRANSFORMERS_CACHE"] = "/data/user_data/haolingp/hf_cache/transformers"
 
 parquet_path = "/data/hf_cache/yodas-granary/data/en000/asr_only/00000000.parquet"
-num_samples = 10
-output_dir = "/data/user_data/haolingp/llm_segmentation_json"
+num_samples = 20
+output_dir = "/data/user_data/haolingp/outputs/llm_segmentation_json"
 os.makedirs(output_dir, exist_ok=True)
 
 model_path = "/data/user_data/haolingp/models/Qwen3-30B-A3B-Instruct-2507-FP8"
@@ -88,12 +88,32 @@ def build_prompt(english_sentence):
 
 Task: Segment the English sentence into THREE different granularities and translate each segment to Chinese.
 
-**IMPORTANT - Granularity Definition:**
-- **low_latency** (FINEST grain) → Many SHORT segments, each 1-3 words
-- **medium_latency** (MEDIUM grain) → Fewer MEDIUM segments, each 3-8 words  
-- **high_latency** (COARSEST grain) → Very few LONG segments or one complete sentence
+**CRITICAL RULES:**
+For EVERY granularity (low_latency, medium_latency, high_latency):
+- The English array MUST have EXACTLY the same number of items as the Chinese array
+- If English has N segments, Chinese MUST have N segments (no more, no less)
+- Each English[i] MUST correspond to Chinese[i] at the SAME index
+- DO NOT merge multiple English segments into one Chinese segment
+- DO NOT skip any segments
 
-Output ONLY valid JSON in this exact format:
+**Granularity Definitions:**
+
+**low_latency** (FINEST grain):
+- Split into MANY SHORT segments (1-3 words each)
+- Break at natural phrase boundaries
+- Keep functional words separate when possible
+
+**medium_latency** (MEDIUM grain):
+- Split into FEWER MEDIUM segments (3-8 words each)
+- Combine related phrases
+- Break at major clause boundaries
+
+**high_latency** (COARSE grain):
+- Split ONLY at major punctuation (periods, semicolons, commas between independent clauses)
+- Each segment = one complete clause or sentence
+- DO NOT output the entire input as one segment if it contains multiple clauses
+
+---
 
 Example 1:
 Input: "Houston issued a series of tornado warnings on the evening of the 16th."
@@ -104,8 +124,8 @@ Input: "Houston issued a series of tornado warnings on the evening of the 16th."
     "Chinese": ["休斯敦", "发出了", "一系列", "龙卷风警报", "在傍晚", "16日。"]
   }},
   "medium_latency": {{
-    "English": ["Houston issued a series of", "tornado warnings", "on the evening of the 16th."],
-    "Chinese": ["休斯敦发出了一系列", "龙卷风警报", "在16日傍晚。"]
+    "English": ["Houston issued", "a series of tornado warnings", "on the evening of the 16th."],
+    "Chinese": ["休斯敦发出了", "一系列龙卷风警报", "在16日傍晚。"]
   }},
   "high_latency": {{
     "English": ["Houston issued a series of tornado warnings on the evening of the 16th."],
@@ -131,10 +151,52 @@ Input: "The company announced new features and improved performance yesterday."
   }}
 }}
 
+Example 3 (Multiple clauses with punctuation):
+Input: "The weather was sunny in the morning, but it started raining in the afternoon, and the temperature dropped significantly."
+
+{{
+  "low_latency": {{
+    "English": ["The weather", "was sunny", "in the morning,", "but", "it started", "raining", "in the afternoon,", "and", "the temperature", "dropped", "significantly."],
+    "Chinese": ["天气", "是晴朗的", "在早上，", "但是", "开始", "下雨", "在下午，", "并且", "温度", "下降了", "显著。"]
+  }},
+  "medium_latency": {{
+    "English": ["The weather was sunny in the morning,", "but it started raining in the afternoon,", "and the temperature dropped significantly."],
+    "Chinese": ["早上天气晴朗，", "但下午开始下雨，", "温度显著下降。"]
+  }},
+  "high_latency": {{
+    "English": ["The weather was sunny in the morning,", "but it started raining in the afternoon,", "and the temperature dropped significantly."],
+    "Chinese": ["早上天气晴朗，", "但下午开始下雨，", "温度显著下降。"]
+  }}
+}}
+
+Example 4 (Short sentence - no punctuation to split):
+Input: "She loves reading books."
+
+{{
+  "low_latency": {{
+    "English": ["She", "loves", "reading", "books."],
+    "Chinese": ["她", "喜欢", "阅读", "书籍。"]
+  }},
+  "medium_latency": {{
+    "English": ["She loves", "reading books."],
+    "Chinese": ["她喜欢", "阅读书籍。"]
+  }},
+  "high_latency": {{
+    "English": ["She loves reading books."],
+    "Chinese": ["她喜欢阅读书籍。"]
+  }}
+}}
+
+---
+
 Now process this input:
 Input: "{english_sentence}"
 
-Output ONLY the JSON object, no explanations:"""
+**REMEMBER:**
+- For high_latency: Split at commas, periods, semicolons that separate clauses
+- NEVER output the entire sentence as one segment if it has multiple clauses
+- English and Chinese arrays MUST have the same length
+- Output ONLY the JSON object, no explanations"""
 
 
 
