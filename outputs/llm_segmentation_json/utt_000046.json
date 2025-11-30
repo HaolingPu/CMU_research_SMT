@@ -1,0 +1,88 @@
+{
+  "low_latency": {
+    "English": [
+      "Well",
+      ",",
+      "if",
+      "I want",
+      "to convert",
+      "two radians",
+      ",",
+      "again",
+      ",",
+      "I have",
+      "degrees",
+      ",",
+      "so",
+      "I've got",
+      "to divide",
+      "by degrees",
+      ",",
+      "or",
+      "put",
+      "the degrees",
+      "on the bottom",
+      "to cancel out.",
+      "Degrees",
+      "will cancel",
+      "with degrees",
+      ",",
+      "and",
+      "I'm left",
+      "with radians",
+      "on top."
+    ],
+    "Chinese": [
+      "嗯",
+      "，",
+      "如果",
+      "我想要",
+      "转换",
+      "两弧度",
+      "，",
+      "再次",
+      "，",
+      "我有",
+      "度数",
+      "，",
+      "所以",
+      "我必须",
+      "除以度数",
+      "，",
+      "或者",
+      "把度数",
+      "放在分母",
+      "来约掉。",
+      "度数",
+      "会与度数相消",
+      "，",
+      "然后",
+      "我剩下",
+      "弧度",
+      "在分子上。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "Well, if I want to convert two radians, again, I have degrees, so I've got to divide by degrees",
+      "or put the degrees on the bottom to cancel out.",
+      "Degrees will cancel with degrees, and I'm left with radians on top."
+    ],
+    "Chinese": [
+      "嗯，如果我想将两弧度转换为度数，我已有度数，因此必须用度数去除或将其置于分母以约去。",
+      "度数会与度数相互抵消，最后结果只剩下弧度在分子位置。",
+      "度数会与度数相消，而我剩下的就是分子上的弧度。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "Well, if I want to convert two radians, again, I have degrees, so I've got to divide by degrees, or put the degrees on the bottom to cancel out.",
+      "Degrees will cancel with degrees, and I'm left with radians on top."
+    ],
+    "Chinese": [
+      "嗯，如果我要把两个弧度换算成度数，既然已经有了度数，就必须用度数去除，或将度数放到分母中以便约掉。",
+      "度数会与度数相消，最终结果只剩弧度在上方。"
+    ]
+  },
+  "input": "Well, if I want to convert two radians, again, I have degrees, so I've got to divide by degrees, or put the degrees on the bottom to cancel out. Degrees will cancel with degrees, and I'm left with radians on top."
+}

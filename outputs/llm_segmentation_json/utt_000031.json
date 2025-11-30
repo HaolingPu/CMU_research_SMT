@@ -1,0 +1,45 @@
+{
+  "low_latency": {
+    "English": [
+      "These",
+      "are",
+      "the kinds of",
+      "things",
+      "that",
+      "differentiate",
+      "one student",
+      "from",
+      "another."
+    ],
+    "Chinese": [
+      "这些",
+      "是",
+      "这类",
+      "事情",
+      "那些",
+      "区分",
+      "一个学生",
+      "与",
+      "另一个。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "These are the kinds of things",
+      "that differentiate one student from another."
+    ],
+    "Chinese": [
+      "这些都是能区分学生的因素",
+      "一个学生与另一个之间的差异。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "These are the kinds of things that differentiate one student from another."
+    ],
+    "Chinese": [
+      "这些是能够区分一名学生与另一名学生的事物。"
+    ]
+  },
+  "input": "These are the kinds of things that differentiate one student from another."
+}

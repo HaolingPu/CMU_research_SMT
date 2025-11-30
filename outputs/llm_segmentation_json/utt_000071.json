@@ -1,0 +1,40 @@
+{
+  "low_latency": {
+    "English": [
+      "So",
+      "a big part",
+      "of that",
+      "is knowing",
+      "degrees",
+      "and",
+      "radians."
+    ],
+    "Chinese": [
+      "所以",
+      "其中很大一部分",
+      "在于了解",
+      "度数",
+      "和",
+      "弧度。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "So a big part of that",
+      "is knowing degrees and radians."
+    ],
+    "Chinese": [
+      "所以其中很大一部分",
+      "在于了解度数和弧度。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "So a big part of that is knowing degrees and radians."
+    ],
+    "Chinese": [
+      "所以其中很大一部分在于了解度数和弧度。"
+    ]
+  },
+  "input": "So a big part of that is knowing degrees and radians."
+}

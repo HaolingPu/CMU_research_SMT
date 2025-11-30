@@ -1,0 +1,35 @@
+{
+  "low_latency": {
+    "English": [
+      "It",
+      "doesn't",
+      "work",
+      "that way."
+    ],
+    "Chinese": [
+      "它",
+      "不是",
+      "这样工作的",
+      "那样的。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "It doesn't work",
+      "that way."
+    ],
+    "Chinese": [
+      "它不是这样工作的",
+      "那样的。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "It doesn't work that way."
+    ],
+    "Chinese": [
+      "它不是那样起作用的。"
+    ]
+  },
+  "input": "It doesn't work that way."
+}

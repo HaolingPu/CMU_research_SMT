@@ -1,0 +1,35 @@
+{
+  "low_latency": {
+    "English": [
+      "Two",
+      "different ways",
+      "of representing",
+      "the same thing."
+    ],
+    "Chinese": [
+      "两种",
+      "不同的方式",
+      "表示",
+      "同一事物。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "Two different ways",
+      "of representing the same thing."
+    ],
+    "Chinese": [
+      "两种不同的方式",
+      "表示同一事物。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "Two different ways of representing the same thing."
+    ],
+    "Chinese": [
+      "有两种不同的方式可以表示同一事物。"
+    ]
+  },
+  "input": "Two different ways of representing the same thing."
+}

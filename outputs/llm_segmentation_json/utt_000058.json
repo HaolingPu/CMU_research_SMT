@@ -1,0 +1,50 @@
+{
+  "low_latency": {
+    "English": [
+      "it's worth",
+      "mentioning",
+      "you know",
+      "you see",
+      "it written",
+      "as pie",
+      "on some"
+    ],
+    "Chinese": [
+      "值得提及的是",
+      "你知道",
+      "你看到",
+      "它被写成",
+      "派",
+      "在一些"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "it's worth mentioning",
+      "you know",
+      "you see it written as pie",
+      "on some"
+    ],
+    "Chinese": [
+      "值得提及的是",
+      "你知道",
+      "你看到它被写成派",
+      "在一些"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "it's worth mentioning,",
+      "you know,",
+      "you see it written as pie,",
+      "on some"
+    ],
+    "Chinese": [
+      "值得提及的是，",
+      "你知道，",
+      "你看到它被写成派，",
+      "在一些"
+    ]
+  },
+  "input": "it's worth mentioning you know you see it written as pie on some"
+}

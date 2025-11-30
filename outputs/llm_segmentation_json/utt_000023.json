@@ -1,0 +1,67 @@
+{
+  "low_latency": {
+    "English": [
+      "career aspirations",
+      "and goals,",
+      "I'm not going to know",
+      "that.",
+      "I go to",
+      "a lot of",
+      "university career fairs",
+      "for CGI",
+      "and one of",
+      "the most important",
+      "things that",
+      "I speak to",
+      "students about",
+      "is getting",
+      "a profile",
+      "on LinkedIn."
+    ],
+    "Chinese": [
+      "职业抱负",
+      "和目标，",
+      "我不会知道",
+      "那。",
+      "我去参加",
+      "很多",
+      "大学职业博览会",
+      "关于CGI",
+      "而且其中最重要的一点",
+      "是我与学生交流时",
+      "提到的事情",
+      "是获取",
+      "一个资料档案",
+      "在领英上。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "career aspirations and goals,",
+      "I'm not going to know that.",
+      "I go to a lot of university career fairs for CGI",
+      "and one of the most important things that I speak to students about",
+      "is getting a profile on LinkedIn."
+    ],
+    "Chinese": [
+      "职业抱负和目标，",
+      "我不会知道那件事。",
+      "我参加许多CGI相关的大学职业博览会",
+      "而我跟学生们交谈时最重要的事情之一",
+      "是在领英上建立个人资料。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "career aspirations and goals, I'm not going to know that.",
+      "I go to a lot of university career fairs for CGI",
+      "and one of the most important things that I speak to students about is getting a profile on LinkedIn."
+    ],
+    "Chinese": [
+      "职业抱负和目标，我不会知道那件事。",
+      "我参加许多CGI相关的大学职业博览会。",
+      "而我跟学生们交谈时最重要的事情之一，就是在领英上建立个人资料。"
+    ]
+  },
+  "input": "career aspirations and goals, I'm not going to know that. I go to a lot of university career fairs for CGI and one of the most important things that I speak to students about is getting a profile on LinkedIn."
+}

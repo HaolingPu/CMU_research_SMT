@@ -1,0 +1,37 @@
+{
+  "low_latency": {
+    "English": [
+      "So",
+      "I'd",
+      "actually",
+      "multiply",
+      "this",
+      "out."
+    ],
+    "Chinese": [
+      "所以",
+      "我实际上会",
+      "将这个展开",
+      "出来。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "So I'd actually",
+      "multiply this out."
+    ],
+    "Chinese": [
+      "所以我实际上会",
+      "把这个展开出来。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "So I'd actually multiply this out."
+    ],
+    "Chinese": [
+      "所以我实际上会把这展开出来。"
+    ]
+  },
+  "input": "So I'd actually multiply this out."
+}

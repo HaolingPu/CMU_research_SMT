@@ -1,0 +1,37 @@
+{
+  "low_latency": {
+    "English": [
+      "Well,",
+      "on the airplane",
+      "you have to",
+      "wear a mask."
+    ],
+    "Chinese": [
+      "嗯，",
+      "在飞机上",
+      "你必须",
+      "戴口罩。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "Well,",
+      "on the airplane you have to wear a mask."
+    ],
+    "Chinese": [
+      "嗯，",
+      "在飞机上你必须戴口罩。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "Well,",
+      "on the airplane you have to wear a mask."
+    ],
+    "Chinese": [
+      "嗯，",
+      "在飞机上你必须戴口罩。"
+    ]
+  },
+  "input": "Well, on the airplane you have to wear a mask."
+}

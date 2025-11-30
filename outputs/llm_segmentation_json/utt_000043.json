@@ -1,0 +1,37 @@
+{
+  "low_latency": {
+    "English": [
+      "And",
+      "that",
+      "would be",
+      "this angle",
+      "in radians."
+    ],
+    "Chinese": [
+      "而且",
+      "那个",
+      "将是",
+      "这个角度",
+      "以弧度表示。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "And that would be",
+      "this angle in radians."
+    ],
+    "Chinese": [
+      "而且那将是",
+      "这个角度的弧度值。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "And that would be this angle in radians."
+    ],
+    "Chinese": [
+      "而且那将是以弧度表示的角度。"
+    ]
+  },
+  "input": "And that would be this angle in radians."
+}

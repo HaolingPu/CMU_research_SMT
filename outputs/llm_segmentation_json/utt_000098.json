@@ -1,0 +1,37 @@
+{
+  "low_latency": {
+    "English": [
+      "I",
+      "didn't know",
+      "that",
+      "was a thing."
+    ],
+    "Chinese": [
+      "我",
+      "不知道",
+      "那",
+      "是一件事情。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "I didn't know",
+      "that was a thing."
+    ],
+    "Chinese": [
+      "我不知道",
+      "那是一件事情。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "I didn't know",
+      "that was a thing."
+    ],
+    "Chinese": [
+      "我不知道",
+      "那是一件事情。"
+    ]
+  },
+  "input": "I didn't know that was a thing."
+}

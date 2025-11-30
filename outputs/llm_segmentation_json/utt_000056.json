@@ -1,0 +1,39 @@
+{
+  "low_latency": {
+    "English": [
+      "Well,",
+      "degrees",
+      "and",
+      "radians",
+      "are similar."
+    ],
+    "Chinese": [
+      "嗯，",
+      "度数",
+      "和",
+      "弧度",
+      "相似。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "Well,",
+      "degrees and radians are similar."
+    ],
+    "Chinese": [
+      "嗯，",
+      "度数和弧度相似。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "Well,",
+      "degrees and radians are similar."
+    ],
+    "Chinese": [
+      "嗯，",
+      "度数和弧度相似。"
+    ]
+  },
+  "input": "Well, degrees and radians are similar."
+}

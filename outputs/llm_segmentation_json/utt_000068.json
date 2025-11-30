@@ -1,0 +1,35 @@
+{
+  "low_latency": {
+    "English": [
+      "This",
+      "would give",
+      "you",
+      "some number."
+    ],
+    "Chinese": [
+      "这",
+      "会给予",
+      "你",
+      "一些数字。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "This would give",
+      "you some number."
+    ],
+    "Chinese": [
+      "这会给予",
+      "你一些数字。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "This would give you some number."
+    ],
+    "Chinese": [
+      "这会给你一些数字。"
+    ]
+  },
+  "input": "This would give you some number."
+}

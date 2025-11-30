@@ -1,0 +1,85 @@
+{
+  "low_latency": {
+    "English": [
+      "Tony",
+      "has",
+      "a proven",
+      "track record",
+      "of listening",
+      "and understanding",
+      "business needs,",
+      "partnering",
+      "with senior",
+      "leadership",
+      "on workforce",
+      "planning,",
+      "strategic",
+      "recruitment",
+      "initiatives,",
+      "execution,",
+      "and delivery.",
+      "The first",
+      "question",
+      "I asked",
+      "our guest",
+      "was,",
+      "can you",
+      "talk about",
+      "your experience",
+      "in using",
+      "digital communication",
+      "technologies",
+      "to find",
+      "and recruit",
+      "talent?"
+    ],
+    "Chinese": [
+      "托尼",
+      "有",
+      "经证实的",
+      "业绩记录",
+      "倾听",
+      "并理解",
+      "业务需求，",
+      "与高级",
+      "领导层合作",
+      "在人员规划上，",
+      "战略招聘",
+      "举措，",
+      "执行，",
+      "以及交付。",
+      "我问我们嘉宾的第一个问题就是，",
+      "你能谈谈",
+      "你使用",
+      "数字通信技术",
+      "寻找",
+      "并招募",
+      "人才的经验吗？"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "Tony has a proven track record of listening and understanding business needs,",
+      "partnering with senior leadership on workforce planning, strategic recruitment initiatives, execution, and delivery.",
+      "The first question I asked our guest was,",
+      "can you talk about your experience in using digital communication technologies to find and recruit talent?"
+    ],
+    "Chinese": [
+      "托尼拥有经证实的倾听并理解业务需求的业绩记录，",
+      "并与高级管理层在人员规划、战略性招聘举措、执行及交付方面协作。",
+      "我问嘉宾的第一个问题是，",
+      "你能否谈谈你在运用数字通信技术寻才和招才方面的经验？"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "Tony has a proven track record of listening and understanding business needs, partnering with senior leadership on workforce planning, strategic recruitment initiatives, execution, and delivery.",
+      "The first question I asked our guest was, can you talk about your experience in using digital communication technologies to find and recruit talent?"
+    ],
+    "Chinese": [
+      "托尼拥有经证实的倾听并理解业务需求的能力，并能与高层领导就人力资源规划、战略性招聘项目、执行与交付等方面开展合作。",
+      "我向嘉宾提出的第一问题是：你能否谈谈自己在利用数字通信技术发掘和招募人才方面的经验？"
+    ]
+  },
+  "input": "Tony has a proven track record of listening and understanding business needs, partnering with senior leadership on workforce planning, strategic recruitment initiatives, execution, and delivery. The first question I asked our guest was, can you talk about your experience in using digital communication technologies to find and recruit talent?"
+}

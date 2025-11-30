@@ -1,0 +1,86 @@
+{
+  "low_latency": {
+    "English": [
+      "the creative side",
+      ",",
+      "putting things down",
+      "such as",
+      "hobbies.",
+      "And",
+      "by hobbies",
+      ",",
+      "I don't mean",
+      "going out",
+      "to a nightclub",
+      "and",
+      "keeping up",
+      "on the most recent music",
+      "as opposed to",
+      "So",
+      ",",
+      "Tony",
+      ",",
+      "thank you very much.",
+      "You're very welcome.",
+      "The synthesis questions",
+      "for this video clip",
+      "are"
+    ],
+    "Chinese": [
+      "创意的一面",
+      "，",
+      "把事情记录下来",
+      "比如",
+      "爱好。",
+      "而且",
+      "所谓爱好",
+      "，",
+      "我不是说",
+      "外出到夜总会",
+      "以及",
+      "跟上最新的音乐",
+      "而不是与",
+      "所以",
+      "，",
+      "托尼",
+      "，",
+      "非常感谢你。",
+      "不客气。",
+      "这个视频片段的综合问题",
+      "是"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "the creative side, putting things down such as hobbies.",
+      "And by hobbies, I don't mean going out to a nightclub and keeping up on the most recent music as opposed to",
+      "So, Tony, thank you very much.",
+      "You're very welcome.",
+      "The synthesis questions for this video clip are"
+    ],
+    "Chinese": [
+      "创意的一面，即把事情记录下来，例如爱好。",
+      "而所谓爱好，并非指去夜总会消遣或追逐最新音乐潮流。",
+      "所以，托尼，非常感谢你。",
+      "不客气。",
+      "这个视频片段的综合问题是"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "the creative side, putting things down such as hobbies.",
+      "And by hobbies, I don't mean going out to a nightclub and keeping up on the most recent music as opposed to",
+      "So, Tony, thank you very much.",
+      "You're very welcome.",
+      "The synthesis questions for this video clip are"
+    ],
+    "Chinese": [
+      "创意的一面，即把事情记录下来，例如爱好。",
+      "而所谓爱好，并非指去夜总会消遣或追逐最新音乐潮流。",
+      "所以，托尼，非常感谢你。",
+      "不客气。",
+      "这个视频片段的综合问题是"
+    ]
+  },
+  "input": "the creative side, putting things down such as hobbies. And by hobbies, I don't mean going out to a nightclub and keeping up on the most recent music as opposed to So, Tony, thank you very much. You're very welcome. The synthesis questions for this video clip are"
+}

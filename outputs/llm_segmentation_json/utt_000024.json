@@ -1,0 +1,37 @@
+{
+  "low_latency": {
+    "English": [
+      "What",
+      "are",
+      "the profiles",
+      "that stand out",
+      "from the crowd?"
+    ],
+    "Chinese": [
+      "什么",
+      "是",
+      "那些脱颖而出的简历",
+      "从人群中",
+      "？"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "What are the profiles",
+      "that stand out from the crowd?"
+    ],
+    "Chinese": [
+      "哪些简历",
+      "在人群中脱颖而出？"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "What are the profiles that stand out from the crowd?"
+    ],
+    "Chinese": [
+      "有哪些简历在人群中脱颖而出？"
+    ]
+  },
+  "input": "What are the profiles that stand out from the crowd?"
+}

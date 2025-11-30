@@ -1,0 +1,70 @@
+{
+  "low_latency": {
+    "English": [
+      "The dogs",
+      "and the dogs",
+      "even the stray dogs",
+      "around the US",
+      "you don't see",
+      "dogs going hungry",
+      "here",
+      "because",
+      "I guess",
+      "we pick up",
+      "stray dogs",
+      "and if they don't get collected",
+      "by someone",
+      "they get put down",
+      "which is a different thing",
+      "instead of just letting them roam"
+    ],
+    "Chinese": [
+      "这些狗",
+      "还有这些狗",
+      "甚至那些在美国各地的流浪狗",
+      "你不会看到",
+      "狗挨饿",
+      "在这里",
+      "因为",
+      "我猜",
+      "我们会收养",
+      "流浪狗",
+      "如果没人领养它们",
+      "它们就会被安乐死",
+      "这与仅仅让它们四处游荡不同"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "The dogs and the dogs, even the stray dogs around the US",
+      "you don't see dogs going hungry here",
+      "because I guess we pick up stray dogs",
+      "and if they don't get collected by someone, they get put down",
+      "which is a different thing instead of just letting them roam"
+    ],
+    "Chinese": [
+      "这些狗，还有那些美国各地的流浪狗",
+      "你不会看到这里狗挨饿",
+      "因为我们大概会收养流浪狗",
+      "如果没人领养，它们就会被安乐死",
+      "这与任由它们四处游荡完全不同"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "The dogs and the dogs, even the stray dogs around the US,",
+      "you don't see dogs going hungry here",
+      "because I guess we pick up stray dogs",
+      "and if they don't get collected by someone, they get put down",
+      "which is a different thing instead of just letting them roam."
+    ],
+    "Chinese": [
+      "这些狗，包括美国各地的流浪狗，",
+      "你不会看到这里的狗挨饿，",
+      "因为我们大概会收养流浪狗，",
+      "如果没人领养，它们就会被安乐死，",
+      "这与任由它们自由漫游截然不同。"
+    ]
+  },
+  "input": "The dogs and the dogs, even the stray dogs around the US, you don't see dogs going hungry here because I guess we pick up stray dogs and if they don't get collected by someone, they get put down, which is a different thing instead of just letting them roam."
+}

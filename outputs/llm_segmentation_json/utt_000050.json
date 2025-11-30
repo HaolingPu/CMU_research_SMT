@@ -1,0 +1,33 @@
+{
+  "low_latency": {
+    "English": [
+      "These",
+      "are",
+      "equivalent."
+    ],
+    "Chinese": [
+      "这些",
+      "是",
+      "等价的。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "These are",
+      "equivalent."
+    ],
+    "Chinese": [
+      "这些是",
+      "等价的。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "These are equivalent."
+    ],
+    "Chinese": [
+      "这些是等价的。"
+    ]
+  },
+  "input": "These are equivalent."
+}

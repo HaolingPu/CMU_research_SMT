@@ -1,0 +1,43 @@
+{
+  "low_latency": {
+    "English": [
+      "As an employer,",
+      "when we assess",
+      "recent graduates,",
+      "the first thing",
+      "I'll do",
+      "is look",
+      "on LinkedIn."
+    ],
+    "Chinese": [
+      "作为雇主，",
+      "当我们评估",
+      "应届毕业生时，",
+      "第一件事",
+      "我将做的是",
+      "查看",
+      "领英。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "As an employer, when we assess recent graduates,",
+      "the first thing I'll do is look on LinkedIn."
+    ],
+    "Chinese": [
+      "作为雇主，在我们评估应届毕业生时，",
+      "我要做的第一件事就是查看领英。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "As an employer, when we assess recent graduates,",
+      "the first thing I'll do is look on LinkedIn."
+    ],
+    "Chinese": [
+      "作为雇主，当我们评估应届毕业生时，",
+      "我要做的第一件事就是查看领英。"
+    ]
+  },
+  "input": "As an employer, when we assess recent graduates, the first thing I'll do is look on LinkedIn."
+}

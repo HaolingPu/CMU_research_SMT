@@ -1,0 +1,43 @@
+{
+  "low_latency": {
+    "English": [
+      "So",
+      "you might",
+      "see",
+      "radians",
+      "written",
+      "sometimes",
+      "as a decimal."
+    ],
+    "Chinese": [
+      "所以",
+      "你可能会",
+      "看到",
+      "弧度",
+      "被写成",
+      "有时",
+      "小数形式。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "So you might see",
+      "radians written sometimes",
+      "as a decimal."
+    ],
+    "Chinese": [
+      "所以你可能会看到",
+      "弧度有时被写成",
+      "小数形式。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "So you might see radians written sometimes as a decimal."
+    ],
+    "Chinese": [
+      "所以你可能会看到弧度有时被写成小数形式。"
+    ]
+  },
+  "input": "So you might see radians written sometimes as a decimal."
+}

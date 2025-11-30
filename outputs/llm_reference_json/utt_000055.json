@@ -1,0 +1,5 @@
+{
+  "utt_id": "utt_000055",
+  "input": "So, in this case we had radians, we have to cancel the radians, get rid of it, divide it out, put it on the bottom. So we're multiplying by pi radians on the bottom, and still have to put the 180 degrees on top. Again, in some cases you won't even see radians written, but in our case it's nice and convenient because we can see they clearly cancel. Now 180 over, or the pi's will also cancel by the way, and then we have 180 over 2. 180 over 2 degrees. Well that's the same as 90 degrees. So we can conclude 90 degrees is the same as 2 pi radians.",
+  "offline_reference": "因此，在这种情况下，我们有弧度，必须将弧度约去，将其除掉并放在分母上，所以我们是在分母上乘以π弧度，同时仍需在分子上写上180度；同样地，在某些情况下你甚至不会看到弧度的字样，但在我们的例子中这样写非常方便且清晰，因为可以清楚地看出它们相互抵消了，而π也会被约去，最后得到180除以2，即180除以2度，这等同于90度，因此我们可以得出结论：90度等于2π弧度。"
+}

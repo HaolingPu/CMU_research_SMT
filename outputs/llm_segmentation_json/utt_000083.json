@@ -1,0 +1,45 @@
+{
+  "low_latency": {
+    "English": [
+      "One",
+      "was a photographer,",
+      "one",
+      "made lunch,",
+      "one",
+      "was a bartender."
+    ],
+    "Chinese": [
+      "一个",
+      "是摄影师，",
+      "一个",
+      "做了午餐，",
+      "一个",
+      "是调酒师。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "One was a photographer,",
+      "one made lunch,",
+      "one was a bartender."
+    ],
+    "Chinese": [
+      "一个是摄影师，",
+      "一个做了午餐，",
+      "一个是调酒师。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "One was a photographer,",
+      "one made lunch,",
+      "one was a bartender."
+    ],
+    "Chinese": [
+      "一个是摄影师，",
+      "一个做了午餐，",
+      "一个是调酒师。"
+    ]
+  },
+  "input": "One was a photographer, one made lunch, one was a bartender."
+}

@@ -1,0 +1,39 @@
+{
+  "low_latency": {
+    "English": [
+      "3.14,",
+      "extended on,",
+      "that's",
+      "an ever-ending",
+      "number."
+    ],
+    "Chinese": [
+      "3.14，",
+      "无限延伸，",
+      "那就是",
+      "一个无穷无尽的",
+      "数字。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "3.14, extended on,",
+      "that's an ever-ending number."
+    ],
+    "Chinese": [
+      "3.14，无限延伸，",
+      "那是一个无穷无尽的数字。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "3.14, extended on,",
+      "that's an ever-ending number."
+    ],
+    "Chinese": [
+      "3.14，无限延伸，",
+      "那是一个无穷无尽的数字。"
+    ]
+  },
+  "input": "3.14, extended on, that's an ever-ending number."
+}

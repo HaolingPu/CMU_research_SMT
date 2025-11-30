@@ -1,0 +1,49 @@
+{
+  "low_latency": {
+    "English": [
+      "and",
+      "when we got",
+      "our first stop",
+      "we went",
+      "and did",
+      "snorkeling",
+      "and the fish",
+      "were gorgeous"
+    ],
+    "Chinese": [
+      "而且",
+      "当我们到达",
+      "第一个停靠点时",
+      "我们去",
+      "并进行了",
+      "浮潜",
+      "而鱼儿",
+      "非常美丽"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "and when we got our first stop",
+      "we went and did snorkeling",
+      "and the fish were gorgeous"
+    ],
+    "Chinese": [
+      "当我们到达第一个停靠点时",
+      "我们去进行了浮潜",
+      "而鱼儿非常美丽"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "and when we got our first stop",
+      "we went and did snorkeling",
+      "and the fish were gorgeous"
+    ],
+    "Chinese": [
+      "当我们到达第一个停靠点时",
+      "我们去进行了浮潜",
+      "而鱼儿非常美丽"
+    ]
+  },
+  "input": "and when we got our first stop we went and did snorkeling and the fish were gorgeous"
+}

@@ -1,0 +1,55 @@
+{
+  "low_latency": {
+    "English": [
+      "Kind of like",
+      "temperature,",
+      "you might think of",
+      "Celsius and Fahrenheit,",
+      "when a boat",
+      "can represent",
+      "a temperature,",
+      "they just have",
+      "different numbers."
+    ],
+    "Chinese": [
+      "有点像",
+      "温度，",
+      "你可能会想到",
+      "摄氏度和华氏度，",
+      "当一艘船",
+      "可以代表",
+      "一种温度时，",
+      "它们只是有",
+      "不同的数字。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "Kind of like temperature,",
+      "you might think of Celsius and Fahrenheit,",
+      "when a boat can represent a temperature,",
+      "they just have different numbers."
+    ],
+    "Chinese": [
+      "有点像温度，",
+      "你可能会想到摄氏度和华氏度，",
+      "当一艘船可以代表一种温度时，",
+      "它们只是有不同的数字。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "Kind of like temperature,",
+      "you might think of Celsius and Fahrenheit,",
+      "when a boat can represent a temperature,",
+      "they just have different numbers."
+    ],
+    "Chinese": [
+      "有点像温度，",
+      "你可能会想到摄氏度和华氏度，",
+      "当一艘船可以代表一种温度时，",
+      "它们只是有不同的数字。"
+    ]
+  },
+  "input": "Kind of like temperature, you might think of Celsius and Fahrenheit, when a boat can represent a temperature, they just have different numbers."
+}

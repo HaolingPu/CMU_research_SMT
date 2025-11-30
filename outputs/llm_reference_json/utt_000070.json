@@ -1,0 +1,5 @@
+{
+  "utt_id": "utt_000070",
+  "input": "So really what we need to know is this ratio right here. 180 degrees over pi radians or pi rad. In fact you might not even see rad written. Often that's not shown as a unit but for our case it helps the clarity so I'm writing it in. Now why is this ratio important? 180 degrees over pi rad. This is equal to 1. 180 degrees is pi radians and vice versa. So this is very convenient when we want to do conversions because converting is all about multiplying by 1. We're allowed to multiply by 1 because anything times 1 is itself. X times 1 is still X, but what we're choosing is",
+  "offline_reference": "因此，我们真正需要了解的是这个比值：180度除以π弧度或π rad，实际上你可能甚至不会看到“rad”被写出来，通常它并不作为单位显示，但为了我们的理解更清晰，我还是把它写了出来。为什么这个比值很重要？因为180度等于π弧度，反之亦然，所以这个比值等于1，这在进行换算时非常方便，因为换算本质上就是乘以1，我们可以乘以1，因为任何数乘以1都保持不变，x乘以1仍然是x，而我们所选择的正是……"
+}

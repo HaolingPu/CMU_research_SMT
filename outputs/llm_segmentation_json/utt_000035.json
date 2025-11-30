@@ -1,0 +1,45 @@
+{
+  "low_latency": {
+    "English": [
+      "And",
+      "are there",
+      "any experiences",
+      "in using",
+      "professional networking sites",
+      "you would",
+      "like to share?"
+    ],
+    "Chinese": [
+      "而且",
+      "有没有",
+      "任何经验",
+      "在使用",
+      "专业社交网站方面",
+      "你愿意",
+      "分享？"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "And are there any experiences",
+      "in using professional networking sites",
+      "you would like to share?"
+    ],
+    "Chinese": [
+      "而且有没有任何经验",
+      "在使用专业社交网站方面",
+      "你愿意分享？"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "And are there any experiences in using professional networking sites?",
+      "you would like to share?"
+    ],
+    "Chinese": [
+      "而且在使用专业社交网站时有没有任何经验？",
+      "你愿意分享吗？"
+    ]
+  },
+  "input": "And are there any experiences in using professional networking sites you would like to share?"
+}

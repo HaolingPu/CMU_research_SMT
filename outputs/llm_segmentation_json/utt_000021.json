@@ -1,0 +1,39 @@
+{
+  "low_latency": {
+    "English": [
+      "I'd expect",
+      "that",
+      "to get",
+      "them",
+      "to the next level."
+    ],
+    "Chinese": [
+      "我预计",
+      "那",
+      "会让他们",
+      "达到",
+      "下一个层次。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "I'd expect that",
+      "to get them to the next level."
+    ],
+    "Chinese": [
+      "我预计那",
+      "会让它们达到下一个层次。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "I'd expect that",
+      "to get them to the next level."
+    ],
+    "Chinese": [
+      "我预计那",
+      "会让它们达到下一个层次。"
+    ]
+  },
+  "input": "I'd expect that to get them to the next level."
+}

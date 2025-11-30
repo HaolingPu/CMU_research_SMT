@@ -1,0 +1,62 @@
+{
+  "low_latency": {
+    "English": [
+      "It was",
+      "really cool",
+      "and",
+      "it was cool",
+      "to really get off campus",
+      "a little bit",
+      "meaning",
+      "outside of the estate",
+      "in Puerto Vallarta",
+      "and",
+      "see",
+      "like",
+      "how real people",
+      "were living",
+      "there."
+    ],
+    "Chinese": [
+      "它真是",
+      "很酷",
+      "而且",
+      "真正离开校园",
+      "稍微一点",
+      "意思是",
+      "在庄园之外",
+      "在波多黎各瓦拉塔",
+      "并且",
+      "看看",
+      "就像",
+      "真实的人们",
+      "是如何生活的",
+      "在那里。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "It was really cool and it was cool to really get off campus a little bit",
+      "meaning outside of the estate in Puerto Vallarta",
+      "and see like how real people were living there."
+    ],
+    "Chinese": [
+      "这真的很酷，真正离开校园一点点也很酷",
+      "意思是在波多黎各瓦拉塔的庄园外",
+      "并看看那里真实人们的生活方式。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "It was really cool and it was cool to really get off campus a little bit",
+      "meaning outside of the estate in Puerto Vallarta",
+      "and see like how real people were living there."
+    ],
+    "Chinese": [
+      "这真的很酷，真正离开校园一点点也很好玩",
+      "意思是在波多黎各瓦拉塔的庄园外面",
+      "并看看那里真实人们是怎么生活的。"
+    ]
+  },
+  "input": "It was really cool and it was cool to really get off campus a little bit meaning outside of the estate in Puerto Vallarta and see like how real people were living there."
+}
