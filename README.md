@@ -248,22 +248,22 @@ Result: a higher-quality subset of streaming pairs.
 We keep MetricX in a separate conda env to avoid version conflicts.
 
 1) Create and activate the env
-   conda create -n metricx -y python=3.9
-   conda activate metricx
+    conda create -n metricx -y python=3.9
+    conda activate metricx
 
 2) Install dependencies
    Create a requirements.txt in your metricx/ repo:
    
-   transformers[torch]==4.30.2
-   sentencepiece==0.1.99
-   datasets==2.13.1
-   fsspec==2023.9.2
-   protobuf==3.20.0
-   git+https://github.com/google-research/mt-metrics-eval@1b47eab
-   
+    transformers[torch]==4.30.2
+    sentencepiece==0.1.99
+    datasets==2.13.1
+    fsspec==2023.9.2
+    protobuf==3.20.0
+    git+https://github.com/google-research/mt-metrics-eval@1b47eab
+    
    Then install:
-   pip install -U uv
-   uv pip install -U -r requirements.txt
+    pip install -U uv
+    uv pip install -U -r requirements.txt
 
 3) Clone the official MetricX repo
    In your code root (e.g. /data/user_data/<USER>/codes):
@@ -293,54 +293,54 @@ Here we flatten the per-utterance streaming JSONs from:
   /data/user_data/<USER>/outputs/streaming_dataset/*.json
 into a single metricx_input.jsonl.
 
-python convert_stream_to_metricx_input.py \
-  --streaming_dir /data/user_data/<USER>/outputs/streaming_dataset \
-  --output_jsonl  /data/user_data/<USER>/outputs/metricx_input.jsonl
+    python convert_stream_to_metricx_input.py \
+    --streaming_dir /data/user_data/<USER>/outputs/streaming_dataset \
+    --output_jsonl  /data/user_data/<USER>/outputs/metricx_input.jsonl
 
 ------------------------------------------------------------
 10.3. Get the prediction
 ------------------------------------------------------------
-PYTHONNOUSERSITE=1 python -m metricx24.predict \
-  --tokenizer /data/user_data/<USER>/models/mt5-xl \
-  --model_name_or_path /data/user_data/<USER>/models/metricx-24-hybrid-xl-v2p6 \
-  --max_input_length 1536 \
-  --batch_size 1 \
-  --input_file /data/user_data/<USER>/outputs/metricx_input.jsonl \
-  --output_file /data/user_data/<USER>/outputs/metricx_output.jsonl \
-  --qe
+    PYTHONNOUSERSITE=1 python -m metricx24.predict \
+    --tokenizer /data/user_data/<USER>/models/mt5-xl \
+    --model_name_or_path /data/user_data/<USER>/models/metricx-24-hybrid-xl-v2p6 \
+    --max_input_length 1536 \
+    --batch_size 1 \
+    --input_file /data/user_data/<USER>/outputs/metricx_input.jsonl \
+    --output_file /data/user_data/<USER>/outputs/metricx_output.jsonl \
+    --qe
 
 ------------------------------------------------------------
 10.4. Filter out the poor data (based on threshold)
 ------------------------------------------------------------
-python /data/user_data/<USER>/codes/filter_metricx.py \
-  --input  /data/user_data/<USER>/outputs/metricx_output.jsonl \
-  --output /data/user_data/<USER>/outputs/metricx_filtered_t5.jsonl \
-  --threshold 5.0
+    python /data/user_data/<USER>/codes/filter_metricx.py \
+    --input  /data/user_data/<USER>/outputs/metricx_output.jsonl \
+    --output /data/user_data/<USER>/outputs/metricx_filtered_t5.jsonl \
+    --threshold 5.0
 
 ------------------------------------------------------------
 11. Summary
 ------------------------------------------------------------
 This pipeline transforms:
 
-      Granary 
+    Granary 
          ↓
     Raw audio + transcripts
          ↓
-       MFA word-level alignment
+    MFA word-level alignment
          ↓
-  LLM semantic English/Chinese segmentation
+    LLM semantic English/Chinese segmentation
          ↓
-  Precise chunk → audio alignment
+    Precise chunk → audio alignment
          ↓
-   Conservative second-based streaming segments
+    Conservative second-based streaming segments
          ↓
-  10.2) Convert to MetricX JSONL
+    10.2) Convert to MetricX JSONL
          ↓
-  10.3) MetricX-24 QE scoring
+    10.3) MetricX-24 QE scoring
          ↓
-  10.4) Threshold filtering (prediction ≤ τ)
+    10.4) Threshold filtering (prediction ≤ τ)
          ↓
-High-quality streaming translation segments
+    High-quality streaming translation segments
 
 Note:
 The result can be used for:
