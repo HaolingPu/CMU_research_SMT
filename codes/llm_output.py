@@ -13,7 +13,7 @@ os.environ["HF_HUB_CACHE"] = "/data/user_data/haolingp/hf_cache/hub"
 os.environ["TRANSFORMERS_CACHE"] = "/data/user_data/haolingp/hf_cache/transformers"
 
 parquet_path = "/data/hf_cache/yodas-granary/data/en000/asr_only/00000000.parquet"
-num_samples = 20
+num_samples = 100
 output_dir = "/data/user_data/haolingp/outputs/llm_segmentation_json"
 output_reference_dir = "/data/user_data/haolingp/outputs/llm_reference_json"
 os.makedirs(output_dir, exist_ok=True)
