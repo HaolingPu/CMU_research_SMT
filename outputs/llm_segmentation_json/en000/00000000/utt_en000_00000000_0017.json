@@ -1,0 +1,56 @@
+{
+  "low_latency": {
+    "English": [
+      "I see that.",
+      "So",
+      "I can see",
+      "you've got",
+      "a degree.",
+      "I can see",
+      "you've spent",
+      "a page of",
+      "your resume",
+      "outlining",
+      "your part-time job."
+    ],
+    "Chinese": [
+      "我明白了。",
+      "所以",
+      "我能看出",
+      "你有",
+      "学位。",
+      "我能看出",
+      "你花了",
+      "一页",
+      "你的简历",
+      "概述",
+      "你的兼职工作。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "I see that.",
+      "So I can see you've got a degree.",
+      "I can see you've spent a page of your resume outlining your part-time job."
+    ],
+    "Chinese": [
+      "我明白了。",
+      "所以我能看出你有学位。",
+      "我能看出你花了一整页简历来描述你的兼职工作。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "I see that.",
+      "So I can see you've got a degree.",
+      "I can see you've spent a page of your resume outlining your part-time job."
+    ],
+    "Chinese": [
+      "我明白了。",
+      "所以我能看出你有学位。",
+      "我能看出你花了一整页简历来描述你的兼职工作。"
+    ]
+  },
+  "input": "I see that. So I can see you've got a degree. I can see you've spent a page of your resume outlining your part-time job.",
+  "utt_id": "utt_en000_00000000_0017"
+}

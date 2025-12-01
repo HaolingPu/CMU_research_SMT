@@ -1,23 +1,65 @@
 import os
 import json
+import glob
 import pandas as pd
+import argparse
 from tqdm import tqdm
 from vllm import LLM, SamplingParams
 from vllm.sampling_params import GuidedDecodingParams
 
 # ============================================================
-# 1️⃣ 配置
+# 1. 配置
 # ============================================================
 os.environ["HF_HOME"] = "/data/user_data/haolingp/hf_cache"
 os.environ["HF_HUB_CACHE"] = "/data/user_data/haolingp/hf_cache/hub"
 os.environ["TRANSFORMERS_CACHE"] = "/data/user_data/haolingp/hf_cache/transformers"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-parquet_path = "/data/hf_cache/yodas-granary/data/en000/asr_only/00000000.parquet"
-num_samples = 100
-output_dir = "/data/user_data/haolingp/outputs/llm_segmentation_json"
-output_reference_dir = "/data/user_data/haolingp/outputs/llm_reference_json"
-os.makedirs(output_dir, exist_ok=True)
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="LLM segmentation pipeline")
+
+    parser.add_argument("--num-en", type=str, default="1",
+                    help="Number of enXXX datasets to process (e.g., 1,2,3 or 'all')")
+                                                              
+    parser.add_argument("--num-parquets", type=int, default=1,
+                        help="Number of parquet files to process. "
+                             "Use 'all' to process everything.")
+
+    parser.add_argument("--num-samples", type=int, default=100,
+                        help="Number of samples per parquet (only applies to subset)")
+
+    return parser.parse_args()
+
+
+# ============================================================
+# 2️⃣ Decide which parquet files to load
+# ============================================================
+
+args = parse_args()
+
+
+AVAILABLE_EN = ["en000", "en001", "en002", "en003", "en004"]
+
+if args.num_en == "all":
+    en_list = AVAILABLE_EN
+else:
+    en_list = AVAILABLE_EN[:int(args.num_en)]
+
+print("\n===========================================")
+print("🔹 Will process EN datasets:", en_list)
+print("===========================================\n")
+
+
+# ============================================================
+# 3. Output Root
+# ============================================================
+output_root = "/data/user_data/haolingp/outputs/llm_segmentation_json"
+os.makedirs(output_root, exist_ok=True)
+
+# ============================================================
+# 4. Load LLM Model
+# ============================================================
 model_path = "/data/user_data/haolingp/models/Qwen3-30B-A3B-Instruct-2507-FP8"
 max_new_tokens = 2048
 
@@ -29,10 +71,13 @@ llm = LLM(
     max_model_len=16384,
     gpu_memory_utilization=0.90
 )
+print("✅ Model loaded.\n")
+
+
 
 
 # ============================================================
-# 2️⃣ JSON schema
+# 5. JSON schema
 # ============================================================
 json_schema = {
     "type": "object",
@@ -72,22 +117,7 @@ sampling_params = SamplingParams(
     guided_decoding=GuidedDecodingParams(json=json_schema)
 )
 
-sampling_params_reference = SamplingParams(
-    temperature=0.0,
-    max_tokens=512,  # 参考翻译不需要那么多tokens
-    repetition_penalty=1.1
-    # ✅ 没有 guided_decoding！
-)
-
 print("✅ Schema loaded.\n")
-
-# ============================================================
-# 3️⃣ 读取 parquet 文件
-# ============================================================
-df = pd.read_parquet(parquet_path)
-df = df.iloc[:num_samples]
-
-print(f"📖 Loaded {len(df)} rows from parquet.\n")
 
 # ============================================================
 # 4️⃣ Prompt 构建
@@ -208,90 +238,85 @@ Input: "{english_sentence}"
 - Output ONLY the JSON object, no explanations"""
 
 
-
-def build_reference_prompt(english_sentence):
-    return f"""
-        Translate the following English sentence into fluent, high-quality Chinese:
-        {english_sentence}
-
-        Rules:
-        - Do NOT segment.
-        - Produce ONE single Chinese sentence.
-        - No explanations.
-        """.strip()
-
-
-
 # ============================================================
 # 5️⃣ 执行 LLM segmentation
 # ============================================================
-successful, failed = 0, 0
-
-for new_id, (index, row) in enumerate(tqdm(df.iterrows(), total=len(df), desc="Processing")):
-
-    utt_id = f"utt_{new_id:06d}" 
-    text = row["text"]
-
-    out_json_path = os.path.join(output_dir, f"{utt_id}.json")
-    raw_path = os.path.join(output_dir, f"{utt_id}_raw.txt")
-
-    prompt = build_prompt(text)
-    ref_prompt = build_reference_prompt(text) # build offline reference
-
-    try:
-        # streaming segmentation
-        outputs = llm.chat(
-            messages=[{"role": "user", "content": prompt}],
-            sampling_params=sampling_params
-        )
-        result = outputs[0].outputs[0]
-        response = result.text.strip()
-
-        parsed = json.loads(response)
-        parsed["input"] = text
-
-        with open(out_json_path, "w", encoding="utf-8") as f:
-            json.dump(parsed, f, ensure_ascii=False, indent=2)
+global_success = 0
+global_fail = 0
 
 
-        # offline reference
-        ref_outputs = llm.chat(
-            messages=[{"role": "user", "content": ref_prompt}],
-            sampling_params=sampling_params_reference
-        )
-        ref_result = ref_outputs[0].outputs[0]
-        offline_translation = ref_result.text.strip()
+for lang_id in en_list:
+    print(f"\n===============================")
+    print(f"🌍 Processing dataset: {lang_id}")
+    print("===============================\n")
 
-        ref_json = {
-            "utt_id": utt_id,
-            "input": text,
-            "offline_reference": offline_translation,
-        }
+    parquet_dir = f"/data/group_data/li_lab/siqiouya/datasets/yodas-granary/data/{lang_id}/asr_only"
+    all_parquets = sorted(glob.glob(os.path.join(parquet_dir, "*.parquet")))
 
+    if args.num_parquets == "all":
+        parquet_files = all_parquets
+    else:
+        parquet_files = all_parquets[:int(args.num_parquets)]
 
-        os.makedirs(output_reference_dir, exist_ok=True)
-        second_path = os.path.join(output_reference_dir, f"{utt_id}.json")
-        with open(second_path, "w", encoding="utf-8") as f2:
-            json.dump(ref_json, f2, ensure_ascii=False, indent=2)
+    print(f"🔹 Total parquet files: {len(all_parquets)}")
+    print(f"🔹 Will process: {len(parquet_files)}")
 
+    for pq_path in parquet_files:
 
+        pq_name = os.path.basename(pq_path).replace(".parquet", "")
+        pq_output_dir = os.path.join(output_root, f"{lang_id}/{pq_name}")
+        os.makedirs(pq_output_dir, exist_ok=True)
 
-        successful += 1
+        df = pd.read_parquet(pq_path)
+        if args.num_samples is not None:
+            df = df.iloc[:args.num_samples]
 
-    except Exception as e:
-        failed += 1
-        with open(out_json_path, "w", encoding="utf-8") as f:
-            json.dump({
-                "utt_id": utt_id,
-                "input": text,
-                "error": str(e),
-                "raw_output": response if "response" in locals() else None
-            }, f, ensure_ascii=False, indent=2)
+        print(f"\n📌 {lang_id} / {pq_name}: {len(df)} rows")
+
+        for idx, row in tqdm(df.iterrows(), total=len(df), desc=f"{lang_id}_{pq_name}"):
+
+          text = row["text"]
+
+          # === Unified uttid naming ===
+          utt_id = f"utt_{lang_id}_{pq_name}_{idx:04d}"
+          out_json_path = os.path.join(pq_output_dir, f"{utt_id}.json")
+
+          # skip existing (auto resume)
+          if os.path.exists(out_json_path):
+              continue
+
+          prompt = build_prompt(text)
+
+          try:
+              outputs = llm.chat(
+                  messages=[{"role": "user", "content": prompt}],
+                  sampling_params=sampling_params
+              )
+              response = outputs[0].outputs[0].text.strip()
+
+              parsed = json.loads(response)
+              parsed["input"] = text
+              parsed["utt_id"] = utt_id  # <-- store utt_id inside JSON
+
+              with open(out_json_path, "w", encoding="utf-8") as f:
+                  json.dump(parsed, f, ensure_ascii=False, indent=2)
+
+              global_success += 1
+
+          except Exception as e:
+              global_fail += 1
+              with open(out_json_path, "w", encoding="utf-8") as f:
+                  json.dump({
+                      "utt_id": utt_id,
+                      "input": text,
+                      "error": str(e),
+                      "raw_output": response if "response" in locals() else None
+                  }, f, ensure_ascii=False, indent=2)
 
 # ============================================================
-# 6️⃣ 总结
+# 6️⃣ Summary
 # ============================================================
 print("\n=== DONE ===")
-print(f"Success: {successful}/{len(df)}")
-print(f"Failed:  {failed}/{len(df)}")
-print(f"Saved results in: {output_dir}")
+print(f"✅ Success: {global_success}")
+print(f"❌ Failed : {global_fail}")
+print(f"📂 Output root: {output_root}\n")

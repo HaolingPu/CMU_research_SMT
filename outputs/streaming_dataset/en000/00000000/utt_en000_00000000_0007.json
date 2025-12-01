@@ -1,0 +1,34 @@
+{
+  "utt_id": "utt_en000_00000000_0007",
+  "original_text": "Huntington grows by one million people.",
+  "source_low_latency": [
+    "Huntington grows",
+    "",
+    "by one million people."
+  ],
+  "target_low_latency": [
+    "亨廷顿增长了",
+    "",
+    "一百万人。"
+  ],
+  "source_medium_latency": [
+    "Huntington grows",
+    "",
+    "by one million people."
+  ],
+  "target_medium_latency": [
+    "亨廷顿增长了",
+    "",
+    "一百万人。"
+  ],
+  "source_high_latency": [
+    "",
+    "",
+    "Huntington grows by one million people."
+  ],
+  "target_high_latency": [
+    "",
+    "",
+    "亨廷顿人口增加了一百万。"
+  ]
+}

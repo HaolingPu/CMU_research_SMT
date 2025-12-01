@@ -4,26 +4,41 @@ import tgt
 
 
 ############################################################
-# 1. Check LLM segmentation JSON
+# 小工具：递归收集所有某后缀文件
 ############################################################
+def collect_files_with_ext(root_dir, ext):
+    paths = []
+    for dirpath, _, filenames in os.walk(root_dir):
+        for fn in filenames:
+            if fn.endswith(ext):
+                full = os.path.join(dirpath, fn)
+                paths.append(full)
+    return sorted(paths)
 
-def check_llm_segmentation_json(dir_path):
+
+############################################################
+# 1. Check LLM segmentation JSON  （递归版）
+############################################################
+def check_llm_segmentation_json(root_dir):
     """
-    Return dict: { filename → { status, reasons, English_lengths, Chinese_lengths } }
+    Return dict: { basename → { status, reasons, English_lengths, Chinese_lengths } }
+
+    basename 例如: utt_en000_00000000_0000
     """
     results = {}
 
-    files = sorted([f for f in os.listdir(dir_path) if f.endswith(".json")])
+    json_paths = collect_files_with_ext(root_dir, ".json")
 
-    for fn in files:
-        full_path = os.path.join(dir_path, fn)
+    for full_path in json_paths:
+        fn = os.path.basename(full_path)
 
         try:
-            data = json.load(open(full_path))
+            data = json.load(open(full_path, "r", encoding="utf-8"))
         except Exception as e:
             results[fn] = {
                 "status": "bad",
-                "reasons": [f"JSON load error: {str(e)}"]
+                "reasons": [f"JSON load error: {str(e)}"],
+                "lengths": {}
             }
             continue
 
@@ -51,7 +66,9 @@ def check_llm_segmentation_json(dir_path):
             # length mismatch
             if len(en) != len(zh):
                 status = "bad"
-                reasons.append(f"{level}: English len {len(en)} != Chinese len {len(zh)}")
+                reasons.append(
+                    f"{level}: English len {len(en)} != Chinese len {len(zh)}"
+                )
 
         results[fn] = {
             "status": status,
@@ -63,34 +80,34 @@ def check_llm_segmentation_json(dir_path):
 
 
 ############################################################
-# 2. Check MFA TextGrid (<unk> filter)
+# 2. Check MFA TextGrid (<unk> filter)  （递归版）
 ############################################################
-
-def check_mfa_textgrids(mfa_dir):
+def check_mfa_textgrids(root_dir):
     """
-    Return dict: { filename → { status, reason } }
+    Return dict: { basename → { status, reason } }
+
+    basename 例如: utt_en000_00000000_0000
     """
     results = {}
 
-    tg_files = sorted([f for f in os.listdir(mfa_dir) if f.endswith(".TextGrid")])
+    tg_paths = collect_files_with_ext(root_dir, ".TextGrid")
 
-    for tg_file in tg_files:
-        path = os.path.join(mfa_dir, tg_file)
+    for full_path in tg_paths:
+        fn = os.path.basename(full_path)
 
         try:
-            tg = tgt.read_textgrid(path)
-        except:
-            results[tg_file] = {"status": "bad", "reason": "cannot open"}
+            tg = tgt.read_textgrid(full_path)
+        except Exception:
+            results[fn] = {"status": "bad", "reason": "cannot open"}
             continue
 
         words = tg.get_tier_by_name("words").intervals
-
-        has_unk = any([w.text.strip() == "<unk>" for w in words])
+        has_unk = any((w.text.strip() == "<unk>" for w in words))
 
         if has_unk:
-            results[tg_file] = {"status": "bad", "reason": "<unk> present"}
+            results[fn] = {"status": "bad", "reason": "<unk> present"}
         else:
-            results[tg_file] = {"status": "good"}
+            results[fn] = {"status": "good"}
 
     return results
 
@@ -98,25 +115,23 @@ def check_mfa_textgrids(mfa_dir):
 ############################################################
 # 3. Merge both filters & save final good/bad jsonl
 ############################################################
-
-def merge_filters(llm_dir, mfa_dir, save_good="good.jsonl", save_bad="bad.jsonl"):
-    # Always clear old logs before writing
+def merge_filters(llm_root, mfa_root, save_good="good.jsonl", save_bad="bad.jsonl"):
+    # 清空旧文件
     open(save_good, "w").close()
     open(save_bad, "w").close()
-    
+
     # Step 1: get LLM check results
-    llm_results = check_llm_segmentation_json(llm_dir)
+    llm_results = check_llm_segmentation_json(llm_root)
 
     # Step 2: get MFA check results
-    mfa_results = check_mfa_textgrids(mfa_dir)
+    mfa_results = check_mfa_textgrids(mfa_root)
 
     good = []
     bad = []
 
-    # ⚠️ Assume filenames are like: utt_000123.json and utt_000123.TextGrid
-    # Extract base name
-    all_keys = set([fn.replace(".json", "") for fn in llm_results]) | \
-               set([fn.replace(".TextGrid", "") for fn in mfa_results])
+    # 文件名统一成不带后缀的 basename，例如 utt_en000_00000000_0000
+    all_keys = set([fn.replace(".json", "") for fn in llm_results.keys()]) | \
+               set([fn.replace(".TextGrid", "") for fn in mfa_results.keys()])
 
     for base in sorted(all_keys):
         llm_info = llm_results.get(base + ".json", None)
@@ -143,7 +158,7 @@ def merge_filters(llm_dir, mfa_dir, save_good="good.jsonl", save_bad="bad.jsonl"
                 is_good = False
                 reasons.append(mfa_info["reason"])
 
-        # Save to list
+        # Save to list（保持原来结构：只存 base；你后面会做 .replace(".TextGrid","")）
         if is_good:
             good.append({"file": base})
         else:
@@ -167,10 +182,9 @@ def merge_filters(llm_dir, mfa_dir, save_good="good.jsonl", save_bad="bad.jsonl"
     return good, bad
 
 
-
 merge_filters(
-    llm_dir="/data/user_data/haolingp/outputs/llm_segmentation_json",
-    mfa_dir="/data/user_data/haolingp/outputs/mfa_output",
-    save_good="/data/user_data/haolingp/outputs/good.jsonl",
-    save_bad="/data/user_data/haolingp/outputs/bad.jsonl"
+    llm_root="/data/user_data/haolingp/outputs/llm_segmentation_json/en000",
+    mfa_root="/data/user_data/haolingp/outputs/mfa_textgrid_output/en000",
+    save_good="/data/user_data/haolingp/outputs/good_en000_all.jsonl",
+    save_bad="/data/user_data/haolingp/outputs/bad_en000_all.jsonl"
 )

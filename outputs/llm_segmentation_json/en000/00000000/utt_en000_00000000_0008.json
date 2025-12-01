@@ -1,0 +1,40 @@
+{
+  "low_latency": {
+    "English": [
+      "The other thing",
+      "about LinkedIn,",
+      "even as a student,",
+      "is",
+      "who your connections are."
+    ],
+    "Chinese": [
+      "其他事情",
+      "关于领英，",
+      "即使作为一名学生，",
+      "是",
+      "你的联系人是谁。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "The other thing about LinkedIn,",
+      "even as a student,",
+      "is who your connections are."
+    ],
+    "Chinese": [
+      "关于领英的另一件事，",
+      "即使是一名学生，",
+      "也是你的联系人是谁。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "The other thing about LinkedIn, even as a student, is who your connections are."
+    ],
+    "Chinese": [
+      "关于领英的另一件事，即使作为一名学生，也是你的联系人是谁。"
+    ]
+  },
+  "input": "The other thing about LinkedIn, even as a student, is who your connections are.",
+  "utt_id": "utt_en000_00000000_0008"
+}

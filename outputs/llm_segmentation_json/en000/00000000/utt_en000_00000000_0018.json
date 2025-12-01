@@ -1,0 +1,39 @@
+{
+  "low_latency": {
+    "English": [
+      "I'm",
+      "not gonna",
+      "hire",
+      "you",
+      "for a",
+      "waitress."
+    ],
+    "Chinese": [
+      "我",
+      "不会雇用",
+      "你",
+      "做一名",
+      "女服务员。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "I'm not gonna hire you",
+      "for a waitress."
+    ],
+    "Chinese": [
+      "我不会雇用你",
+      "做女服务员。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "I'm not gonna hire you for a waitress."
+    ],
+    "Chinese": [
+      "我不会雇用你做女服务员。"
+    ]
+  },
+  "input": "I'm not gonna hire you for a waitress.",
+  "utt_id": "utt_en000_00000000_0018"
+}

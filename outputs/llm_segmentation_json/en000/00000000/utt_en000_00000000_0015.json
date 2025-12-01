@@ -1,0 +1,54 @@
+{
+  "low_latency": {
+    "English": [
+      "But",
+      "they completely disregard",
+      "they've got",
+      "a Bachelor of Science in,",
+      "a Bachelor of Computer Science degree.",
+      "And",
+      "that's all",
+      "it'll say."
+    ],
+    "Chinese": [
+      "但是",
+      "他们完全忽视",
+      "他们拥有",
+      "理学学士学位，",
+      "计算机科学学士学位。",
+      "而且",
+      "这正是全部",
+      "它会说的内容。"
+    ]
+  },
+  "medium_latency": {
+    "English": [
+      "But they completely disregard",
+      "they've got a Bachelor of Science in,",
+      "a Bachelor of Computer Science degree.",
+      "And that's all",
+      "it'll say."
+    ],
+    "Chinese": [
+      "但他们完全忽视",
+      "他们拥有的是理学学士学位，",
+      "计算机科学学士学位。",
+      "而这正是全部",
+      "它会说的内容。"
+    ]
+  },
+  "high_latency": {
+    "English": [
+      "But they completely disregard they've got a Bachelor of Science in,",
+      "a Bachelor of Computer Science degree.",
+      "And that's all it'll say."
+    ],
+    "Chinese": [
+      "但他们完全忽视他们所拥有的是理学学士学位，",
+      "计算机科学学士学位。",
+      "而这正是它会说的全部内容。"
+    ]
+  },
+  "input": "But they completely disregard they've got a Bachelor of Science in, a Bachelor of Computer Science degree. And that's all it'll say.",
+  "utt_id": "utt_en000_00000000_0015"
+}
