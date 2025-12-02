@@ -1,35 +1,43 @@
-#!/bin/bash
-#SBATCH --job-name=streaming-pipeline
-#SBATCH --output=logs/pipeline_%j.out
-#SBATCH --error=logs/pipeline_%j.err
-#SBATCH --partition=debug
-#SBATCH --gres=gpu:1
+#!/usr/bin/env bash
+#SBATCH --job-name=pipeline
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
+#SBATCH --gres=gpu:L40S:8
 #SBATCH --mem=128G
+#SBATCH --partition=general
 #SBATCH --time=12:00:00
+
+#SBATCH -o slurm_logs/%j.out
+#SBATCH -e slurm_logs/%j.err
+
+##Optional but recommended:
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=haolingp@andrew.cmu.edu
 
 
 set -e
 echo "===== START PIPELINE ====="
 
+source ~/.bashrc
 # 1. Activate conda environment
 conda activate vllm
 echo "[OK] Activated vllm"
 
 # 2. Run llm_output.py
 cd /data/user_data/haolingp/codes/
-python /data/user_data/haolingp/codes/llm_output.py --num-en 1 --num-parquets 1
-
+bash /data/user_data/haolingp/codes/run_llm_parallel.sh
 # python /data/user_data/haolingp/codes/llm_output.py --num-en 1 --num-parquets 1 --num-samples 20
 
 
 # Now we have the llm segmentation
 # 3. run MFA =====> audio + text
+echo "Exporting MFA corpus for en000 (ALL parquets)..."
 python /data/user_data/haolingp/codes/export_mfa_corpus.py \
     --input-root /data/group_data/li_lab/siqiouya/datasets/yodas-granary/data \
     --lang en000 \
     --output-dir /data/user_data/haolingp/outputs/mfa_corpus \
-    --num-parquets 1 \
+    --num-parquets all \
     # --num-samples 20
 
 
@@ -98,10 +106,9 @@ PYTHONNOUSERSITE=1 python -m metricx24.predict \
   --batch_size 1 \
   --input_file  $METRICX_INPUT \
   --output_file $METRICX_OUTPUT \
-  --qe
+  --qe || true
 
-echo "[OK] MetricX scoring finished"
-
+echo "[OK] MetricX scoring step finished (errors ignored)"
 
 ###########################################
 # 6. Filter bad examples

@@ -15,9 +15,6 @@ def normalize_text(s):
     return s
 
 
-############################################################
-# Load MFA word alignment
-############################################################
 def load_word_alignment(textgrid_path):
     tg = tgt.read_textgrid(textgrid_path)
     words = tg.get_tier_by_name("words").intervals
@@ -32,17 +29,14 @@ def load_word_alignment(textgrid_path):
     return out
 
 
-############################################################
-# Match LLM chunks to MFA timestamps
-############################################################
 def match_llm_chunks_to_mfa(llm_chunks, mfa_words):
     mfa_tokens = [normalize_text(w["word"]) for w in mfa_words]
     results = []
 
     for chunk in llm_chunks:
         tokens = normalize_text(chunk).split()
-
         matched = []
+
         for t in tokens:
             for i, w in enumerate(mfa_tokens):
                 if w == t:
@@ -60,9 +54,6 @@ def match_llm_chunks_to_mfa(llm_chunks, mfa_words):
     return results
 
 
-############################################################
-# Conservative second-based streaming
-############################################################
 def assign_chunks_by_second(aligned_chunks):
     valid = [x for x in aligned_chunks if x["end"] is not None]
     if not valid:
@@ -90,9 +81,6 @@ def assign_chunks_by_second(aligned_chunks):
     return timeline
 
 
-############################################################
-# Build final source/target segments
-############################################################
 def build_final_segments(timeline, eng_chunks, zh_chunks):
     eng2zh = {e: z for e, z in zip(eng_chunks, zh_chunks)}
     sources, targets = [], []
@@ -109,95 +97,101 @@ def build_final_segments(timeline, eng_chunks, zh_chunks):
 
 
 ############################################################
-# MAIN: process all languages / all parquets / all utt
+# MAIN FOR ONE LANGUAGE
 ############################################################
-def generate_all(LLM_ROOT, MFA_ROOT, GOOD_JSONL, OUTPUT_ROOT):
+def process_language(lang, LLM_ROOT, MFA_ROOT, GOOD_JSONL, OUTPUT_ROOT):
 
-    # ---- load good IDs ----
+    print(f"\n==============================")
+    print(f"🌍 Processing language {lang}")
+    print(f"==============================\n")
+
+    # ---- load good IDs (lang/pq/utt_base) ----
     good_ids = set()
     with open(GOOD_JSONL, "r") as f:
         for line in f:
             obj = json.loads(line)
             good_ids.add(obj["file"])
 
-    print(f"Loaded {len(good_ids)} good IDs\n")
+    print(f"Loaded {len(good_ids)} good IDs for {lang}\n")
 
-    # ---- loop languages ----
-    langs = sorted(os.listdir(LLM_ROOT))
-    for lang in langs:
-        lang_llm_dir = os.path.join(LLM_ROOT, lang)
-        if not os.path.isdir(lang_llm_dir):
+    lang_llm_dir = os.path.join(LLM_ROOT, lang)
+    lang_mfa_dir = os.path.join(MFA_ROOT, lang)
+
+    if not os.path.isdir(lang_llm_dir) or not os.path.isdir(lang_mfa_dir):
+        print(f"⚠️ Missing LLM or MFA directory for {lang}, skip.")
+        return
+
+    parquet_dirs = sorted(os.listdir(lang_llm_dir))
+
+    for pq in parquet_dirs:
+        llm_pq_dir = os.path.join(lang_llm_dir, pq)
+        mfa_pq_dir = os.path.join(lang_mfa_dir, pq)
+
+        if not os.path.isdir(llm_pq_dir):
+            continue
+        if not os.path.isdir(mfa_pq_dir):
+            print(f"⚠️ Missing MFA for parquet {pq}, skip.")
             continue
 
-        print(f"🌍 Processing language: {lang}")
+        print(f"  📁 Parquet: {pq}")
 
-        # match MFA directory
-        lang_mfa_dir = os.path.join(MFA_ROOT, lang)
-        if not os.path.isdir(lang_mfa_dir):
-            print(f"❌ Missing MFA dir for {lang}, skipping.")
-            continue
+        out_dir = os.path.join(OUTPUT_ROOT, lang, pq)
+        os.makedirs(out_dir, exist_ok=True)
 
-        # loop parquet dirs (00000000, 00000001...)
-        parquet_dirs = sorted(os.listdir(lang_llm_dir))
-        for pq in parquet_dirs:
-            llm_pq_dir = os.path.join(lang_llm_dir, pq)
-            mfa_pq_dir = os.path.join(lang_mfa_dir, pq)
+        llm_files = sorted(f for f in os.listdir(llm_pq_dir) if f.endswith(".json"))
 
-            if not os.path.isdir(llm_pq_dir):
-                continue
-            if not os.path.isdir(mfa_pq_dir):
-                print(f"⚠️ Missing MFA for {pq}, skip.")
+        for fname in tqdm(llm_files):
+
+            utt_base = fname.replace(".json", "")
+            key = f"{lang}/{pq}/{utt_base}"
+
+            if key not in good_ids:
                 continue
 
-            print(f"  📁 Parquet: {pq}")
+            llm_path = os.path.join(llm_pq_dir, fname)
+            textgrid_path = os.path.join(mfa_pq_dir, utt_base + ".TextGrid")
+            out_path = os.path.join(out_dir, utt_base + ".json")
 
-            # output directory
-            out_dir = os.path.join(OUTPUT_ROOT, lang, pq)
-            os.makedirs(out_dir, exist_ok=True)
+            seg = json.load(open(llm_path))
+            mfa_words = load_word_alignment(textgrid_path)
 
-            llm_files = sorted(f for f in os.listdir(llm_pq_dir) if f.endswith(".json"))
+            out_json = {
+                "utt_id": utt_base,
+                "original_text": seg.get("input", "")
+            }
 
-            for fname in tqdm(llm_files):
+            for level in ["low_latency", "medium_latency", "high_latency"]:
+                eng = seg[level]["English"]
+                zh = seg[level]["Chinese"]
 
-                utt_base = fname[:-5]
-                if utt_base not in good_ids:
-                    continue
+                aligned = match_llm_chunks_to_mfa(eng, mfa_words)
+                timeline = assign_chunks_by_second(aligned)
+                src, tgt = build_final_segments(timeline, eng, zh)
 
-                llm_path = os.path.join(llm_pq_dir, fname)
-                textgrid_path = os.path.join(mfa_pq_dir, utt_base + ".TextGrid")
-                out_path = os.path.join(out_dir, utt_base + ".json")
+                out_json[f"source_{level}"] = src
+                out_json[f"target_{level}"] = tgt
 
-                seg = json.load(open(llm_path))
-                mfa_words = load_word_alignment(textgrid_path)
+            json.dump(out_json, open(out_path, "w"), ensure_ascii=False, indent=2)
 
-                out_json = {
-                    "utt_id": utt_base,
-                    "original_text": seg.get("input", "")
-                }
-
-                for level in ["low_latency", "medium_latency", "high_latency"]:
-                    eng = seg[level]["English"]
-                    zh = seg[level]["Chinese"]
-
-                    aligned = match_llm_chunks_to_mfa(eng, mfa_words)
-                    timeline = assign_chunks_by_second(aligned)
-                    src, tgt = build_final_segments(timeline, eng, zh)
-
-                    out_json[f"source_{level}"] = src
-                    out_json[f"target_{level}"] = tgt
-
-                json.dump(out_json, open(out_path, "w"), ensure_ascii=False, indent=2)
-
-    print("✨ DONE! All trajectories generated.")
+    print(f"✨ Done {lang}!\n")
 
 
 ############################################################
-# Run
+# RUN FOR ALL LANGS
 ############################################################
 if __name__ == "__main__":
-    generate_all(
-        LLM_ROOT="/data/user_data/haolingp/outputs/llm_segmentation_json",
-        MFA_ROOT="/data/user_data/haolingp/outputs/mfa_textgrid_output",
-        GOOD_JSONL="/data/user_data/haolingp/outputs/good_en000_all.jsonl",
-        OUTPUT_ROOT="/data/user_data/haolingp/outputs/streaming_dataset"
-    )
+
+    LLM_ROOT = "/data/user_data/haolingp/outputs/llm_segmentation_json"
+    MFA_ROOT = "/data/user_data/haolingp/outputs/mfa_textgrid_output"
+    OUTPUT_ROOT = "/data/user_data/haolingp/outputs/streaming_dataset"
+
+    # langs = ["en000", "en001", "en002", "en003", "en004"]
+    langs = ["en000"]
+
+    for lang in langs:
+        GOOD_JSONL = f"/data/user_data/haolingp/outputs/good_{lang}_all.jsonl"
+        process_language(lang, LLM_ROOT, MFA_ROOT, GOOD_JSONL, OUTPUT_ROOT)
+
+    print("\n==============================")
+    print("🎉 ALL LANGUAGES COMPLETED!")
+    print("==============================\n")

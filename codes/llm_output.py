@@ -26,8 +26,8 @@ def parse_args():
                         help="Number of parquet files to process. "
                              "Use 'all' to process everything.")
 
-    parser.add_argument("--num-samples", type=int, default=100,
-                        help="Number of samples per parquet (only applies to subset)")
+    parser.add_argument("--num-samples", type=str, default="all",
+                        help="Samples per parquet: 100, 200, or 'all' (default: all)")
 
     return parser.parse_args()
 
@@ -45,6 +45,11 @@ if args.num_en == "all":
     en_list = AVAILABLE_EN
 else:
     en_list = AVAILABLE_EN[:int(args.num_en)]
+
+if args.num_samples == "all":
+    num_samples = None
+else:
+    num_samples = int(args.num_samples)
 
 print("\n===========================================")
 print("🔹 Will process EN datasets:", en_list)
@@ -135,6 +140,23 @@ For EVERY granularity (low_latency, medium_latency, high_latency):
 - DO NOT merge multiple English segments into one Chinese segment
 - DO NOT skip any segments
 
+==================== NEW CHUNK QUALITY RULES ====================
+
+Each English chunk MUST satisfy ALL of the following:
+
+A. Minimum length requirement:
+   - A chunk MUST contain at least TWO meaningful English words.
+   - Single-word chunks are NOT allowed.
+
+B. No punctuation chunks:
+   - A chunk CANNOT be a standalone symbol such as:
+     ".", "?", "!", ",", "...", "-", ":", ";", "。", "，"
+   - A chunk composed ONLY of punctuation is strictly forbidden.
+
+C. No empty chunks
+   - Segments must contain actual semantic content.
+
+   
 **Granularity Definitions:**
 
 **low_latency** (FINEST grain):
@@ -268,8 +290,8 @@ for lang_id in en_list:
         os.makedirs(pq_output_dir, exist_ok=True)
 
         df = pd.read_parquet(pq_path)
-        if args.num_samples is not None:
-            df = df.iloc[:args.num_samples]
+        if num_samples is not None:
+            df = df.iloc[:num_samples]
 
         print(f"\n📌 {lang_id} / {pq_name}: {len(df)} rows")
 
