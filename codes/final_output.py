@@ -15,89 +15,137 @@ def load_streaming_dataset(stream_root):
     Load all streaming dataset JSON into a dict:
     utt_id → { ... streaming json ... }
     """
+    print(f"\n📥 Loading streaming dataset from: {stream_root}")
     index = {}
 
     for dirpath, _, files in os.walk(stream_root):
         for f in files:
             if f.endswith(".json"):
                 p = os.path.join(dirpath, f)
-                data = json.load(open(p))
-                index[data["utt_id"]] = data
+                try:
+                    data = json.load(open(p))
+                    index[data["utt_id"]] = data
+                except Exception as e:
+                    print(f"  ⚠️ Error loading {f}: {e}")
+                    continue
 
-    print(f"Loaded {len(index)} streaming items.")
+    print(f"✓ Loaded {len(index)} streaming items.\n")
     return index
 
 
 def build_jsonl(metricx_file, stream_root, output_root):
     """
     Build structured trajectory-style dataset:
-    en000/00000000/low_latency.jsonl
-    ...
+    en000/00000000/low_latency.json
+    en000/00000000/medium_latency.json
+    en000/00000000/high_latency.json
     """
+
+    print(f"\n{'='*60}")
+    print(f"Building final dataset")
+    print(f"{'='*60}\n")
 
     os.makedirs(output_root, exist_ok=True)
 
     # Load streaming dataset mapping: utt_id → segmentation
     stream_index = load_streaming_dataset(stream_root)
 
-    # Accumulator
+    # Accumulator: (lang, pqid) → {latency → [entries]}
     dataset = defaultdict(lambda: {
         "low": [],
         "medium": [],
         "high": []
     })
 
-    print(f"\n📥 Loading MetricX QE file: {metricx_file}")
+    print(f"📥 Loading MetricX filtered file: {metricx_file}")
+    
+    if not os.path.exists(metricx_file):
+        print(f"❌ Error: MetricX file not found!")
+        return
+    
     lines = open(metricx_file).readlines()
-    print(f"Found {len(lines)} lines.\n")
+    print(f"✓ Found {len(lines)} filtered entries.\n")
 
-    for line in tqdm(lines, desc="Parsing QE output"):
-        item = json.loads(line)
+    processed = 0
+    skipped = 0
 
-        meta = item["metadata"]
-        utt = meta["utt_id"]
-        latency = meta["latency"]
+    for line in tqdm(lines, desc="Processing entries"):
+        try:
+            item = json.loads(line)
 
-        lang, pqid = parse_utt_id(utt)
+            meta = item["metadata"]
+            utt = meta["utt_id"]
+            latency = meta["latency"]
 
-        # ----- 关键：从 streaming dataset 取 segmentation -----
-        if utt not in stream_index:
+            lang, pqid = parse_utt_id(utt)
+
+            # ----- 关键：从 streaming dataset 取 segmentation -----
+            if utt not in stream_index:
+                skipped += 1
+                continue
+
+            seg = stream_index[utt]  # segmentation dict
+
+            src_key = f"source_{latency}_latency"
+            tgt_key = f"target_{latency}_latency"
+
+            if src_key not in seg or tgt_key not in seg:
+                skipped += 1
+                continue
+
+            traj_entry = {
+                "utt_id": utt,
+                "latency": latency,
+                "source": seg[src_key],      # LIST of segments
+                "target": seg[tgt_key]       # LIST of segments
+            }
+
+            dataset[(lang, pqid)][latency].append(traj_entry)
+            processed += 1
+
+        except Exception as e:
+            print(f"\n  ⚠️ Error processing line: {e}")
+            skipped += 1
             continue
 
-        seg = stream_index[utt]  # segmentation dict
-
-        src_key = f"source_{latency}_latency"
-        tgt_key = f"target_{latency}_latency"
-
-        if src_key not in seg or tgt_key not in seg:
-            continue
-
-        traj_entry = {
-            "utt_id": utt,
-            "latency": latency,
-            "source": seg[src_key],      # LIST
-            "target": seg[tgt_key]       # LIST
-        }
-
-        dataset[(lang, pqid)][latency].append(traj_entry)
+    print(f"\n✓ Processed: {processed}")
+    print(f"✓ Skipped: {skipped}\n")
 
     # ----- write output -----
-    print("\n💾 Writing JSONL output...\n")
+    print("💾 Writing output files...\n")
 
-    for (lang, pqid), groups in dataset.items():
+    total_files = 0
+    total_entries = 0
+
+    for (lang, pqid), groups in sorted(dataset.items()):
         base = os.path.join(output_root, lang, pqid)
         os.makedirs(base, exist_ok=True)
 
         for latency in ["low", "medium", "high"]:
+            # 修改：使用 .json 扩展名（匹配你的截图）
             out_path = os.path.join(base, f"{latency}_latency.jsonl")
 
-            with open(out_path, "w", encoding="utf-8") as f:
-                for entry in groups[latency]:
-                    f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+            entries = groups[latency]
+            
+            if len(entries) > 0:
+                with open(out_path, "w", encoding="utf-8") as f:
+                    for entry in entries:
+                        f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
-            print(f"Saved {out_path}  ({len(groups[latency])} entries)")
+                total_files += 1
+                total_entries += len(entries)
+                
+                # 只显示前几个和最后几个，避免输出太多
+                if total_files <= 10 or (lang, pqid) == list(sorted(dataset.items()))[-1][0]:
+                    print(f"  ✓ {lang}/{pqid}/{latency}_latency.json ({len(entries)} entries)")
 
-    print("\n🎉 DONE! Trajectory-style dataset built.\n")
+    print(f"\n{'='*60}")
+    print(f"🎉 DONE! Trajectory-style dataset built.")
+    print(f"{'='*60}")
+    print(f"Total output files: {total_files}")
+    print(f"Total entries: {total_entries}")
+    print(f"Output directory: {output_root}/")
+    print(f"{'='*60}\n")
 
 
 if __name__ == "__main__":
@@ -105,7 +153,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--metricx_jsonl", required=True,
-                        help="Sentence-level MetricX QE output")
+                        help="Sentence-level MetricX QE output (filtered)")
 
     parser.add_argument("--stream_dir", required=True,
                         help="Streaming dataset directory")

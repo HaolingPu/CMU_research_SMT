@@ -42,7 +42,8 @@ else:
 
 num_samples = None if args.num_samples == "all" else int(args.num_samples)
 
-output_root = "/data/user_data/haolingp/outputs/llm_segmentation_json"
+
+output_root = "/data/user_data/haolingp/outputs/llm_output"
 os.makedirs(output_root, exist_ok=True)
 
 # ============================================================

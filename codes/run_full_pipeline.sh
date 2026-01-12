@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
-#SBATCH --gres=gpu:L40S:8
+#SBATCH --gres=gpu:L40S:1
 #SBATCH --mem=128G
 #SBATCH --partition=general
 #SBATCH --time=12:00:00
@@ -24,21 +24,28 @@ source ~/.bashrc
 conda activate vllm
 echo "[OK] Activated vllm"
 
+
 # 2. Run llm_output.py
 cd /data/user_data/haolingp/codes/
-bash /data/user_data/haolingp/codes/run_llm_parallel.sh
-# python /data/user_data/haolingp/codes/llm_output.py --num-en 1 --num-parquets 1 --num-samples 20
+# python /data/user_data/haolingp/codes/llm_output.py --num-en 1 --num-parquets 1
 
+echo "[OK] Segmentation completed."
+
+# ⭐ 新增：后处理LLM输出，合并单词chunks if it is only one word in the chunk
+python /data/user_data/haolingp/codes/post_process_llm_output.py \
+    --input_dir /data/user_data/haolingp/outputs/llm_output \
+    --output_dir /data/user_data/haolingp/outputs/llm_output_modified \
+    --lang en000
 
 # Now we have the llm segmentation
 # 3. run MFA =====> audio + text
 echo "Exporting MFA corpus for en000 (ALL parquets)..."
-python /data/user_data/haolingp/codes/export_mfa_corpus.py \
-    --input-root /data/group_data/li_lab/siqiouya/datasets/yodas-granary/data \
-    --lang en000 \
-    --output-dir /data/user_data/haolingp/outputs/mfa_corpus \
-    --num-parquets all \
-    # --num-samples 20
+# python /data/user_data/haolingp/codes/export_mfa_corpus.py \
+#     --input-root /data/group_data/li_lab/siqiouya/datasets/yodas-granary/data \
+#     --lang en000 \
+#     --output-dir /data/user_data/haolingp/outputs/mfa_corpus \
+#     --num-parquets all \
+    # --num-samples all
 
 
 # 4. audio + text ==> textgrid
@@ -50,10 +57,10 @@ conda deactivate
 conda activate SMT
 
 mfa align \
-    /data/user_data/haolingp/outputs/mfa_corpus \
+    /data/user_data/haolingp/outputs/mfa_corpus/en000 \
     english_us_arpa \
     english_us_arpa \
-    /data/user_data/haolingp/outputs/mfa_textgrid_output \
+    /data/user_data/haolingp/outputs/mfa_textgrid_output/en000 \
     --clean
 
 # 5. find the good and bad json:
@@ -66,6 +73,9 @@ echo "[OK] Generated streaming_dataset/"
 
 # 7. convert the stream into metrix form
 
+conda deactivate
+conda activate metricx
+
 echo "Converting streaming dataset → MetricX input ..."
 python /data/user_data/haolingp/codes/convert_metricx.py \
     --stream_dir /data/user_data/haolingp/outputs/streaming_dataset \
@@ -73,14 +83,6 @@ python /data/user_data/haolingp/codes/convert_metricx.py \
 
 echo "[OK] metricx_input.jsonl generated"
 
-
-
-###########################################
-#8. Activate MetricX environment
-###########################################
-conda deactivate
-conda activate metricx
-echo "[OK] Activated metricx env"
 
 ###########################################
 # 5. Run MetricX-24 QE Scoring
@@ -134,6 +136,7 @@ python /data/user_data/haolingp/codes/final_output.py \
   --metricx_jsonl /data/user_data/haolingp/outputs/metricx_filtered_t5.0.jsonl \
   --stream_dir /data/user_data/haolingp/outputs/streaming_dataset \
   --output_dir /data/user_data/haolingp/outputs/final_jsonl_dataset \
+
 
 
 

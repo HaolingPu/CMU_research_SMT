@@ -68,15 +68,20 @@ def convert_dataset(stream_root, output_file):
             out.write(json.dumps(example, ensure_ascii=False) + "\n")
 
     out.close()
-    print(f"\n🎉 Done! Written to: {output_file}\n")
+    print(f"\n{'='*60}")
+    print(f"🎉 Done!")
+    print(f"Output: {output_file}")
+    print(f"{'='*60}\n")
 
 
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--stream_dir", required=True)
-    parser.add_argument("--output", required=True)
+    parser.add_argument("--stream_dir", required=True,
+                       help="Root of streaming dataset")
+    parser.add_argument("--output", required=True,
+                       help="Output JSONL file")
 
     args = parser.parse_args()
     convert_dataset(args.stream_dir, args.output)

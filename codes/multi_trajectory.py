@@ -105,11 +105,12 @@ def process_language(lang, LLM_ROOT, MFA_ROOT, GOOD_JSONL, OUTPUT_ROOT):
     print(f"🌍 Processing language {lang}")
     print(f"==============================\n")
 
-    # ---- load good IDs (lang/pq/utt_base) ----
+    # ---- load good IDs (只存utt_base，不包含路径) ----
     good_ids = set()
     with open(GOOD_JSONL, "r") as f:
         for line in f:
             obj = json.loads(line)
+            # 只添加file字段，例如 "utt_en000_00000000_0000"
             good_ids.add(obj["file"])
 
     print(f"Loaded {len(good_ids)} good IDs for {lang}\n")
@@ -121,7 +122,13 @@ def process_language(lang, LLM_ROOT, MFA_ROOT, GOOD_JSONL, OUTPUT_ROOT):
         print(f"⚠️ Missing LLM or MFA directory for {lang}, skip.")
         return
 
-    parquet_dirs = sorted(os.listdir(lang_llm_dir))
+    # 获取所有parquet目录（8位数字）
+    parquet_dirs = sorted([
+        d for d in os.listdir(lang_llm_dir)
+        if os.path.isdir(os.path.join(lang_llm_dir, d)) and d.isdigit() and len(d) == 8
+    ])
+
+    total_processed = 0
 
     for pq in parquet_dirs:
         llm_pq_dir = os.path.join(lang_llm_dir, pq)
@@ -140,40 +147,56 @@ def process_language(lang, LLM_ROOT, MFA_ROOT, GOOD_JSONL, OUTPUT_ROOT):
 
         llm_files = sorted(f for f in os.listdir(llm_pq_dir) if f.endswith(".json"))
 
-        for fname in tqdm(llm_files):
+        parquet_count = 0
 
-            utt_base = fname.replace(".json", "")
-            key = f"{lang}/{pq}/{utt_base}"
+        for fname in tqdm(llm_files, desc=f"    {pq}"):
 
-            if key not in good_ids:
+            utt_base = fname.replace(".json", "")  # "utt_en000_00000000_0000"
+            
+            # ✅ 修复：直接用utt_base检查，不加路径
+            if utt_base not in good_ids:
                 continue
 
             llm_path = os.path.join(llm_pq_dir, fname)
             textgrid_path = os.path.join(mfa_pq_dir, utt_base + ".TextGrid")
             out_path = os.path.join(out_dir, utt_base + ".json")
 
-            seg = json.load(open(llm_path))
-            mfa_words = load_word_alignment(textgrid_path)
+            # 检查TextGrid是否存在
+            if not os.path.exists(textgrid_path):
+                print(f"    ⚠️ TextGrid not found: {utt_base}")
+                continue
 
-            out_json = {
-                "utt_id": utt_base,
-                "original_text": seg.get("input", "")
-            }
+            try:
+                seg = json.load(open(llm_path))
+                mfa_words = load_word_alignment(textgrid_path)
 
-            for level in ["low_latency", "medium_latency", "high_latency"]:
-                eng = seg[level]["English"]
-                zh = seg[level]["Chinese"]
+                out_json = {
+                    "utt_id": utt_base,
+                    "original_text": seg.get("input", "")
+                }
 
-                aligned = match_llm_chunks_to_mfa(eng, mfa_words)
-                timeline = assign_chunks_by_second(aligned)
-                src, tgt = build_final_segments(timeline, eng, zh)
+                for level in ["low_latency", "medium_latency", "high_latency"]:
+                    eng = seg[level]["English"]
+                    zh = seg[level]["Chinese"]
 
-                out_json[f"source_{level}"] = src
-                out_json[f"target_{level}"] = tgt
+                    aligned = match_llm_chunks_to_mfa(eng, mfa_words)
+                    timeline = assign_chunks_by_second(aligned)
+                    src, tgt = build_final_segments(timeline, eng, zh)
 
-            json.dump(out_json, open(out_path, "w"), ensure_ascii=False, indent=2)
+                    out_json[f"source_{level}"] = src
+                    out_json[f"target_{level}"] = tgt
 
-    print(f"✨ Done {lang}!\n")
+                json.dump(out_json, open(out_path, "w"), ensure_ascii=False, indent=2)
+                parquet_count += 1
+                total_processed += 1
+
+            except Exception as e:
+                print(f"    ❌ Error processing {utt_base}: {e}")
+                continue
+        
+        print(f"    ✓ Processed {parquet_count} files from {pq}")
+
+    print(f"\n✨ Done {lang}! Total processed: {total_processed}\n")
 
 
 ############################################################
@@ -181,7 +204,7 @@ def process_language(lang, LLM_ROOT, MFA_ROOT, GOOD_JSONL, OUTPUT_ROOT):
 ############################################################
 if __name__ == "__main__":
 
-    LLM_ROOT = "/data/user_data/haolingp/outputs/llm_segmentation_json"
+    LLM_ROOT = "/data/user_data/haolingp/outputs/llm_output_modified"
     MFA_ROOT = "/data/user_data/haolingp/outputs/mfa_textgrid_output"
     OUTPUT_ROOT = "/data/user_data/haolingp/outputs/streaming_dataset"
 
@@ -190,6 +213,11 @@ if __name__ == "__main__":
 
     for lang in langs:
         GOOD_JSONL = f"/data/user_data/haolingp/outputs/good_{lang}_all.jsonl"
+        
+        if not os.path.exists(GOOD_JSONL):
+            print(f"❌ Good list not found: {GOOD_JSONL}")
+            continue
+            
         process_language(lang, LLM_ROOT, MFA_ROOT, GOOD_JSONL, OUTPUT_ROOT)
 
     print("\n==============================")

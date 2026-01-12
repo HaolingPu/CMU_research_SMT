@@ -3,42 +3,37 @@ import json
 import glob
 import pandas as pd
 import argparse
-import requests
 from tqdm import tqdm
 from vllm import LLM, SamplingParams
 from vllm.sampling_params import GuidedDecodingParams
 
 # ============================================================
-# 1. 配置
+# Arguments for DP worker
+# ============================================================
+def parse_args():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--task-id", type=int, required=True)
+    parser.add_argument("--num-tasks", type=int, required=True)
+    parser.add_argument("--tp", type=int, default=1)
+
+    parser.add_argument("--num-en", type=str, default="1")
+    parser.add_argument("--num-parquets", type=str, default="all")
+    parser.add_argument("--num-samples", type=str, default="all")
+    parser.add_argument("--batch-size", type=int, default=32)  # 目前不用，只保留参数
+
+    return parser.parse_args()
+
+
+args = parse_args()
+
+# ============================================================
+# Config
 # ============================================================
 os.environ["HF_HOME"] = "/data/user_data/haolingp/hf_cache"
 os.environ["HF_HUB_CACHE"] = "/data/user_data/haolingp/hf_cache/hub"
 os.environ["TRANSFORMERS_CACHE"] = "/data/user_data/haolingp/hf_cache/transformers"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
-
-
-def parse_args():
-    parser = argparse.ArgumentParser(description="LLM segmentation pipeline")
-
-    parser.add_argument("--num-en", type=str, default="1",
-                    help="Number of enXXX datasets to process (e.g., 1,2,3 or 'all')")
-                                                              
-    parser.add_argument("--num-parquets", type=int, default=1,
-                        help="Number of parquet files to process. "
-                             "Use 'all' to process everything.")
-
-    parser.add_argument("--num-samples", type=str, default="all",
-                        help="Samples per parquet: 100, 200, or 'all' (default: all)")
-    
-    return parser.parse_args()
-
-
-# ============================================================
-# 2️⃣ Decide which parquet files to load
-# ============================================================
-
-args = parse_args()
-
 
 AVAILABLE_EN = ["en000", "en001", "en002", "en003", "en004"]
 
@@ -47,43 +42,28 @@ if args.num_en == "all":
 else:
     en_list = AVAILABLE_EN[:int(args.num_en)]
 
-if args.num_samples == "all":
-    num_samples = None
-else:
-    num_samples = int(args.num_samples)
+num_samples = None if args.num_samples == "all" else int(args.num_samples)
+num_parquets = None if args.num_parquets == "all" else int(args.num_parquets)
 
-print("\n===========================================")
-print("🔹 Will process EN datasets:", en_list)
-print("===========================================\n")
-
-
-# ============================================================
-# 3. Output Root
-# ============================================================
-output_root = "/data/user_data/haolingp/outputs/llm_segmentation_json__test_one"
+output_root = "/data/user_data/haolingp/outputs/llm_segmentation_json_no_batch"
 os.makedirs(output_root, exist_ok=True)
 
 # ============================================================
-# 4. Load LLM Model
+# Load model
 # ============================================================
-model_path = "/data/user_data/haolingp/models/Qwen3-30B-A3B-Instruct-2507-FP8"
-max_new_tokens = 2048
+print(f"[Task {args.task_id}] Loading model TP={args.tp} ...")
 
-print(f"🚀 Loading model {model_path}")
+model_path = "/data/user_data/haolingp/models/Qwen3-30B-A3B-Instruct-2507-FP8"
 llm = LLM(
     model=model_path,
     dtype="bfloat16",
-    tensor_parallel_size=1,
+    tensor_parallel_size=args.tp,
     max_model_len=16384,
-    gpu_memory_utilization=0.90
+    gpu_memory_utilization=0.90,
 )
-print("✅ Model loaded.\n")
-
-
-
 
 # ============================================================
-# 5. JSON schema
+# JSON schema
 # ============================================================
 json_schema = {
     "type": "object",
@@ -92,43 +72,41 @@ json_schema = {
             "type": "object",
             "properties": {
                 "English": {"type": "array", "items": {"type": "string"}},
-                "Chinese": {"type": "array", "items": {"type": "string"}}
+                "Chinese": {"type": "array", "items": {"type": "string"}},
             },
-            "required": ["English", "Chinese"]
+            "required": ["English", "Chinese"],
         },
         "medium_latency": {
             "type": "object",
             "properties": {
                 "English": {"type": "array", "items": {"type": "string"}},
-                "Chinese": {"type": "array", "items": {"type": "string"}}
+                "Chinese": {"type": "array", "items": {"type": "string"}},
             },
-            "required": ["English", "Chinese"]
+            "required": ["English", "Chinese"],
         },
         "high_latency": {
             "type": "object",
             "properties": {
                 "English": {"type": "array", "items": {"type": "string"}},
-                "Chinese": {"type": "array", "items": {"type": "string"}}
+                "Chinese": {"type": "array", "items": {"type": "string"}},
             },
-            "required": ["English", "Chinese"]
-        }
+            "required": ["English", "Chinese"],
+        },
     },
-    "required": ["low_latency", "medium_latency", "high_latency"]
+    "required": ["low_latency", "medium_latency", "high_latency"],
 }
 
 sampling_params = SamplingParams(
     temperature=0.0,
-    max_tokens=max_new_tokens,
+    max_tokens=2048,
     repetition_penalty=1.1,
-    guided_decoding=GuidedDecodingParams(json=json_schema)
+    guided_decoding=GuidedDecodingParams(json=json_schema),
 )
 
-print("✅ Schema loaded.\n")
-
 # ============================================================
-# 4️⃣ Prompt 构建
+# Build prompt
 # ============================================================
-def build_prompt(english_sentence):
+def build_prompt(english_sentence: str) -> str:
     return f"""You are a professional English-to-Chinese simultaneous interpreter.
 
 Task: Segment the English sentence into THREE different granularities and translate each segment to Chinese.
@@ -258,88 +236,109 @@ Input: "{english_sentence}"
 - For high_latency: Split at commas, periods, semicolons that separate clauses
 - NEVER output the entire sentence as one segment if it has multiple clauses
 - English and Chinese arrays MUST have the same length
-- Output ONLY the JSON object, no explanations"""
+- Output ONLY the JSON object, no explanations
+"""
 
 
 # ============================================================
-# 5️⃣ 执行 LLM segmentation
+# Worker DP Split Logic
+# ============================================================
+def split_list(lst, num_parts):
+    """Split list into num_parts chunks and return the chunk for this task-id."""
+    if num_parts <= 0:
+        return lst
+    chunk = (len(lst) + num_parts - 1) // num_parts
+    start = args.task_id * chunk
+    end = min(len(lst), (args.task_id + 1) * chunk)
+    return lst[start:end]
+
+
+# ============================================================
+# Run segmentation (no batch to vLLM, single call per utt)
 # ============================================================
 global_success = 0
 global_fail = 0
 
-
 for lang_id in en_list:
-    print(f"\n===============================")
-    print(f"🌍 Processing dataset: {lang_id}")
-    print("===============================\n")
+    lang_root = os.path.join(output_root, lang_id)
+    os.makedirs(lang_root, exist_ok=True)
 
     parquet_dir = f"/data/group_data/li_lab/siqiouya/datasets/yodas-granary/data/{lang_id}/asr_only"
     all_parquets = sorted(glob.glob(os.path.join(parquet_dir, "*.parquet")))
 
-    if args.num_parquets == "all":
-        parquet_files = all_parquets
-    else:
-        parquet_files = all_parquets[:int(args.num_parquets)]
+    if num_parquets is not None:
+        all_parquets = all_parquets[:num_parquets]
 
-    print(f"🔹 Total parquet files: {len(all_parquets)}")
-    print(f"🔹 Will process: {len(parquet_files)}")
+    my_parquets = split_list(all_parquets, args.num_tasks)
 
-    for pq_path in parquet_files:
+    print(f"[Task {args.task_id}] {lang_id}: assigned {len(my_parquets)} parquets.")
 
-        pq_name = os.path.basename(pq_path).replace(".parquet", "")
-        pq_output_dir = os.path.join(output_root, f"{lang_id}/{pq_name}")
-        os.makedirs(pq_output_dir, exist_ok=True)
+    for pq_path in my_parquets:
+        pq_name = os.path.splitext(os.path.basename(str(pq_path)))[0]
+
+        pq_out_dir = os.path.join(lang_root, pq_name)
+        os.makedirs(pq_out_dir, exist_ok=True)
 
         df = pd.read_parquet(pq_path)
         if num_samples is not None:
             df = df.iloc[:num_samples]
 
-        print(f"\n📌 {lang_id} / {pq_name}: {len(df)} rows")
+        total = len(df)
+        print(f"[Task {args.task_id}] Processing {pq_name}, rows={total}")
 
-        for idx, row in tqdm(df.iterrows(), total=len(df), desc=f"{lang_id}_{pq_name}"):
+        for idx, row in tqdm(df.iterrows(), total=total, desc=f"{lang_id}_{pq_name}"):
+            text = row["text"]
+            utt_id = f"utt_{lang_id}_{pq_name}_{idx:04d}"
+            out_path = os.path.join(pq_out_dir, f"{utt_id}.json")
 
-          text = row["text"]
+            if os.path.exists(out_path):
+                continue
 
-          # === Unified uttid naming ===
-          utt_id = f"utt_{lang_id}_{pq_name}_{idx:04d}"
-          out_json_path = os.path.join(pq_output_dir, f"{utt_id}.json")
+            prompt = build_prompt(text)
 
-          # skip existing (auto resume)
-          if os.path.exists(out_json_path):
-              continue
+            try:
+                # 单条请求，保持 JSON schema 能正常工作
+                outputs = llm.chat(
+                    messages=[{"role": "user", "content": prompt}],
+                    sampling_params=sampling_params,
+                )
 
-          prompt = build_prompt(text)
+                # vLLM: outputs 是一个 list[RequestOutput]
+                response_text = outputs[0].outputs[0].text.strip()
 
-          try:
-              outputs = llm.chat(
-                  messages=[{"role": "user", "content": prompt}],
-                  sampling_params=sampling_params
-              )
-              response = outputs[0].outputs[0].text.strip()
+                # 极端情况下如果模型加了 ```json ``` 之类，可以简单清理一下
+                if response_text.startswith("```"):
+                    # 去掉围栏，尽量获取中间内容
+                    response_text = response_text.strip()
+                    response_text = response_text.lstrip("`")
+                    response_text = response_text.rstrip("`")
+                    # 有时候是 ```json\n...\n``` 的格式
+                    if "\n" in response_text:
+                        lines = response_text.split("\n")
+                        # 去掉第一行和最后一行可能的 ``` / ```json
+                        if lines[0].strip().startswith("```"):
+                            lines = lines[1:]
+                        if lines and lines[-1].strip().startswith("```"):
+                            lines = lines[:-1]
+                        response_text = "\n".join(lines).strip()
 
-              parsed = json.loads(response)
-              parsed["input"] = text
-              parsed["utt_id"] = utt_id  # <-- store utt_id inside JSON
+                parsed = json.loads(response_text)
+                parsed["input"] = text
+                parsed["utt_id"] = utt_id
 
-              with open(out_json_path, "w", encoding="utf-8") as f:
-                  json.dump(parsed, f, ensure_ascii=False, indent=2)
+                with open(out_path, "w", encoding="utf-8") as f:
+                    json.dump(parsed, f, ensure_ascii=False, indent=2)
 
-              global_success += 1
+                global_success += 1
 
-          except Exception as e:
-              global_fail += 1
-              with open(out_json_path, "w", encoding="utf-8") as f:
-                  json.dump({
-                      "utt_id": utt_id,
-                      "input": text,
-                      "error": str(e),
-                      "raw_output": response if "response" in locals() else None
-                  }, f, ensure_ascii=False, indent=2)
+            except Exception as e:
+                with open(out_path, "w", encoding="utf-8") as f:
+                    json.dump(
+                        {"input": text, "utt_id": utt_id, "error": str(e)},
+                        f,
+                        ensure_ascii=False,
+                        indent=2,
+                    )
+                global_fail += 1
 
-# ============================================================
-# 6️⃣ Summary
-# ============================================================
-print("\n=== DONE ===")
-print(f"✅ Success: {global_success}")
-print(f"❌ Failed : {global_fail}")
-print(f"📂 Output root: {output_root}\n")
+print(f"[Task {args.task_id}] DONE | success={global_success} fail={global_fail}")

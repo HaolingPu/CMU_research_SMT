@@ -4,20 +4,24 @@ import tgt
 
 
 ############################################################
-# Collect all files recursively, return map: key → full_path
+# Collect files in a single parquet directory
 ############################################################
-def collect_files(root, ext, lang):
+def collect_files_single_parquet(parquet_dir, ext):
+    """
+    Collect files from a single parquet directory.
+    Returns: {filename_base: full_path}
+    """
     mapping = {}
-
-    for dirpath, _, filenames in os.walk(root):
-        for fn in filenames:
-            if fn.endswith(ext):
-                full = os.path.join(dirpath, fn)
-                rel = os.path.relpath(full, root)   # e.g. "00000000/utt_..."
-                base = rel[: -len(ext)]            # no suffix
-                key = f"{lang}/{base}"             # add language prefix
-                mapping[key] = full
-
+    
+    if not os.path.exists(parquet_dir):
+        return mapping
+    
+    for fn in os.listdir(parquet_dir):
+        if fn.endswith(ext):
+            full = os.path.join(parquet_dir, fn)
+            base = fn[:-len(ext)]  # remove extension
+            mapping[base] = full
+    
     return mapping
 
 
@@ -57,7 +61,7 @@ def check_llm_json(full_path):
 
 
 ############################################################
-# Check MFATextGrid (<unk>)
+# Check MFA TextGrid (<unk>)
 ############################################################
 def check_textgrid(full_path):
     try:
@@ -73,72 +77,116 @@ def check_textgrid(full_path):
 
 
 ############################################################
-# Final merge
+# Process all parquets for a language
 ############################################################
-def merge_filters(llm_root, mfa_root, save_good, save_bad, lang):
-    # Collect recursive file maps
-    llm_map = collect_files(llm_root, ".json", lang)
-    mfa_map = collect_files(mfa_root, ".TextGrid", lang)
-
-    all_keys = sorted(set(llm_map.keys()) | set(mfa_map.keys()))
-
-    good = []
-    bad  = []
-
-    # Clear old outputs
+def process_language(llm_root, mfa_root, save_good, save_bad, lang):
+    """
+    Process all parquet directories for a language
+    Output to 2 files (all good in one, all bad in one)
+    """
+    print(f"\n===== Processing {lang} =====")
+    
+    # Get all parquet directories
+    lang_llm_dir = os.path.join(llm_root, lang)
+    lang_mfa_dir = os.path.join(mfa_root, lang)
+    
+    if not os.path.exists(lang_llm_dir):
+        print(f"ERROR: LLM directory not found: {lang_llm_dir}")
+        return
+    
+    # Get list of parquet directories (8-digit folders)
+    parquet_dirs = sorted([
+        d for d in os.listdir(lang_llm_dir)
+        if os.path.isdir(os.path.join(lang_llm_dir, d)) and d.isdigit() and len(d) == 8
+    ])
+    
+    print(f"Found {len(parquet_dirs)} parquet directories")
+    
+    # Clear output files
     open(save_good, "w").close()
     open(save_bad, "w").close()
+    
+    total_good = 0
+    total_bad = 0
+    
+    # Process each parquet
+    for parquet_name in parquet_dirs:
+        llm_parquet_dir = os.path.join(lang_llm_dir, parquet_name)
+        mfa_parquet_dir = os.path.join(lang_mfa_dir, parquet_name)
+        
+        # Collect files in this parquet
+        llm_map = collect_files_single_parquet(llm_parquet_dir, ".json")
+        mfa_map = collect_files_single_parquet(mfa_parquet_dir, ".TextGrid")
+        
+        all_keys = sorted(set(llm_map.keys()) | set(mfa_map.keys()))
+        
+        parquet_good = 0
+        parquet_bad = 0
+        
+        for key in all_keys:
+            reasons = []
+            ok = True
 
-    for key in all_keys:
-        reasons = []
-        ok = True
-
-        # LLM JSON check
-        if key not in llm_map:
-            ok = False
-            reasons.append("missing LLM JSON")
-        else:
-            llm_ok, llm_reasons = check_llm_json(llm_map[key])
-            if not llm_ok:
+            # LLM JSON check
+            if key not in llm_map:
                 ok = False
-                reasons.extend(llm_reasons)
+                reasons.append("missing LLM JSON")
+            else:
+                llm_ok, llm_reasons = check_llm_json(llm_map[key])
+                if not llm_ok:
+                    ok = False
+                    reasons.extend(llm_reasons)
 
-        # TextGrid check
-        if key not in mfa_map:
-            ok = False
-            reasons.append("missing TextGrid")
-        else:
-            tg_ok, tg_reasons = check_textgrid(mfa_map[key])
-            if not tg_ok:
+            # TextGrid check
+            if key not in mfa_map:
                 ok = False
-                reasons.extend(tg_reasons)
+                reasons.append("missing TextGrid")
+            else:
+                tg_ok, tg_reasons = check_textgrid(mfa_map[key])
+                if not tg_ok:
+                    ok = False
+                    reasons.extend(tg_reasons)
 
-        # Save
-        item = {"file": key}
-        if ok:
-            with open(save_good, "a") as f:
-                f.write(json.dumps(item) + "\n")
-        else:
-            item["reasons"] = reasons
-            with open(save_bad, "a") as f:
-                f.write(json.dumps(item) + "\n")
-
-    print("===== SUMMARY =====")
-    print("Total:", len(all_keys))
-    print("Good :", sum(1 for _ in open(save_good)))
-    print("Bad  :", sum(1 for _ in open(save_bad)))
-    print("====================")
+            # Save to file
+            item = {"file": key}
+            if ok:
+                with open(save_good, "a") as f:
+                    f.write(json.dumps(item) + "\n")
+                parquet_good += 1
+                total_good += 1
+            else:
+                item["reasons"] = reasons
+                with open(save_bad, "a") as f:
+                    f.write(json.dumps(item) + "\n")
+                parquet_bad += 1
+                total_bad += 1
+        
+        print(f"  [{parquet_name}] Good: {parquet_good}, Bad: {parquet_bad}")
+    
+    print(f"\n===== {lang} SUMMARY =====")
+    print(f"Total Good: {total_good}")
+    print(f"Total Bad : {total_bad}")
+    print(f"Total     : {total_good + total_bad}")
+    print("=" * 30)
 
 
 ############################################################
-# Run
+# Main
 ############################################################
-
-for en in ["en000"]:
-    merge_filters(
-        llm_root=f"/data/user_data/haolingp/outputs/llm_segmentation_json/{en}",
-        mfa_root=f"/data/user_data/haolingp/outputs/mfa_textgrid_output/{en}",
-        save_good=f"/data/user_data/haolingp/outputs/good_{en}_all.jsonl",
-        save_bad=f"/data/user_data/haolingp/outputs/bad_{en}_all.jsonl",
-        lang=en
+if __name__ == "__main__":
+    # Output files (just 2 files)
+    output_dir = "/data/user_data/haolingp/outputs"
+    
+    # Process en000
+    process_language(
+        llm_root="/data/user_data/haolingp/outputs/llm_output",
+        mfa_root="/data/user_data/haolingp/outputs/mfa_textgrid_output",
+        save_good=f"{output_dir}/good_en000_all.jsonl",
+        save_bad=f"{output_dir}/bad_en000_all.jsonl",
+        lang="en000"
     )
+    
+    print("\n✅ All quality checks completed!")
+    print(f"Results saved:")
+    print(f"  - {output_dir}/good_en000_all.jsonl")
+    print(f"  - {output_dir}/bad_en000_all.jsonl")
