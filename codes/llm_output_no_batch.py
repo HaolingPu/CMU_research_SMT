@@ -106,6 +106,38 @@ sampling_params = SamplingParams(
 # ============================================================
 # Build prompt
 # ============================================================
+def build_prompt_EAST(english_sentence: str)-> str:
+    return f"""
+        As a professional simultaneous interpreter, your task is to segment sentences into independent
+    semantic chunks and provide corresponding English translations.
+    You will use three different granularities for segmentation:
+    1. For low latency, the chunks would be fragmented into brief, coherent phrases that convey acomplete thought.
+    2. For medium latency, the chunks would be longer, possibly clause or sentence-long segments.
+    3. For high latency, the chunks would be the longest, likely to cover complete clauses or full
+    sentences.
+    You also need to provide corresponding simultaneous translation for each segment by performing
+    the translation monotonically while making the translation grammatically tolerable.
+    Please take into consideration the example attached below:
+    Input:
+    Chinese: 休斯敦16日晚发出一系列龙卷风和严重雷暴警报。
+    Output:
+    {
+        "low_latency": {
+        "Chinese": ["休斯敦", "16日晚", "发出一系列", "龙卷风", "和严重雷暴", "警报。"],
+        "English": ["Houston", "on the evening of the 16th", "issued a series of", "tornado", "and severe thunderstorm", "warnings."]
+        },
+        "medium_latency":{
+        "Chinese": ["休斯敦16日晚", "发出一系列", "龙卷风和严重雷暴警报。"],
+        "English": ["On the evening of the 16th, Houston", "issued a series of", "tornado and severe thunderstorm warnings."]
+        },
+        "high_latency": {
+        "Chinese": ["休斯敦16日晚", "发出一系列龙卷风和严重雷暴警报。"],
+        "English": ["On the evening of the 16th, Houston", "issued a series of tornado and severe thunderstorm warnings."]
+        }
+    } 
+    """
+
+
 def build_prompt(english_sentence: str) -> str:
     return f"""You are a professional English-to-Chinese simultaneous interpreter.
 
@@ -294,7 +326,7 @@ for lang_id in en_list:
             if os.path.exists(out_path):
                 continue
 
-            prompt = build_prompt(text)
+            prompt = build_prompt_EAST(text)
 
             try:
                 # 单条请求，保持 JSON schema 能正常工作

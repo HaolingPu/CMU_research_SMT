@@ -203,22 +203,62 @@ def process_language(lang, LLM_ROOT, MFA_ROOT, GOOD_JSONL, OUTPUT_ROOT):
 # RUN FOR ALL LANGS
 ############################################################
 if __name__ == "__main__":
+    import argparse
 
-    LLM_ROOT = "/data/user_data/haolingp/outputs/llm_output_modified"
-    MFA_ROOT = "/data/user_data/haolingp/outputs/mfa_textgrid_output"
-    OUTPUT_ROOT = "/data/user_data/haolingp/outputs/streaming_dataset"
+    parser = argparse.ArgumentParser(
+        description="Generate streaming trajectories from good LLM + MFA results."
+    )
 
-    # langs = ["en000", "en001", "en002", "en003", "en004"]
-    langs = ["en000"]
+    parser.add_argument(
+        "--llm-root",
+        type=str,
+        required=True,
+        help="Root directory of LLM outputs (contains lang subdirs).",
+    )
+    parser.add_argument(
+        "--mfa-root",
+        type=str,
+        required=True,
+        help="Root directory of MFA TextGrid outputs (contains lang subdirs).",
+    )
+    parser.add_argument(
+        "--good-root",
+        type=str,
+        required=True,
+        help="Directory containing good_{lang}_all.jsonl files.",
+    )
+    parser.add_argument(
+        "--output-root",
+        type=str,
+        required=True,
+        help="Output directory for streaming_dataset.",
+    )
+    parser.add_argument(
+        "--langs",
+        nargs="+",
+        default=["en000"],
+        help="Language splits to process (default: en000).",
+    )
 
-    for lang in langs:
-        GOOD_JSONL = f"/data/user_data/haolingp/outputs/good_{lang}_all.jsonl"
-        
-        if not os.path.exists(GOOD_JSONL):
-            print(f"❌ Good list not found: {GOOD_JSONL}")
+    args = parser.parse_args()
+
+    os.makedirs(args.output_root, exist_ok=True)
+
+    for lang in args.langs:
+        good_jsonl = os.path.join(args.good_root, f"good_EAST_{lang}_all.jsonl")
+
+        if not os.path.exists(good_jsonl):
+            print(f"❌ Good list not found: {good_jsonl}")
             continue
-            
-        process_language(lang, LLM_ROOT, MFA_ROOT, GOOD_JSONL, OUTPUT_ROOT)
+
+        print(f"\n===== Processing {lang} =====")
+        process_language(
+            lang,
+            args.llm_root,
+            args.mfa_root,
+            good_jsonl,
+            args.output_root,
+        )
 
     print("\n==============================")
     print("🎉 ALL LANGUAGES COMPLETED!")

@@ -174,19 +174,70 @@ def process_language(llm_root, mfa_root, save_good, save_bad, lang):
 # Main
 ############################################################
 if __name__ == "__main__":
-    # Output files (just 2 files)
-    output_dir = "/data/user_data/haolingp/outputs"
-    
-    # Process en000
-    process_language(
-        llm_root="/data/user_data/haolingp/outputs/llm_output",
-        mfa_root="/data/user_data/haolingp/outputs/mfa_textgrid_output",
-        save_good=f"{output_dir}/good_en000_all.jsonl",
-        save_bad=f"{output_dir}/bad_en000_all.jsonl",
-        lang="en000"
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Quality check LLM JSON + MFA TextGrid for a language split (e.g., en000)."
     )
-    
+    parser.add_argument(
+        "--llm-root",
+        type=str,
+        required=True,
+        help="Root directory for LLM outputs (contains lang subdir like en000/00000000/...).",
+    )
+    parser.add_argument(
+        "--mfa-root",
+        type=str,
+        required=True,
+        help="Root directory for MFA TextGrid outputs (contains lang subdir like en000/00000000/...).",
+    )
+    parser.add_argument(
+        "--lang",
+        type=str,
+        default="en000",
+        help="Language split directory name (default: en000).",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default="/data/user_data/haolingp/outputs",
+        help="Directory to save good/bad jsonl files.",
+    )
+    parser.add_argument(
+        "--good-name",
+        type=str,
+        default=None,
+        help="Optional filename for good jsonl. Default: good_{lang}_all.jsonl",
+    )
+    parser.add_argument(
+        "--bad-name",
+        type=str,
+        default=None,
+        help="Optional filename for bad jsonl. Default: bad_{lang}_all.jsonl",
+    )
+
+    args = parser.parse_args()
+
+    os.makedirs(args.output_dir, exist_ok=True)
+
+    good_path = os.path.join(
+        args.output_dir,
+        args.good_name if args.good_name else f"good_EAST_{args.lang}_all.jsonl",
+    )
+    bad_path = os.path.join(
+        args.output_dir,
+        args.bad_name if args.bad_name else f"bad_EAST_{args.lang}_all.jsonl",
+    )
+
+    process_language(
+        llm_root=args.llm_root,
+        mfa_root=args.mfa_root,
+        save_good=good_path,
+        save_bad=bad_path,
+        lang=args.lang,
+    )
+
     print("\n✅ All quality checks completed!")
-    print(f"Results saved:")
-    print(f"  - {output_dir}/good_en000_all.jsonl")
-    print(f"  - {output_dir}/bad_en000_all.jsonl")
+    print("Results saved:")
+    print(f"  - {good_path}")
+    print(f"  - {bad_path}")

@@ -6,6 +6,7 @@ import argparse
 from tqdm import tqdm
 from vllm import LLM, SamplingParams
 from vllm.sampling_params import GuidedDecodingParams
+from __future__ import annotations
 from typing import Dict, List, Any
 
 # ============================================================
@@ -105,177 +106,78 @@ sampling_params = SamplingParams(
 # ============================================================
 # Build prompt
 # ============================================================
-PROMPT_EAST = """
-    As a professional simultaneous interpreter, your task is to segment sentences into independent
-    semantic chunks and provide corresponding Chinese translations.
-    You will use three different granularities for segmentation:
-    1. For low latency, the chunks would be fragmented into brief, coherent phrases that convey acomplete thought.
-    2. For medium latency, the chunks would be longer, possibly clause or sentence-long segments.
-    3. For high latency, the chunks would be the longest, likely to cover complete clauses or full
-    sentences.
-    You also need to provide corresponding simultaneous translation for each segment by performing
-    the translation monotonically while making the translation grammatically tolerable.
-    Please take into consideration the example attached below:
-    Input:
-    English: Houston issued a series of tornado and severe thunderstorm warnings on the evening of the 16th.
+_EXAMPLE_TEXT = (
+    "Almost every way we make electricity today except for the emerging renewables and nuclear puts out CO2."
+)
 
-    Output:
-    {
-        "low_latency": {
-            "English": ["Houston", "on the evening of the 16th", "issued a series of", "tornado", "and severe thunderstorm", "warnings."],
-            "Chinese": ["休斯敦", "16日晚", "发出一系列", "龙卷风", "和严重雷暴", "警报。"]
-        },
-        "medium_latency": {
-            "English": ["On the evening of the 16th, Houston", "issued a series of", "tornado and severe thunderstorm warnings."],
-            "Chinese": ["休斯敦16日晚", "发出一系列", "龙卷风和严重雷暴警报。"]
-        },
-        "high_latency": {
-            "English": ["On the evening of the 16th, Houston", "issued a series of tornado and severe thunderstorm warnings."],
-            "Chinese": ["休斯敦16日晚", "发出一系列龙卷风和严重雷暴警报。"]
-        }
-    }
-"""
-def build_prompt_EAST(english_sentence: str)-> str:
-    return (
-        PROMPT_EAST
-        + "\n\nNow process the following input:\n"
-        + f"English: {english_sentence}\n"
-        + "Output:\n"
+_EXAMPLE_OUTPUTS: Dict[str, Dict[str, Any]] = {
+    "Japanese": {
+        "segmented_pairs": [
+            ["Almost every way", "ほとんどすべての方法は"],
+            ["we make electricity today", "私たちが今日電気を作る"],
+            ["except for the emerging renewables and nuclear", "新興の再生可能エネルギーと原子力を除いて"],
+            ["puts out CO2", "CO2を排出します"],
+        ],
+        "output": "ほとんどすべての方法で、私たちが今日電気を作るのは、新興の再生可能エネルギーと原子力を除いて、CO2を排出します",
+    },
+    "Chinese": {
+        "segmented_pairs": [
+            ["Almost every way", "几乎每一种方式"],
+            ["we make electricity today", "我们今天发电的方式"],
+            ["except for the emerging renewables and nuclear", "除了新兴的可再生能源和核能"],
+            ["puts out CO2", "会排放二氧化碳"],
+        ],
+        "output": "几乎每一种我们今天发电的方式，除了新兴的可再生能源和核能，都会排放二氧化碳。",
+    },
+    "German": {
+        "segmented_pairs": [
+            ["Almost every way we make electricity today", "Fast jede Art, wie wir heute Strom erzeugen,"],
+            ["except for the emerging renewables and nuclear", "außer den aufkommenden erneuerbaren Energien und der Kernenergie,"],
+            ["puts out CO2", "stößt CO2 aus."],
+        ],
+        "output": "Fast jede Art, wie wir heute Strom erzeugen, außer den aufkommenden erneuerbaren Energien und der Kernenergie, stößt CO2 aus.",
+    },
+}
+
+
+def build_simul_must_baseline_prompt(text: str, target_language: str) -> List[Dict[str, str]]:
+    """
+    Paper baseline prompt for Simul-MuST-C style segmentation + translation.
+    Assumes ONLY three target languages: Chinese, Japanese, German.
+    Always includes the one-shot example from the paper figure.
+
+    Returns chat messages: [{"role":"system","content":...}, {"role":"user","content":...}]
+    """
+    if target_language not in _EXAMPLE_OUTPUTS:
+        raise ValueError(f"Unsupported target_language={target_language}. Must be one of: {list(_EXAMPLE_OUTPUTS)}")
+
+    system_msg = (
+        f"You will be provided with a sentence in English, and your task is to interpret it into {target_language}.\n"
+        "Always answer in the following JSON format:\n"
+        "{'segmented_pairs': List[Tuple[English, Language]], 'output': Language}"
     )
 
+    example_output = _EXAMPLE_OUTPUTS[target_language]
 
-def build_prompt(english_sentence):
-    return f"""You are a professional English-to-Chinese simultaneous interpreter.
+    user_msg = (
+        "Instructions: 'Salami technique' in simultaneous interpretation refers to a technique where the interpreter "
+        "breaks down the source language input into smaller, manageable segments that each contain enough information "
+        "to be accurately interpreted.\n"
+        "1. Break down the following sentence into smaller segments for easier simultaneous interpretation.\n"
+        f"2. Translate each segment into {target_language}.\n"
+        "3. Connect the translated segments.\n\n"
+        "Example Text:\n"
+        f"{_EXAMPLE_TEXT}\n\n"
+        "Example Output:\n"
+        f"{example_output}\n\n"
+        "Inputs:\n"
+        f"{text}\n"
+    )
 
-Task: Segment the English sentence into THREE different granularities and translate each segment to Chinese.
-
-**CRITICAL RULES:**
-For EVERY granularity (low_latency, medium_latency, high_latency):
-- The English array MUST have EXACTLY the same number of items as the Chinese array
-- If English has N segments, Chinese MUST have N segments (no more, no less)
-- Each English[i] MUST correspond to Chinese[i] at the SAME index
-- DO NOT merge multiple English segments into one Chinese segment
-- DO NOT skip any segments
-
-==================== NEW CHUNK QUALITY RULES ====================
-
-Each English chunk MUST satisfy ALL of the following:
-
-A. Minimum length requirement:
-   - A chunk MUST contain at least TWO meaningful English words.
-   - Single-word chunks are NOT allowed.
-
-B. No punctuation chunks:
-   - A chunk CANNOT be a standalone symbol such as:
-     ".", "?", "!", ",", "...", "-", ":", ";", "。", "，"
-   - A chunk composed ONLY of punctuation is strictly forbidden.
-
-C. No empty chunks
-   - Segments must contain actual semantic content.
-
-   
-**Granularity Definitions:**
-
-**low_latency** (FINEST grain):
-- Split into MANY SHORT segments (1-3 words each)
-- Break at natural phrase boundaries
-- Keep functional words separate when possible
-
-**medium_latency** (MEDIUM grain):
-- Split into FEWER MEDIUM segments (3-8 words each)
-- Combine related phrases
-- Break at major clause boundaries
-
-**high_latency** (COARSE grain):
-- Split ONLY at major punctuation (periods, semicolons, commas between independent clauses)
-- Each segment = one complete clause or sentence
-- DO NOT output the entire input as one segment if it contains multiple clauses
-
----
-
-Example 1:
-Input: "Houston issued a series of tornado warnings on the evening of the 16th."
-
-{{
-  "low_latency": {{
-    "English": ["Houston", "issued", "a series of", "tornado warnings", "on the evening", "of the 16th."],
-    "Chinese": ["休斯敦", "发出了", "一系列", "龙卷风警报", "在傍晚", "16日。"]
-  }},
-  "medium_latency": {{
-    "English": ["Houston issued", "a series of tornado warnings", "on the evening of the 16th."],
-    "Chinese": ["休斯敦发出了", "一系列龙卷风警报", "在16日傍晚。"]
-  }},
-  "high_latency": {{
-    "English": ["Houston issued a series of tornado warnings on the evening of the 16th."],
-    "Chinese": ["休斯敦在16日傍晚发出了一系列龙卷风警报。"]
-  }}
-}}
-
-Example 2:
-Input: "The company announced new features and improved performance yesterday."
-
-{{
-  "low_latency": {{
-    "English": ["The company", "announced", "new features", "and", "improved performance", "yesterday."],
-    "Chinese": ["该公司", "宣布了", "新功能", "以及", "改进的性能", "昨天。"]
-  }},
-  "medium_latency": {{
-    "English": ["The company announced", "new features and improved performance", "yesterday."],
-    "Chinese": ["该公司宣布了", "新功能和改进的性能", "昨天。"]
-  }},
-  "high_latency": {{
-    "English": ["The company announced new features and improved performance yesterday."],
-    "Chinese": ["该公司昨天宣布了新功能和改进的性能。"]
-  }}
-}}
-
-Example 3 (Multiple clauses with punctuation):
-Input: "The weather was sunny in the morning, but it started raining in the afternoon, and the temperature dropped significantly."
-
-{{
-  "low_latency": {{
-    "English": ["The weather", "was sunny", "in the morning,", "but", "it started", "raining", "in the afternoon,", "and", "the temperature", "dropped", "significantly."],
-    "Chinese": ["天气", "是晴朗的", "在早上，", "但是", "开始", "下雨", "在下午，", "并且", "温度", "下降了", "显著。"]
-  }},
-  "medium_latency": {{
-    "English": ["The weather was sunny in the morning,", "but it started raining in the afternoon,", "and the temperature dropped significantly."],
-    "Chinese": ["早上天气晴朗，", "但下午开始下雨，", "温度显著下降。"]
-  }},
-  "high_latency": {{
-    "English": ["The weather was sunny in the morning,", "but it started raining in the afternoon,", "and the temperature dropped significantly."],
-    "Chinese": ["早上天气晴朗，", "但下午开始下雨，", "温度显著下降。"]
-  }}
-}}
-
-Example 4 (Short sentence - no punctuation to split):
-Input: "She loves reading books."
-
-{{
-  "low_latency": {{
-    "English": ["She", "loves", "reading", "books."],
-    "Chinese": ["她", "喜欢", "阅读", "书籍。"]
-  }},
-  "medium_latency": {{
-    "English": ["She loves", "reading books."],
-    "Chinese": ["她喜欢", "阅读书籍。"]
-  }},
-  "high_latency": {{
-    "English": ["She loves reading books."],
-    "Chinese": ["她喜欢阅读书籍。"]
-  }}
-}}
-
----
-
-Now process this input:
-Input: "{english_sentence}"
-
-**REMEMBER:**
-- For high_latency: Split at commas, periods, semicolons that separate clauses
-- NEVER output the entire sentence as one segment if it has multiple clauses
-- English and Chinese arrays MUST have the same length
-- Output ONLY the JSON object, no explanations"""
-
+    return [
+        {"role": "system", "content": system_msg},
+        {"role": "user", "content": user_msg},
+    ]
 
 # ============================================================
 # Worker DP Split Logic

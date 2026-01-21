@@ -33,13 +33,13 @@ echo "[OK] Segmentation completed."
 
 # ⭐ 新增：后处理LLM输出，合并单词chunks if it is only one word in the chunk
 python /data/user_data/haolingp/codes/post_process_llm_output.py \
-    --input_dir /data/user_data/haolingp/outputs/llm_output \
-    --output_dir /data/user_data/haolingp/outputs/llm_output_modified \
+    --input_dir /data/user_data/haolingp/outputs/llm_output_EAST \
+    --output_dir /data/user_data/haolingp/outputs/llm_output_EAST_merged \
     --lang en000
 
 # Now we have the llm segmentation
 # 3. run MFA =====> audio + text
-echo "Exporting MFA corpus for en000 (ALL parquets)..."
+echo "(Already exists)Exporting MFA corpus for en000 (ALL parquets)..."
 # python /data/user_data/haolingp/codes/export_mfa_corpus.py \
 #     --input-root /data/group_data/li_lab/siqiouya/datasets/yodas-granary/data \
 #     --lang en000 \
@@ -56,19 +56,30 @@ rm -rf ~/.local/share/mfa
 conda deactivate
 conda activate SMT
 
-mfa align \
-    /data/user_data/haolingp/outputs/mfa_corpus/en000 \
-    english_us_arpa \
-    english_us_arpa \
-    /data/user_data/haolingp/outputs/mfa_textgrid_output/en000 \
-    --clean
+echo "(Already exists) mfa_textgrid_output"
+# mfa align \
+#     /data/user_data/haolingp/outputs/mfa_corpus/en000 \
+#     english_us_arpa \
+#     english_us_arpa \
+#     /data/user_data/haolingp/outputs/mfa_textgrid_output/en000 \
+#     --clean
+
 
 # 5. find the good and bad json:
-python /data/user_data/haolingp/codes/find_bad_json.py
+python /data/user_data/haolingp/codes/find_bad_json.py \
+  --llm-root /data/user_data/haolingp/outputs/llm_output_EAST \
+  --mfa-root /data/user_data/haolingp/outputs/mfa_textgrid_output \
+  --lang en000
+
 
 # 6. use good jsons to get the trajectory
 echo "Running mult_trajectory.py ..."
-python /data/user_data/haolingp/codes/multi_trajectory.py
+python /data/user_data/haolingp/codes/multi_trajectory.py \
+  --llm-root /data/user_data/haolingp/outputs/llm_output_EAST_merged \
+  --mfa-root /data/user_data/haolingp/outputs/mfa_textgrid_output \
+  --good-root /data/user_data/haolingp/outputs \
+  --output-root /data/user_data/haolingp/outputs/streaming_dataset_EAST \
+  --langs en000
 echo "[OK] Generated streaming_dataset/"
 
 # 7. convert the stream into metrix form
@@ -78,8 +89,8 @@ conda activate metricx
 
 echo "Converting streaming dataset → MetricX input ..."
 python /data/user_data/haolingp/codes/convert_metricx.py \
-    --stream_dir /data/user_data/haolingp/outputs/streaming_dataset \
-    --output /data/user_data/haolingp/outputs/metricx_input.jsonl
+    --stream_dir /data/user_data/haolingp/outputs/streaming_dataset_EAST  \
+    --output /data/user_data/haolingp/outputs/metricx_input_EAST.jsonl
 
 echo "[OK] metricx_input.jsonl generated"
 
@@ -90,8 +101,8 @@ echo "[OK] metricx_input.jsonl generated"
 
 TOKENIZER_DIR=/data/user_data/haolingp/models/mt5-xl
 MODEL_DIR=/data/user_data/haolingp/models/metricx-24-hybrid-xl-v2p6
-METRICX_OUTPUT=/data/user_data/haolingp/outputs/metricx_output.jsonl
-METRICX_INPUT=/data/user_data/haolingp/outputs/metricx_input.jsonl
+METRICX_OUTPUT=/data/user_data/haolingp/outputs/metricx_output_EAST.jsonl
+METRICX_INPUT=/data/user_data/haolingp/outputs/metricx_input_EAST.jsonl
 
 export TOKENIZERS_PARALLELISM=false
 export OMP_NUM_THREADS=1
@@ -116,7 +127,7 @@ echo "[OK] MetricX scoring step finished (errors ignored)"
 # 6. Filter bad examples
 ###########################################
 THRESH=5.0
-FILTERED_OUTPUT=/data/user_data/haolingp/outputs/metricx_filtered_t${THRESH}.jsonl
+FILTERED_OUTPUT=/data/user_data/haolingp/outputs/metricx_filtered_t${THRESH}_EAST.jsonl
 
 echo "Filtering MetricX results with threshold = $THRESH ..."
 
@@ -133,9 +144,9 @@ echo "[OK] Filtered dataset saved → $FILTERED_OUTPUT"
 ###########################################
 
 python /data/user_data/haolingp/codes/final_output.py \
-  --metricx_jsonl /data/user_data/haolingp/outputs/metricx_filtered_t5.0.jsonl \
-  --stream_dir /data/user_data/haolingp/outputs/streaming_dataset \
-  --output_dir /data/user_data/haolingp/outputs/final_jsonl_dataset \
+  --metricx_jsonl /data/user_data/haolingp/outputs/metricx_filtered_t5.0_EAST.jsonl \
+  --stream_dir /data/user_data/haolingp/outputs/streaming_dataset_EAST \
+  --output_dir /data/user_data/haolingp/outputs/final_jsonl_dataset_EAST \
 
 
 
