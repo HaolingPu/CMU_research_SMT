@@ -1,0 +1,26 @@
+# ===== HPC / cache =====
+.cache/
+hf_cache/
+vscode-server/
+
+# ===== Conda / Python envs =====
+conda_envs/
+conda_pkgs/
+conda_user/
+.env
+.venv/
+
+# ===== Data & outputs (DO NOT COMMIT) =====
+data_synthesis/datasets/
+data_synthesis/models/
+data_synthesis/outputs/
+data_synthesis/MFA_backup/
+
+# ===== Logs / temp =====
+*.log
+*.tmp
+__pycache__/
+*.pyc
+
+# ===== Misc =====
+test.txt
