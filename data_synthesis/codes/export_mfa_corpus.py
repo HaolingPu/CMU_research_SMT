@@ -11,7 +11,7 @@ import soundfile as sf
 # ============================================================
 def clean_text(t: str):
     t = t.lower()
-    t = re.sub(r"[^a-z' ]+", " ", t)
+    t = re.sub(r"[^a-z0-9' ]+", " ", t)
     t = re.sub(r"\s+", " ", t).strip()
     return t
 
@@ -44,7 +44,7 @@ def process_parquet(parquet_path, out_base_dir, lang, num_samples=None):
 
         # Text
         text = clean_text(row["text"])
-
+        
         # uttid
         uttid = f"utt_{lang}_{parquet_name}_{idx:04d}"
 

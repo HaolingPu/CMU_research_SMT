@@ -3,6 +3,7 @@ import json
 import re
 import tgt
 from tqdm import tqdm
+import math
 
 
 ############################################################
@@ -10,9 +11,10 @@ from tqdm import tqdm
 ############################################################
 def normalize_text(s):
     s = s.lower()
-    s = re.sub(r"[^a-z' ]+", " ", s)
+    s = re.sub(r"[^a-z0-9' ]+", " ", s)
     s = re.sub(r"\s+", " ", s).strip()
     return s
+
 
 
 def load_word_alignment(textgrid_path):
@@ -30,28 +32,40 @@ def load_word_alignment(textgrid_path):
 
 
 def match_llm_chunks_to_mfa(llm_chunks, mfa_words):
+    """
+    Mono-global matching:
+    - Maintain a global cursor across chunks
+    - For each token, search forward from cursor
+    - This prevents later repeated words (e.g., "so") from always matching the first occurrence
+    """
     mfa_tokens = [normalize_text(w["word"]) for w in mfa_words]
     results = []
+
+    cursor = 0  # ✅ global pointer across chunks
 
     for chunk in llm_chunks:
         tokens = normalize_text(chunk).split()
         matched = []
 
         for t in tokens:
-            for i, w in enumerate(mfa_tokens):
-                if w == t:
+            # search only forward
+            for i in range(cursor, len(mfa_tokens)):
+                if mfa_tokens[i] == t:
                     matched.append(i)
+                    cursor = i + 1  # ✅ advance cursor
                     break
 
         if not matched:
             results.append({"chunk": chunk, "start": None, "end": None})
             continue
 
-        start = min(mfa_words[i]["start"] for i in matched)
-        end = max(mfa_words[i]["end"] for i in matched)
+        # with monotonic indices, start/end are simply first/last match
+        start = mfa_words[matched[0]]["start"]
+        end = mfa_words[matched[-1]]["end"]
         results.append({"chunk": chunk, "start": start, "end": end})
 
     return results
+
 
 
 def assign_chunks_by_second(aligned_chunks):
@@ -60,9 +74,10 @@ def assign_chunks_by_second(aligned_chunks):
         return [{"second": 0, "emit": []}]
 
     max_time = max(x["end"] for x in valid)
-    max_sec = int(max_time) + 1
+    eps = 1e-6  # make sure the length(audio) == length(target)!!!
+    max_sec = int(math.ceil(max_time - eps))
 
-    emitted = []
+    emitted = set()
     timeline = []
 
     for sec in range(max_sec):
@@ -74,10 +89,11 @@ def assign_chunks_by_second(aligned_chunks):
                 continue
             if item["end"] is not None and item["end"] <= sec_end:
                 to_emit.append(item["chunk"])
-                emitted.append(i)
+                emitted.add(i)
 
         timeline.append({"second": sec, "emit": to_emit})
 
+    # print(f"timeline:, {timeline}")
     return timeline
 
 
@@ -131,6 +147,9 @@ def process_language(lang, LLM_ROOT, MFA_ROOT, GOOD_JSONL, OUTPUT_ROOT):
     total_processed = 0
 
     for pq in parquet_dirs:
+        #debug:
+        # if pq != "00000000":
+        #     continue
         llm_pq_dir = os.path.join(lang_llm_dir, pq)
         mfa_pq_dir = os.path.join(lang_mfa_dir, pq)
 
@@ -147,11 +166,21 @@ def process_language(lang, LLM_ROOT, MFA_ROOT, GOOD_JSONL, OUTPUT_ROOT):
 
         llm_files = sorted(f for f in os.listdir(llm_pq_dir) if f.endswith(".json"))
 
+        # TARGET_UTT = "utt_en000_00000000_0006" # debugging
+        # pq = TARGET_UTT.split("_")[2]
+
+        # print("DEBUG pq =", pq)
+        # print("DEBUG llm_pq_dir =", llm_pq_dir)
+        # print("DEBUG target json exists in this pq? ", TARGET_UTT + ".json" in llm_files)
+        # print("DEBUG target in good_ids? ", TARGET_UTT in good_ids)
+
         parquet_count = 0
 
         for fname in tqdm(llm_files, desc=f"    {pq}"):
 
-            utt_base = fname.replace(".json", "")  # "utt_en000_00000000_0000"
+            utt_base = fname.replace(".json", "")
+            # if utt_base != TARGET_UTT:
+            #     continue
             
             # ✅ 修复：直接用utt_base检查，不加路径
             if utt_base not in good_ids:
@@ -169,13 +198,20 @@ def process_language(lang, LLM_ROOT, MFA_ROOT, GOOD_JSONL, OUTPUT_ROOT):
             try:
                 seg = json.load(open(llm_path))
                 mfa_words = load_word_alignment(textgrid_path)
+        
 
                 out_json = {
                     "utt_id": utt_base,
                     "original_text": seg.get("input", "")
                 }
+                
+                if "offline" in seg:
+                    levels = ["offline"]
+                else:
+                    levels = ["low_latency", "medium_latency", "high_latency"]
 
-                for level in ["low_latency", "medium_latency", "high_latency"]:
+
+                for level in levels:
                     eng = seg[level]["English"]
                     zh = seg[level]["Chinese"]
 
@@ -245,7 +281,7 @@ if __name__ == "__main__":
     os.makedirs(args.output_root, exist_ok=True)
 
     for lang in args.langs:
-        good_jsonl = os.path.join(args.good_root, f"good_EAST_{lang}_all.jsonl")
+        good_jsonl = args.good_root
 
         if not os.path.exists(good_jsonl):
             print(f"❌ Good list not found: {good_jsonl}")

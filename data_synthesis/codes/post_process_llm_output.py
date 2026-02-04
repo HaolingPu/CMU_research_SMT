@@ -91,7 +91,12 @@ def process_json_file(input_path, output_path):
         modified = False
         
         # Process each latency level
-        for level in ["low_latency", "medium_latency", "high_latency"]:
+        if "offline" in data:
+            levels = ["offline"]
+        else:
+            levels = ["low_latency", "medium_latency", "high_latency"]
+
+        for level in levels:
             if level not in data:
                 continue
             
@@ -175,6 +180,7 @@ def process_language(input_dir, output_dir, lang):
             
             if success:
                 if is_modified:
+                    print(f"modified: ,{input_path}")
                     modified_files += 1
                     parquet_modified += 1
             else:

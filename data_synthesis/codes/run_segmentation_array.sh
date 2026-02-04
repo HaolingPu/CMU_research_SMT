@@ -40,14 +40,14 @@ cd /data/user_data/haolingp/codes/
 # ---------------------------------------------
 echo "Launching local vLLM engine (TP=1) for task $SLURM_ARRAY_TASK_ID"
     
-python llm_output_vllm_batch.py \
+python llm_output_Salami.py \
     --task-id $SLURM_ARRAY_TASK_ID \
     --num-tasks 8 \
     --tp 1 \
     --batch-size 64 \
     --num-en 1 \
     --num-parquets all \
-    --num-samples all
+    --num-samples all \
 
 echo "===== TASK $SLURM_ARRAY_TASK_ID DONE ====="
 
