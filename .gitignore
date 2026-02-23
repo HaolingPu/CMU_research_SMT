@@ -15,6 +15,7 @@ data_synthesis/datasets/
 data_synthesis/models/
 data_synthesis/outputs/
 data_synthesis/MFA_backup/
+outputs/
 
 # ===== Logs / temp =====
 *.log

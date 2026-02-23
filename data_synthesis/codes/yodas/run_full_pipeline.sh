@@ -26,33 +26,23 @@ echo "[OK] Activated vllm"
 
 
 # 2. Run llm_output.py
-cd /data/user_data/haolingp/codes/
-# python /data/user_data/haolingp/codes/llm_output.py --num-en 1 --num-parquets 1
+cd /data/user_data/haolingp/data_synthesis/codes/yodas/
+# python /data/user_data/haolingp/data_synthesis/codes/yodas/llm_output.py --num-en 1 --num-parquets 1
 
 echo "[OK] Segmentation completed."
 
 # ⭐ 新增：后处理LLM输出，合并单词chunks if it is only one word in the chunk
-python /data/user_data/haolingp/codes/post_process_llm_output.py \
+python /data/user_data/haolingp/data_synthesis/codes/yodas/post_process_llm_output.py \
     --input_dir /data/user_data/haolingp/outputs/llm_output_OFFLINE \
     --output_dir /data/user_data/haolingp/outputs/llm_output_SALAMI_merged \
     --lang en000
 
 
-# 5. find the good and bad json:
-python /data/user_data/haolingp/codes/find_bad_json.py \
-  --llm-root /data/user_data/haolingp/outputs/llm_output_SALAMI_merged \
-  --mfa-root /data/user_data/haolingp/outputs/textgrids \
-  --corpus-root /data/user_data/haolingp/outputs/mfa_corpus \
-  --lang en000 \
-  --output-dir /data/user_data/haolingp/outputs \
-  --good-name good_SALAMI_en000_all.jsonl \
-  --bad-name bad_SALAMI_en000_all.jsonl
-
 
 # Now we have the llm segmentation
 # 3. run MFA =====> audio + text
 echo "(Already exists)Exporting MFA corpus for en000 (ALL parquets)..."
-# python /data/user_data/haolingp/codes/export_mfa_corpus.py \
+# python /data/user_data/haolingp/data_synthesis/codes/yodas/export_mfa_corpus.py \
 #     --input-root /data/group_data/li_lab/siqiouya/datasets/yodas-granary/data \
 #     --lang en000 \
 #     --output-dir /data/user_data/haolingp/outputs/mfa_corpus \
@@ -84,11 +74,20 @@ echo "(Already exists) mfa_textgrid_output"
 
 
 
+# 5. find the good and bad json:
+python /data/user_data/haolingp/data_synthesis/codes/yodas/find_bad_json.py \
+  --llm-root /data/user_data/haolingp/outputs/llm_output_SALAMI_merged \
+  --mfa-root /data/user_data/haolingp/outputs/textgrids \
+  --corpus-root /data/user_data/haolingp/outputs/mfa_corpus \
+  --lang en000 \
+  --output-dir /data/user_data/haolingp/outputs \
+  --good-name good_SALAMI_en000_all.jsonl \
+  --bad-name bad_SALAMI_en000_all.jsonl
 
 
 # 6. use good jsons to get the trajectory
 echo "Running mult_trajectory.py ..."
-# python /data/user_data/haolingp/codes/multi_trajectory.py \
+# python /data/user_data/haolingp/data_synthesis/codes/yodas/multi_trajectory.py \
 #   --llm-root /data/user_data/haolingp/outputs/llm_output_EAST_merged \
 #   --mfa-root /data/user_data/haolingp/outputs/mfa_textgrid_output \
 #   --good-root /data/user_data/haolingp/outputs \
@@ -96,7 +95,7 @@ echo "Running mult_trajectory.py ..."
 #   --langs en000
 # echo "[OK] Generated streaming_dataset/"
 
-python /data/user_data/haolingp/codes/multi_trajectory.py \
+python /data/user_data/haolingp/data_synthesis/codes/yodas/multi_trajectory.py \
   --llm-root /data/user_data/haolingp/outputs/llm_output_modified \
   --mfa-root /data/user_data/haolingp/outputs/textgrids \
   --good-root /data/user_data/haolingp/outputs \
@@ -110,7 +109,7 @@ conda deactivate
 conda activate metricx
 
 echo "Converting streaming dataset → MetricX input ..."
-python /data/user_data/haolingp/codes/convert_metricx.py \
+python /data/user_data/haolingp/data_synthesis/codes/yodas/convert_metricx.py \
     --stream_dir /data/user_data/haolingp/outputs/streaming_dataset  \
     --output /data/user_data/haolingp/outputs/metricx_input.jsonl
 
@@ -133,7 +132,7 @@ export MKL_SERVICE_FORCE_INTEL=1
 
 echo "Running MetricX QE ..."
 
-cd /data/user_data/haolingp/codes/metricx/
+cd /data/user_data/haolingp/data_synthesis/codes/metricx/
 PYTHONNOUSERSITE=1 python -m metricx24.predict \
   --tokenizer $TOKENIZER_DIR \
   --model_name_or_path $MODEL_DIR \
@@ -148,12 +147,12 @@ echo "[OK] MetricX scoring step finished (errors ignored)"
 ###########################################
 # 6. Filter bad examples
 ###########################################
-THRESH=5.0
+THRESH=3.0
 FILTERED_OUTPUT=/data/user_data/haolingp/outputs/metricx_filtered_t${THRESH}_EAST.jsonl
 
 echo "Filtering MetricX results with threshold = $THRESH ..."
 
-python /data/user_data/haolingp/codes/filter_metricx.py \
+python /data/user_data/haolingp/data_synthesis/codes/yodas/filter_metricx.py \
   --input  $METRICX_OUTPUT \
   --output $FILTERED_OUTPUT \
   --threshold $THRESH
@@ -165,13 +164,13 @@ echo "[OK] Filtered dataset saved → $FILTERED_OUTPUT"
 # 7. get the final dataset
 ###########################################
 
-python /data/user_data/haolingp/codes/final_output.py \
+python /data/user_data/haolingp/data_synthesis/codes/yodas/final_output.py \
   --metricx_jsonl /data/user_data/haolingp/outputs/metricx_filtered_t5.0_EAST.jsonl \
   --stream_dir /data/user_data/haolingp/outputs/streaming_dataset_EAST \
   --output_dir /data/user_data/haolingp/outputs/final_jsonl_dataset_EAST \
 
 
-# python /data/user_data/haolingp/codes/final_output.py \
+# python /data/user_data/haolingp/data_synthesis/codes/yodas/final_output.py \
 #   --metricx_jsonl /data/user_data/haolingp/outputs/metricx_filtered_t5.0_EAST.jsonl \
 #   --stream_dir /data/user_data/haolingp/outputs/streaming_dataset_EAST \
 #   --output_dir /data/user_data/haolingp/outputs/final_jsonl_dataset_EAST \

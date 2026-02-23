@@ -261,4 +261,4 @@ if __name__ == "__main__":
 
 
 
-# (SMT) [haolingp@babel-n5-16 codes]$ python /data/user_data/haolingp/codes/multi_trajectory_test.py   --textgrid /data/user_data/haolingp/outputs/mfa_textgrid_output/en000/00000000/utt_en000_00000000_0055.TextGrid   --llm /data/user_data/haolingp/outputs/llm_output_modified/en000/00000000/utt_en000_00000000_0055.json   --level low_latency   --max-words 120   --max-chunks 25
+# (SMT) [haolingp@babel-n5-16 codes]$ python /data/user_data/haolingp/data_synthesis/codes/yodas/multi_trajectory_test.py   --textgrid /data/user_data/haolingp/outputs/mfa_textgrid_output/en000/00000000/utt_en000_00000000_0055.TextGrid   --llm /data/user_data/haolingp/outputs/llm_output_modified/en000/00000000/utt_en000_00000000_0055.json   --level low_latency   --max-words 120   --max-chunks 25

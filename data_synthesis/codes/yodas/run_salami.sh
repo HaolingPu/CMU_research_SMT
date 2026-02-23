@@ -25,7 +25,7 @@ echo "===== START PIPELINE ====="
 source ~/.bashrc
 
 
-# python /data/user_data/haolingp/codes/post_process_llm_output.py \
+# python /data/user_data/haolingp/data_synthesis/codes/yodas/post_process_llm_output.py \
 #     --input_dir /data/user_data/haolingp/outputs/llm_output_Salami_offline \
 #     --output_dir /data/user_data/haolingp/outputs/llm_output_SALAMI_merged \
 #     --lang en000
@@ -33,7 +33,7 @@ source ~/.bashrc
 
 
 # # 5. find the good and bad json:
-# python /data/user_data/haolingp/codes/find_bad_json.py \
+# python /data/user_data/haolingp/data_synthesis/codes/yodas/find_bad_json.py \
 #   --llm-root /data/user_data/haolingp/outputs/llm_output_SALAMI_merged \
 #   --mfa-root /data/user_data/haolingp/outputs/textgrids \
 #   --corpus-root /data/user_data/haolingp/outputs/mfa_corpus \
@@ -45,7 +45,7 @@ source ~/.bashrc
 
 # # 6. use good jsons to get the trajectory
 # echo "Running mult_trajectory.py ..."
-# python /data/user_data/haolingp/codes/multi_trajectory.py \
+# python /data/user_data/haolingp/data_synthesis/codes/yodas/multi_trajectory.py \
 #   --llm-root /data/user_data/haolingp/outputs/llm_output_SALAMI_merged \
 #   --mfa-root /data/user_data/haolingp/outputs/textgrids \
 #   --good-root /data/user_data/haolingp/outputs/good_SALAMI_en000_all.jsonl \
@@ -59,7 +59,7 @@ conda deactivate
 conda activate metricx
 
 # echo "Converting streaming dataset → MetricX input ..."
-# python /data/user_data/haolingp/codes/convert_metricx.py \
+# python /data/user_data/haolingp/data_synthesis/codes/yodas/convert_metricx.py \
 #     --stream_dir /data/user_data/haolingp/outputs/streaming_dataset_SALAMI  \
 #     --output /data/user_data/haolingp/outputs/metricx_input_SALAMI.jsonl
 
@@ -78,7 +78,7 @@ export MKL_SERVICE_FORCE_INTEL=1
 
 echo "Running MetricX QE ..."
 
-cd /data/user_data/haolingp/codes/metricx/
+cd /data/user_data/haolingp/data_synthesis/codes/metricx/
 PYTHONNOUSERSITE=1 python -m metricx24.predict \
   --tokenizer $TOKENIZER_DIR \
   --model_name_or_path $MODEL_DIR \
@@ -99,7 +99,7 @@ FILTERED_OUTPUT=/data/user_data/haolingp/outputs/SALAMI/metricx_filtered_t${THRE
 
 echo "Filtering MetricX results with threshold = $THRESH ..."
 
-python /data/user_data/haolingp/codes/filter_metricx.py \
+python /data/user_data/haolingp/data_synthesis/codes/yodas/filter_metricx.py \
   --input  $METRICX_OUTPUT \
   --output $FILTERED_OUTPUT \
   --threshold $THRESH
@@ -112,7 +112,7 @@ echo "[OK] Filtered dataset saved → $FILTERED_OUTPUT"
 # 7. get the final dataset
 ###########################################
 
-python /data/user_data/haolingp/codes/final_output.py \
+python /data/user_data/haolingp/data_synthesis/codes/yodas/final_output.py \
   --metricx_jsonl /data/user_data/haolingp/outputs/SALAMI/metricx_filtered_t5.0_SALAMI.jsonl \
   --stream_dir /data/user_data/haolingp/outputs/SALAMI/streaming_dataset_SALAMI \
   --output_dir /data/user_data/haolingp/outputs/SALAMI/final_jsonl_dataset_SALAMI \

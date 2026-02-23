@@ -33,18 +33,18 @@ echo "=============================================="
 source ~/.bashrc
 conda activate vllm
 
-cd /data/user_data/haolingp/codes/
+cd /data/user_data/haolingp/data_synthesis/codes/yodas/
 
 # ---------------------------------------------
 # 每个任务独立运行 Qwen3-30B 推理（TP=2）
 # ---------------------------------------------
 echo "Launching local vLLM engine (TP=1) for task $SLURM_ARRAY_TASK_ID"
     
-python llm_output_Salami.py \
+python llm_output_vllm_batch.py \
     --task-id $SLURM_ARRAY_TASK_ID \
     --num-tasks 8 \
     --tp 1 \
-    --batch-size 64 \
+    --batch-size 4096 \
     --num-en 1 \
     --num-parquets all \
     --num-samples all \
