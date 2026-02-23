@@ -1,9 +1,0 @@
-utt_id,bleu_low_latency,laal_low_latency,bleu_medium_latency,laal_medium_latency,bleu_high_latency,laal_high_latency
-utt_000003,80.32,,100.0,,80.32,
-utt_000007,30.93,,48.0,,100.0,
-utt_000008,27.09,,30.26,,30.72,
-utt_000011,100.0,,100.0,,100.0,
-utt_000014,32.27,,29.01,,35.1,
-utt_000015,43.57,,42.56,,41.56,
-utt_000016,48.33,,48.33,,48.33,
-utt_000017,20.96,,26.24,,26.24,

@@ -25,3 +25,6 @@ __pycache__/
 
 # ===== Misc =====
 test.txt
+ANLP/
+models/
+vllm_requirements.txt
