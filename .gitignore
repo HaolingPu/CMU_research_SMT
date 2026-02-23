@@ -22,6 +22,7 @@ outputs/
 *.tmp
 __pycache__/
 *.pyc
+slurm_logs/
 
 # ===== Misc =====
 test.txt
