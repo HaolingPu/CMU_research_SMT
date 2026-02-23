@@ -70,23 +70,25 @@ def build_stream_path_index(stream_root: str, only_recording: Optional[str] = No
 
 def open_writers(output_root: str, append: bool = False):
     """
-    Cache file handles by (recording_id, latency).
+    No longer caches file handles to avoid hitting the OS open-file-descriptor
+    limit (ulimit -n) when there are many unique (recording_id, latency) pairs.
+    Each write opens in append mode and closes immediately.
+    On the first visit to a (recording_id, latency) pair, the file is truncated
+    unless append=True.
     """
-    writers: Dict[Tuple[str, str], any] = {}
+    writers: Dict[Tuple[str, str], any] = {}  # kept only to track seen pairs
     os.makedirs(output_root, exist_ok=True)
-    mode = "a" if append else "w"
 
     def get_writer(recording_id: str, latency: str):
         key = (recording_id, latency)
-        if key in writers:
-            return writers[key]
-
         out_dir = os.path.join(output_root, recording_id)
         os.makedirs(out_dir, exist_ok=True)
         out_path = os.path.join(out_dir, f"{latency}_latency.jsonl")
-        f = open(out_path, mode, encoding="utf-8")
-        writers[key] = f
-        return f
+        # Truncate on first visit (unless appending); afterwards always append.
+        if not append and key not in writers:
+            open(out_path, "w", encoding="utf-8").close()
+        writers[key] = True
+        return open(out_path, "a", encoding="utf-8")
 
     return writers, get_writer
 
@@ -178,20 +180,15 @@ def build_jsonl(
                         with open(out_path, "w", encoding="utf-8") as wf:
                             json.dump(out_item, wf, ensure_ascii=False, indent=2)
                     else:
-                        wf = get_writer(recording_id, latency)
-                        wf.write(json.dumps(out_item, ensure_ascii=False) + "\n")
+                        with get_writer(recording_id, latency) as wf:
+                            wf.write(json.dumps(out_item, ensure_ascii=False) + "\n")
                     processed += 1
 
                 except Exception:
                     skipped += 1
                     continue
     finally:
-        if not flat_output:
-            for wf in writers.values():
-                try:
-                    wf.close()
-                except Exception:
-                    pass
+        pass  # files are closed after each write; nothing to clean up
 
     print("\n============================================================")
     print("DONE")

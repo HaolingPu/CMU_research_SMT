@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+# ============================================================
+# Salami  Stage 1 — LLM output post-processing
+#
+# Input  : ${BASE}/llm_output_raw          (raw LLM salami JSON files)
+# Output : ${BASE}/llm_output_offline_merged_fixed
+#          ${BASE}/good_train_xl_salami_mfa.jsonl  (→ Stage 2)
+#
+# Submit : sbatch stage1_llm.sh
+# Then   : sbatch stage2_streaming.sh
+# ============================================================
+#SBATCH --job-name=salami_s1_llm
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=180G
+#SBATCH --partition=general
+#SBATCH --qos=normal
+#SBATCH --time=1-00:00:00
+#SBATCH -o /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/slurm_logs/stage1_llm_%A.out
+#SBATCH -e /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/slurm_logs/stage1_llm_%A.err
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=haolingp@andrew.cmu.edu
+
+set -e
+echo "===== Salami Stage 1 — START $(date) ====="
+
+source ~/.bashrc
+conda activate SMT
+
+BASE=/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami
+CODE=/data/user_data/haolingp/data_synthesis/codes/gigaspeech
+
+mkdir -p ${BASE}/slurm_logs
+
+# ── Step 0: Fix LLM raw ──────────────────────────────────────
+rm -rf ${BASE}/llm_output_raw_fixed
+
+python ${CODE}/fix_llm_raw.py \
+  --in_dir         ${BASE}/llm_output_raw \
+  --out_dir        ${BASE}/llm_output_raw_fixed \
+  --out_good_jsonl ${BASE}/good_train_xl_salami_fixed.jsonl \
+  --sync_zh_punct \
+  --zh_punct_allow_insert \
+  --filter_zh_punct \
+  --zh_excess_threshold 2
+
+# ── Step 1: Salami → offline format ──────────────────────────
+rm -rf ${BASE}/llm_output_offline_fixed
+
+python ${CODE}/salami/map_salami_to_offline_gigaspeech.py \
+  --input_dir  ${BASE}/llm_output_raw_fixed \
+  --output_dir ${BASE}/llm_output_offline_fixed
+
+# ── Step 2: Post-process (merge one-word chunks) ──────────────
+rm -rf ${BASE}/llm_output_offline_merged_fixed
+
+python ${CODE}/post_process_llm_output_gigaspeech.py \
+  --input-dir  ${BASE}/llm_output_offline_fixed \
+  --output-dir ${BASE}/llm_output_offline_merged_fixed \
+  --overwrite
+
+# ── Step 3: Find bad JSONs (MFA alignment check) ─────────────
+python ${CODE}/find_bad_json_gigaspeech.py \
+  --llm-dir    ${BASE}/llm_output_offline_merged_fixed \
+  --mfa-dir    /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/gigaspeech_mfa_textgrid \
+  --corpus-dir /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/gigaspeech_mfa_corpus \
+  --good-jsonl ${BASE}/good_train_xl_salami_mfa.jsonl \
+  --bad-jsonl  ${BASE}/bad_train_xl_salami_mfa.jsonl \
+  --allow-one-word
+
+echo "===== Salami Stage 1 — DONE $(date) ====="
+echo "Next: sbatch stage2_streaming.sh"

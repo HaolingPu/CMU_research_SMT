@@ -21,59 +21,78 @@ source ~/.bashrc
 
 conda activate SMT
 
-# 0) Fix LLM raw: restore punctuation from manifest, filter token mismatches
+BASE=/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami
+
+# 0) Fix LLM raw: restore punctuation from manifest, filter token mismatches,
+#    sync Chinese punct to repaired English boundaries, filter missing zh punct
+rm -rf  ${BASE}/llm_output_raw_fixed
+
 python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/fix_llm_raw.py \
-  --in_dir         /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/llm_output_raw \
-  --out_dir        /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/llm_output_raw_fixed \
-  --out_good_jsonl /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/good_train_xl_salami_fixed.jsonl
+  --in_dir         ${BASE}/llm_output_raw \
+  --out_dir        ${BASE}/llm_output_raw_fixed \
+  --out_good_jsonl ${BASE}/good_train_xl_salami_fixed.jsonl \
+  --sync_zh_punct \
+  --zh_punct_allow_insert \
+  --filter_zh_punct \
+  --zh_excess_threshold 2
 
 # 1) salami -> offline (restructured)
+rm -rf  ${BASE}/llm_output_offline_fixed
+
 python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/salami/map_salami_to_offline_gigaspeech.py \
-  --input_dir  /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/llm_output_raw_fixed \
-  --output_dir /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/llm_output_offline_fixed
+  --input_dir  ${BASE}/llm_output_raw_fixed \
+  --output_dir ${BASE}/llm_output_offline_fixed
 
 # 2) Merge one-word chunks
+rm -rf  ${BASE}/llm_output_offline_merged_fixed
+
 python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/post_process_llm_output_gigaspeech.py \
-  --input-dir  /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/llm_output_offline_fixed \
-  --output-dir /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/llm_output_offline_merged_fixed \
+  --input-dir  ${BASE}/llm_output_offline_fixed \
+  --output-dir ${BASE}/llm_output_offline_merged_fixed \
   --overwrite
 
 # MFA corpus and MFA textgrid (DONE - reuse existing)
 
 # 3) find bad json
 python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/find_bad_json_gigaspeech.py \
-  --llm-dir    /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/llm_output_offline_merged_fixed \
+  --llm-dir    ${BASE}/llm_output_offline_merged_fixed \
   --mfa-dir    /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/gigaspeech_mfa_textgrid \
   --corpus-dir /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/gigaspeech_mfa_corpus \
-  --good-jsonl /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/good_train_xl_salami_mfa.jsonl \
-  --bad-jsonl  /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/bad_train_xl_salami_mfa.jsonl \
+  --good-jsonl ${BASE}/good_train_xl_salami_mfa.jsonl \
+  --bad-jsonl  ${BASE}/bad_train_xl_salami_mfa.jsonl \
   --allow-one-word
 
 # 4) creating streaming dataset
+rm -rf  ${BASE}/streaming_salami_dataset
+
 python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/multi_trajectory_gigaspeech.py \
-  --llm-dir    /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/llm_output_offline_merged_fixed \
+  --llm-dir    ${BASE}/llm_output_offline_merged_fixed \
   --mfa-dir    /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/gigaspeech_mfa_textgrid \
-  --good-jsonl /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/good_train_xl_salami_mfa.jsonl \
-  --output-dir /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/streaming_salami_dataset \
+  --good-jsonl ${BASE}/good_train_xl_salami_mfa.jsonl \
+  --output-dir ${BASE}/streaming_salami_dataset \
   --chunk-ms 960 \
   --overwrite
+
+# 4-check) Quality check on streaming dataset
+python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/check_streaming_dataset.py \
+  --stream_dir ${BASE}/streaming_salami_dataset \
+  --tsv        /data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_xl_case_robust_asr-filtered.tsv \
+  --report     ${BASE}/check_streaming_report.json \
+  --zh_excess_threshold 2 \
+  || true   # non-blocking: report only, never fail the pipeline
 
 # 6) create Metricx_input
 conda deactivate
 conda activate metricx
 python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/convert_metricx_gigaspeech.py \
-  --stream_dir /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/streaming_salami_dataset \
-  --output /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/metricx_input.jsonl
-
-
+  --stream_dir ${BASE}/streaming_salami_dataset \
+  --output     ${BASE}/metricx_input.jsonl
 
 echo "Pipeline done, Now need to split the metricx input and predict!"
 
-
-
-
 # 把 metricx input split 8 份
-mkdir -p /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/metricx_shards
+rm -rf  ${BASE}/metricx_shards
+mkdir -p ${BASE}/metricx_shards
 split -d -n l/8 \
-  /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/metricx_input.jsonl \
-  /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/metricx_shards/input_
+  ${BASE}/metricx_input.jsonl \
+  ${BASE}/metricx_shards/input_

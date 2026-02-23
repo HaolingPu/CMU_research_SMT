@@ -56,6 +56,10 @@ def detect_levels(data: Dict) -> List[Tuple[str, str, str]]:
     if "source_offline" in data and "target_offline" in data:
         levels.append(("offline", "source_offline", "target_offline"))
 
+    # future_sampling (adaptive latency via majority vote)
+    if "source_future_sampling" in data and "target_future_sampling" in data:
+        levels.append(("future_sampling", "source_future_sampling", "target_future_sampling"))
+
     return levels
 
 

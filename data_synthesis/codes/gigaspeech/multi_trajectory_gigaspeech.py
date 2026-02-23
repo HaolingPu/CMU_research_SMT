@@ -141,6 +141,15 @@ def assign_chunks_by_window(
 
         timeline.append({"chunk_index": idx, "emit_idx": emit_idx})
 
+    # Any segments not yet emitted (end=None or aligned beyond audio) are
+    # appended to the last window so no source/target content is dropped.
+    unemitted = [i for i in range(len(aligned_chunks)) if i not in emitted]
+    if unemitted:
+        if timeline:
+            timeline[-1]["emit_idx"].extend(unemitted)
+        else:
+            timeline.append({"chunk_index": 0, "emit_idx": unemitted})
+
     return timeline
 
 
