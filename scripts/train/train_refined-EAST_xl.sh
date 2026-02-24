@@ -1,6 +1,38 @@
+#!/usr/bin/env bash
+
+##SBATCH --nodelist=babel-4-23
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=128GB
+#SBATCH --gres=gpu:L40S:4
+#SBATCH --partition=general
+#SBATCH --exclude=babel-p9-32
+#SBATCH --time=1-00:00:00
+##SBATCH --dependency=afterok:job_id
+##SBATCH --array=1-7
+##SBATCH --account=siqiouya
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=siqiouya@andrew.cmu.edu
+#SBATCH -e slurm_logs/%j.err
+#SBATCH -o slurm_logs/%j.out
+
+WANDB_API_KEY=$(cat /home/siqiouya/.keys/wandb)
+HF_TOKEN=$(cat /home/siqiouya/.keys/huggingface)
+
+apptainer exec \
+  --nv \
+  --env "MODELSCOPE_CACHE=/home/siqiouya/.cache/modelscope/" \
+  --env "MEGATRON_LM_PATH=/home/siqiouya/code/Megatron-LM/" \
+  --env "NCCL_P2P_DISABLE=1" \
+  --env "NCCL_IB_DISABLE=1" \
+  --env "WANDB_API_KEY=${WANDB_API_KEY}" \
+  --env "HF_TOKEN=${HF_TOKEN}" \
+  docker://modelscope-registry.us-west-1.cr.aliyuncs.com/modelscope-repo/modelscope:ubuntu22.04-cuda12.8.1-py311-torch2.8.0-vllm0.11.0-modelscope1.31.0-swift3.9.1 \
+  bash -c '
 export train_dataset=/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_xl_case_robust_asr-filtered_zh-refined-EAST.jsonl
 
-PYTORCH_CUDA_ALLOC_CONF='expandable_segments:True' \
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
 NPROC_PER_NODE=4 \
 CUDA_VISIBLE_DEVICES=0,1,2,3 \
 ENABLE_AUDIO_OUTPUT=False \
@@ -48,13 +80,13 @@ megatron sft \
     --attention_backend flash \
     --wandb_project gigaspeech_zh \
     --wandb_exp_name gigaspeech-zh-refined-EAST-xl_origin-bsz4
-    
+
 BASE_DIR=/data/user_data/siqiouya/ckpts/infinisst-omni/gigaspeech-zh-refined-EAST-xl_origin-bsz4
 LATEST_CKPT=$(ls -td "$BASE_DIR"/v*-* 2>/dev/null | head -n 1)
 
 if [ -z "$LATEST_CKPT" ]; then
     echo "Warning: No checkpoint found for gigaspeech-zh-refined-EAST-xl_origin-bsz4"
-    continue
+    exit 1
 fi
 
 echo "Exporting checkpoint: $LATEST_CKPT"
@@ -64,5 +96,4 @@ swift export \
     --to_hf true \
     --torch_dtype bfloat16 \
     --output_dir "${LATEST_CKPT}-hf/"
-
-# hf upload owaski/gigaspeech-zh-refined-EAST-xl_origin-bsz4 ${LATEST_CKPT}-hf
+'

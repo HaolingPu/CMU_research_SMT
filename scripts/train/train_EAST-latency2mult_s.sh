@@ -30,12 +30,13 @@ apptainer exec \
   --env "HF_TOKEN=${HF_TOKEN}" \
   docker://modelscope-registry.us-west-1.cr.aliyuncs.com/modelscope-repo/modelscope:ubuntu22.04-cuda12.8.1-py311-torch2.8.0-vllm0.11.0-modelscope1.31.0-swift3.9.1 \
   bash -c '
-export train_dataset=/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_xl_case_robust_asr-filtered_zh-refined-EAST-mult.jsonl
+export train_dataset=/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_s_zh-EAST-latency2mult_origin.jsonl
 
 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
 NPROC_PER_NODE=4 \
 CUDA_VISIBLE_DEVICES=0,1,2,3 \
 ENABLE_AUDIO_OUTPUT=False \
+MASTER_PORT=29501 \
 megatron sft \
     --load /data/user_data/siqiouya/ckpts/pretrained/llm/Qwen3-Omni-30B-A3B-Instruct-mcore/ \
     --dataset ${train_dataset} \
@@ -68,7 +69,7 @@ megatron sft \
     --weight_decay 0.01 \
     --clip_grad 1.0 \
     --max_epochs 1 \
-    --save /data/user_data/siqiouya/ckpts/infinisst-omni/gigaspeech-zh-refined-EAST-mult-xl_origin-bsz4 \
+    --save /data/user_data/siqiouya/ckpts/infinisst-omni/gigaspeech-zh-EAST-latency2mult-s_origin-bsz4 \
     --log_interval 10 \
     --eval_interval 200 \
     --save_interval 200 \
@@ -79,13 +80,13 @@ megatron sft \
     --no_save_rng true \
     --attention_backend flash \
     --wandb_project gigaspeech_zh \
-    --wandb_exp_name gigaspeech-zh-refined-EAST-mult-xl_origin-bsz4
+    --wandb_exp_name gigaspeech-zh-EAST-latency2mult-s_origin-bsz4
 
-BASE_DIR=/data/user_data/siqiouya/ckpts/infinisst-omni/gigaspeech-zh-refined-EAST-mult-xl_origin-bsz4
+BASE_DIR=/data/user_data/siqiouya/ckpts/infinisst-omni/gigaspeech-zh-EAST-latency2mult-s_origin-bsz4
 LATEST_CKPT=$(ls -td "$BASE_DIR"/v*-* 2>/dev/null | head -n 1)
 
 if [ -z "$LATEST_CKPT" ]; then
-    echo "Warning: No checkpoint found for gigaspeech-zh-refined-EAST-mult-xl_origin-bsz4"
+    echo "Warning: No checkpoint found for gigaspeech-zh-EAST-latency2mult-s_origin-bsz4"
     exit 1
 fi
 

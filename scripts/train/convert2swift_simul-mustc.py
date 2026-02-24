@@ -11,8 +11,8 @@ orig_manifest = pd.read_csv(tsv_path, sep='\t')
 
 # Simul-MuST-C
 manifest_root = "/data/group_data/li_lab/haolingp/data_synthesis/gigaspeech/final_jsonl_salami/"
-audio_clips_root = "/data/group_data/li_lab/siqiouya/datasets/gigaspeech/audio_clips_zh_Simul-MuST-C_fixed/"
-output_filename = "train_xl_case_robust_asr-filtered_zh-Simul-MuST-C_fixed.jsonl"
+audio_clips_root = "/data/group_data/li_lab/siqiouya/datasets/gigaspeech/audio_clips_zh_Simul-MuST-C_fixed_v2/"
+output_filename = "train_xl_case_robust_asr-filtered_zh-Simul-MuST-C_fixed_v2.jsonl"
 
 output_root = "/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/"
 os.makedirs(audio_clips_root, exist_ok=True)

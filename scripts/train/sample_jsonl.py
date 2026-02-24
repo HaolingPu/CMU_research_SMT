@@ -6,9 +6,9 @@ import random
 
 """
 DATA_DIR=/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests
-python sample_jsonl.py 12500 ${DATA_DIR}/train_xl_case_robust_asr-filtered_zh-Simul-MuST-C_fixed.jsonl ${DATA_DIR}/train_s_zh-Simul-MuST-C-fixed_origin.jsonl
-python sample_jsonl.py 12500 ${DATA_DIR}/train_xl_case_robust_asr-filtered_zh-EAST-mult_fixed.jsonl ${DATA_DIR}/train_s_zh-EAST-mult-fixed_origin.jsonl
-python sample_jsonl.py 12500 ${DATA_DIR}/train_xl_case_robust_asr-filtered_zh-refined-EAST-mult_fixed.jsonl ${DATA_DIR}/train_s_zh-refined-EAST-mult-fixed_origin.jsonl
+python sample_jsonl.py 12500 ${DATA_DIR}/train_xl_case_robust_asr-filtered_zh-Simul-MuST-C_fixed_v2.jsonl ${DATA_DIR}/train_s_zh-Simul-MuST-C-fixed_v2_origin.jsonl
+python sample_jsonl.py 12500 ${DATA_DIR}/train_xl_case_robust_asr-filtered_zh-EAST-latency2mult.jsonl ${DATA_DIR}/train_s_zh-EAST-latency2mult_origin.jsonl
+python sample_jsonl.py 12500 ${DATA_DIR}/train_xl_case_robust_asr-filtered_zh-refined-EAST-latency2mult.jsonl ${DATA_DIR}/train_s_zh-refined-EAST-latency2mult_origin.jsonl
 """
 
 def main():
