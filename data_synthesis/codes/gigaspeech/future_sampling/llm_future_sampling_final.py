@@ -297,13 +297,13 @@ def compute_laal(
     actions: List[str],
     reference: str,
 ) -> float:
-    """Text LAAL using source chunk index as source-time surrogate."""
+    """Text LAAL using source-word count as source-time surrogate."""
     timeline: List[int] = []
     source_read = 0
 
     for chunk, delta, action in zip(source_chunks, target_deltas, actions):
-        if str(chunk).strip():
-            source_read += 1
+        words_in_chunk = len(str(chunk).strip().split()) if str(chunk).strip() else 0
+        source_read += words_in_chunk
         if action == "WRITE" and str(delta).strip():
             for _ in str(delta).strip():
                 timeline.append(source_read)
@@ -311,7 +311,11 @@ def compute_laal(
     y = "".join(d for d in target_deltas if d)
     y_len = len(y)
     yref_len = len(str(reference).replace(" ", ""))
-    x_len = sum(1 for c in source_chunks if str(c).strip())
+    x_len = sum(
+        len(str(c).strip().split())
+        for c in source_chunks
+        if str(c).strip()
+    )
 
     if y_len == 0 or x_len == 0 or yref_len == 0:
         return float("nan")
@@ -601,6 +605,7 @@ def build_score_prompt(
     candidates_str = "\n".join(
         (
             f'Candidate {item["candidate_id"]}:\n'
+            f'  full_prefix_so_far: "{item["safe_prefix"]}"\n'
             f'  new_delta_only: "{item["delta"]}"'
         )
         for item in candidate_items
@@ -609,15 +614,18 @@ def build_score_prompt(
         "You are evaluating incremental simultaneous-translation candidates.\n\n"
         f'Observed English so far: "{observed_source}"\n'
         f'Chinese already committed: "{committed}"\n\n'
-        "Each candidate provides ONLY the new incremental delta beyond committed.\n"
-        "Score the quality of this NEW DELTA as the immediate next continuation.\n"
+        "Each candidate provides:\n"
+        "- full_prefix_so_far: full aligned/truncated Chinese prefix after this step\n"
+        "- new_delta_only: the incremental delta beyond committed\n\n"
+        "Score the quality of the NEW DELTA as the immediate next continuation,\n"
+        "but use full_prefix_so_far to avoid over-penalizing truncation artifacts.\n"
         "Do NOT re-evaluate already committed content by itself.\n"
         "Judge whether the candidate is a correct next incremental continuation for the observed English,\n"
         "given the committed Chinese context.\n\n"
         "## Definition of Over-translation (IMPORTANT)\n"
         "- Over-translation means translating content that is NOT YET present in the observed English.\n"
         "- If the delta translates words that ARE already present in observed English, that is CORRECT and should NOT be penalized.\n"
-        "- If delta starts mid-phrase because of truncation, evaluate it using the committed Chinese as left context.\n\n"
+        "- If delta starts mid-phrase because of truncation, evaluate it using full_prefix_so_far and committed Chinese as context.\n\n"
         "Scoring criteria:\n"
         "- 90-100: Perfectly faithful, natural, no over-translation\n"
         "- 70-89: Mostly correct, minor issues\n"
@@ -625,7 +633,7 @@ def build_score_prompt(
         "- 0-49: Wrong translation or significant over-translation\n\n"
         "Deduction rules:\n"
         "- DO NOT deduct: delta covers ALL words in observed English faithfully\n"
-        "- DO NOT deduct: new_delta_only starts mid-word/phrase due to truncation (use committed Chinese as left context)\n"
+        "- DO NOT deduct: new_delta_only starts mid-word/phrase due to truncation (use full_prefix_so_far as context)\n"
         "- DO deduct heavily: delta includes content not supported by observed English\n"
         "- Deduct for mistranslation, hallucination, semantic drift, awkward continuation\n"
         "- Deduct if the new delta contradicts or degrades the committed context\n"
@@ -644,11 +652,13 @@ def build_score_prompt(
         'Example 3 (truncation artifact, good):\n'
         '  Observed: "And these introductions are"\n'
         '  Committed: "而且这"\n'
+        '  FullPrefix: "而且这些介绍不可避免"\n'
         '  Delta: "些介绍不可避免"\n'
         '  Score: 82\n'
         'Example 4 (bad over-translation):\n'
         '  Observed: "And these introductions are"\n'
         '  Committed: "而且这"\n'
+        '  FullPrefix: "而且这些介绍出于文学上的诚实感"\n'
         '  Delta: "些介绍出于文学上的诚实感"\n'
         '  Score: 40\n\n'
         f"{candidates_str}\n\n"
