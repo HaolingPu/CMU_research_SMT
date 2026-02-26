@@ -99,7 +99,7 @@ def load_tsv(path):
 
 
 def load_manifest(path):
-    """Returns {utt_id -> hypothesis}"""
+    """Returns {utt_id -> hypothesis}. When multiple (utt_id, latency) exist, last one wins."""
     print(f"Loading MetricX manifest: {path}")
     index = {}
     with open(path, encoding="utf-8") as f:
@@ -110,12 +110,27 @@ def load_manifest(path):
             d = json.loads(line)
             uid = d["metadata"]["utt_id"]
             index[uid] = d.get("hypothesis", "")
-    print(f"  {len(index)} entries")
+    print(f"  {len(index)} entries (unique utt_id)")
     return index
 
 
+def load_manifest_by_key(path):
+    """Returns {(utt_id, latency) -> hypothesis} for same-latency comparison."""
+    key_to_hyp = {}
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            d = json.loads(line)
+            uid = d["metadata"]["utt_id"]
+            lat = d["metadata"].get("latency", "")
+            key_to_hyp[(uid, lat)] = d.get("hypothesis", "")
+    return key_to_hyp
+
+
 def load_final(root):
-    """Returns {utt_id -> entry_dict}"""
+    """Returns {utt_id -> entry_dict}. When multiple latencies per utt_id, last one wins."""
     print(f"Loading final jsonl: {root}")
     index = {}
     for dirpath, _, files in os.walk(root):
@@ -131,8 +146,28 @@ def load_final(root):
                     uid = d.get("utt_id", "")
                     if uid:
                         index[uid] = d
-    print(f"  {len(index)} entries")
+    print(f"  {len(index)} entries (unique utt_id)")
     return index
+
+
+def load_final_by_key(root):
+    """Returns {(utt_id, latency) -> entry_dict} for same-latency comparison."""
+    key_to_entry = {}
+    for dirpath, _, files in os.walk(root):
+        for fn in files:
+            if not fn.endswith(".jsonl"):
+                continue
+            with open(os.path.join(dirpath, fn), encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    d = json.loads(line)
+                    uid = d.get("utt_id", "")
+                    lat = d.get("latency", "")
+                    if uid:
+                        key_to_entry[(uid, lat)] = d
+    return key_to_entry
 
 
 # ---------------------------------------------------------------------------
@@ -150,10 +185,13 @@ def main():
     tsv      = load_tsv(args.tsv)
     manifest = load_manifest(args.manifest)
     final    = load_final(args.final_dir)
+    manifest_by_key = load_manifest_by_key(args.manifest)
+    final_by_key    = load_final_by_key(args.final_dir)
 
     tsv_ids      = set(tsv)
     manifest_ids = set(manifest)
     final_ids    = set(final)
+    common_keys  = sorted(set(manifest_by_key) & set(final_by_key))
 
     # IDs present in final but not in TSV (shouldn't happen)
     extra_in_final   = sorted(final_ids - tsv_ids)
@@ -182,6 +220,20 @@ def main():
     en_clause_counts     = Counter()
     zh_clause_counts     = Counter()
     diff_sent_end_dist   = Counter()
+
+    # Same-latency stats: only (utt_id, latency) present in both manifest and final
+    tgt_exact_same_lat = 0
+    tgt_punct_exact_same_lat = 0
+    for key in common_keys:
+        uid, lat = key
+        hyp = manifest_by_key[key]
+        d = final_by_key[key]
+        tgt_joined = join_tgt(d.get("target", []))
+        if tgt_joined == hyp:
+            tgt_exact_same_lat += 1
+        delta = diff_counters(punct_counts(tgt_joined), punct_counts(hyp))
+        if not delta:
+            tgt_punct_exact_same_lat += 1
 
     for uid in common:
         tsv_src  = tsv[uid]
@@ -326,6 +378,13 @@ def main():
         for ex in tgt_punct_diff[:5]:
             print(f"    {ex['utt_id']}: {ex['diff']}")
 
+    print(f"\n--- TARGET (same (utt_id, latency) only) [{len(common_keys)}] ---")
+    print(f"  (Manifest and final both keyed by utt_id; when multiple latencies exist,")
+    print(f"   the above TARGET stats can mix different latencies → spurious mismatches.)")
+    print(f"  Same-latency pairs:     {len(common_keys)}")
+    print(f"  Target text exact:     {tgt_exact_same_lat}")
+    print(f"  Target punct exact:    {tgt_punct_exact_same_lat}")
+
     print(f"\n--- SOURCE / TARGET punctuation alignment [{total}] ---")
     print(f"  Array length mismatches:   {len(st_len_mismatch)}")
 
@@ -382,6 +441,9 @@ def main():
         "target_punct_exact":  tgt_punct_exact,
         "target_punct_mismatch_count": len(tgt_punct_diff),
         "target_punct_mismatch_examples": tgt_punct_diff[:50],
+        "same_latency_pairs":  len(common_keys),
+        "target_exact_same_latency": tgt_exact_same_lat,
+        "target_punct_exact_same_latency": tgt_punct_exact_same_lat,
         # src/tgt alignment
         "st_array_len_mismatch_count": len(st_len_mismatch),
         "st_array_len_mismatch_examples": st_len_mismatch[:20],

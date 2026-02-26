@@ -13,6 +13,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32
+#SBATCH --gres=gpu:1
 #SBATCH --mem=180G
 #SBATCH --partition=general
 #SBATCH --qos=normal
@@ -33,9 +34,9 @@ CODE=/data/user_data/haolingp/data_synthesis/codes/gigaspeech
 
 mkdir -p ${BASE}/slurm_logs
 
-# ── Step 0: Fix LLM raw ──────────────────────────────────────
-# Restore English punctuation from manifest, sync Chinese punctuation,
-# filter utterances with token mismatches or punct misalignment.
+# ── Step 0: Fix LLM raw (方案 A：只修不筛) ─────────────────────
+# Restore EN punct from manifest, sync ZH punct; do NOT filter by zh/en punct.
+# Only token-mismatch is dropped; punct mismatch is kept for data volume.
 rm -rf ${BASE}/llm_output_raw_fixed
 
 python ${CODE}/fix_llm_raw.py \
@@ -43,9 +44,7 @@ python ${CODE}/fix_llm_raw.py \
   --out_dir        ${BASE}/llm_output_raw_fixed \
   --out_good_jsonl ${BASE}/good_train_xl_east_fixed.jsonl \
   --sync_zh_punct \
-  --zh_punct_allow_insert \
-  --filter_zh_punct \
-  --zh_excess_threshold 2
+  --zh_punct_allow_insert
 
 # ── Step 1: Post-process (merge one-word chunks, etc.) ───────
 rm -rf ${BASE}/llm_output_merged_fixed

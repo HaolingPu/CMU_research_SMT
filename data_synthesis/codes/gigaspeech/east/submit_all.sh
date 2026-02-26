@@ -16,11 +16,18 @@ submit() {
   local desc="$1"; shift
   local cmd=("$@")
   if $DRY; then
-    echo "[DRY] ${cmd[*]}"
+    echo "[DRY] ${cmd[*]}" >&2
     echo "9999999"   # fake job ID
   else
     local jid
-    jid=$("${cmd[@]}" --parsable)
+    # Put --parsable right after sbatch so we get only the job ID (some SLURM
+    # treat --parsable after script name as a script arg and then print "Submitted batch job NNN")
+    local full=()
+    for x in "${cmd[@]}"; do
+      full+=("$x")
+      [[ "$x" == "sbatch" ]] && full+=("--parsable")
+    done
+    jid=$("${full[@]}")
     echo "Submitted ${desc}: job ${jid}" >&2
     echo "${jid}"
   fi

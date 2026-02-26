@@ -14,6 +14,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32
+#SBATCH --gres=gpu:1
 #SBATCH --mem=180G
 #SBATCH --partition=general
 #SBATCH --qos=normal

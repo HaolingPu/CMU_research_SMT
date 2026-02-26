@@ -23,8 +23,7 @@ conda activate SMT
 BASE=/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_east
 
 # ===========================
-# 0) Fix LLM raw: restore punctuation from manifest, filter token mismatches,
-#    sync Chinese punct to repaired English boundaries, filter missing zh punct
+# 0) Fix LLM raw (方案 A：只修不筛): restore EN punct, sync ZH punct; no punct filter
 # ===========================
 rm -rf ${BASE}/llm_output_raw_fixed
 
@@ -33,9 +32,7 @@ python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/fix_llm_raw.py \
   --out_dir        ${BASE}/llm_output_raw_fixed \
   --out_good_jsonl ${BASE}/good_train_xl_east_fixed.jsonl \
   --sync_zh_punct \
-  --zh_punct_allow_insert \
-  --filter_zh_punct \
-  --zh_excess_threshold 2
+  --zh_punct_allow_insert
 
 # ===========================
 # 1) Post-process LLM output (raw_fixed -> merged_fixed)

@@ -42,22 +42,22 @@ PYTHONNOUSERSITE=1 python -m metricx24.predict \
 echo "DONE, Now need to concatenate"
 
 
-## 合并8个metricx output (run manually after all 8 jobs finish)
-cat /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/metricx_shards/output_*.jsonl \
-  > /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/metricx_output.jsonl
+# ## 合并8个metricx output (run manually after all 8 jobs finish)
+# cat /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/metricx_shards/output_*.jsonl \
+#   > /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/metricx_output.jsonl
 
 
 
-# # # 6) Filter MetricX (run after merge)
-python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/filter_metricx_gigaspeech.py \
-  --input /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/metricx_output.jsonl \
-  --output /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/metricx_filtered_t3.0.jsonl \
-  --threshold 3.0
+# # # # 6) Filter MetricX (run after merge)
+# python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/filter_metricx_gigaspeech.py \
+#   --input /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/metricx_output.jsonl \
+#   --output /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/metricx_filtered_t3.0.jsonl \
+#   --threshold 3.0
 
-# # # 7) Final dataset (run after filter)
-python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/final_output_gigaspeech.py \
-  --metricx_jsonl /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/metricx_filtered_t3.0.jsonl \
-  --stream_dir /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/streaming_salami_dataset \
-  --output_dir /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/final_jsonl_salami
+# # # # 7) Final dataset (run after filter)
+# python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/final_output_gigaspeech.py \
+#   --metricx_jsonl /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/metricx_filtered_t3.0.jsonl \
+#   --stream_dir /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/streaming_salami_dataset \
+#   --output_dir /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_salami/final_jsonl_salami
 
-echo "===== PIPELINE DONE ====="
+# echo "===== PIPELINE DONE ====="

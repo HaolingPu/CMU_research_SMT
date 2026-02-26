@@ -5,7 +5,7 @@
 # Input  : ${BASE}/metricx_shards/output_00.jsonl … output_07.jsonl
 # Output : ${BASE}/metricx_output.jsonl
 #          ${BASE}/metricx_filtered_t3.0.jsonl
-#          ${BASE}/final_jsonl_dataset
+#          ${BASE}/final_jsonl_east
 #          ${BASE}/check_final_report.json
 #
 # Submit : sbatch stage4_final.sh   (after ALL Stage 3 tasks complete)
@@ -14,6 +14,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
+#SBATCH --gres=gpu:1
 #SBATCH --mem=64G
 #SBATCH --partition=general
 #SBATCH --qos=normal
@@ -68,21 +69,21 @@ echo "Filtered: $(wc -l < ${BASE}/metricx_filtered_t3.0.jsonl) lines kept"
 conda deactivate
 conda activate SMT
 
-rm -rf ${BASE}/final_jsonl_dataset
+rm -rf ${BASE}/final_jsonl_east
 
 python ${CODE}/final_output_gigaspeech.py \
   --metricx_jsonl ${BASE}/metricx_filtered_t3.0.jsonl \
   --stream_dir    ${BASE}/streaming_EAST_dataset \
-  --output_dir    ${BASE}/final_jsonl_dataset
+  --output_dir    ${BASE}/final_jsonl_east
 
 # ── Step 7-check: Quality check on final output ──────────────
 python ${CODE}/check_salami_final.py \
   --tsv       ${TSV} \
   --manifest  ${BASE}/metricx_filtered_t3.0.jsonl \
-  --final_dir ${BASE}/final_jsonl_dataset \
+  --final_dir ${BASE}/final_jsonl_east \
   --report    ${BASE}/check_final_report.json \
   || true   # non-blocking
 
 echo "===== EAST Stage 4 — DONE $(date) ====="
-echo "Final dataset: ${BASE}/final_jsonl_dataset"
+echo "Final dataset: ${BASE}/final_jsonl_east"
 echo "Quality report: ${BASE}/check_final_report.json"

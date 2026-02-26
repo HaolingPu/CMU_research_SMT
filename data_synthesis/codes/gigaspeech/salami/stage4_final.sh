@@ -14,6 +14,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
+#SBATCH --gres=gpu:1
 #SBATCH --mem=64G
 #SBATCH --partition=general
 #SBATCH --qos=normal
@@ -59,10 +60,10 @@ echo "Merged MetricX output: $(wc -l < ${BASE}/metricx_output.jsonl) lines"
 # ── Step 6: Filter by MetricX score ──────────────────────────
 python ${CODE}/filter_metricx_gigaspeech.py \
   --input     ${BASE}/metricx_output.jsonl \
-  --output    ${BASE}/metricx_filtered_t3.0.jsonl \
-  --threshold 3.0
+  --output    ${BASE}/metricx_filtered_t5.0.jsonl \
+  --threshold 5.0
 
-echo "Filtered: $(wc -l < ${BASE}/metricx_filtered_t3.0.jsonl) lines kept"
+echo "Filtered: $(wc -l < ${BASE}/metricx_filtered_t5.0.jsonl) lines kept"
 
 # ── Step 7: Build final dataset ──────────────────────────────
 conda deactivate
@@ -71,14 +72,14 @@ conda activate SMT
 rm -rf ${BASE}/final_jsonl_salami
 
 python ${CODE}/final_output_gigaspeech.py \
-  --metricx_jsonl ${BASE}/metricx_filtered_t3.0.jsonl \
+  --metricx_jsonl ${BASE}/metricx_filtered_t5.0.jsonl \
   --stream_dir    ${BASE}/streaming_salami_dataset \
   --output_dir    ${BASE}/final_jsonl_salami
 
 # ── Step 7-check: Quality check on final output ──────────────
 python ${CODE}/check_salami_final.py \
   --tsv       ${TSV} \
-  --manifest  ${BASE}/metricx_filtered_t3.0.jsonl \
+  --manifest  ${BASE}/metricx_filtered_t5.0.jsonl \
   --final_dir ${BASE}/final_jsonl_salami \
   --report    ${BASE}/check_final_report.json \
   || true
