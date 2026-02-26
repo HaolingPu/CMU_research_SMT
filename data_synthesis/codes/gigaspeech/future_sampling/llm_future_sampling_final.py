@@ -601,7 +601,6 @@ def build_score_prompt(
     candidates_str = "\n".join(
         (
             f'Candidate {item["candidate_id"]}:\n'
-            f'  full_prefix_so_far: "{item["safe_prefix"]}"\n'
             f'  new_delta_only: "{item["delta"]}"'
         )
         for item in candidate_items
@@ -610,19 +609,15 @@ def build_score_prompt(
         "You are evaluating incremental simultaneous-translation candidates.\n\n"
         f'Observed English so far: "{observed_source}"\n'
         f'Chinese already committed: "{committed}"\n\n'
-        "Each candidate provides:\n"
-        "- full_prefix_so_far: full aligned/truncated Chinese prefix after this step\n"
-        "- new_delta_only: portion beyond the committed prefix\n\n"
-        "Score each candidate based on the incremental quality of the NEW DELTA, "
-        "but use full_prefix_so_far as context to avoid penalizing truncation artifacts.\n"
+        "Each candidate provides ONLY the new incremental delta beyond committed.\n"
+        "Score the quality of this NEW DELTA as the immediate next continuation.\n"
         "Do NOT re-evaluate already committed content by itself.\n"
         "Judge whether the candidate is a correct next incremental continuation for the observed English,\n"
         "given the committed Chinese context.\n\n"
         "## Definition of Over-translation (IMPORTANT)\n"
         "- Over-translation means translating content that is NOT YET present in the observed English.\n"
         "- If the delta translates words that ARE already present in observed English, that is CORRECT and should NOT be penalized.\n"
-        '- Example: if observed English contains "monotonous and unavailing", then translating both '
-        '"单调" and "毫无成效" is correct (NOT over-translation).\n\n'
+        "- If delta starts mid-phrase because of truncation, evaluate it using the committed Chinese as left context.\n\n"
         "Scoring criteria:\n"
         "- 90-100: Perfectly faithful, natural, no over-translation\n"
         "- 70-89: Mostly correct, minor issues\n"
@@ -630,54 +625,32 @@ def build_score_prompt(
         "- 0-49: Wrong translation or significant over-translation\n\n"
         "Deduction rules:\n"
         "- DO NOT deduct: delta covers ALL words in observed English faithfully\n"
-        "- DO NOT deduct: new_delta_only starts mid-word/phrase due to truncation (use full_prefix_so_far for context)\n"
+        "- DO NOT deduct: new_delta_only starts mid-word/phrase due to truncation (use committed Chinese as left context)\n"
         "- DO deduct heavily: delta includes content not supported by observed English\n"
         "- Deduct for mistranslation, hallucination, semantic drift, awkward continuation\n"
         "- Deduct if the new delta contradicts or degrades the committed context\n"
         "- Do NOT reward a candidate just because committed content (already fixed) is good\n\n"
         "Few-shot examples:\n"
-        'Example 1:\n'
+        'Example 1 (good):\n'
         '  Observed: "monotonous and unavailing"\n'
         '  Committed: ""\n'
-        '  FullPrefix: "显得单调乏味且毫无成效"\n'
         '  Delta: "显得单调乏味且毫无成效"\n'
-        '  Score: 92\n'
-        '  Reason: Faithfully translates both observed words; "unavailing" -> "毫无成效" is correct, NOT over-translation.\n\n'
-        'Example 2:\n'
+        '  Score: 92\n\n'
+        'Example 2 (partial/incomplete):\n'
         '  Observed: "monotonous and unavailing"\n'
         '  Committed: ""\n'
-        '  FullPrefix: "显得单调"\n'
         '  Delta: "显得单调"\n'
-        '  Score: 68\n'
-        '  Reason: Partially correct but incomplete; "unavailing" is already observed but not yet translated.\n\n'
-        'Example 3:\n'
-        '  Observed: "monotonous"\n'
-        '  Committed: ""\n'
-        '  FullPrefix: "出于文学上的诚实感"\n'
-        '  Delta: "出于文学上的诚实感"\n'
-        '  Score: 35\n'
-        '  Reason: True over-translation and semantic drift; content is not supported by observed English.\n\n'
-        'Example 4 (truncation artifact, good):\n'
+        '  Score: 68\n\n'
+        'Example 3 (truncation artifact, good):\n'
         '  Observed: "And these introductions are"\n'
         '  Committed: "而且这"\n'
-        '  FullPrefix: "而且这些介绍不可避免"\n'
         '  Delta: "些介绍不可避免"\n'
         '  Score: 82\n'
-        '  Reason: Delta starts mid-phrase due to truncation, but full prefix faithfully covers only observed content.\n\n'
-        'Example 5 (truncation artifact, bad over-translation):\n'
+        'Example 4 (bad over-translation):\n'
         '  Observed: "And these introductions are"\n'
         '  Committed: "而且这"\n'
-        '  FullPrefix: "而且这些介绍出于文学上的诚实感"\n'
         '  Delta: "些介绍出于文学上的诚实感"\n'
-        '  Score: 40\n'
-        '  Reason: Even considering truncation, full prefix over-translates beyond observed English.\n\n'
-        'Example 6 (mistranslation):\n'
-        '  Observed: "And these introductions are"\n'
-        '  Committed: ""\n'
-        '  FullPrefix: "而这些演讲是"\n'
-        '  Delta: "而这些演讲是"\n'
-        '  Score: 30\n'
-        '  Reason: "introductions" is mistranslated as "演讲" instead of "介绍".\n\n'
+        '  Score: 40\n\n'
         f"{candidates_str}\n\n"
         "Output STRICT JSON only in this format:\n"
         '{"scores":[{"candidate_id":1,"score":87,"tags":["ok"]},{"candidate_id":2,"score":41,"tags":["mistranslation","drift"]}]}\n'
@@ -955,7 +928,7 @@ def score_candidate_prefixes(
         model=model,
         prompt=prompt_text,
         temperature=0.0,
-        max_tokens=1024,
+        max_tokens=256,
     )
     raw = (resp.choices[0].text or "").strip()
     text = clean_llm_output(raw).strip()
