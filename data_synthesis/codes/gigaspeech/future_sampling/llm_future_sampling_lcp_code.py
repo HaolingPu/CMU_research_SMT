@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Final entrypoint: semantic-merge safe prefix synthesis."""
+"""Baseline1 entrypoint: pure code LCP (100%)."""
 
 import os
 import sys
@@ -13,9 +13,7 @@ def main() -> None:
         core,
         *sys.argv[1:],
         "--selection-mode",
-        "semantic_merge_vote",
-        "--consensus-ratio",
-        "0.7",
+        "lcp_code",
     ]
     os.execv(sys.executable, argv)
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Final entrypoint: semantic-merge safe prefix synthesis."""
+"""Baseline4 entrypoint: majority-vote prefix with boundary rule."""
 
 import os
 import sys
@@ -13,9 +13,9 @@ def main() -> None:
         core,
         *sys.argv[1:],
         "--selection-mode",
-        "semantic_merge_vote",
+        "majority_vote",
         "--consensus-ratio",
-        "0.7",
+        "0.6",
     ]
     os.execv(sys.executable, argv)
 
