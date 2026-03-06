@@ -22,7 +22,7 @@ conda activate vllm
 
 # ===== 常改的配置（只看这里） =====
 MANIFEST="/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_xl_case_robust_asr-filtered.tsv"
-PYTHON_SCRIPT="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_final.py"
+PYTHON_SCRIPT="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_majority_vote.py"
 OUTPUT_ROOT="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_future_sampling_final/llm_batch_output_1000"
 
 BASE_MODEL="/data/user_data/haolingp/models/Qwen3-4B-Base"

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Baseline3 entrypoint: LLM quorum-LCP (70%, no boundary rule)."""
+"""Baseline3 entrypoint: LLM quorum-LCP (70%) with boundary rule."""
 
 import os
 import sys

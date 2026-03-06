@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Baseline runner (100 cases): 4 tasks x 25 rows
+# Final (majority_vote / semantic synthesis) runner: 100 cases = 4 tasks x 25 rows
 
-#SBATCH --job-name=fut_b4_mvbdry
+#SBATCH --job-name=fut_final_mv100
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=16
 #SBATCH --gres=gpu:L40S:2
@@ -21,11 +21,12 @@ source ~/.bashrc
 conda activate vllm
 
 MANIFEST="/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_xl_case_robust_asr-filtered.tsv"
-PYTHON_SCRIPT="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_majority_boundary.py"
-OUTPUT_ROOT="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_future_sampling_final/llm_batch_output_b4_majority_boundary_100"
+PYTHON_SCRIPT="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_majority_vote.py"
+OUTPUT_ROOT="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_future_sampling_final/llm_batch_output_final_majority_vote_simalign_100"
 
 BASE_MODEL="/data/user_data/haolingp/models/Qwen3-4B-Base"
 INSTRUCT_MODEL="/data/user_data/haolingp/models/Qwen3-30B-A3B-Instruct-2507-FP8"
+SIMALIGN_MODEL="/data/user_data/haolingp/models/LaBSE"
 
 TASK_ID="${SLURM_ARRAY_TASK_ID:-0}"
 NUM_TASKS=4
@@ -75,8 +76,7 @@ if ! curl -s "http://localhost:${INSTRUCT_PORT}/health" > /dev/null 2>&1; then
   exit 1
 fi
 
-
-CUDA_VISIBLE_DEVICES=0 python "$PYTHON_SCRIPT" \
+SIMALIGN_MODEL="$SIMALIGN_MODEL" CUDA_VISIBLE_DEVICES=0 python "$PYTHON_SCRIPT" \
   --input-tsv "$MANIFEST" \
   --output-root "$OUTPUT_ROOT" \
   --task-id "$TASK_ID" \
@@ -86,6 +86,7 @@ CUDA_VISIBLE_DEVICES=0 python "$PYTHON_SCRIPT" \
   --parallel-utterances 16 \
   --future-sampling-batch-size 4 \
   --base-model-path "$BASE_MODEL" \
+  --align-method simalign \
   --overwrite
 
 kill "$SERVE_PID" 2>/dev/null || true

@@ -1,21 +1,42 @@
 #!/usr/bin/env python3
 """
-Word alignment via simalign + monotonic alignment (drop-in replacement for awesome-align).
+Word alignment via simalign (drop-in replacement for awesome-align).
 
-Uses simalign (SentenceAligner, e.g. pvl/labse_bert) for src-tgt word alignment,
-then converts crossing alignments to monotonic alignment following GigaSpeech's
-build_trajectory_full_mfa.py. Goal: truncate target translation by observed source.
+【Simalign 整体逻辑】
+1. 用 simalign（基于 LaBSE 等句子向量的词对齐）做 源文(如英文) ↔ 译文(如中文) 的词级对齐。
+2. 源文按空格分词，译文用 jieba 分词后，调用 SentenceAligner.get_word_aligns() 得到 (src_word_idx, tgt_word_idx)。
+3. 返回给上层的是 (src_word_idx, tgt_char_idx)：tgt_char_idx 是「归一化译文」里该目标词结尾字符的索引，
+   这样 core 用 translation[:len(result)] 截断时，和归一化字符串的字符一一对应。
+4. 可选：环境变量 SIMALIGN_USE_MONOTONIC=1 时，会对齐结果做单调化（源索引随目标索引非降），便于轨迹/边界一致。
 
-Reference: https://github.com/owaski/GigaSpeech/blob/main/preprocess/build_trajectory_full_mfa.py
+Default behavior follows the "minimal simalign path":
+  - split source by whitespace
+  - split Chinese target by jieba
+  - call SentenceAligner.get_word_aligns()
+  - use returned (src_word_idx, tgt_word_idx) pairs directly
 
-Dependencies: simalign, jieba
-  pip install simalign jieba
+Optional monotonic post-processing can be enabled via env var for A/B testing.
 """
 
 from __future__ import annotations
 
 import os
-from typing import Any, List, Optional, Tuple
+import re
+from typing import Any, Dict, List, Optional, Tuple
+
+# 零宽/不可见字符，对齐前从译文里去掉，避免 jieba 和字符偏移错位
+_ZERO_WIDTH_AND_INVISIBLE = re.compile(
+    r"[\u200b\u200c\u200d\u200e\u200f\ufeff\u2060\u2061\u2062\u2063\u2064\u180e\u034f]+"
+)
+
+_DEBUG_PRINT_COUNT = 0
+
+
+def _env_flag(name: str, default: bool = False) -> bool:
+    raw = os.environ.get(name, "")
+    if not raw:
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
 
 # Optional: normalize translation before alignment (strip, first line)
 def _normalize_tgt_for_jieba(text: str) -> str:
@@ -25,6 +46,7 @@ def _normalize_tgt_for_jieba(text: str) -> str:
     # First line only, like clean_translation_for_alignment
     if "\n" in t:
         t = t.split("\n")[0].strip()
+    t = _ZERO_WIDTH_AND_INVISIBLE.sub("", t)
     return t
 
 
@@ -58,15 +80,27 @@ def load_align_model(cache_dir: Optional[str] = None, device: Optional[str] = No
         device = "cuda"
     elif isinstance(device, str) and device.startswith("cuda"):
         device = "cuda"  # simalign uses "cuda" or "cpu"
-    # "m" = match/intersection (key "inter"); "a"=argmax, "i"=itermax. Use intersection for monotonic.
+    align_model_name = os.environ.get("SIMALIGN_MODEL", "sentence-transformers/LaBSE")
+    matching_methods = os.environ.get("SIMALIGN_MATCHING_METHODS", "a")
+    use_monotonic = _env_flag("SIMALIGN_USE_MONOTONIC", default=False)
+    debug_enabled = _env_flag("SIMALIGN_DEBUG", default=False)
     aligner = SentenceAligner(
-        model="pvl/labse_bert",
+        model=align_model_name,
         token_type="bpe",
-        matching_methods="m",
+        matching_methods=matching_methods,
         device=device,
     )
-    print(f"[Align v2] simalign loaded on {device}.")
-    return aligner, None
+    cfg = {
+        "matching_methods": matching_methods,
+        "use_monotonic": use_monotonic,
+        "debug": debug_enabled,
+        "debug_max_cases": int(os.environ.get("SIMALIGN_DEBUG_MAX_CASES", "20")),
+    }
+    print(
+        f"[Align v2] simalign loaded on {device} | model={align_model_name} "
+        f"| methods={matching_methods} | monotonic={use_monotonic} | debug={debug_enabled}"
+    )
+    return aligner, cfg
 
 
 def _to_monotonic_alignments(
@@ -101,13 +135,45 @@ def _to_monotonic_alignments(
     return alignments_r
 
 
+def _pick_alignment_pairs(
+    alignments_dict: Dict[str, Any],
+    matching_methods: str,
+) -> List[Tuple[int, int]]:
+    methods = set((matching_methods or "").lower())
+    key_priority: List[str] = []
+    if "a" in methods:
+        key_priority.extend(["mwmf", "fwd", "forward", "argmax"])
+    if "m" in methods:
+        key_priority.extend(["inter", "intersection", "mwmf"])
+    if "i" in methods:
+        key_priority.extend(["itermax", "iter"])
+    key_priority.extend(["mwmf", "inter", "itermax", "fwd", "forward"])
+
+    seen = set()
+    for k in key_priority:
+        if k in seen:
+            continue
+        seen.add(k)
+        v = alignments_dict.get(k)
+        if isinstance(v, list) and v:
+            return [(int(s), int(t)) for s, t in v]
+
+    for v in alignments_dict.values():
+        if isinstance(v, list) and v:
+            try:
+                return [(int(s), int(t)) for s, t in v]
+            except Exception:
+                continue
+    return []
+
+
 def get_word_alignments(
     src_text: str,
     tgt_text: str,
     align_model: Any,
     align_tokenizer: Any,
 ) -> List[Tuple[int, int]]:
-    """Word-level alignment via simalign + monotonic.
+    """Word-level alignment via simalign.
 
     Returns (src_word_idx, tgt_char_idx) so core's len(translation) checks work.
     tgt_char_idx = end character index (inclusive) of that tgt word in normalized text.
@@ -115,24 +181,46 @@ def get_word_alignments(
     - tgt: jieba (Chinese words). Translation is normalized (first line, strip).
     """
     import jieba
-    src_words = src_text.strip().split()
+    src_words = [w for w in src_text.strip().split() if w and not w.isspace()]
     tgt_raw = _normalize_tgt_for_jieba(tgt_text)
-    tgt_words = list(jieba.cut(tgt_raw.replace(" ", ""))) if tgt_raw else []
+    tgt_words = [w for w in jieba.cut(tgt_raw) if w and not w.isspace()] if tgt_raw else []
 
     if not src_words or not tgt_words:
         return []
+
+    cfg = align_tokenizer if isinstance(align_tokenizer, dict) else {}
+    matching_methods = str(cfg.get("matching_methods", "a"))
+    use_monotonic = bool(cfg.get("use_monotonic", False))
+    debug_enabled = bool(cfg.get("debug", False))
+    debug_max_cases = int(cfg.get("debug_max_cases", 20))
 
     try:
         alignments_dict = align_model.get_word_aligns(src_words, tgt_words)
     except Exception:
         return []
 
-    # intersection: key "inter" (matching_methods="m"); some versions use "mwmf"
-    inter = alignments_dict.get("inter") or alignments_dict.get("mwmf")
-    if not inter:
+    raw_pairs = _pick_alignment_pairs(alignments_dict, matching_methods)
+    if not raw_pairs:
         return []
 
-    mono = _to_monotonic_alignments(inter, len(src_words), len(tgt_words))
+    out_pairs = raw_pairs
+    if use_monotonic:
+        out_pairs = _to_monotonic_alignments(raw_pairs, len(src_words), len(tgt_words))
+
+    global _DEBUG_PRINT_COUNT
+    if debug_enabled and _DEBUG_PRINT_COUNT < debug_max_cases:
+        _DEBUG_PRINT_COUNT += 1
+        size_info = {
+            k: (len(v) if isinstance(v, list) else -1)
+            for k, v in alignments_dict.items()
+        }
+        print(
+            f"[Align v2 DEBUG #{_DEBUG_PRINT_COUNT}] src_words={src_words} "
+            f"| tgt_words={tgt_words} | keys={size_info} "
+            f"| picked={raw_pairs} | monotonic={use_monotonic} -> {out_pairs}",
+            flush=True,
+        )
+
     # Map tgt_word_idx -> end char index (inclusive) in normalized translation
     norm = "".join(tgt_words)
     cum = 0
@@ -140,14 +228,7 @@ def get_word_alignments(
     for w in tgt_words:
         cum += len(w)
         char_end.append(cum - 1)
-    return [(s, char_end[t]) for s, t in mono if t < len(char_end)]
-
-
-# Thresholds for truncation (En->Zh often 1~4 chars/word, e.g. "inevitably"->"不可避免地")
-_MAX_TGT_CHARS_PER_OBS_WORD = 5
-_ALIGNMENT_SPREAD_THRESHOLD = 12
-_ALIGNMENT_VERY_END_MARGIN = 3
-_ALIGNMENT_TOO_EARLY_THRESHOLD = 2
+    return [(s, char_end[t]) for s, t in out_pairs if t < len(char_end)]
 
 
 def truncate_by_alignment(
@@ -156,13 +237,16 @@ def truncate_by_alignment(
     translation: str,
     alignments: List[Tuple[int, int]],
 ) -> str:
-    """Truncate translation to the part aligned to observed source.
+    """Truncate by scanning target-side alignments left-to-right.
 
-    alignments: (src_word_idx, tgt_char_idx) from get_word_alignments.
-    tgt_char_idx = end character index (inclusive) in normalized (no-space) text.
-    Returns a prefix of translation so that core's translation[:len(result)] is
-    consistent (norm↔translation offset mapping). Caller typically passes
-    already normalized translation (e.g. clean_translation_for_alignment + normalize_zh).
+    We keep consuming target content while aligned source indices stay inside
+    the observed range [0, obs_n). The first aligned target position whose
+    source index enters the future range [obs_n, ...) stops the prefix.
+
+    alignments: (src_word_idx, tgt_char_idx), where tgt_char_idx is the end
+    character index (inclusive) of the aligned target word in normalized text.
+    Unmatched target characters are ignored naturally because only aligned
+    positions participate in the scan.
     """
     obs_n = len(observed_src.strip().split())
     if obs_n <= 0 or not translation:
@@ -170,52 +254,27 @@ def truncate_by_alignment(
 
     norm = _normalize_tgt_for_jieba(translation).replace(" ", "")
     n_norm = len(norm)
-    if not n_norm:
+    if not n_norm or not alignments:
         return ""
 
-    last = obs_n - 1
-    last_t = [t for s, t in alignments if s == last]
+    safe_char_idx = -1
+    future_seen = False
 
-    def _cap_by_obs_words(raw_len: int) -> int:
-        if obs_n <= 0:
-            return raw_len
-        cap = obs_n * _MAX_TGT_CHARS_PER_OBS_WORD
-        return min(raw_len, max(2, cap), n_norm)
+    for s, t in sorted(alignments, key=lambda x: (x[1], x[0])):
+        if t < 0:
+            continue
+        t = min(t, n_norm - 1)
+        if s < obs_n:
+            safe_char_idx = max(safe_char_idx, t)
+            continue
+        future_seen = True
+        break
 
-    def _fallback_safe_tgt_idx() -> str:
-        safe_char_idx = -1
-        for s, t in alignments:
-            if s < obs_n:
-                safe_char_idx = max(safe_char_idx, t)
-        if safe_char_idx >= 0:
-            raw_len = safe_char_idx + 1
-            capped = _cap_by_obs_words(raw_len)
-            return _translation_prefix_for_norm_char_count(translation, capped)
+    if safe_char_idx >= 0:
+        return _translation_prefix_for_norm_char_count(translation, safe_char_idx + 1)
+    if future_seen:
         return ""
-
-    def _fallback_ratio() -> str:
-        src_total = len(full_src.strip().split())
-        if src_total == 0:
-            return ""
-        ratio = obs_n / src_total
-        safe_chars = int(len(norm) * ratio * 0.6)
-        safe_chars = min(safe_chars, _cap_by_obs_words(safe_chars))
-        return _translation_prefix_for_norm_char_count(translation, safe_chars) if safe_chars >= 1 else ""
-
-    if last_t:
-        spread = max(last_t) - min(last_t)
-        if spread > _ALIGNMENT_SPREAD_THRESHOLD:
-            return _fallback_safe_tgt_idx() or _fallback_ratio()
-        t_idx = sorted(last_t)[len(last_t) // 2]
-        if t_idx > n_norm - 1 - _ALIGNMENT_VERY_END_MARGIN:
-            return _fallback_safe_tgt_idx() or _fallback_ratio()
-        if t_idx < _ALIGNMENT_TOO_EARLY_THRESHOLD:
-            return _fallback_safe_tgt_idx() or _fallback_ratio()
-        raw_len = t_idx + 1
-        capped = _cap_by_obs_words(raw_len)
-        return _translation_prefix_for_norm_char_count(translation, capped)
-
-    return _fallback_safe_tgt_idx() or _fallback_ratio()
+    return ""
 
 
 def build_local_alignment_windows(
@@ -266,5 +325,3 @@ def get_word_alignments_batch(
         get_word_alignments(src_text, tgt_text, align_model, align_tokenizer)
         for src_text, tgt_text in pairs
     ]
-
-

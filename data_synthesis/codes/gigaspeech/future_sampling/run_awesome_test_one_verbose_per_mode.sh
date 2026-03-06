@@ -20,7 +20,7 @@ mkdir -p "$OUTPUT_ROOT"
 export CUDA_VISIBLE_DEVICES=0
 export HF_HOME="${HF_HOME:-/data/user_data/haolingp/models}"
 
-for MODE in semantic_merge_vote majority_vote lcp70_llm lcp70_code lcp_code; do
+for MODE in majority_vote lcp70_llm lcp70_code lcp_code; do
   OUT="$OUTPUT_ROOT/awesome_verbose_${MODE}"
   mkdir -p "$OUT"
   echo "========== awesome-align mode=$MODE -> $OUT =========="

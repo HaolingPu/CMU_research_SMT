@@ -21,7 +21,7 @@ Usage:
   CUDA_VISIBLE_DEVICES=1 vllm serve MODEL --served-model-name qwen3-instruct --port 8100
 
   # Then run this script on GPU 0 (base + align share the card when using 4B):
-  CUDA_VISIBLE_DEVICES=0 python llm_future_sampling_final.py \\
+  CUDA_VISIBLE_DEVICES=0 python llm_future_sampling_majority_vote.py \\
     --input-tsv MANIFEST.tsv --output-root OUT --test-one
   # With 4B base + align on same GPU, use e.g. --gpu-memory-utilization 0.85.
 """

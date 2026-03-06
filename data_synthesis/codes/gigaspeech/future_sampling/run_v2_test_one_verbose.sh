@@ -12,14 +12,14 @@ OUTPUT_ROOT="${2:-}"
 if [[ -z "$INPUT_TSV" || -z "$OUTPUT_ROOT" ]]; then
   echo "Usage: $0 <input.tsv> <output_root>"
   echo "Example: $0 /path/to/MANIFEST.tsv /path/to/OUT"
-  echo "Runs: CUDA_VISIBLE_DEVICES=0 python llm_future_sampling_final_v2.py --input-tsv <input> --output-root <output> --test-one --verbose"
+  echo "Runs: CUDA_VISIBLE_DEVICES=0 python llm_future_sampling_majority_vote_v2.py --input-tsv <input> --output-root <output> --test-one --verbose"
   exit 1
 fi
 
 export CUDA_VISIBLE_DEVICES=0
 export HF_HOME="${HF_HOME:-/data/user_data/haolingp/models}"
 
-python llm_future_sampling_final_v2.py \
+python llm_future_sampling_majority_vote_v2.py \
   --input-tsv "$INPUT_TSV" \
   --output-root "$OUTPUT_ROOT" \
   --test-one \

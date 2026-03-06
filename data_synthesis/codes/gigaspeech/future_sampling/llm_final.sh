@@ -38,7 +38,7 @@ source ~/.bashrc
 conda activate vllm
 
 MANIFEST="/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_xl_case_robust_asr-filtered.tsv"
-CODE="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_final.py"
+CODE="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_majority_vote.py"
 OUT_ROOT="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_future_sampling_final/llm_batch_output"
 
 BASE_MODEL="${BASE_MODEL:-/data/user_data/haolingp/models/Qwen3-30B-A3B-FP8}"

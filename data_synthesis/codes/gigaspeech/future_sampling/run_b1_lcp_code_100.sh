@@ -22,10 +22,11 @@ conda activate vllm
 
 MANIFEST="/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_xl_case_robust_asr-filtered.tsv"
 PYTHON_SCRIPT="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_lcp_code.py"
-OUTPUT_ROOT="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_future_sampling_final/llm_batch_output_b1_lcp_code_100"
+OUTPUT_ROOT="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_future_sampling_final/llm_batch_output_b1_lcp_code_simalign_100"
 
 BASE_MODEL="/data/user_data/haolingp/models/Qwen3-4B-Base"
 INSTRUCT_MODEL="/data/user_data/haolingp/models/Qwen3-30B-A3B-Instruct-2507-FP8"
+SIMALIGN_MODEL="/data/user_data/haolingp/models/LaBSE"
 
 TASK_ID="${SLURM_ARRAY_TASK_ID:-0}"
 NUM_TASKS=4
@@ -76,7 +77,7 @@ if ! curl -s "http://localhost:${INSTRUCT_PORT}/health" > /dev/null 2>&1; then
 fi
 
 
-CUDA_VISIBLE_DEVICES=0 python "$PYTHON_SCRIPT" \
+SIMALIGN_MODEL="$SIMALIGN_MODEL" CUDA_VISIBLE_DEVICES=0 python "$PYTHON_SCRIPT" \
   --input-tsv "$MANIFEST" \
   --output-root "$OUTPUT_ROOT" \
   --task-id "$TASK_ID" \
@@ -86,6 +87,7 @@ CUDA_VISIBLE_DEVICES=0 python "$PYTHON_SCRIPT" \
   --parallel-utterances 16 \
   --future-sampling-batch-size 4 \
   --base-model-path "$BASE_MODEL" \
+  --align-method simalign \
   --overwrite
 
 kill "$SERVE_PID" 2>/dev/null || true
