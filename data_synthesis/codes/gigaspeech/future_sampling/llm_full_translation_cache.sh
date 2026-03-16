@@ -47,6 +47,7 @@ if [[ -n "${MAX_ROWS}" ]]; then
     --tp "${TP}" \
     --batch-size "${BATCH_SIZE}" \
     --max-tokens "${MAX_TOKENS}" \
+    --overwrite \
     --max-rows "${MAX_ROWS}"
 else
   python "${CODE}" \
@@ -57,7 +58,8 @@ else
     --num-tasks "${NUM_TASKS}" \
     --tp "${TP}" \
     --batch-size "${BATCH_SIZE}" \
-    --max-tokens "${MAX_TOKENS}"
+    --max-tokens "${MAX_TOKENS}" \
+    --overwrite
 fi
 
 echo "===== DONE TASK ${SLURM_ARRAY_TASK_ID} ====="
