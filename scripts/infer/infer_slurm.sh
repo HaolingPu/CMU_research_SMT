@@ -6,7 +6,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=96GB
 #SBATCH --gres=gpu:L40S:2
-#SBATCH --partition=general
+#SBATCH --partition=preempt
 ##SBATCH --requeue
 #SBATCH --exclude=babel-p9-32,babel-o5-24
 #SBATCH --time=1-00:00:00
@@ -18,7 +18,7 @@
 #SBATCH -e slurm_logs/%A_%a.err
 #SBATCH -o slurm_logs/%A_%a.out
 
-# sbatch infer_slurm.sh /data/user_data/siqiouya/ckpts/infinisst-omni/gigaspeech-zh-Simul-MuST-C-fixed-s_origin-bsz4/v0-20260223-121324-hf Standard
+# sbatch infer_slurm.sh /data/user_data/siqiouya/ckpts/infinisst-omni/gigaspeech-zh-Simul-MuST-C-fixed-v2-s_origin-bsz4/v2-20260224-133550-hf Standard
 # sbatch infer_slurm.sh /data/user_data/siqiouya/ckpts/infinisst-omni/gigaspeech-zh-EAST-latency2mult-s_origin-bsz4/v1-20260224-064826-hf/ Standard
 # sbatch infer_slurm.sh /data/user_data/siqiouya/ckpts/infinisst-omni/gigaspeech-zh-refined-EAST-latency2mult-s_origin-bsz4/v0-20260224-072656-hf/ Standard
 # sbatch infer_slurm.sh /data/user_data/siqiouya/ckpts/infinisst-omni/gigaspeech-zh-s_origin-bsz4/v1-20260122-055820-hf Standard
