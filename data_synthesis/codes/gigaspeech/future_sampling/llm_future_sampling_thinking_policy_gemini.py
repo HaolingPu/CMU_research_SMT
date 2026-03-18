@@ -395,29 +395,20 @@ def build_final_completion_prompt(full_source: str, committed_chinese: str) -> s
 
 
 def _thinking_system_prompt() -> str:
-    if _GEMINI_PROMPT_VERSION == "advanced":
-        return (
-            "You are a professional simultaneous interpreter (English -> Chinese) acting as a policy model.\n\n"
-            "Your job: given a PARTIAL English source, N possible future continuations, and a committed Chinese "
-            "prefix, decide what additional Chinese text is SAFE to emit RIGHT NOW.\n\n"
-            "Core rules:\n"
-            "- Output ONLY the new Chinese segment that can be APPENDED after the committed Chinese.\n"
-            "- The output must remain valid under EVERY possible future.\n"
-            "- Be conservative and literal; do not embellish or rewrite.\n"
-            "- Never repeat committed text or restart a clause.\n"
-            "- If nothing safe and well-formed can be appended, output exactly EMPTY.\n"
-            "- Do NOT output explanation, reasoning, or commentary; only the Chinese segment or EMPTY."
-        )
     return (
-        "You are a professional simultaneous interpreter (English -> Chinese) acting as a policy model.\n\n"
-        "Your job: given a PARTIAL English source, N possible future continuations, and a committed Chinese "
-        "prefix, decide what additional Chinese text is SAFE to emit RIGHT NOW.\n\n"
-        "Core rules:\n"
-        "- Output ONLY the new Chinese segment that can be APPENDED after the committed Chinese.\n"
-        "- The output must remain valid under EVERY possible future.\n"
-        "- Do NOT revise already committed text.\n"
-        "- If nothing is safely appendable yet, output exactly: EMPTY\n"
-        "- Do NOT output any explanation, reasoning, or commentary — only the Chinese segment or EMPTY."
+        "You are a professional English-to-Chinese simultaneous interpreter.\n"
+        "Follow the user's task instructions carefully.\n"
+        "Return only the requested Chinese output, or EMPTY when instructed.\n"
+        "Do not include explanations, reasoning, bullets, or quotation marks."
+    )
+
+
+def _final_completion_system_prompt() -> str:
+    return (
+        "You are a professional English-to-Chinese translator.\n"
+        "Follow the user's task instructions carefully.\n"
+        "Return only the requested Chinese continuation.\n"
+        "Do not include explanations, reasoning, bullets, or quotation marks."
     )
 
 
@@ -584,10 +575,7 @@ def force_complete_translation(
     prompt = build_final_completion_prompt(full_source, committed_chinese)
     request_kwargs = _build_chat_kwargs(
         model=model,
-        system_prompt=(
-            "You are a professional translator. Return ONLY the remaining Chinese "
-            "continuation after the committed prefix. No explanation."
-        ),
+        system_prompt=_final_completion_system_prompt(),
         user_content=prompt,
         temperature=0.0,
         max_tokens=2048,
