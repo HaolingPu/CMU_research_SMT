@@ -4,9 +4,9 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=4
-#SBATCH --mem=96GB
+#SBATCH --mem=64GB
 #SBATCH --gres=gpu:L40S:2
-#SBATCH --partition=preempt
+#SBATCH --partition=general
 ##SBATCH --requeue
 #SBATCH --exclude=babel-p9-32,babel-o5-24
 #SBATCH --time=1-00:00:00
@@ -22,6 +22,7 @@
 # sbatch infer_slurm.sh /data/user_data/siqiouya/ckpts/infinisst-omni/gigaspeech-zh-EAST-latency2mult-s_origin-bsz4/v1-20260224-064826-hf/ Standard
 # sbatch infer_slurm.sh /data/user_data/siqiouya/ckpts/infinisst-omni/gigaspeech-zh-refined-EAST-latency2mult-s_origin-bsz4/v0-20260224-072656-hf/ Standard
 # sbatch infer_slurm.sh /data/user_data/siqiouya/ckpts/infinisst-omni/gigaspeech-zh-s_origin-bsz4/v1-20260122-055820-hf Standard
+# sbatch infer_slurm.sh /data/user_data/siqiouya/ckpts/infinisst-omni/gigaspeech-zh-hibiki-s-bsz4/v0-20260326-141050-hf Standard
 
 source /home/siqiouya/miniconda3/bin/activate omni_inference
 
