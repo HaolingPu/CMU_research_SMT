@@ -16,6 +16,11 @@ from openai import OpenAI
 
 _FIRST_SENTENCE_END_RE = re.compile(r'[.!?](?:["\')\]]+)?(?=\s|$)')
 
+"""
+CUDA_VISIBLE_DEVICES=0 vllm serve \
+    /data/user_data/siqiouya/ckpts/pretrained/llm/Qwen3-30B-A3B-Base-bnb-4bit \
+    --max-model-len 2048
+"""
 
 def create_base_client(base_url: str, model_name: str) -> Tuple[OpenAI, str]:
     """Create an OpenAI client pointing at a vLLM server.

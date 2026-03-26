@@ -32,6 +32,7 @@ from tqdm import tqdm
 
 from future_sampling import create_base_client, sample_futures
 from gemini_translation import GeminiConfig, GeminiTranslator
+from vllm_translation import VllmTranslatorConfig, VllmTranslator
 
 
 # ---------------------------------------------------------------------------
@@ -86,7 +87,7 @@ def _normalize_zh(text: str) -> str:
 
 def process_utterance(
     base_llm: Any,
-    translator: GeminiTranslator,
+    translator: Any,
     utt_id: str,
     sentences: List[str],
     trajectory: List[str],
@@ -205,6 +206,14 @@ def parse_args() -> argparse.Namespace:
         choices=["none", "minimal", "low", "medium", "high"],
         default="low",
     )
+    p.add_argument("--translator", choices=["gemini", "vllm"], default="gemini",
+                   help="Which translator backend to use.")
+    p.add_argument("--translator-model-url", default="http://localhost:8001/v1",
+                   help="vLLM server URL for the translator model (only used with --translator vllm).")
+    p.add_argument("--translator-model-name", default="Qwen3-4B",
+                   help="Model name on the translator vLLM server (only used with --translator vllm).")
+    p.add_argument("--translator-tokenizer-path", default=None,
+                   help="Local path to tokenizer for the translator model (defaults to --translator-model-name).")
     p.add_argument("--gemini-api-key-env", default="GEMINI_API_KEY",
                    help="Name of the environment variable holding the Gemini API key.")
     p.add_argument("--gemini-timeout", type=float, default=600.0)
@@ -234,29 +243,37 @@ def _sanitize_filename(name: str) -> str:
 def main() -> None:
     args = parse_args()
 
-    # --- Gemini API key ---
-    api_key = os.environ.get(args.gemini_api_key_env, "").strip()
-    if not api_key:
-        raise SystemExit(
-            f"ERROR: env var {args.gemini_api_key_env} is not set. "
-            "Export your Gemini API key before running."
-        )
-
     os.makedirs(args.output_root, exist_ok=True)
 
-    # --- Connect to vLLM server ---
+    # --- Connect to vLLM server (base model for future sampling) ---
     print(f"[Base] Connecting to vLLM server at {args.base_model_url} (model={args.base_model_name}) ...")
     base_llm = create_base_client(args.base_model_url, args.base_model_name)
     print("[Base] Client ready.")
 
-    config = GeminiConfig(
-        api_key=api_key,
-        model=args.thinking_model_name,
-        reasoning_effort=args.thinking_reasoning_effort,
-        timeout=args.gemini_timeout,
-    )
-    translator = GeminiTranslator(config)
-    print(f"[Gemini] Using model={config.model} reasoning_effort={config.reasoning_effort}")
+    # --- Build translator ---
+    if args.translator == "vllm":
+        t_config = VllmTranslatorConfig(
+            base_url=args.translator_model_url,
+            model=args.translator_model_name,
+            timeout=args.gemini_timeout,
+        )
+        translator = VllmTranslator(t_config, tokenizer_path=args.translator_tokenizer_path)
+        print(f"[vLLM Translator] Using model={t_config.model} at {t_config.base_url}")
+    else:
+        api_key = os.environ.get(args.gemini_api_key_env, "").strip()
+        if not api_key:
+            raise SystemExit(
+                f"ERROR: env var {args.gemini_api_key_env} is not set. "
+                "Export your Gemini API key before running."
+            )
+        g_config = GeminiConfig(
+            api_key=api_key,
+            model=args.thinking_model_name,
+            reasoning_effort=args.thinking_reasoning_effort,
+            timeout=args.gemini_timeout,
+        )
+        translator = GeminiTranslator(g_config)
+        print(f"[Gemini] Using model={g_config.model} reasoning_effort={g_config.reasoning_effort}")
 
     # --- Collect rows ---
     row_list = list(iter_rows(
