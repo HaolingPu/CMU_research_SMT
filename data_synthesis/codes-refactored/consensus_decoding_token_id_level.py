@@ -739,6 +739,8 @@ def run_one_utterance(
                 api_timeout=args.instruct_api_timeout,
                 target_lang=args.target_lang,
             )
+            if final_delta:
+                committed_text += final_delta
             target_deltas.append(final_delta if final_delta else "")
             actions.append("WRITE" if final_delta else "READ")
             continue
@@ -884,6 +886,8 @@ def main() -> None:
     num_concurrent = max(1, args.num_concurrent_cases)
     row_items = [(idx, s.to_dict()) for idx, (_, s) in enumerate(rows.iterrows())]
 
+    failures: List[str] = []
+
     if num_concurrent <= 1:
         for row_idx, row_dict in row_items:
             _process_one_row(row_idx, row_dict)
@@ -895,7 +899,13 @@ def main() -> None:
                 try:
                     fut.result()
                 except Exception as exc:
-                    print(f"[ERROR] Row {futs[fut]}: {exc}", file=sys.stderr)
+                    row_id = futs[fut]
+                    print(f"[ERROR] Row {row_id}: {exc}", file=sys.stderr)
+                    failures.append(f"Row {row_id}: {exc}")
+
+    if failures:
+        print(f"[FATAL] {len(failures)} row(s) failed", file=sys.stderr)
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":
