@@ -66,6 +66,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--target-lang", default="Chinese")
     # Output / row selection
     p.add_argument("--output-jsonl", default=None)
+    p.add_argument("--output-dir", default=None,
+                   help="Write one pretty-printed JSON file per utterance under this directory.")
     p.add_argument("--overwrite", action="store_true")
     p.add_argument("--row-idx", type=int, default=0)
     p.add_argument("--utt-id", default=None)
@@ -114,6 +116,10 @@ def get_full_source_text(row: Dict[str, Any]) -> str:
     if not text or text.lower() == "nan":
         raise ValueError("src_text is empty")
     return text
+
+
+def sanitize_filename(name: str) -> str:
+    return "".join(ch if ch.isalnum() or ch in "-_." else "_" for ch in str(name))
 
 
 def clean_model_text(text: str) -> str:
@@ -366,12 +372,28 @@ def main() -> None:
         os.makedirs(os.path.dirname(os.path.abspath(args.output_jsonl)), exist_ok=True)
         out_fh = open(args.output_jsonl, "w" if args.overwrite else "a", encoding="utf-8")
 
+    if args.output_dir:
+        os.makedirs(args.output_dir, exist_ok=True)
+
     for _, row in rows.iterrows():
+        utt_id = str(row.get(args.id_column, row.get("id", f"row_{args.row_idx}")))
+        out_path = (
+            os.path.join(args.output_dir, f"{sanitize_filename(utt_id)}.json")
+            if args.output_dir else None
+        )
+        if out_path and os.path.exists(out_path) and not args.overwrite:
+            print(f"  {utt_id}  [SKIP existing]")
+            continue
+
         result = run_one_utterance(row.to_dict(), args, mt_tokenizer)
         print(f"  {result['utt_id']}")
         if out_fh:
             out_fh.write(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
             out_fh.flush()
+        if out_path:
+            with open(out_path, "w", encoding="utf-8") as fh:
+                json.dump(result, fh, ensure_ascii=False, indent=2)
+                fh.write("\n")
 
     if out_fh:
         out_fh.close()

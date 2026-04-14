@@ -25,6 +25,8 @@ import os
 import re
 import urllib.error
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from threading import Lock
 from typing import Any, Dict, List
 
 import pandas as pd
@@ -65,10 +67,13 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--target-lang", default="Chinese")
     # Output / row selection
     p.add_argument("--output-jsonl", default=None)
+    p.add_argument("--output-dir", default=None,
+                   help="Write one pretty-printed JSON file per utterance under this directory.")
     p.add_argument("--overwrite", action="store_true")
     p.add_argument("--row-idx", type=int, default=0)
     p.add_argument("--utt-id", default=None)
     p.add_argument("--max-rows", type=int, default=1)
+    p.add_argument("--num-concurrent-cases", type=int, default=1)
     p.add_argument("--test-one", action="store_true")
     return p.parse_args()
 
@@ -113,6 +118,10 @@ def get_full_source_text(row: Dict[str, Any]) -> str:
     if not text or text.lower() == "nan":
         raise ValueError("src_text is empty")
     return text
+
+
+def sanitize_filename(name: str) -> str:
+    return "".join(ch if ch.isalnum() or ch in "-_." else "_" for ch in str(name))
 
 
 def clean_model_text(text: str) -> str:
@@ -386,6 +395,10 @@ def select_rows(df: pd.DataFrame, args: argparse.Namespace) -> pd.DataFrame:
 def main() -> None:
     setup_env()
     args = parse_args()
+    if args.la_n <= 0:
+        raise ValueError("--la-n must be positive")
+    if args.segment_size <= 0:
+        raise ValueError("--segment-size must be positive")
 
     df = pd.read_csv(args.input_tsv, sep="\t")
     rows = select_rows(df, args)
@@ -399,19 +412,62 @@ def main() -> None:
     mt_tokenizer = load_tokenizer(args.mt_tokenizer_path)
 
     out_fh = None
+    out_lock = Lock()
     if args.output_jsonl:
         os.makedirs(os.path.dirname(os.path.abspath(args.output_jsonl)), exist_ok=True)
         out_fh = open(args.output_jsonl, "w" if args.overwrite else "a", encoding="utf-8")
 
-    for _, row in rows.iterrows():
-        result = run_one_utterance(row.to_dict(), args, mt_tokenizer)
+    if args.output_dir:
+        os.makedirs(args.output_dir, exist_ok=True)
+
+    def _process_one_row(row_idx: int, row_dict: Dict[str, Any]) -> None:
+        utt_id = str(row_dict.get(args.id_column, row_dict.get("id", f"row_{row_idx}")))
+        out_path = (
+            os.path.join(args.output_dir, f"{sanitize_filename(utt_id)}.json")
+            if args.output_dir else None
+        )
+        if out_path and os.path.exists(out_path) and not args.overwrite:
+            print(f"  {utt_id}  [SKIP existing]")
+            return
+
+        result = run_one_utterance(row_dict, args, mt_tokenizer)
         print(f"  {result['utt_id']}")
         if out_fh:
-            out_fh.write(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
-            out_fh.flush()
+            with out_lock:
+                out_fh.write(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
+                out_fh.flush()
+        if out_path:
+            with open(out_path, "w", encoding="utf-8") as fh:
+                json.dump(result, fh, ensure_ascii=False, indent=2)
+                fh.write("\n")
+
+    row_items = [(idx, row.to_dict()) for idx, (_, row) in enumerate(rows.iterrows())]
+    failures: List[str] = []
+    num_concurrent = max(1, int(args.num_concurrent_cases))
+
+    if num_concurrent <= 1:
+        for row_idx, row_dict in row_items:
+            try:
+                _process_one_row(row_idx, row_dict)
+            except Exception as exc:
+                failures.append(f"row {row_idx}: {exc}")
+                print(f"[ERROR] row {row_idx}: {exc}")
+    else:
+        print(f"[Concurrent] {len(row_items)} rows, {num_concurrent} workers")
+        with ThreadPoolExecutor(max_workers=num_concurrent) as executor:
+            futs = {executor.submit(_process_one_row, ri, rd): ri for ri, rd in row_items}
+            for fut in as_completed(futs):
+                row_idx = futs[fut]
+                try:
+                    fut.result()
+                except Exception as exc:
+                    failures.append(f"row {row_idx}: {exc}")
+                    print(f"[ERROR] row {row_idx}: {exc}")
 
     if out_fh:
         out_fh.close()
+    if failures:
+        raise RuntimeError(f"{len(failures)} row(s) failed; first: {failures[0]}")
     print("Done.")
 
 
