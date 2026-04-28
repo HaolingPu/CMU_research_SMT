@@ -62,8 +62,14 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--num-futures", type=int, default=20)
     p.add_argument("--secondary-num-futures", type=int, default=10)
     p.add_argument("--future-tokens", type=int, default=20)
-    p.add_argument("--sample-temperature", type=float, default=0.8)
-    p.add_argument("--max-consensus-steps", type=int, default=32)
+    p.add_argument("--sample-temperature", type=float, default=1.0)
+    p.add_argument("--max-consensus-steps", type=int, default=12)
+    p.add_argument("--min-consensus-horizon", type=int, default=1,
+                   help="Minimum number of consensus-confirmed tokens required before committing. "
+                        "If the pending buffer ends up shorter than this (after consensus breaks), "
+                        "discard all pending tokens and READ instead. Default 1 (commit any non-empty pending).")
+    p.add_argument("--final-max-tokens", type=int, default=128,
+                   help="Maximum tokens for the final tail-completion step.")
     p.add_argument("--candidate-top-k", type=int, default=TOP_K)
     p.add_argument("--min-p", type=float, default=0.0)
     p.add_argument("--top-p", type=float, default=0.0,
@@ -71,6 +77,13 @@ def parse_args() -> argparse.Namespace:
     # target language
     p.add_argument("--target-lang", default="Chinese",
                    help="Target language name for prompts (e.g. Chinese, Japanese, German)")
+    p.add_argument(
+        "--future-source-window-chunks",
+        type=int,
+        default=0,
+        help="For future sampling, keep only the most recent N observed source chunks. "
+             "Use 0 to keep the full observed prefix.",
+    )
     # output
     p.add_argument("--output-jsonl", default=None)
     p.add_argument("--verbose", action="store_true")
@@ -117,6 +130,46 @@ def build_source_observed(chunks: List[str], t: int) -> str:
     return join_source_chunks(chunks[: t + 1])
 
 
+def parse_source_units(raw: Any) -> List[str]:
+    if raw is None or (isinstance(raw, float) and pd.isna(raw)):
+        return []
+    text = str(raw).strip()
+    if not text or text.lower() == "nan":
+        return []
+    try:
+        parsed = ast.literal_eval(text)
+    except Exception:
+        return [text]
+    if isinstance(parsed, list):
+        return [str(x or "") for x in parsed]
+    return [str(parsed)]
+
+
+def build_source_observed_recent_units(
+    source_units: List[str],
+    observed_full: str,
+    num_units: int,
+) -> str:
+    if not observed_full:
+        return ""
+    if not source_units or num_units <= 0:
+        return observed_full
+
+    prev_full = ""
+    for unit_idx, unit in enumerate(source_units):
+        full_through_unit = append_text_continuation(prev_full, unit)
+        if observed_full == full_through_unit or full_through_unit.startswith(observed_full):
+            start_idx = max(0, unit_idx - num_units + 1)
+            prefix = ""
+            for prior_unit in source_units[start_idx:unit_idx]:
+                prefix = append_text_continuation(prefix, prior_unit)
+            partial_current = observed_full[len(prev_full):] if observed_full.startswith(prev_full) else observed_full
+            return append_text_continuation(prefix, partial_current)
+        prev_full = full_through_unit
+
+    return observed_full
+
+
 def get_full_source_text(row: Dict[str, Any]) -> str:
     raw = row.get("src_text")
     if raw is None or pd.isna(raw):
@@ -155,6 +208,22 @@ def _vlog(f: Optional[Any], msg: str) -> None:
     f.flush()
 
 
+def _vlog_pretty_value(f: Optional[Any], label: str, value: Any) -> None:
+    if f is None:
+        return
+    if isinstance(value, (list, dict)):
+        pretty = json.dumps(value, ensure_ascii=False, indent=2)
+        lines = pretty.splitlines()
+        if not lines:
+            _vlog(f, f"# {label}: []")
+            return
+        _vlog(f, f"# {label}: {lines[0]}")
+        for line in lines[1:]:
+            _vlog(f, f"#   {line}")
+        return
+    _vlog(f, f"# {label}: {value}")
+
+
 class _TeeWriter:
     """Write to both a file and stdout (used only for --test-one)."""
     def __init__(self, fobj: Any):
@@ -188,10 +257,28 @@ def clean_model_text(text: str) -> str:
 
 
 def clean_future_text(observed_source: str, raw_text: str) -> str:
+    # 只保留第一行 (如果模型输出了多行，我们只取第一行作为续写)，并且如果第一行以observed source开头，就去掉这个重复的prefix（有些模型喜欢在续写里重复输入的source prefix）
     text = clean_model_text(raw_text)
     if text.startswith(observed_source):
         text = text[len(observed_source):].lstrip()
     text = text.splitlines()[0].strip() if text else ""
+    # Strip leading placeholders like "..." or "…" that instruct models sometimes prepend.
+    text = re.sub(r"^[\.\s…\-]+", "", text)
+    # If the cleaned continuation still starts by repeating the trailing words of the
+    # observed source (instruct-model habit), strip the longest matching suffix-prefix.
+    obs_trailing = observed_source.strip()
+    if obs_trailing and text:
+        # Try the longest possible suffix of observed_source that matches the start of text.
+        for k in range(min(len(obs_trailing), len(text)), 2, -1):
+            tail = obs_trailing[-k:]
+            if text.startswith(tail):
+                text = text[k:].lstrip()
+                break
+            # Also try after a leading space (text starts with a space in some models)
+            tail_space = " " + tail
+            if text.startswith(tail_space):
+                text = text[len(tail_space):].lstrip()
+                break
     return text
 
 
@@ -212,6 +299,89 @@ def is_valid_future_text(text: str) -> bool:
 
 def build_future_sampling_prompt(observed_source: str) -> str:
     return observed_source
+
+
+# ---------------------------------------------------------------------------
+# Method A: instruct-model future sampling via /chat/completions
+# Generates N diverse continuations in a single call as a numbered list.
+# ---------------------------------------------------------------------------
+
+def build_future_sampling_chat_messages(observed_source: str, num_futures: int) -> List[Dict[str, str]]:
+    """Method A: ask the model to produce a numbered list of `num_futures` continuations in one call."""
+    return [
+        {"role": "system", "content": (
+            "You are an expert linguist predicting how an incomplete spoken English sentence "
+            "might continue. Stay on the same domain and style as the input. Generate diverse "
+            "continuations that vary in topic emphasis and sentence structure but remain plausible."
+        )},
+        {"role": "user", "content": (
+            f"Generate exactly {num_futures} different continuations of this English text. "
+            f"Each should be 15-30 words. Output English only (no Chinese, no analysis).\n\n"
+            f"IMPORTANT: each numbered item must contain ONLY the new words that come AFTER the "
+            f"input — do NOT repeat any words from the input text, do NOT prepend '...' or any "
+            f"placeholder. Start each item with the very next word.\n\n"
+            f"Text: {observed_source}\n\n"
+            f"Format strictly as:\n1. <new words after input>\n2. <new words after input>\n"
+            f"...\n{num_futures}. <new words after input>"
+        )},
+    ]
+
+
+def build_future_sampling_chat_messages_single(observed_source: str) -> List[Dict[str, str]]:
+    """Method B: ask the model for ONE continuation; caller invokes with n=num_futures for independent samples."""
+    return [
+        {"role": "system", "content": (
+            "You are an expert linguist predicting how an incomplete spoken English sentence "
+            "might continue. Stay on the same domain and style as the input."
+        )},
+        {"role": "user", "content": (
+            f"Continue this English text with one plausible continuation of 15-30 words. "
+            f"Output English only (no Chinese, no analysis).\n\n"
+            f"IMPORTANT: output ONLY the new words that come AFTER the input — do NOT repeat any "
+            f"words from the input text, do NOT prepend '...' or any placeholder. Start with the "
+            f"very next word.\n\n"
+            f"Text: {observed_source}\n\n"
+            f"Continuation:"
+        )},
+    ]
+
+
+_NUMBERED_LIST_RE = re.compile(r"^\s*(\d+)[\.\)]\s*(.+?)\s*$", re.MULTILINE)
+
+
+def parse_method_a_output(raw_text: str, num_expected: int) -> List[str]:
+    """Parse a numbered list response (1. ... 2. ... N. ...) into a list of continuations."""
+    if not raw_text:
+        return []
+    items: List[Tuple[int, str]] = []
+    for match in _NUMBERED_LIST_RE.finditer(raw_text):
+        idx = int(match.group(1))
+        text = match.group(2).strip()
+        # Some models output "1. ... so it was in <continuation>" — strip leading "..." or "so it was in"
+        text = re.sub(r"^[\.\s\-…]+", "", text)
+        if 1 <= idx <= num_expected and text:
+            items.append((idx, text))
+    items.sort(key=lambda x: x[0])
+    seen_idx: set = set()
+    out: List[str] = []
+    for idx, text in items:
+        if idx in seen_idx:
+            continue
+        seen_idx.add(idx)
+        out.append(text)
+    return out
+
+
+def _is_chat_endpoint_model(api_model: str) -> bool:
+    """Decide whether to route to /chat/completions (instruct-style) or /completions (raw LM).
+
+    Heuristic: model name contains an instruct suffix ('-it', 'instruct', 'chat').
+    Examples:
+      gemma4-e2b-it, qwen3-instruct, llama-3-chat → /chat/completions
+      gemma4-e2b, qwen3-4b-base                    → /completions (raw text continuation)
+    """
+    name = str(api_model or "").lower()
+    return any(tag in name for tag in ("-it", "instruct", "chat"))
 
 
 def build_translation_probe_prompt(tokenizer: Any, full_source: str, target_prefix: str, target_lang: str = "Chinese") -> str:
@@ -272,15 +442,21 @@ def build_final_completion_prompt(tokenizer: Any, full_source: str, committed_te
         messages = [{"role": "user", "content": (
             f"[TASK]\nTranslate the [INPUT] text into {target_lang}.\n\n"
             f"[INPUT]\n{full_source}\n\n"
-            f"[IMPORTANT]\nOutput the complete {target_lang} translation only."
+            f"[IMPORTANT]\nOutput the complete {target_lang} translation only.\n"
+            "Do not add explanations, summaries, examples, lists, numbering, markdown, or background knowledge."
         )}]
     else:
         messages = [{"role": "user", "content": (
             f"[TASK]\nTranslate the [INPUT] text into {target_lang}.\n\n"
             f"[INPUT]\n{full_source}\n\n"
             f"[IMPORTANT]\nA partial {target_lang} translation is already committed "
-            "at the start of the assistant reply. Continue from that prefix "
-            "and output only the remaining continuation."
+            "at the start of the assistant reply.\n"
+            f"Continue ONLY with the source content that is not yet covered by the committed {target_lang} prefix.\n"
+            "Do not repeat the committed prefix.\n"
+            "Do not add explanations, summaries, examples, lists, numbering, markdown, or background knowledge.\n"
+            "Do not translate beyond the source.\n"
+            "If there is no remaining source content to translate, output nothing.\n"
+            f"Output only the remaining {target_lang} continuation."
         )}]
     prompt = tokenizer.apply_chat_template(messages, add_generation_prompt=False, tokenize=False)
     prompt += "<|im_start|>assistant\n"
@@ -407,27 +583,83 @@ def sample_source_futures_api(
 ) -> List[str]:
     if not observed_source.strip():
         return []
+
+    base = normalize_api_base(api_base)
+
+    if _is_chat_endpoint_model(api_model):
+        # Choose Method A (numbered-list, one call) or Method B (n independent calls in one batched request).
+        # Set FUTURE_SAMPLING_METHOD=B to switch; default is A.
+        method = os.environ.get("FUTURE_SAMPLING_METHOD", "A").strip().upper()
+
+        if method == "B":
+            # Method B: one /chat/completions call with n=num_futures. vLLM samples each completion
+            # independently and returns them as separate `choices` (semantically equivalent to N
+            # independent calls but batched on the GPU for speed).
+            messages = build_future_sampling_chat_messages_single(observed_source)
+            payload = {
+                "model": api_model,
+                "messages": messages,
+                "max_tokens": future_tokens,
+                "temperature": sample_temperature,
+                "top_p": 0.95,
+                "n": num_futures,
+            }
+            data = _http_json(f"{base}/chat/completions", payload=payload, timeout=api_timeout)
+            futures: List[str] = []
+            for choice in data.get("choices", []):
+                msg = choice.get("message", {}) if isinstance(choice, dict) else {}
+                raw = str(msg.get("content", "")) if isinstance(msg, dict) else ""
+                cleaned = clean_future_text(observed_source, raw)
+                if cleaned and is_valid_future_text(cleaned):
+                    futures.append(cleaned)
+            return futures
+
+        # Method A (default): one /chat/completions call returning a numbered list of N continuations.
+        messages = build_future_sampling_chat_messages(observed_source, num_futures)
+        # Allow enough output for ~30 words per item × num_futures + numbering overhead.
+        max_tokens = max(future_tokens * num_futures, 40 * num_futures + 50)
+        payload = {
+            "model": api_model,
+            "messages": messages,
+            "max_tokens": max_tokens,
+            "temperature": sample_temperature,
+            "top_p": 0.95,
+            "n": 1,
+        }
+        data = _http_json(f"{base}/chat/completions", payload=payload, timeout=api_timeout)
+        choices = data.get("choices", [])
+        if not choices:
+            return []
+        msg = choices[0].get("message", {}) if isinstance(choices[0], dict) else {}
+        raw_text = str(msg.get("content", "")) if isinstance(msg, dict) else ""
+        items = parse_method_a_output(raw_text, num_expected=num_futures)
+        futures: List[str] = []
+        for raw in items:
+            cleaned = clean_future_text(observed_source, raw)
+            if cleaned and is_valid_future_text(cleaned):
+                futures.append(cleaned)
+        return futures
+
+    # Default: base model raw text continuation via /completions.
     payload = {
         "model": api_model,
-        "prompt": build_future_sampling_prompt(observed_source),
+        "prompt": observed_source,
         "max_tokens": future_tokens,
         "temperature": sample_temperature,
         "top_p": 0.95,
         "n": num_futures,
         "stop": ["<|im_end|>", "<|endoftext|>", "<|im_start|>"],
     }
-    data = _http_json(f"{normalize_api_base(api_base)}/completions", payload=payload, timeout=api_timeout) #call base model，用observed source作为prompt，采样n条可能的未来源语言续写
+    data = _http_json(f"{base}/completions", payload=payload, timeout=api_timeout) #call base model，用observed source作为prompt，采样n条可能的未来源语言续写
     futures: List[str] = []
-    seen: set = set()
-    for choice in data.get("choices", []): #每个choice是一条future续写，清洗去重后返回
+    for choice in data.get("choices", []):
         raw = str(choice.get("text", "")) if isinstance(choice, dict) else ""
         cleaned = clean_future_text(observed_source, raw)
-        if cleaned and is_valid_future_text(cleaned) and cleaned.lower() not in seen:
-            seen.add(cleaned.lower())
+        if cleaned and is_valid_future_text(cleaned):
             futures.append(cleaned)
     return futures
 
-
+#Step1: primary base model采样未来续写，Step2: secondary base model采样未来续写，合并去重后得到所有候选未来续写列
 def sample_source_futures_multi(
     base_specs: List[Dict[str, Any]],
     observed_source: str,
@@ -761,7 +993,8 @@ def extend_pending_tokens(
     pending_token_ids: List[int] = []
     grow_logs: List[Dict[str, Any]] = []
 
-    for step_idx in range(max_consensus_steps):
+    for step_idx in range(max_consensus_steps): #最多32 步
+        # 2a) 每条 future 拼成完整 source，问 instruct 模型："给定这个完整英文 + 已有中文前缀，下一个中文 token 是啥？"
         target_prefix_token_ids = list(committed_token_ids) + list(pending_token_ids)
         full_sources = [append_text_continuation(source_observed, f) for f in futures]
 
@@ -786,6 +1019,7 @@ def extend_pending_tokens(
                                   "future": futures[i], "dist_debug": dist_debug})
                 return pending_token_ids, grow_logs
             distributions.append(dist)
+            # select 3 policies: topk, topp, minp
             candidate_ids = _select_candidates(dist, top_p=top_p, min_p=min_p, top_k=candidate_top_k)
             per_future.append({
                 "future": futures[i],
@@ -794,6 +1028,7 @@ def extend_pending_tokens(
                 "num_candidates": len(candidate_ids),
             })
 
+        # 共识选 token
         consensus_token_id, meta = choose_consensus_token(distributions, min_p=min_p, candidate_top_k=candidate_top_k, top_p=top_p)
         if consensus_token_id is None: #没有共识token，停止本轮生长
             grow_logs.append({"step": step_idx, "stop": "no_consensus_token",
@@ -829,12 +1064,13 @@ def force_complete_translation(
     api_model: str,
     api_timeout: float = 120.0,
     target_lang: str = "Chinese",
+    max_tokens: int = 128,
 ) -> str:
     prompt = build_final_completion_prompt(tokenizer, full_source, committed_text, target_lang=target_lang)
     payload = {
         "model": api_model,
         "prompt": prompt,
-        "max_tokens": 512,
+        "max_tokens": max(1, int(max_tokens)),
         "temperature": 0.0,
         "stop": ["<|im_end|>", "<|endoftext|>", "<|im_start|>"],
     }
@@ -918,6 +1154,26 @@ def compute_bleu_char(hypothesis: str, reference: str, max_order: int = 4, smoot
     return bp * math.exp(sum(math.log(p) for p in precisions) / eff_order) * 100.0
 
 
+def _nonspace_char_count(text: str) -> int:
+    return sum(1 for c in str(text or "") if not c.isspace())
+
+
+def compute_length_ratio_ref(hypothesis: str, reference: str) -> float:
+    hyp_len = _nonspace_char_count(hypothesis)
+    ref_len = _nonspace_char_count(reference)
+    if hyp_len == 0 or ref_len == 0:
+        return float("nan")
+    return hyp_len / ref_len
+
+
+def compute_length_ratio_src(hypothesis: str, source: str) -> float:
+    hyp_len = _nonspace_char_count(hypothesis)
+    src_word_count = len(str(source or "").split())
+    if hyp_len == 0 or src_word_count == 0:
+        return float("nan")
+    return hyp_len / src_word_count
+
+
 # ---------------------------------------------------------------------------
 # Run one utterance
 # ---------------------------------------------------------------------------
@@ -931,6 +1187,7 @@ def run_one_utterance(
 ) -> Dict[str, Any]:
     utt_id = str(row.get(args.id_column, row.get("id", f"row_{args.row_idx}")))
     chunks = parse_trajectory(row["src_trajectory"])
+    source_units = parse_source_units(row.get("src_text_full"))
     full_source_text = get_full_source_text(row)
 
     committed_text = ""
@@ -947,8 +1204,10 @@ def run_one_utterance(
 
     # ── verbose header ──
     _vlog(verbose_log_file, "############################################################")
-    _vlog(verbose_log_file, f"# Utterance: {utt_id}")
-    _vlog(verbose_log_file, f"# Full text: {full_source_text}")
+    _vlog(verbose_log_file, f"# utt_id: {utt_id}")
+    _vlog(verbose_log_file, f"# source_full_text: {full_source_text}")
+    _vlog_pretty_value(verbose_log_file, "src_text_full", source_units)
+    _vlog_pretty_value(verbose_log_file, "src_trajectory", chunks)
     _vlog(verbose_log_file, f"# Chunks: {len(chunks)}")
     _vlog(verbose_log_file, f"# num_futures={args.num_futures}, top_k={args.candidate_top_k}, min_p={args.min_p}")
     for si, bs in enumerate(base_specs):
@@ -958,21 +1217,31 @@ def run_one_utterance(
     _vlog(verbose_log_file, "############################################################")
 
     for t in range(len(chunks)):
-        source_observed = build_source_observed(chunks, t)
+        current_source_chunk = str(chunks[t] or "")
+        source_observed_full = build_source_observed(chunks, t)
+        source_observed = build_source_observed_recent_units(
+            source_units=source_units,
+            observed_full=source_observed_full,
+            num_units=args.future_source_window_chunks,
+        )
         _vlog(verbose_log_file, f"\n{'='*60}")
         _vlog(verbose_log_file, f"Chunk {t + 1}/{len(chunks)}")
-        _vlog(verbose_log_file, f"source_observed: {source_observed!r}")
+        _vlog(verbose_log_file, f"source_observed: {current_source_chunk!r}")
+        _vlog(verbose_log_file, f"future_source_prefix: {source_observed!r}")
+        if source_observed != source_observed_full:
+            _vlog(verbose_log_file, f"source_observed_full: {source_observed_full!r}")
         _vlog(verbose_log_file, f"committed_before: {committed_text!r}")
 
         if t == len(chunks) - 1: #最后一个chunk，不再做共识，直接让instruct model把翻译补完
             final_delta = force_complete_translation(
                 tokenizer=instruct_tokenizer,
-                full_source=full_source_text,
+                full_source=source_observed_full,
                 committed_text=committed_text,
                 api_base=args.instruct_api_base,
                 api_model=args.instruct_api_model,
                 api_timeout=args.instruct_api_timeout,
                 target_lang=args.target_lang,
+                max_tokens=args.final_max_tokens,
             )
             if final_delta:
                 committed_text += final_delta
@@ -999,7 +1268,7 @@ def run_one_utterance(
                 label = info.get("source", "?")
                 _vlog(verbose_log_file, f"  future[{fi}] ({label}): {ftxt!r}")
 
-        if len(futures) < 2: #future太少无法做共识，等待更多源语言输入
+        if len(futures) <= 3: #future太少无法做共识，等待更多源语言输入
             target_deltas.append("")
             actions.append("READ")
             _vlog(verbose_log_file, "  -> READ (too few futures)")
@@ -1007,7 +1276,7 @@ def run_one_utterance(
 
         pending_token_ids, grow_logs = extend_pending_tokens(
             instruct_tokenizer=instruct_tokenizer,
-            source_observed=source_observed,
+            source_observed=source_observed_full,
             futures=futures,
             committed_text=committed_text,
             committed_token_ids=committed_token_ids,
@@ -1020,6 +1289,22 @@ def run_one_utterance(
             top_p=args.top_p,
             target_lang=args.target_lang,
         )
+
+        # ── min-consensus-horizon filter ──
+        # If the consensus only carried us a few tokens before breaking, the path is fragile.
+        # Discard the whole pending buffer and READ instead, to avoid early-commit lock-in.
+        if (
+            args.min_consensus_horizon > 1
+            and 0 < len(pending_token_ids) < args.min_consensus_horizon
+        ):
+            pending_text_dropped = decode_token_ids_to_text(instruct_tokenizer, pending_token_ids)
+            _vlog(verbose_log_file,
+                  f"[Step 5.5] horizon_filter: dropped pending={pending_text_dropped!r} "
+                  f"(len={len(pending_token_ids)} < min_horizon={args.min_consensus_horizon}) -> READ")
+            grow_logs.append({"step": "filter", "stop": "below_min_horizon",
+                              "horizon": len(pending_token_ids),
+                              "min_horizon": args.min_consensus_horizon})
+            pending_token_ids = []
 
         # ── verbose: consensus steps ──
         if verbose_log_file is not None and grow_logs:
@@ -1065,8 +1350,9 @@ def run_one_utterance(
 
     result: Dict[str, Any] = {
         "utt_id": utt_id,
-        "src_trajectory": chunks,
         "source_full_text": full_source_text,
+        "src_text_full": source_units,
+        "src_trajectory": chunks,
         "target_trajectory": target_deltas,
         "actions": actions,
         "prediction": committed_text,
@@ -1076,17 +1362,32 @@ def run_one_utterance(
     reference_text = _extract_reference_text_from_row(row, target_lang=args.target_lang)
     laal_value = float("nan")
     bleu_char_value = float("nan")
+    length_ratio_ref = float("nan")
     try:
         if not reference_text:
             raise ValueError("reference_text_unavailable")
         laal_value = compute_laal(chunks, target_deltas, actions, reference_text)
         bleu_char_value = compute_bleu_char(committed_text, reference_text)
+        length_ratio_ref = compute_length_ratio_ref(committed_text, reference_text)
     except Exception:
         pass
+    length_ratio_src = compute_length_ratio_src(committed_text, full_source_text)
 
     result["reference_text"] = reference_text or ""
-    result["metrics"] = {"laal_text": laal_value, "bleu_char": bleu_char_value}
-    _vlog(verbose_log_file, f"  prediction={committed_text!r} bleu={bleu_char_value:.2f} laal={laal_value:.2f}")
+    result["metrics"] = {
+        "laal_text": laal_value,
+        "bleu_char": bleu_char_value,
+        "length_ratio_ref": length_ratio_ref,
+        "length_ratio_src": length_ratio_src,
+        "pred_chars": _nonspace_char_count(committed_text),
+        "ref_chars": _nonspace_char_count(reference_text or ""),
+        "src_words": len(str(full_source_text or "").split()),
+    }
+    _vlog(
+        verbose_log_file,
+        f"  prediction={committed_text!r} bleu={bleu_char_value:.2f} laal={laal_value:.2f} "
+        f"len_ratio_ref={length_ratio_ref:.2f} len_ratio_src={length_ratio_src:.2f}",
+    )
     return result
 
 
@@ -1115,7 +1416,7 @@ def main() -> None:
     setup_env()
     args = parse_args()
 
-    primary_num_futures = args.num_futures - args.secondary_num_futures
+    primary_num_futures = args.num_futures - args.secondary_num_futures # 两个base 各10个 future sampling
     if primary_num_futures <= 0:
         raise ValueError("primary base model must keep at least 1 future")
 
