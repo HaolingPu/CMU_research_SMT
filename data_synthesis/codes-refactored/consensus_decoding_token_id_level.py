@@ -29,6 +29,7 @@ import sys
 import unicodedata
 import urllib.error
 import urllib.request
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -84,14 +85,22 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--num-futures", type=int, default=20)
     p.add_argument("--secondary-num-futures", type=int, default=10)
     p.add_argument("--future-tokens", type=int, default=20)
-    p.add_argument("--sample-temperature", type=float, default=0.8)
-    p.add_argument("--max-consensus-steps", type=int, default=32)
+    p.add_argument("--sample-temperature", type=float, default=1.0)
+    p.add_argument("--max-consensus-steps", type=int, default=12)
+    p.add_argument("--min-consensus-horizon", type=int, default=1,
+                   help="Minimum number of consensus-confirmed tokens required before committing.")
+    p.add_argument("--final-max-tokens", type=int, default=128,
+                   help="Maximum tokens for the final tail-completion step.")
     p.add_argument("--candidate-top-k", type=int, default=TOP_K)
     p.add_argument("--min-p", type=float, default=0.0)
     p.add_argument("--top-p", type=float, default=0.0,
                    help="Nucleus (top-p) candidate selection: keep smallest set with cumulative prob >= top-p.")
     # target language
-    p.add_argument("--target-lang", default="Chinese")
+    p.add_argument("--target-lang", default="Chinese",
+                   help="Target language name for prompts (e.g. Chinese, Japanese, German)")
+    p.add_argument("--future-source-window-chunks", type=int, default=0,
+                   help="For future sampling, keep only the most recent N observed source chunks. "
+                        "Use 0 to keep the full observed prefix.")
     # output
     p.add_argument("--output-jsonl", default=None)
     p.add_argument("--row-idx", type=int, default=0)
@@ -133,6 +142,46 @@ def join_source_chunks(chunks: List[str]) -> str:
 
 def build_source_observed(chunks: List[str], t: int) -> str:
     return join_source_chunks(chunks[: t + 1])
+
+
+def parse_source_units(raw: Any) -> List[str]:
+    if raw is None or (isinstance(raw, float) and pd.isna(raw)):
+        return []
+    text = str(raw).strip()
+    if not text or text.lower() == "nan":
+        return []
+    try:
+        parsed = ast.literal_eval(text)
+    except Exception:
+        return [text]
+    if isinstance(parsed, list):
+        return [str(x or "") for x in parsed]
+    return [str(parsed)]
+
+
+def build_source_observed_recent_units(
+    source_units: List[str],
+    observed_full: str,
+    num_units: int,
+) -> str:
+    if not observed_full:
+        return ""
+    if not source_units or num_units <= 0:
+        return observed_full
+
+    prev_full = ""
+    for unit_idx, unit in enumerate(source_units):
+        full_through_unit = append_text_continuation(prev_full, unit)
+        if observed_full == full_through_unit or full_through_unit.startswith(observed_full):
+            start_idx = max(0, unit_idx - num_units + 1)
+            prefix = ""
+            for prior_unit in source_units[start_idx:unit_idx]:
+                prefix = append_text_continuation(prefix, prior_unit)
+            partial_current = observed_full[len(prev_full):] if observed_full.startswith(prev_full) else observed_full
+            return append_text_continuation(prefix, partial_current)
+        prev_full = full_through_unit
+
+    return observed_full
 
 
 def get_full_source_text(row: Dict[str, Any]) -> str:
@@ -179,6 +228,18 @@ def clean_future_text(observed_source: str, raw_text: str) -> str:
     if text.startswith(observed_source):
         text = text[len(observed_source):].lstrip()
     text = text.splitlines()[0].strip() if text else ""
+    text = re.sub(r"^[\.\s\u2026\-]+", "", text)
+    obs_trailing = observed_source.strip()
+    if obs_trailing and text:
+        for k in range(min(len(obs_trailing), len(text)), 2, -1):
+            tail = obs_trailing[-k:]
+            if text.startswith(tail):
+                text = text[k:].lstrip()
+                break
+            tail_space = " " + tail
+            if text.startswith(tail_space):
+                text = text[len(tail_space):].lstrip()
+                break
     return text
 
 
@@ -201,6 +262,72 @@ def is_valid_future_text(text: str) -> bool:
 
 def build_future_sampling_prompt(observed_source: str) -> str:
     return observed_source
+
+
+def build_future_sampling_chat_messages(observed_source: str, num_futures: int) -> List[Dict[str, str]]:
+    return [
+        {"role": "system", "content": (
+            "You are an expert linguist predicting how an incomplete spoken English sentence "
+            "might continue. Stay on the same domain and style as the input. Generate diverse "
+            "continuations that vary in topic emphasis and sentence structure but remain plausible."
+        )},
+        {"role": "user", "content": (
+            f"Generate exactly {num_futures} different continuations of this English text. "
+            f"Each should be 15-30 words. Output English only (no Chinese, no analysis).\n\n"
+            f"IMPORTANT: each numbered item must contain ONLY the new words that come AFTER the "
+            f"input - do NOT repeat any words from the input text, do NOT prepend '...' or any "
+            f"placeholder. Start each item with the very next word.\n\n"
+            f"Text: {observed_source}\n\n"
+            f"Format strictly as:\n1. <new words after input>\n2. <new words after input>\n"
+            f"...\n{num_futures}. <new words after input>"
+        )},
+    ]
+
+
+def build_future_sampling_chat_messages_single(observed_source: str) -> List[Dict[str, str]]:
+    return [
+        {"role": "system", "content": (
+            "You are an expert linguist predicting how an incomplete spoken English sentence "
+            "might continue. Stay on the same domain and style as the input."
+        )},
+        {"role": "user", "content": (
+            f"Continue this English text with one plausible continuation of 15-30 words. "
+            f"Output English only (no Chinese, no analysis).\n\n"
+            f"IMPORTANT: output ONLY the new words that come AFTER the input - do NOT repeat any "
+            f"words from the input text, do NOT prepend '...' or any placeholder. Start with the "
+            f"very next word.\n\n"
+            f"Text: {observed_source}\n\n"
+            f"Continuation:"
+        )},
+    ]
+
+
+_NUMBERED_LIST_RE = re.compile(r"^\s*(\d+)[\.\)]\s*(.+?)\s*$", re.MULTILINE)
+
+
+def parse_method_a_output(raw_text: str, num_expected: int) -> List[str]:
+    if not raw_text:
+        return []
+    items: List[Tuple[int, str]] = []
+    for match in _NUMBERED_LIST_RE.finditer(raw_text):
+        idx = int(match.group(1))
+        text = re.sub(r"^[\.\s\-\u2026]+", "", match.group(2).strip())
+        if 1 <= idx <= num_expected and text:
+            items.append((idx, text))
+    items.sort(key=lambda x: x[0])
+    seen_idx: set = set()
+    out: List[str] = []
+    for idx, text in items:
+        if idx in seen_idx:
+            continue
+        seen_idx.add(idx)
+        out.append(text)
+    return out
+
+
+def _is_chat_endpoint_model(api_model: str) -> bool:
+    name = str(api_model or "").lower()
+    return any(tag in name for tag in ("-it", "instruct", "chat"))
 
 
 def _build_translation_messages(
@@ -252,15 +379,21 @@ def build_final_completion_prompt(
         messages = [{"role": "user", "content": (
             f"[TASK]\nTranslate the [INPUT] text into {target_lang}.\n\n"
             f"[INPUT]\n{full_source}\n\n"
-            f"[IMPORTANT]\nOutput the complete {target_lang} translation only."
+            f"[IMPORTANT]\nOutput the complete {target_lang} translation only.\n"
+            "Do not add explanations, summaries, examples, lists, numbering, markdown, or background knowledge."
         )}]
     else:
         messages = [{"role": "user", "content": (
             f"[TASK]\nTranslate the [INPUT] text into {target_lang}.\n\n"
             f"[INPUT]\n{full_source}\n\n"
             f"[IMPORTANT]\nA partial {target_lang} translation is already committed "
-            "at the start of the assistant reply. Continue from that prefix "
-            "and output only the remaining continuation."
+            "at the start of the assistant reply.\n"
+            f"Continue ONLY with the source content that is not yet covered by the committed {target_lang} prefix.\n"
+            "Do not repeat the committed prefix.\n"
+            "Do not add explanations, summaries, examples, lists, numbering, markdown, or background knowledge.\n"
+            "Do not translate beyond the source.\n"
+            "If there is no remaining source content to translate, output nothing.\n"
+            f"Output only the remaining {target_lang} continuation."
         )}]
     prompt = tokenizer.apply_chat_template(messages, add_generation_prompt=False, tokenize=False)
     prompt += "<|im_start|>assistant\n"
@@ -370,23 +503,66 @@ def sample_source_futures_api(
 ) -> List[str]:
     if not observed_source.strip():
         return []
+
+    base = normalize_api_base(api_base)
+    if _is_chat_endpoint_model(api_model):
+        method = os.environ.get("FUTURE_SAMPLING_METHOD", "A").strip().upper()
+        if method == "B":
+            payload = {
+                "model": api_model,
+                "messages": build_future_sampling_chat_messages_single(observed_source),
+                "max_tokens": future_tokens,
+                "temperature": sample_temperature,
+                "top_p": 0.95,
+                "n": num_futures,
+            }
+            data = _http_json(f"{base}/chat/completions", payload=payload, timeout=api_timeout)
+            futures: List[str] = []
+            for choice in data.get("choices", []):
+                msg = choice.get("message", {}) if isinstance(choice, dict) else {}
+                raw = str(msg.get("content", "")) if isinstance(msg, dict) else ""
+                cleaned = clean_future_text(observed_source, raw)
+                if cleaned and is_valid_future_text(cleaned):
+                    futures.append(cleaned)
+            return futures
+
+        max_tokens = max(future_tokens * num_futures, 40 * num_futures + 50)
+        payload = {
+            "model": api_model,
+            "messages": build_future_sampling_chat_messages(observed_source, num_futures),
+            "max_tokens": max_tokens,
+            "temperature": sample_temperature,
+            "top_p": 0.95,
+            "n": 1,
+        }
+        data = _http_json(f"{base}/chat/completions", payload=payload, timeout=api_timeout)
+        choices = data.get("choices", [])
+        if not choices:
+            return []
+        msg = choices[0].get("message", {}) if isinstance(choices[0], dict) else {}
+        raw_text = str(msg.get("content", "")) if isinstance(msg, dict) else ""
+        futures = []
+        for raw in parse_method_a_output(raw_text, num_expected=num_futures):
+            cleaned = clean_future_text(observed_source, raw)
+            if cleaned and is_valid_future_text(cleaned):
+                futures.append(cleaned)
+        return futures
+
     payload = {
         "model": api_model,
-        "prompt": build_future_sampling_prompt(observed_source),
+        "prompt": observed_source,
         "max_tokens": future_tokens,
         "temperature": sample_temperature,
         "top_p": 0.95,
         "n": num_futures,
         "stop": ["<|im_end|>", "<|endoftext|>", "<|im_start|>"],
     }
-    data = _http_json(f"{normalize_api_base(api_base)}/completions", payload=payload, timeout=api_timeout)
+    data = _http_json(f"{base}/completions", payload=payload, timeout=api_timeout)
     futures: List[str] = []
-    seen: set = set()
     for choice in data.get("choices", []):
         raw = str(choice.get("text", "")) if isinstance(choice, dict) else ""
         cleaned = clean_future_text(observed_source, raw)
-        if cleaned and is_valid_future_text(cleaned) and cleaned.lower() not in seen:
-            seen.add(cleaned.lower())
+        if cleaned and is_valid_future_text(cleaned):
             futures.append(cleaned)
     return futures
 
@@ -683,12 +859,13 @@ def force_complete_translation(
     api_model: str,
     api_timeout: float = 120.0,
     target_lang: str = "Chinese",
+    max_tokens: int = 128,
 ) -> str:
     prompt = build_final_completion_prompt(tokenizer, full_source, committed_text, target_lang=target_lang)
     payload = {
         "model": api_model,
         "prompt": prompt,
-        "max_tokens": 512,
+        "max_tokens": max(1, int(max_tokens)),
         "temperature": 0.0,
         "stop": ["<|im_end|>", "<|endoftext|>", "<|im_start|>"],
     }
@@ -697,6 +874,99 @@ def force_complete_translation(
     if not choices:
         return ""
     return clean_model_text(str(choices[0].get("text", "")))
+
+
+# ---------------------------------------------------------------------------
+# Metrics
+# ---------------------------------------------------------------------------
+
+def _extract_reference_text_from_row(row: Dict[str, Any], target_lang: str = "Chinese") -> Optional[str]:
+    lang_suffix_map = {"Japanese": "ja", "German": "de", "French": "fr", "Spanish": "es"}
+    lang_suffix = lang_suffix_map.get(target_lang, "")
+    keys: List[str] = []
+    if lang_suffix:
+        keys.extend([f"target_full_{lang_suffix}", f"tgt_text_full_{lang_suffix}", f"llm_reference_text_{lang_suffix}"])
+    keys.extend(["llm_reference_text", "tgt_text_full", "tgt_text", "target_text", "translation", "ref_text", "reference"])
+    for key in keys:
+        raw = row.get(key)
+        if raw is None or pd.isna(raw):
+            continue
+        text = str(raw).strip()
+        if text and text.lower() != "nan":
+            return text
+    return None
+
+
+def compute_laal(
+    source_chunks: List[str], target_deltas: List[str], actions: List[str], reference: str,
+) -> float:
+    timeline: List[int] = []
+    source_read = 0
+    for chunk, delta, action in zip(source_chunks, target_deltas, actions):
+        source_read += len(str(chunk).strip().split()) if str(chunk).strip() else 0
+        if action == "WRITE" and str(delta).strip():
+            for _ in str(delta).strip():
+                timeline.append(source_read)
+    y_len = len("".join(d for d in target_deltas if d))
+    yref_len = len(str(reference).replace(" ", ""))
+    x_len = sum(len(str(c).strip().split()) for c in source_chunks if str(c).strip())
+    if y_len == 0 or x_len == 0 or yref_len == 0:
+        return float("nan")
+    denom = max(y_len, yref_len)
+    if denom <= 0 or not timeline:
+        return float("nan")
+    total = 0.0
+    for i in range(1, denom + 1):
+        d_i = timeline[i - 1] if i <= len(timeline) else x_len
+        total += d_i - (i - 1) * x_len / denom
+    return total / denom
+
+
+def compute_bleu_char(hypothesis: str, reference: str, max_order: int = 4, smooth: bool = True) -> float:
+    hyp = [c for c in str(hypothesis) if not c.isspace()]
+    ref = [c for c in str(reference) if not c.isspace()]
+    hyp_len, ref_len = len(hyp), len(ref)
+    if hyp_len == 0 or ref_len == 0:
+        return float("nan")
+    eff_order = min(max_order, hyp_len, ref_len)
+    if eff_order <= 0:
+        return float("nan")
+    precisions: List[float] = []
+    for n in range(1, eff_order + 1):
+        hyp_ngrams = Counter(tuple(hyp[i:i + n]) for i in range(hyp_len - n + 1))
+        ref_ngrams = Counter(tuple(ref[i:i + n]) for i in range(ref_len - n + 1))
+        total = sum(hyp_ngrams.values())
+        if total <= 0:
+            return float("nan")
+        clipped = sum(min(cnt, ref_ngrams.get(ng, 0)) for ng, cnt in hyp_ngrams.items())
+        if smooth:
+            precisions.append((clipped + 1.0) / (total + 1.0))
+        else:
+            if clipped == 0:
+                return 0.0
+            precisions.append(clipped / total)
+    bp = 1.0 if hyp_len > ref_len else math.exp(1.0 - (ref_len / hyp_len))
+    return bp * math.exp(sum(math.log(p) for p in precisions) / eff_order) * 100.0
+
+
+def _nonspace_char_count(text: str) -> int:
+    return sum(1 for c in str(text or "") if not c.isspace())
+
+
+def compute_length_ratio_ref(hypothesis: str, reference: str) -> float:
+    hyp_len = _nonspace_char_count(hypothesis)
+    ref_len = _nonspace_char_count(reference)
+    if hyp_len == 0 or ref_len == 0:
+        return float("nan")
+    return hyp_len / ref_len
+
+
+def compute_length_ratio_src(hypothesis: str, source: str) -> float:
+    hyp_len = _nonspace_char_count(hypothesis)
+    src_word_count = len(str(source or "").split())
+    if hyp_len == 0 or src_word_count == 0:
+        return float("nan")
+    return hyp_len / src_word_count
 
 
 # ---------------------------------------------------------------------------
@@ -711,6 +981,7 @@ def run_one_utterance(
 ) -> Dict[str, Any]:
     utt_id = str(row.get(args.id_column, row.get("id", f"row_{args.row_idx}")))
     chunks = parse_trajectory(row["src_trajectory"])
+    source_units = parse_source_units(row.get("src_text_full"))
     full_source_text = get_full_source_text(row)
 
     committed_text = ""
@@ -726,21 +997,32 @@ def run_one_utterance(
         candidate_policy = f"top_k({args.candidate_top_k})"
 
     for t in range(len(chunks)):
-        source_observed = build_source_observed(chunks, t)
+        source_observed_full = build_source_observed(chunks, t)
+        source_observed = build_source_observed_recent_units(
+            source_units=source_units,
+            observed_full=source_observed_full,
+            num_units=args.future_source_window_chunks,
+        )
 
         # Last chunk: force-complete the remaining translation.
         if t == len(chunks) - 1:
             final_delta = force_complete_translation(
                 tokenizer=instruct_tokenizer,
-                full_source=full_source_text,
+                full_source=source_observed_full,
                 committed_text=committed_text,
                 api_base=args.instruct_api_base,
                 api_model=args.instruct_api_model,
                 api_timeout=args.instruct_api_timeout,
                 target_lang=args.target_lang,
+                max_tokens=args.final_max_tokens,
             )
-            target_deltas.append(final_delta if final_delta else "")
-            actions.append("WRITE" if final_delta else "READ")
+            if final_delta:
+                committed_text += final_delta
+                target_deltas.append(final_delta)
+                actions.append("WRITE")
+            else:
+                target_deltas.append("")
+                actions.append("READ")
             continue
 
         # Sample source futures from base models.
@@ -750,7 +1032,7 @@ def run_one_utterance(
             future_tokens=args.future_tokens,
             sample_temperature=args.sample_temperature,
         )
-        if len(futures) < 2:
+        if len(futures) <= 3:
             target_deltas.append("")
             actions.append("READ")
             continue
@@ -758,7 +1040,7 @@ def run_one_utterance(
         # Grow pending tokens via iterative consensus.
         pending_token_ids = extend_pending_tokens(
             instruct_tokenizer=instruct_tokenizer,
-            source_observed=source_observed,
+            source_observed=source_observed_full,
             futures=futures,
             committed_token_ids=committed_token_ids,
             max_consensus_steps=args.max_consensus_steps,
@@ -771,6 +1053,9 @@ def run_one_utterance(
             target_lang=args.target_lang,
         )
 
+        if args.min_consensus_horizon > 1 and 0 < len(pending_token_ids) < args.min_consensus_horizon:
+            pending_token_ids = []
+
         # Trim to clean boundary and commit.
         new_committed, delta, delta_token_ids = commit_pending_tokens(
             tokenizer=instruct_tokenizer,
@@ -782,15 +1067,42 @@ def run_one_utterance(
         committed_text = new_committed
         committed_token_ids.extend(delta_token_ids)
 
-    return {
+    result: Dict[str, Any] = {
         "utt_id": utt_id,
-        "src_trajectory": chunks,
         "source_full_text": full_source_text,
+        "src_text_full": source_units,
+        "src_trajectory": chunks,
         "target_trajectory": target_deltas,
         "actions": actions,
         "prediction": committed_text,
         "decoder_impl": {"candidate_policy": candidate_policy, "backend": "vllm_completion"},
     }
+
+    reference_text = _extract_reference_text_from_row(row, target_lang=args.target_lang)
+    laal_value = float("nan")
+    bleu_char_value = float("nan")
+    length_ratio_ref = float("nan")
+    try:
+        if not reference_text:
+            raise ValueError("reference_text_unavailable")
+        laal_value = compute_laal(chunks, target_deltas, actions, reference_text)
+        bleu_char_value = compute_bleu_char(committed_text, reference_text)
+        length_ratio_ref = compute_length_ratio_ref(committed_text, reference_text)
+    except Exception:
+        pass
+    length_ratio_src = compute_length_ratio_src(committed_text, full_source_text)
+
+    result["reference_text"] = reference_text or ""
+    result["metrics"] = {
+        "laal_text": laal_value,
+        "bleu_char": bleu_char_value,
+        "length_ratio_ref": length_ratio_ref,
+        "length_ratio_src": length_ratio_src,
+        "pred_chars": _nonspace_char_count(committed_text),
+        "ref_chars": _nonspace_char_count(reference_text or ""),
+        "src_words": len(str(full_source_text or "").split()),
+    }
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -883,6 +1195,7 @@ def main() -> None:
 
     num_concurrent = max(1, args.num_concurrent_cases)
     row_items = [(idx, s.to_dict()) for idx, (_, s) in enumerate(rows.iterrows())]
+    failures: List[str] = []
 
     if num_concurrent <= 1:
         for row_idx, row_dict in row_items:
@@ -895,7 +1208,13 @@ def main() -> None:
                 try:
                     fut.result()
                 except Exception as exc:
-                    print(f"[ERROR] Row {futs[fut]}: {exc}", file=sys.stderr)
+                    row_id = futs[fut]
+                    print(f"[ERROR] Row {row_id} raised: {exc}", file=sys.stderr)
+                    failures.append(f"Row {row_id}: {exc}")
+
+    if failures:
+        print(f"[FATAL] {len(failures)} row(s) failed", file=sys.stderr)
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":
