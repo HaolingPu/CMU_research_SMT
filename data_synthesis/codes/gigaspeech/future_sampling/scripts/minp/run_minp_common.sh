@@ -14,7 +14,7 @@ VLLM="${GEMMA4_ENV}/bin/vllm"
 
 SERVE_INSTRUCT="${CODE_DIR}/serve_instruct_gpu0.sh"
 SERVE_DUALBASE="${CODE_DIR}/serve_dual_base_gpu1.sh"
-DECODER="${CODE_DIR}/consensus_decoding_token_id_level.py"
+DECODER="/home/siqiouya/code/CMU_research_SMT/data_synthesis/codes-refactored/consensus_decoding_token_id_level.py"
 TOKENIZER="/data/user_data/haolingp/models/Qwen3-30B-A3B-Instruct-2507-FP8"
 
 INPUT_TSV="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/eval_datasets/train_xl_case_robust_asr_filtered_frozen_llm_reference_subsentence_ref.tsv"

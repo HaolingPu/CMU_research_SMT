@@ -9,12 +9,14 @@
 #SBATCH --array=0-3
 #SBATCH --time=2-00:00:00
 #SBATCH --exclude=babel-t9-16,babel-o5-16
-#SBATCH -o /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/slurm_logs/topk5_f200_%A_%a.out
-#SBATCH -e /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/slurm_logs/topk5_f200_%A_%a.err
 #SBATCH --mail-type=END,FAIL
-#SBATCH --mail-user=haolingp@andrew.cmu.edu
+#SBATCH --mail-user=siqiouya@andrew.cmu.edu
+#SBATCH -e slurm_logs/topk5_f200_%A_%a.err
+#SBATCH -o slurm_logs/topk5_f200_%A_%a.out
 
 set -e
+
+source /home/siqiouya/miniconda3/bin/activate consensus
 
 TASK_ID="${SLURM_ARRAY_TASK_ID:-0}"
 JOB_ID="${OUTPUT_JOB_ID:-${SLURM_ARRAY_JOB_ID:-manual}}"
@@ -26,18 +28,18 @@ NUM_TASKS=4                          # array 0-3
 NUM_FUTURES=200                      # TOTAL futures (decoder splits primary = num_futures - secondary)
 SECONDARY_NUM_FUTURES=100            # → primary = 100, secondary = 100
 
-CODE_DIR="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling"
-GEMMA4_ENV="/data/user_data/haolingp/conda_envs/gemma4"
+CODE_DIR="/home/siqiouya/code/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling"
+GEMMA4_ENV="/home/siqiouya/miniconda3/envs/consensus/"
 PYTHON="${GEMMA4_ENV}/bin/python"
 VLLM="${GEMMA4_ENV}/bin/vllm"
 
 SERVE_INSTRUCT="${CODE_DIR}/serve_instruct_gpu0.sh"
 SERVE_DUALBASE="${CODE_DIR}/serve_dual_base_gpu1.sh"
-DECODER="${CODE_DIR}/consensus_decoding_token_id_level.py"
-TOKENIZER="/data/user_data/haolingp/models/Qwen3-30B-A3B-Instruct-2507-FP8"
+DECODER="/home/siqiouya/code/CMU_research_SMT/data_synthesis/codes-refactored/consensus_decoding_token_id_level.py"
+TOKENIZER="/data/user_data/siqiouya/ckpts/pretrained/llm/Qwen3-30B-A3B-Instruct-2507-FP8"
 
 INPUT_TSV="/data/group_data/li_lab/haolingp/manifest/train_xl_case_robust_asr_filtered_frozen_llm_reference_subsentence_ref.tsv"
-OUTPUT_ROOT="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_debug/topk/consensus_decoding_en_zh_top_5_futures200"
+OUTPUT_ROOT="/data/group_data/li_lab/siqiouya/datasets/gigaspeech/consensus_decoding/topk/consensus_decoding_en_zh_top_5_futures200"
 
 FUTURE_TOKENS=20
 MAX_CONSENSUS_STEPS=20              # default (no k4 horizon)
