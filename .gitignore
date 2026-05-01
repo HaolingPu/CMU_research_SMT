@@ -30,3 +30,8 @@ test.txt
 ANLP/
 models/
 vllm_requirements.txt
+
+data_synthesis/codes-refactored/viz_out/
+.codex
+CLAUDE.md
+launch.json
