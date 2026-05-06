@@ -7,7 +7,6 @@ from .cli import MIN_P, TOP_K
 from .distributions import batch_get_next_token_distributions
 from .http_client import _http_json, normalize_api_base
 from .prompts import build_final_completion_prompt
-from .cleaning import clean_model_text
 from .text_utils import append_text_continuation
 from .tokens import _single_token_text, decode_token_ids_to_text, inspect_token_ids
 
@@ -181,4 +180,4 @@ def force_complete_translation(
     choices = data.get("choices", [])
     if not choices:
         return ""
-    return clean_model_text(str(choices[0].get("text", "")))
+    return str(choices[0].get("text", ""))

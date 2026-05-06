@@ -98,21 +98,10 @@ def build_translation_probe_prompt_prefix_token_ids(
     has_target_prefix: bool,
     target_lang: str = "Chinese",
 ) -> List[int]:
-    if not has_target_prefix:
-        messages = [{"role": "user", "content": (
-            f"[TASK]\nTranslate the [INPUT] text into {target_lang}.\n\n"
-            f"[INPUT]\n{full_source}\n\n"
-            f"[IMPORTANT]\nStart the {target_lang} translation from the beginning "
-            "and output only the next continuation token(s)."
-        )}]
-    else:
-        messages = [{"role": "user", "content": (
-            f"[TASK]\nTranslate the [INPUT] text into {target_lang}.\n\n"
-            f"[INPUT]\n{full_source}\n\n"
-            f"[IMPORTANT]\nA partial {target_lang} translation is already committed "
-            "at the start of the assistant reply. You must continue from that "
-            "exact prefix and produce only the continuation."
-        )}]
+    messages = [{"role": "user", "content": (
+        f"[TASK]\nTranslate the [INPUT] text into {target_lang}.\n\n"
+        f"[INPUT]\n{full_source}"
+    )}]
     prompt_ids = tokenizer.apply_chat_template(messages, add_generation_prompt=False, tokenize=True)
     if isinstance(prompt_ids, dict):
         prompt_ids = prompt_ids.get("input_ids", [])

@@ -6,7 +6,7 @@ from __future__ import annotations
 import os
 from typing import Any, Dict, List, Tuple
 
-from .cleaning import clean_future_text, is_valid_future_text
+from .cleaning import is_valid_future_text
 from .http_client import _http_json, normalize_api_base
 from .prompts import (
     _is_chat_endpoint_model,
@@ -53,9 +53,8 @@ def sample_source_futures_api(
             for choice in data.get("choices", []):
                 msg = choice.get("message", {}) if isinstance(choice, dict) else {}
                 raw = str(msg.get("content", "")) if isinstance(msg, dict) else ""
-                cleaned = clean_future_text(observed_source, raw)
-                if cleaned and is_valid_future_text(cleaned):
-                    futures.append(cleaned)
+                if raw and is_valid_future_text(raw):
+                    futures.append(raw)
             return futures
 
         # Method A (default): one /chat/completions call returning a numbered list of N continuations.
@@ -79,7 +78,7 @@ def sample_source_futures_api(
         items = parse_method_a_output(raw_text, num_expected=num_futures)
         futures: List[str] = []
         for raw in items:
-            cleaned = clean_future_text(observed_source, raw)
+            cleaned = raw
             if cleaned and is_valid_future_text(cleaned):
                 futures.append(cleaned)
         return futures
@@ -92,13 +91,13 @@ def sample_source_futures_api(
         "temperature": sample_temperature,
         "top_p": 0.95,
         "n": num_futures,
-        "stop": ["<|im_end|>", "<|endoftext|>", "<|im_start|>"],
+        "stop": ["<|im_end|>", "<|endoftext|>", "<|im_start|>", "\n"],
     }
     data = _http_json(f"{base}/completions", payload=payload, timeout=api_timeout) #call base model，用observed source作为prompt，采样n条可能的未来源语言续写
     futures: List[str] = []
     for choice in data.get("choices", []):
         raw = str(choice.get("text", "")) if isinstance(choice, dict) else ""
-        cleaned = clean_future_text(observed_source, raw)
+        cleaned = raw
         if cleaned and is_valid_future_text(cleaned):
             futures.append(cleaned)
     return futures
