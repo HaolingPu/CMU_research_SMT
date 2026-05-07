@@ -174,7 +174,7 @@ def force_complete_translation(
         "prompt": prompt,
         "max_tokens": max(1, int(max_tokens)),
         "temperature": 0.0,
-        "stop": ["<|im_end|>", "<|endoftext|>", "<|im_start|>"],
+        "stop": ["<|im_end|>", "<|endoftext|>", "<|im_start|>", "<turn|>", "<eos>"],
     }
     data = _http_json(f"{normalize_api_base(api_base)}/completions", payload=payload, timeout=api_timeout) #call instruct model，带上已提交翻译前缀，让模型把剩余翻译补完
     choices = data.get("choices", [])

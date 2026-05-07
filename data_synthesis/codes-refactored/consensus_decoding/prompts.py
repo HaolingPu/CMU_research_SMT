@@ -99,16 +99,18 @@ def build_translation_probe_prompt_prefix_token_ids(
     target_lang: str = "Chinese",
 ) -> List[int]:
     messages = [{"role": "user", "content": (
-        f"[TASK]\nTranslate the [INPUT] text into {target_lang}.\n\n"
+        f"[TASK]\nTranslate the [INPUT] text into {target_lang}. Do not add explanations, summaries, examples, lists, numbering, markdown, or background knowledge.\n\n"
         f"[INPUT]\n{full_source}"
     )}]
-    prompt_ids = tokenizer.apply_chat_template(messages, add_generation_prompt=False, tokenize=True)
+    # add_generation_prompt=True lets the tokenizer's own chat template emit the
+    # right assistant-turn prefix for whatever model family it is (Qwen → "<|im_start|>assistant\n",
+    # Gemma → "<|turn>model\n", etc.). Caller appends the committed target prefix tokens after this.
+    prompt_ids = tokenizer.apply_chat_template(messages, add_generation_prompt=True, tokenize=True)
     if isinstance(prompt_ids, dict):
         prompt_ids = prompt_ids.get("input_ids", [])
     elif hasattr(prompt_ids, "input_ids"):
         prompt_ids = prompt_ids.input_ids
-    assistant_prefix_ids = tokenizer.encode("<|im_start|>assistant\n", add_special_tokens=False)
-    return list(prompt_ids) + list(assistant_prefix_ids) #返回翻译指令+assistant前缀的token ID列表，后面会拼上已提交翻译的token IDs
+    return list(prompt_ids)
 
 
 def build_final_completion_prompt(tokenizer: Any, full_source: str, committed_text: str, target_lang: str = "Chinese") -> str:
@@ -132,8 +134,9 @@ def build_final_completion_prompt(tokenizer: Any, full_source: str, committed_te
             "If there is no remaining source content to translate, output nothing.\n"
             f"Output only the remaining {target_lang} continuation."
         )}]
-    prompt = tokenizer.apply_chat_template(messages, add_generation_prompt=False, tokenize=False)
-    prompt += "<|im_start|>assistant\n"
+    # add_generation_prompt=True so the tokenizer's chat template emits the
+    # right assistant-turn prefix string for any model family.
+    prompt = tokenizer.apply_chat_template(messages, add_generation_prompt=True, tokenize=False)
     if str(committed_text or "").strip():
         prompt += committed_text
     return prompt
