@@ -5,10 +5,14 @@ import argparse
 import json
 import os
 import sys
+import time
+import urllib.error
+import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
+from tqdm.auto import tqdm
 from transformers import AutoTokenizer
 
 from .cli import parse_args, setup_env
@@ -63,6 +67,13 @@ def run_one_utterance(
     target_deltas: List[str] = []
     actions: List[str] = []
 
+    # Per-row stage timing (wall-clock seconds; summed across chunks).
+    t_future_sample_s = 0.0       # time in sample_source_futures_multi (base models)
+    t_translation_s = 0.0          # time in extend_pending_tokens + force_complete_translation (instruct)
+    n_future_sample_calls = 0
+    n_translation_consensus_calls = 0
+    n_translation_final_calls = 0
+
     if args.top_p > 0:
         candidate_policy = f"top_p({args.top_p})"
     elif args.min_p > 0:
@@ -101,6 +112,7 @@ def run_one_utterance(
         _vlog(verbose_log_file, f"committed_before: {committed_text!r}")
 
         if t == len(chunks) - 1: #最后一个chunk，不再做共识，直接让instruct model把翻译补完
+            _t0 = time.perf_counter()
             final_delta = force_complete_translation(
                 tokenizer=instruct_tokenizer,
                 full_source=source_observed_full,
@@ -111,6 +123,8 @@ def run_one_utterance(
                 target_lang=args.target_lang,
                 max_tokens=args.final_max_tokens,
             )
+            t_translation_s += time.perf_counter() - _t0
+            n_translation_final_calls += 1
             if final_delta:
                 committed_text += final_delta
                 target_deltas.append(final_delta)
@@ -121,12 +135,15 @@ def run_one_utterance(
             _vlog(verbose_log_file, f"  [Final] delta={final_delta!r}")
             continue
 
+        _t0 = time.perf_counter()
         futures, future_infos = sample_source_futures_multi( #call base models，用当前observed source采样多条未来续写
             base_specs=base_specs,
             observed_source=source_observed,
             future_tokens=args.future_tokens,
             sample_temperature=args.sample_temperature,
         )
+        t_future_sample_s += time.perf_counter() - _t0
+        n_future_sample_calls += 1
 
         # ── verbose: list futures ──
         _vlog(verbose_log_file, f"[Step 1-2] future_sampling total={len(futures)}")
@@ -142,6 +159,7 @@ def run_one_utterance(
             _vlog(verbose_log_file, "  -> READ (too few futures)")
             continue
 
+        _t0 = time.perf_counter()
         pending_token_ids, grow_logs = extend_pending_tokens(
             instruct_tokenizer=instruct_tokenizer,
             source_observed=source_observed_full,
@@ -157,6 +175,8 @@ def run_one_utterance(
             top_p=args.top_p,
             target_lang=args.target_lang,
         )
+        t_translation_s += time.perf_counter() - _t0
+        n_translation_consensus_calls += 1
 
         # ── min-consensus-horizon filter ──
         # If the consensus only carried us a few tokens before breaking, the path is fragile.
@@ -225,6 +245,13 @@ def run_one_utterance(
         "actions": actions,
         "prediction": committed_text,
         "decoder_impl": {"candidate_policy": candidate_policy, "backend": "vllm_completion"},
+        "timing": {
+            "future_sample_seconds": t_future_sample_s,
+            "translation_seconds": t_translation_s,
+            "n_future_sample_calls": n_future_sample_calls,
+            "n_translation_consensus_calls": n_translation_consensus_calls,
+            "n_translation_final_calls": n_translation_final_calls,
+        },
     }
 
     reference_text = _extract_reference_text_from_row(row, target_lang=args.target_lang)
@@ -274,6 +301,47 @@ def select_rows(df: pd.DataFrame, args: argparse.Namespace) -> pd.DataFrame:
     start = max(0, int(args.row_idx))
     end = min(len(df), start + max(1, int(args.max_rows)))
     return df.iloc[start:end]
+
+
+# ---------------------------------------------------------------------------
+# Benchmark helpers (prefix-cache snapshot via vLLM /metrics)
+# ---------------------------------------------------------------------------
+
+def _fetch_prefix_cache_counters(api_base: str, timeout: float = 5.0) -> Tuple[float, float]:
+    """Return (queries_total, hits_total) for the vLLM prefix cache, in tokens.
+    Falls back to (0.0, 0.0) on any error so benchmarks don't crash on stale endpoints.
+    """
+    # vLLM exposes Prometheus /metrics at the root, sibling of /v1.
+    url = normalize_api_base(api_base).removesuffix("/v1") + "/metrics"
+    try:
+        req = urllib.request.Request(url, method="GET")
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            text = resp.read().decode("utf-8", errors="replace")
+    except (urllib.error.HTTPError, urllib.error.URLError, OSError):
+        return 0.0, 0.0
+    queries = hits = 0.0
+    for line in text.splitlines():
+        if line.startswith("#") or not line.strip():
+            continue
+        if line.startswith("vllm:prefix_cache_queries_total{"):
+            try:
+                queries = float(line.rsplit(" ", 1)[-1])
+            except ValueError:
+                pass
+        elif line.startswith("vllm:prefix_cache_hits_total{"):
+            try:
+                hits = float(line.rsplit(" ", 1)[-1])
+            except ValueError:
+                pass
+    return queries, hits
+
+
+def _hit_rate_pct(before: Tuple[float, float], after: Tuple[float, float]) -> Tuple[float, float, float]:
+    """Return (delta_hits, delta_queries, hit_rate_pct) over the [before, after] window."""
+    dq = after[0] - before[0]
+    dh = after[1] - before[1]
+    pct = (100.0 * dh / dq) if dq > 0 else float("nan")
+    return dh, dq, pct
 
 
 # ---------------------------------------------------------------------------
@@ -364,20 +432,92 @@ def main() -> None:
     row_items = [(idx, s.to_dict()) for idx, (_, s) in enumerate(rows.iterrows())]
     failures: List[str] = []
 
+    # ── benchmark snapshot: prefix-cache counters BEFORE the run ─────────────
+    cache_before: Dict[str, Tuple[float, float]] = {}
+    for spec in base_specs:
+        cache_before[f"base[{spec['name']}]={spec['api_model']}"] = _fetch_prefix_cache_counters(spec["api_base"])
+    cache_before[f"instruct={args.instruct_api_model}"] = _fetch_prefix_cache_counters(args.instruct_api_base)
+
+    # ── per-row timing aggregation across threads ────────────────────────────
+    agg = {
+        "future_sample_seconds": 0.0,
+        "translation_seconds": 0.0,
+        "n_future_sample_calls": 0,
+        "n_translation_consensus_calls": 0,
+        "n_translation_final_calls": 0,
+        "rows_completed": 0,
+        "rows_skipped_existing": 0,
+    }
+
+    def _accumulate(result: Dict[str, Any]) -> None:
+        if not isinstance(result, dict):
+            return
+        if result.get("skipped_existing"):
+            agg["rows_skipped_existing"] += 1
+            return
+        timing = result.get("timing", {}) or {}
+        agg["future_sample_seconds"] += float(timing.get("future_sample_seconds", 0.0))
+        agg["translation_seconds"] += float(timing.get("translation_seconds", 0.0))
+        agg["n_future_sample_calls"] += int(timing.get("n_future_sample_calls", 0))
+        agg["n_translation_consensus_calls"] += int(timing.get("n_translation_consensus_calls", 0))
+        agg["n_translation_final_calls"] += int(timing.get("n_translation_final_calls", 0))
+        agg["rows_completed"] += 1
+
+    wall_t0 = time.perf_counter()
+
     if num_concurrent <= 1:
-        for row_idx, row_dict in row_items:
-            _process_one_row(row_idx, row_dict)
+        for row_idx, row_dict in tqdm(row_items, desc="rows", unit="row", file=sys.stderr):
+            _accumulate(_process_one_row(row_idx, row_dict))
     else:
         print(f"[Concurrent] {len(row_items)} rows, {num_concurrent} workers")
         with ThreadPoolExecutor(max_workers=num_concurrent) as executor:
             futs = {executor.submit(_process_one_row, ri, rd): ri for ri, rd in row_items}
-            for fut in as_completed(futs):
-                try:
-                    fut.result()
-                except Exception as exc:
-                    row_id = futs[fut]
-                    print(f"[ERROR] Row {row_id} raised: {exc}", file=sys.stderr)
-                    failures.append(f"Row {row_id}: {exc}")
+            with tqdm(total=len(futs), desc="rows", unit="row", file=sys.stderr) as bar:
+                for fut in as_completed(futs):
+                    try:
+                        _accumulate(fut.result())
+                    except Exception as exc:
+                        row_id = futs[fut]
+                        print(f"[ERROR] Row {row_id} raised: {exc}", file=sys.stderr)
+                        failures.append(f"Row {row_id}: {exc}")
+                    bar.update(1)
+
+    wall_seconds = time.perf_counter() - wall_t0
+
+    # ── benchmark snapshot: prefix-cache counters AFTER the run ──────────────
+    cache_after: Dict[str, Tuple[float, float]] = {}
+    for spec in base_specs:
+        cache_after[f"base[{spec['name']}]={spec['api_model']}"] = _fetch_prefix_cache_counters(spec["api_base"])
+    cache_after[f"instruct={args.instruct_api_model}"] = _fetch_prefix_cache_counters(args.instruct_api_base)
+
+    # ── final summary ────────────────────────────────────────────────────────
+    rc = agg["rows_completed"]
+    avg_fs = (agg["future_sample_seconds"] / rc) if rc else 0.0
+    avg_tr = (agg["translation_seconds"] / rc) if rc else 0.0
+    print()
+    print("=" * 72)
+    print("BENCHMARK SUMMARY")
+    print("=" * 72)
+    print(f"  rows completed                    : {rc}")
+    print(f"  rows skipped (existing output)    : {agg['rows_skipped_existing']}")
+    print(f"  workers (concurrent cases)        : {num_concurrent}")
+    print(f"  wall-clock time                   : {wall_seconds:8.2f} s")
+    print()
+    print(f"  ── per-stage time (summed across threads; >wall when concurrent) ──")
+    print(f"  future-sampling time   total      : {agg['future_sample_seconds']:8.2f} s   "
+          f"calls={agg['n_future_sample_calls']:6d}   "
+          f"avg/call={(agg['future_sample_seconds']/agg['n_future_sample_calls']) if agg['n_future_sample_calls'] else 0:.3f} s   "
+          f"avg/row={avg_fs:.2f} s")
+    print(f"  translation (consensus+final)     : {agg['translation_seconds']:8.2f} s   "
+          f"calls={agg['n_translation_consensus_calls']+agg['n_translation_final_calls']:6d}   "
+          f"avg/row={avg_tr:.2f} s   "
+          f"(consensus={agg['n_translation_consensus_calls']}, final={agg['n_translation_final_calls']})")
+    print()
+    print(f"  ── prefix cache hit rate (this-run window) ────────────────────────")
+    for label in cache_after:
+        dh, dq, pct = _hit_rate_pct(cache_before.get(label, (0.0, 0.0)), cache_after[label])
+        print(f"  {label:<46s}: {pct:6.2f}%  ({dh:>10,.0f} / {dq:>10,.0f} tokens)")
+    print("=" * 72)
 
     if failures:
         print(f"[FATAL] {len(failures)} row(s) failed", file=sys.stderr)
