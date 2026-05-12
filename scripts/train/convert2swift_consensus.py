@@ -73,7 +73,13 @@ def main():
             continue
 
         audio_path, start, duration = rows.iloc[0]["audio"].split(":")
-        wav, sr = sf.read(audio_path, start=int(start), frames=int(duration))
+        try:
+            wav, sr = sf.read(audio_path, start=int(start), frames=int(duration))
+        except sf.LibsndfileError as e:
+            n_skip += 1
+            pbar.set_description(f"Processing, skipped {n_skip} instances")
+            print(f"[skip] {utt_id}: {audio_path}:{start}:{duration} — {e}")
+            continue
         assert sr == 16000
 
         multiplier = int(rng.integers(1, 13))
@@ -133,4 +139,8 @@ done
 python scripts/train/convert2swift_consensus.py \
     --manifest-root /data/group_data/li_lab/haolingp/data_synthesis/gigaspeech/consensus_future/topk/consensus_decoding_en_zh_top5_v2_qe3 \
     --variant-tag topk5_v2
+
+python scripts/train/convert2swift_consensus.py \
+    --manifest-root /data/group_data/li_lab/siqiouya/datasets/gigaspeech/consensus_decoding/topk/consensus_decoding_en_zh_top_5_futures200-segale/qe3-lr-aligned-full \
+    --variant-tag topk5_f200
 """
