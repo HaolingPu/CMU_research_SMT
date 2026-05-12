@@ -1,0 +1,11 @@
+gigaspeech-zh-EAST-mult-fixed-s_origin-bsz4/v0-20260223-112630-hf/
+gigaspeech-zh-EAST-latency2mult-s_origin-bsz4/v1-20260224-064826-hf/
+gigaspeech-zh-refined-EAST-mult-fixed-s_origin-bsz4/v0-20260223-112635-hf/
+gigaspeech-zh-refined-EAST-latency2mult-s_origin-bsz4/v0-20260224-072656-hf/
+gigaspeech-zh-Simul-MuST-C-fixed-s_origin-bsz4/v0-20260223-121324-hf/
+gigaspeech-zh-Simul-MuST-C-fixed-v2-s_origin-bsz4/v2-20260224-133550-hf/
+gigaspeech-zh-s_origin-bsz4/v1-20260122-055820-hf/
+gigaspeech-zh-hibiki-s-bsz4/v0-20260326-141050-hf/
+gigaspeech-zh-consensus-topk5-s-bsz4/v1-20260418-002956-hf/
+gigaspeech-zh-consensus-topk5_v2-s-bsz4/v0-20260425-121058-hf/
+gigaspeech-zh-consensus-topk5_f200-s-bsz4/v0-20260502-125501-hf/

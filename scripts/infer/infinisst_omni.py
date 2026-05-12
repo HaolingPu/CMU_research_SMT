@@ -177,12 +177,12 @@ class InfiniSSTOmni(SpeechToTextAgent):
     def load_model(self, args):
         if args.use_vllm:
             self.model = LLM(
-                model=args.model_name, trust_remote_code=True, gpu_memory_utilization=0.95,
+                model=args.model_name, trust_remote_code=True, gpu_memory_utilization=0.90,
                 tensor_parallel_size=2,
                 limit_mm_per_prompt={'audio': self.max_cache_chunks},
                 max_num_seqs=1,
-                max_model_len=32768,
-                enable_prefix_caching=True
+                max_model_len=16384,
+                enable_prefix_caching=True,
             )
             self.sampling_params = SamplingParams(
                 temperature=self.temperature,
