@@ -3,7 +3,8 @@
 
 Reads the future_aware_testset_v2 TSV (id, source, reference, ...), synthesizes
 each English `source` to a WAV via the ElevenLabs API, and writes
-`source.txt` (paths) and `target.txt` (Chinese references) manifests.
+`source.txt` (paths), `target.txt` (Chinese references), and a StreamLAAL-
+compatible `data_<speed_tag>.yaml` manifest with per-utterance segments.
 
 API key is read from the ELEVENLABS_API_KEY env var.
 """
@@ -13,6 +14,7 @@ from __future__ import annotations
 import argparse
 import os
 import sys
+import wave
 from pathlib import Path
 
 import pandas as pd
@@ -120,10 +122,23 @@ def main() -> int:
 
     source_txt = output_dir / f"source_{speed_tag}.txt"
     target_txt = output_dir / "target.txt"
-    with source_txt.open("w") as fs, target_txt.open("w") as ft:
-        for _, wav_path, reference in successful_rows:
+    source_text_txt = output_dir / "source_text.txt"
+    data_yaml = output_dir / f"data_{speed_tag}.yaml"
+    id_to_source = {str(row["id"]): str(row["source"]) for _, row in df.iterrows()}
+    with source_txt.open("w") as fs, target_txt.open("w") as ft, \
+         source_text_txt.open("w") as fe, data_yaml.open("w") as fy:
+        yaml_entries = []
+        for utt_id, wav_path, reference in successful_rows:
             fs.write(f"{wav_path}\n")
             ft.write(f"{reference}\n")
+            fe.write(f"{id_to_source[utt_id]}\n")
+            with wave.open(wav_path, "rb") as w:
+                duration = round(w.getnframes() / w.getframerate(), 3)
+            yaml_entries.append(
+                f"{{duration: {duration}, offset: 0, rW: 0, "
+                f"speaker_id: NA, uW: 0, wav: {Path(wav_path).name}}}"
+            )
+        fy.write("[" + ",\n  ".join(yaml_entries) + "]\n")
 
     print(
         f"\nDone. synthesized={n_synth} skipped(existing)={n_skip} "
@@ -131,6 +146,8 @@ def main() -> int:
     )
     print(f"  {source_txt}")
     print(f"  {target_txt}")
+    print(f"  {source_text_txt}")
+    print(f"  {data_yaml}")
     if failed_ids:
         print(f"Failed ids: {failed_ids}", file=sys.stderr)
         return 1
