@@ -120,6 +120,19 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--min-p", type=float, default=0.0)
     p.add_argument("--top-p", type=float, default=0.0,
                    help="Nucleus (top-p) candidate selection: keep smallest set with cumulative prob >= top-p.")
+    p.add_argument("--soft-vote-top-k", type=int, default=20,
+                   help="Per-future top-N cap (safety) before voting.")
+    p.add_argument("--soft-vote-min-p", type=float, default=0.1,
+                   help="Per-future per-token min probability for entering the vote. "
+                        "Tokens with p < this are dropped from that future before voting.")
+    p.add_argument("--min-voters-ratio", type=float, default=0.75,
+                   help="A token is eligible to win iff at least this fraction of futures "
+                        "contributed it (after min-p + top-K filter). I.e., ≥ ceil(N*ratio) "
+                        "futures must list the token in their filtered top-K. Looser-than-"
+                        "intersection: ratio=1.0 ↔ strict intersection; <1.0 lets majority "
+                        "agreement override a minority that ranks the token lower.")
+    p.add_argument("--soft-vote-threshold", type=float, default=0.0,
+                   help="DEPRECATED — kept for CLI backward compat, ignored.")
     # target language
     p.add_argument("--target-lang", default="Chinese",
                    help="Target language name for prompts (e.g. Chinese, Japanese, German)")
@@ -356,10 +369,6 @@ def is_valid_future_text(text: str) -> bool:
 # Prompt builders
 # ---------------------------------------------------------------------------
 
-def build_future_sampling_prompt(observed_source: str) -> str:
-    return observed_source
-
-
 # ---------------------------------------------------------------------------
 # Method A: instruct-model future sampling via /chat/completions
 # Generates N diverse continuations in a single call as a numbered list.
@@ -431,134 +440,6 @@ def parse_method_a_output(raw_text: str, num_expected: int) -> List[str]:
     return out
 
 
-# ---------------------------------------------------------------------------
-# Method C: targeted instruct future sampling via structured JSON.
-# The instruct model first identifies up to K ambiguity spans in the heard
-# English prefix whose Chinese translation could still change, proposes 2
-# competing branches per span, and writes one short English continuation per
-# branch — plus a few neutral continuations as a control group. This produces
-# branch-coverage-oriented futures (vs probability-mass futures from base LM).
-# ---------------------------------------------------------------------------
-
-def build_targeted_future_messages(
-    observed_source: str,
-    committed_text: str,
-    target_lang: str,
-    max_spans: int,
-    num_neutrals: int,
-) -> List[Dict[str, str]]:
-    """Build the 2-step JSON prompt for ambiguity-targeted continuation sampling."""
-    system = (
-        f"You help a simultaneous English-to-{target_lang} interpreter test whether "
-        f"the current {target_lang} prefix is safe to commit. Your job is to surface "
-        f"ambiguities in the heard English prefix that could still flip the {target_lang} "
-        f"translation, and to write short natural continuations that probe each branch."
-    )
-    user = (
-        f"English heard so far:\n\"{observed_source}\"\n\n"
-        f"{target_lang} committed so far:\n\"{committed_text}\"\n\n"
-        f"Task:\n"
-        f"1. Find up to {max_spans} spans in the English prefix whose {target_lang} "
-        f"translation could change after hearing more words (word sense, verb sense, "
-        f"PP/clause attachment, long-distance structure, proper-name vs common-noun reading).\n"
-        f"2. For each span, propose 2-3 possible branches. Use 3 only when the span "
-        f"genuinely has 3 or more distinct senses (e.g., a polysemous verb like "
-        f"\"run\" or \"draw\"); otherwise 2 is sufficient. Do NOT pad with near-duplicate branches.\n"
-        f"3. For each branch, write 1 short natural English continuation, 4-12 words, "
-        f"starting immediately AFTER the heard English prefix and grammatically connecting "
-        f"to it (if the prefix ends mid-clause, the continuation completes the clause).\n"
-        f"4. Additionally, write {num_neutrals} neutral continuations that simply extend "
-        f"the sentence without committing to any branch (control group); use span=\"none\" "
-        f"and branch=\"neutral\" for these.\n\n"
-        f"Rules:\n"
-        f"- Output English only (not {target_lang}).\n"
-        f"- Do NOT repeat the English prefix verbatim — output only what comes AFTER it.\n"
-        f"- Avoid implausible or off-topic details.\n"
-        f"- If there is no meaningful ambiguity, output only the {num_neutrals} neutral items.\n"
-        f"- Output strictly the JSON object described below, nothing else.\n\n"
-        f"Format:\n"
-        f"{{\n"
-        f"  \"items\": [\n"
-        f"    {{\"span\": \"<exact span text or 'none'>\", "
-        f"\"branch\": \"<short label of the branch>\", "
-        f"\"continuation\": \"<4-12 English words>\"}}\n"
-        f"  ]\n"
-        f"}}"
-    )
-    return [
-        {"role": "system", "content": system},
-        {"role": "user", "content": user},
-    ]
-
-
-def _extract_first_json_object(raw_text: str) -> Optional[str]:
-    """Extract the first balanced top-level JSON object from raw_text. Tolerates
-    leading/trailing prose or markdown fences around the JSON."""
-    if not raw_text:
-        return None
-    s = raw_text
-    # Strip common code fences.
-    s = re.sub(r"^```(?:json)?\s*", "", s.strip(), flags=re.IGNORECASE)
-    s = re.sub(r"\s*```\s*$", "", s)
-    start = s.find("{")
-    if start < 0:
-        return None
-    depth = 0
-    in_str = False
-    esc = False
-    for i in range(start, len(s)):
-        ch = s[i]
-        if in_str:
-            if esc:
-                esc = False
-            elif ch == "\\":
-                esc = True
-            elif ch == "\"":
-                in_str = False
-            continue
-        if ch == "\"":
-            in_str = True
-        elif ch == "{":
-            depth += 1
-        elif ch == "}":
-            depth -= 1
-            if depth == 0:
-                return s[start:i + 1]
-    return None
-
-
-def parse_targeted_future_json(raw_text: str) -> List[Dict[str, str]]:
-    """Parse the targeted-instruct JSON response into a list of items.
-
-    Returns a list of {"span": str, "branch": str, "continuation": str}. Items with
-    empty continuation are dropped. Returns [] on any parse failure (caller decides
-    whether to fall back or READ).
-    """
-    blob = _extract_first_json_object(raw_text)
-    if not blob:
-        return []
-    try:
-        data = json.loads(blob)
-    except (json.JSONDecodeError, ValueError):
-        return []
-    items = data.get("items") if isinstance(data, dict) else None
-    if not isinstance(items, list):
-        return []
-    out: List[Dict[str, str]] = []
-    for it in items:
-        if not isinstance(it, dict):
-            continue
-        cont = str(it.get("continuation", "")).strip()
-        if not cont:
-            continue
-        out.append({
-            "span": str(it.get("span", "")).strip(),
-            "branch": str(it.get("branch", "")).strip(),
-            "continuation": cont,
-        })
-    return out
-
-
 def _is_chat_endpoint_model(api_model: str) -> bool:
     """Decide whether to route to /chat/completions (instruct-style) or /completions (raw LM).
 
@@ -569,29 +450,6 @@ def _is_chat_endpoint_model(api_model: str) -> bool:
     """
     name = str(api_model or "").lower()
     return any(tag in name for tag in ("-it", "instruct", "chat"))
-
-
-def build_translation_probe_prompt(tokenizer: Any, full_source: str, target_prefix: str, target_lang: str = "Chinese") -> str:
-    if not str(target_prefix or "").strip():
-        messages = [{"role": "user", "content": (
-            f"[TASK]\nTranslate the [INPUT] text into {target_lang}.\n\n"
-            f"[INPUT]\n{full_source}\n\n"
-            f"[IMPORTANT]\nStart the {target_lang} translation from the beginning "
-            "and output only the next continuation token(s)."
-        )}]
-    else:
-        messages = [{"role": "user", "content": (
-            f"[TASK]\nTranslate the [INPUT] text into {target_lang}.\n\n"
-            f"[INPUT]\n{full_source}\n\n"
-            f"[IMPORTANT]\nA partial {target_lang} translation is already committed "
-            "at the start of the assistant reply. You must continue from that "
-            "exact prefix and produce only the continuation."
-        )}]
-    prompt = tokenizer.apply_chat_template(messages, add_generation_prompt=False, tokenize=False)
-    prompt += "<|im_start|>assistant\n"
-    if str(target_prefix or "").strip():
-        prompt += target_prefix
-    return prompt
 
 
 def build_translation_probe_prompt_prefix_token_ids(
@@ -932,109 +790,6 @@ _AXIS_HINT_FACTUAL_ASIDE = (
     "or state a domain-specific fact. The continuation should read like an "
     "encyclopedia or footnote, not narrative prose."
 )
-# K-RISK axes: each axis is bound to a SPECIFIC translation failure mode.
-# Goal: produce a continuation that would, if true, invalidate the
-# already-committed Chinese prefix in exactly this way. If the risk doesn't
-# apply to the current partial, produce a plausible neutral continuation.
-_AXIS_HINT_WORD_SENSE_RISK = (
-    "For THIS batch — WORD SENSE risk. Examine the partial for any noun, "
-    "adjective, or content word with MULTIPLE distinct Chinese senses (e.g. "
-    "'bank' = 银行 / 河岸, 'fan' = 风扇 / 粉丝, 'spring' = 春天 / 弹簧 / 泉水, "
-    "'plant' = 植物 / 工厂). If such a word exists in the partial AND its "
-    "sense is not yet pinned down, write a continuation that resolves it to "
-    "a SPECIFIC sense which forces a DIFFERENT Chinese word than the most "
-    "default reading would commit. If no such ambiguous word exists, write a "
-    "plausible neutral continuation that follows the partial naturally."
-)
-_AXIS_HINT_VERB_ROLE_RISK = (
-    "For THIS batch — VERB SENSE / ROLE risk. Examine the partial for any "
-    "verb whose Chinese translation depends on context (e.g. 'raise' = 提高 / "
-    "筹集 / 抚养 / 提出, 'run' = 经营 / 运行 / 竞选 / 跑, 'present' = 呈现 / "
-    "赠送 / 介绍, 'address' = 处理 / 演讲 / 致函, 'charge' = 收费 / 控告 / "
-    "充电 / 冲锋). If the partial contains a verb whose sense is still "
-    "undetermined, write a continuation that pins it to a SPECIFIC sense "
-    "that would force a different Chinese verb than the default. If no such "
-    "verb is in the partial, write a plausible neutral continuation."
-)
-_AXIS_HINT_ATTACHMENT_RISK = (
-    "For THIS batch — ATTACHMENT risk. Examine the partial for any "
-    "prepositional phrase, relative clause, adverbial, or modifier that could "
-    "plausibly attach to MULTIPLE different heads, leading to different "
-    "Chinese sentence structures (classic PP-attachment 'I saw the man with "
-    "the telescope', or relative-clause attachment 'the daughter of the king "
-    "who was crowned yesterday'). If such an attachment ambiguity is present "
-    "in the partial, write a continuation that disambiguates the attachment "
-    "toward the LESS OBVIOUS reading. If no attachment ambiguity exists, "
-    "write a plausible neutral continuation."
-)
-_AXIS_HINT_PREDICATE_DELAY_RISK = (
-    "For THIS batch — MAIN PREDICATE DELAY risk. Examine the partial: has "
-    "the MAIN verb of the matrix clause been heard yet? Many sentences start "
-    "with a subject + relative clause / appositive / adverbial that DELAYS "
-    "the main predicate (e.g. 'The agreement that the two countries signed "
-    "last year...' — the matrix verb is still pending). If the main predicate "
-    "is still pending, write a continuation that supplies a SPECIFIC matrix "
-    "predicate which would force a non-default Chinese verb at the matrix "
-    "position. If the main predicate has already been heard, write a "
-    "plausible neutral continuation."
-)
-_AXIS_HINT_POLARITY_REVERSAL_RISK = (
-    "For THIS batch — POLARITY / REVERSAL risk. Examine the partial: is its "
-    "current trajectory positive / successful / affirmative / cooperative? "
-    "Could it be REVERSED by a subsequent 'but', 'although', 'however', "
-    "'failed to', 'turned out not to', 'unfortunately', 'instead'? If a "
-    "polarity flip is plausible given the partial, write a continuation that "
-    "flips it (positive → negative, success → failure, acceptance → "
-    "rejection, confirmation → denial). If no such reversal is plausible, "
-    "write a plausible neutral continuation that preserves the current "
-    "trajectory."
-)
-# L axes: softened version of J's narrative-diversity axes.
-# - keep SUBJECT_CONTINUES (baseline)
-# - loosen NAMED_ACTOR → NEW_ACTOR_OR_TOPIC (definite NP OK, no "specific" name required)
-# - extend TIME_PIVOT → add CONDITIONAL anchors (if/when/before/after)
-# - relax DIRECT_SPEECH → SPEECH_ACT_OR_ATTITUDE (reported speech + mental stance, no quote required)
-# - replace FACTUAL_ASIDE → POLARITY_OR_OUTCOME_FLIPS (translation-relevant direction flip)
-_AXIS_HINT_NEW_ACTOR_OR_TOPIC = (
-    "For THIS batch: introduce a NEW grammatical subject / topic that takes "
-    "over the next clause. The new subject must be SPECIFIC — a definite NP "
-    "or proper noun. ACCEPTABLE: 'the guard', 'the queen', 'the committee', "
-    "'the old woman', 'the crowd', 'Lieutenant Cross', 'the foreman', "
-    "'Marseille'. NOT ACCEPTABLE: 'a shadow', 'a figure', 'someone', "
-    "'something', 'a voice'. The new entity must serve as the grammatical "
-    "subject of an action verb in the continuation."
-)
-_AXIS_HINT_TIME_OR_CONDITION_PIVOT = (
-    "For THIS batch: the continuation must pivot to a DIFFERENT TIME FRAME "
-    "or introduce a CONDITIONAL / TEMPORAL anchor. Acceptable forms: "
-    "flash-forward ('years later, the next morning, by the time'), flashback "
-    "('long before that, as a child'), frequency ('every Sunday, in those "
-    "days'), or conditional ('if the rain held, when the bell rang, before "
-    "they noticed, after the meeting was over, unless the king agreed'). "
-    "The continuation must clearly anchor in a different temporal or "
-    "conditional frame from the partial."
-)
-_AXIS_HINT_SPEECH_ACT_OR_ATTITUDE = (
-    "For THIS batch: the continuation must signal a SPEECH ACT, REPORT, or "
-    "MENTAL STANCE. This includes reported speech ('asked whether...', "
-    "'warned that...', 'claimed that...', 'insisted on...', 'muttered "
-    "something about...', 'argued that...') and mental states ('wondered "
-    "if...', 'feared that...', 'realized...', 'understood that...', "
-    "'suspected...', 'doubted whether...'). Direct quotes with attribution "
-    "are allowed but NOT required. The continuation must include a verb "
-    "signalling speech or mental stance."
-)
-_AXIS_HINT_POLARITY_OUTCOME_FLIPS = (
-    "For THIS batch: the continuation must FLIP the polarity or outcome of "
-    "the partial's current trajectory. If the partial is heading toward "
-    "success / affirmation / cooperation / approval, flip to failure / "
-    "denial / refusal / rejection. If it's heading toward failure, flip to "
-    "success. Examples: 'succeeded' → 'failed at the last moment', "
-    "'accepted' → 'rejected outright', 'was praised' → 'was condemned', "
-    "'proved true' → 'turned out false', 'agreed' → 'refused', 'survived' → "
-    "'died'. The continuation must change the direction of the outcome from "
-    "what the partial implies."
-)
 
 
 def _sample_prefill_one_batch(
@@ -1341,83 +1096,6 @@ def sample_source_futures_targeted_prefill(
     return merged_f, merged_i
 
 
-def sample_source_futures_targeted_instruct(
-    observed_source: str,
-    committed_text: str,
-    target_lang: str,
-    max_spans: int,
-    num_neutrals: int,
-    api_base: str,
-    api_model: str,
-    api_timeout: float,
-    sample_temperature: float = 0.7,
-    top_p: float = 0.9,
-    max_tokens: int = 600,
-) -> Tuple[List[str], List[Dict[str, Any]]]:
-    """Method C: ambiguity-targeted future sampling via the instruct model.
-
-    Returns (futures, items_info) where:
-      - futures: deduped list of English continuations (drop-in for downstream consensus)
-      - items_info: parallel list of dicts {"source": "targeted_instruct", "span", "branch",
-                    "continuation"} aligned with `futures` (for verbose logging / future
-                    per-span aggregation)
-
-    Returns ([], []) on parse failure or empty observed_source; the caller will then READ.
-    """
-    if not observed_source.strip():
-        return [], []
-    base = normalize_api_base(api_base)
-    messages = build_targeted_future_messages(
-        observed_source=observed_source,
-        committed_text=committed_text or "",
-        target_lang=target_lang,
-        max_spans=max_spans,
-        num_neutrals=num_neutrals,
-    )
-    payload: Dict[str, Any] = {
-        "model": api_model,
-        "messages": messages,
-        "max_tokens": max_tokens,
-        "temperature": sample_temperature,
-        "top_p": top_p,
-        "n": 1,
-        # vLLM honors this and gates decoding to valid JSON. If the backend doesn't
-        # support it, vLLM ignores the field rather than erroring.
-        "response_format": {"type": "json_object"},
-    }
-    try:
-        data = _http_json(f"{base}/chat/completions", payload=payload, timeout=api_timeout)
-    except Exception:
-        return [], []
-    choices = data.get("choices", []) if isinstance(data, dict) else []
-    if not choices:
-        return [], []
-    msg = choices[0].get("message", {}) if isinstance(choices[0], dict) else {}
-    raw_text = str(msg.get("content", "")) if isinstance(msg, dict) else ""
-    items = parse_targeted_future_json(raw_text)
-
-    futures: List[str] = []
-    items_info: List[Dict[str, Any]] = []
-    seen: set = set()
-    for it in items:
-        cleaned = clean_future_text(observed_source, it["continuation"])
-        if not cleaned or not is_valid_future_text(cleaned):
-            continue
-        key = cleaned.lower()
-        if key in seen:
-            continue
-        seen.add(key)
-        futures.append(cleaned)
-        items_info.append({
-            "source": "targeted_instruct",
-            "path": api_model,
-            "span": it["span"],
-            "branch": it["branch"],
-            "future": cleaned,
-        })
-    return futures, items_info
-
-
 # ---------------------------------------------------------------------------
 # Next-token distribution (API only, batch)
 # ---------------------------------------------------------------------------
@@ -1474,6 +1152,7 @@ def batch_get_next_token_distributions(
     api_model: str = "",
     api_timeout: float = 120.0,
     target_lang: str = "Chinese",
+    min_logprobs: int = 0,
 ) -> List[Tuple[Dict[int, float], Dict[str, Any]]]:
 # Step 1: 用 chat template 把翻译指令编码成 token IDs
 #         → [<|im_start|>, user, \n, [TASK], Translate..., <|im_end|>]
@@ -1495,7 +1174,7 @@ def batch_get_next_token_distributions(
     # [user task tokens] + [assistant prefix tokens] + [already committed target prefix tokens]
     if not prompts:
         return []
-    logprobs_n = max(top_k, 100) if (min_p > 0 or top_p > 0) else top_k
+    logprobs_n = max(top_k, 100, min_logprobs) if (min_p > 0 or top_p > 0) else max(top_k, min_logprobs)
     payload = {
         "model": api_model,
         "prompt": prompts,
@@ -1588,28 +1267,59 @@ def choose_consensus_token(
     min_p: float = MIN_P,
     candidate_top_k: int = TOP_K,
     top_p: float = 0.0,
+    soft_vote_top_k: int = 20,
+    soft_vote_min_p: float = 0.1,
+    soft_vote_threshold: float = 0.0,  # deprecated, unused
+    min_voters_ratio: float = 0.75,
 ) -> Tuple[Optional[int], Dict[str, Any]]:
+    # Looser-than-intersection majority vote.
+    # Per future:  filter dist to {tok : p >= soft_vote_min_p}, then take top-K.
+    # For each token in that filtered set, increment per_token_voters[tok] and
+    # accumulate agg_score[tok] += p.
+    # A token is eligible to win iff per_token_voters[tok] >= ceil(N*ratio).
+    # Winner = argmax_{eligible} agg_score, must be strictly unique.
+    del soft_vote_threshold  # silently ignored — deprecated argument
     if not distributions:
         return None, {"reason": "no_distributions"}
-    candidate_lists = [_select_candidates(dist, top_p=top_p, min_p=min_p, top_k=candidate_top_k)
+    candidate_lists = [_select_candidates(dist, top_p=top_p, min_p=min_p, top_k=soft_vote_top_k)
                        for dist in distributions]
-    # Soft voting / sum-of-probabilities ensemble (product-of-experts style).
-    # Replaces the previous strict set-intersection: now the token with the
-    # highest summed probability across all futures wins, even if not every
-    # future ranked it in their top-k. This lets ≥majority agreement override
-    # a single dissenting future.
-    agg: Counter = Counter()
+    num_futures = len(distributions)
+    per_token_voters: Counter = Counter()
+    agg_score: Counter = Counter()
     for dist in distributions:
-        for tok, p in dist.items():
-            agg[tok] += p
-    if not agg:
-        return None, {"reason": "no_distributions"}
-    best_token, best_score = agg.most_common(1)[0]
-    return best_token, {
-        "reason": "ok",
-        "intersection": [tok for tok, _ in agg.most_common(candidate_top_k)],
-        "avg_score": best_score / len(distributions),
+        filtered = [(tok, p) for tok, p in dist.items() if p >= soft_vote_min_p]
+        filtered.sort(key=lambda kv: kv[1], reverse=True)
+        filtered = filtered[:soft_vote_top_k]
+        for tok, p in filtered:
+            per_token_voters[tok] += 1
+            agg_score[tok] += p
+    min_voters = max(1, math.ceil(num_futures * min_voters_ratio))
+    eligible = {tok: agg_score[tok] for tok, v in per_token_voters.items() if v >= min_voters}
+    base_meta = {
         "candidate_lists": candidate_lists,
+        "num_futures": num_futures,
+        "min_voters": min_voters,
+        "soft_vote_min_p": soft_vote_min_p,
+    }
+    if not eligible:
+        top_close = per_token_voters.most_common(soft_vote_top_k)
+        return None, {"reason": "no_token_with_enough_voters",
+                      "intersection": [t for t, _ in top_close],
+                      "close_voters": top_close, **base_meta}
+    ranked = sorted(eligible.items(), key=lambda kv: kv[1], reverse=True)
+    top_tok, top_score = ranked[0]
+    second_score = ranked[1][1] if len(ranked) > 1 else 0.0
+    base_meta = {
+        **base_meta,
+        "intersection": [tok for tok, _ in ranked[:soft_vote_top_k]],
+        "top_voters": per_token_voters[top_tok],
+    }
+    if top_score <= second_score:
+        return None, {"reason": "tied_top", **base_meta}
+    return top_tok, {
+        "reason": "ok",
+        "avg_score": top_score / num_futures,
+        **base_meta,
     }
 
 
@@ -1720,6 +1430,10 @@ def extend_pending_tokens(
     min_p: float = 0.0,
     top_p: float = 0.0,
     target_lang: str = "Chinese",
+    soft_vote_top_k: int = 20,
+    soft_vote_min_p: float = 0.1,
+    soft_vote_threshold: float = 0.8,
+    min_voters_ratio: float = 0.75,
 ) -> Tuple[List[int], List[Dict[str, Any]]]:
     pending_token_ids: List[int] = []
     grow_logs: List[Dict[str, Any]] = []
@@ -1740,6 +1454,7 @@ def extend_pending_tokens(
             api_model=instruct_api_model,
             api_timeout=instruct_api_timeout,
             target_lang=target_lang,
+            min_logprobs=soft_vote_top_k,
         )
 
         distributions: List[Dict[int, float]] = []
@@ -1751,7 +1466,7 @@ def extend_pending_tokens(
                 return pending_token_ids, grow_logs
             distributions.append(dist)
             # select 3 policies: topk, topp, minp
-            candidate_ids = _select_candidates(dist, top_p=top_p, min_p=min_p, top_k=candidate_top_k)
+            candidate_ids = _select_candidates(dist, top_p=top_p, min_p=min_p, top_k=soft_vote_top_k)
             per_future.append({
                 "future": futures[i],
                 "candidate_texts": [_single_token_text(instruct_tokenizer, t) for t in candidate_ids],
@@ -1760,7 +1475,16 @@ def extend_pending_tokens(
             })
 
         # 共识选 token
-        consensus_token_id, meta = choose_consensus_token(distributions, min_p=min_p, candidate_top_k=candidate_top_k, top_p=top_p)
+        consensus_token_id, meta = choose_consensus_token(
+            distributions,
+            min_p=min_p,
+            candidate_top_k=candidate_top_k,
+            top_p=top_p,
+            soft_vote_top_k=soft_vote_top_k,
+            soft_vote_min_p=soft_vote_min_p,
+            soft_vote_threshold=soft_vote_threshold,
+            min_voters_ratio=min_voters_ratio,
+        )
         if consensus_token_id is None: #没有共识token，停止本轮生长
             grow_logs.append({"step": step_idx, "stop": "no_consensus_token",
                               "per_future": per_future, "meta": meta})
@@ -1946,7 +1670,7 @@ def run_one_utterance(
     for si, bs in enumerate(base_specs):
         label = bs.get("name", f"spec_{si}")
         _vlog(verbose_log_file, f"# base_model[{label}]: api model={bs.get('api_model','')} base={bs.get('api_base','')} num_futures={bs.get('num_futures','')}")
-    _vlog(verbose_log_file, f"# instruct_backend: vllm_completion")
+    _vlog(verbose_log_file, "# instruct_backend: vllm_completion")
     _vlog(verbose_log_file, "############################################################")
 
     for t in range(len(chunks)):
@@ -2059,6 +1783,10 @@ def run_one_utterance(
             min_p=args.min_p,
             top_p=args.top_p,
             target_lang=args.target_lang,
+            soft_vote_top_k=args.soft_vote_top_k,
+            soft_vote_min_p=args.soft_vote_min_p,
+            soft_vote_threshold=args.soft_vote_threshold,
+            min_voters_ratio=args.min_voters_ratio,
         )
 
         # ── min-consensus-horizon filter ──
@@ -2079,7 +1807,7 @@ def run_one_utterance(
 
         # ── verbose: consensus steps ──
         if verbose_log_file is not None and grow_logs:
-            _vlog(verbose_log_file, f"[Step 4-5] consensus summary:")
+            _vlog(verbose_log_file, "[Step 4-5] consensus summary:")
             for gl in grow_logs:
                 step = gl.get("step", "?")
                 stop = gl.get("stop", "")
