@@ -1,3 +1,35 @@
 gigaspeech-zh-s_origin-bsz4/v1-20260122-055820-hf/
 gigaspeech-zh-hibiki-s-bsz4/v0-20260326-141050-hf/
 gigaspeech-zh-consensus-topk5_f200-s-bsz4/v0-20260502-125501-hf/
+# topk5_v2 / topk5 commented out -- only score the new k4 ckpt for now.
+# To re-include later, uncomment.
+# gigaspeech-zh-consensus-topk5_v2-s-bsz4/v1-20260426-030647-hf/
+# gigaspeech-zh-consensus-topk5-s-bsz4/v0-20260427-000433-hf/
+gigaspeech-zh-consensus-topk5_k4-s-bsz4/v1-20260429-023458-hf/
+gigaspeech-zh-PA-40k-s-bsz4/v0-20260504-150226-hf/
+# LA-40k + LA-40k-seg13 evals removed; only best LA (seg14) retained. Weights preserved.
+# gigaspeech-zh-LA-40k-s-bsz4/v0-20260506-221535-hf/
+# gigaspeech-zh-LA-40k-seg13-s-bsz4/v0-20260507-214653-hf/
+gigaspeech-zh-LA-40k-seg14-LA2-s-bsz4/v0-20260510-125709-hf/
+gigaspeech-zh-consensus-top5-axis5-s-bsz4/v0-20260516-121120-hf/
+gigaspeech-zh-consensus-top5-axis5-sv-s-bsz4/v0-20260518-141037-hf/
+gigaspeech-zh-consensus-top5-axis5-fut100-s-bsz4/v0-20260521-002657-hf/
+gigaspeech-zh-consensus-top5-axis5-fut100_n100-s-bsz4/v0-20260525-013823-hf/
+# --- EAST / Simul-MuST-C baselines (Standard prompt) ---
+gigaspeech-zh-EAST-lowonly-s-bsz4/v0-20260601-001003-hf/
+gigaspeech-zh-EAST-even-s-bsz4/v0-20260601-001001-hf/
+gigaspeech-zh-Simul-MuST-C-fixed-v2-s_origin-bsz4/v1-20260601-005257-hf/
+gigaspeech-zh-hibiki-s-bsz4/v0-20260601-121643-hf/
+# --- qwenasr-sentsplit re-run of top5-axis5 (cleaned manifest, 2026-06-21) ---
+gigaspeech-zh-consensus-top5-axis5-qwenasr-s-bsz4/v0-20260621-084030-hf/
+gigaspeech-zh-consensus-INTERSECT-old-ctrl-s-bsz4/v0-20260622-070111-hf/
+gigaspeech-zh-consensus-INTERSECT-new-ctrl-s-bsz4/v0-20260622-075224-hf/
+gigaspeech-zh-consensus-top5-axis5-qwenasr-fixed-s-bsz4/v0-20260622-084355-hf/
+gigaspeech-zh-consensus-INTERSECT-win3-fixed-s-bsz4/v0-20260624-151538-hf/
+gigaspeech-zh-consensus-FULL40k-win3-s-bsz4/v0-20260626-145826-hf/
+gigaspeech-zh-consensus-FULL40k-win3-nopfix-s-bsz4/v0-20260627-084825-hf/
+gigaspeech-zh-consensus-FULL40k-win3-splitfix-s-bsz4/v0-20260628-111920-hf/
+gigaspeech-zh-consensus-FULL40k-win3-clausesplit-s-bsz4/v0-20260630-060135-hf/
+gigaspeech-zh-consensus-anchor40k-s-bsz4/v0-20260717-141356-hf/
+gigaspeech-zh-consensus-bestof4refsel-s-bsz4/v0-20260719-152000-hf/
+gigaspeech-zh-consensus-bestof5refsel-s-bsz4/v0-20260719-153718-hf/

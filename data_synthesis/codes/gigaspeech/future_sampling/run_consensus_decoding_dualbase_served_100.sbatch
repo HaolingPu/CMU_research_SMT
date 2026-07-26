@@ -38,20 +38,25 @@ export PATH="${GEMMA4_ENV}/bin:${PATH}"
 
 SERVE_SCRIPT_INSTRUCT="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/serve_instruct_gpu0.sh"
 SERVE_SCRIPT_DUALBASE="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/serve_dual_base_gpu1.sh"
-SCRIPT_PATH="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/consensus_decoding.py"
+SCRIPT_PATH="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/consensus_decoding_token_id_level.py"
 INSTRUCT_TOKENIZER_PATH="${INSTRUCT_TOKENIZER_PATH:-/data/user_data/haolingp/models/Qwen3-30B-A3B-Instruct-2507-FP8}"
 
-INPUT_TSV="${INPUT_TSV:-/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/eval_datasets/train_xl_case_robust_asr_filtered_frozen_llm_reference.tsv}"
-OUTPUT_ROOT="${OUTPUT_ROOT:-/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_debug/gemma4/true-minp-serve-100}"
+INPUT_TSV="${INPUT_TSV:-/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/eval_datasets/train_xl_case_robust_asr_filtered_frozen_llm_reference_subsentence_ref.tsv}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_debug/topk/debug_1000}"
 
-TOTAL_ROWS="${TOTAL_ROWS:-100}"
+TOTAL_ROWS="${TOTAL_ROWS:-1000}"
 NUM_TASKS="${NUM_TASKS:-4}"
 NUM_FUTURES="${NUM_FUTURES:-20}"
 SECONDARY_NUM_FUTURES="${SECONDARY_NUM_FUTURES:-10}"
 FUTURE_TOKENS="${FUTURE_TOKENS:-20}"
-MAX_CONSENSUS_STEPS="${MAX_CONSENSUS_STEPS:-32}"
-MIN_P="${MIN_P:-0.1}"
-NUM_CONCURRENT_CASES="${NUM_CONCURRENT_CASES:-8}"
+MAX_CONSENSUS_STEPS="${MAX_CONSENSUS_STEPS:-12}"
+MIN_CONSENSUS_HORIZON="${MIN_CONSENSUS_HORIZON:-1}"
+CANDIDATE_TOP_K="${CANDIDATE_TOP_K:-5}"
+MIN_P="${MIN_P:-0.0}"
+TOP_P="${TOP_P:-0.0}"
+FUTURE_SOURCE_WINDOW_CHUNKS="${FUTURE_SOURCE_WINDOW_CHUNKS:-3}"
+TARGET_LANG="${TARGET_LANG:-Chinese}"
+NUM_CONCURRENT_CASES="${NUM_CONCURRENT_CASES:-32}"
 
 ROWS_PER_TASK=$(( (TOTAL_ROWS + NUM_TASKS - 1) / NUM_TASKS ))
 ROW_START=$(( TASK_ID * ROWS_PER_TASK ))
@@ -89,7 +94,10 @@ echo "Rows                   : start=${ROW_START} count=${ROW_COUNT} total=${TOT
 echo "Num tasks              : ${NUM_TASKS}"
 echo "Futures                : total=${NUM_FUTURES} secondary=${SECONDARY_NUM_FUTURES}"
 echo "Future tokens          : ${FUTURE_TOKENS}"
-echo "Min-p                  : ${MIN_P}"
+echo "Top-k / min-p / top-p  : ${CANDIDATE_TOP_K} / ${MIN_P} / ${TOP_P}"
+echo "Max consensus steps    : ${MAX_CONSENSUS_STEPS}"
+echo "Future src window      : ${FUTURE_SOURCE_WINDOW_CHUNKS}"
+echo "Target lang            : ${TARGET_LANG}"
 echo "Concurrent cases       : ${NUM_CONCURRENT_CASES}"
 echo "Ports                  : instruct=${INSTRUCT_PORT} primary=${PRIMARY_BASE_PORT} secondary=${SECONDARY_BASE_PORT}"
 echo "Serve instruct         : ${SERVE_SCRIPT_INSTRUCT}"
@@ -158,7 +166,12 @@ echo "[RUN] Launching consensus decoding ..."
     --secondary-num-futures "${SECONDARY_NUM_FUTURES}" \
     --future-tokens "${FUTURE_TOKENS}" \
     --max-consensus-steps "${MAX_CONSENSUS_STEPS}" \
+    --min-consensus-horizon "${MIN_CONSENSUS_HORIZON}" \
+    --candidate-top-k "${CANDIDATE_TOP_K}" \
     --min-p "${MIN_P}" \
+    --top-p "${TOP_P}" \
+    --future-source-window-chunks "${FUTURE_SOURCE_WINDOW_CHUNKS}" \
+    --target-lang "${TARGET_LANG}" \
     --instruct-api-base "http://127.0.0.1:${INSTRUCT_PORT}/v1" \
     --instruct-api-model "qwen3-instruct" \
     --instruct-tokenizer-path "${INSTRUCT_TOKENIZER_PATH}" \
@@ -176,6 +189,11 @@ echo "[RUN] Launching consensus decoding ..."
     echo "rows_count=${ROW_COUNT}"
     echo "num_futures=${NUM_FUTURES}"
     echo "secondary_num_futures=${SECONDARY_NUM_FUTURES}"
+    echo "candidate_top_k=${CANDIDATE_TOP_K}"
+    echo "min_p=${MIN_P}"
+    echo "top_p=${TOP_P}"
+    echo "max_consensus_steps=${MAX_CONSENSUS_STEPS}"
+    echo "future_source_window_chunks=${FUTURE_SOURCE_WINDOW_CHUNKS}"
 } > "${RESULT_SENTINEL}"
 
 echo "===== DONE DUAL-BASE CONSENSUS VIA USER SERVES TASK ${TASK_ID} ====="

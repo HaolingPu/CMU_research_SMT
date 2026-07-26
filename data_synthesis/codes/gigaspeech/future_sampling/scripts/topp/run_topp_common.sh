@@ -17,21 +17,30 @@ SERVE_DUALBASE="${CODE_DIR}/serve_dual_base_gpu1.sh"
 DECODER="/home/siqiouya/code/CMU_research_SMT/data_synthesis/codes-refactored/consensus_decoding_token_id_level.py"
 TOKENIZER="/data/user_data/haolingp/models/Qwen3-30B-A3B-Instruct-2507-FP8"
 
-INPUT_TSV="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/eval_datasets/train_xl_case_robust_asr_filtered_frozen_llm_reference_subsentence_ref.tsv"
-OUTPUT_ROOT="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_debug/topp/consensus_decoding_en_zh_topp_${TOP_P_VALUE}"
+INPUT_TSV="${INPUT_TSV:-/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/eval_datasets/train_xl_case_robust_asr_filtered_frozen_llm_reference_subsentence_ref.tsv}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_debug/topp/consensus_decoding_en_zh_topp_${TOP_P_VALUE}}"
 
-TOTAL_ROWS=40000
-ROW_OFFSET=0
-NUM_TASKS=12
-NUM_FUTURES=20
-SECONDARY_NUM_FUTURES=10
-FUTURE_TOKENS=20
-MAX_CONSENSUS_STEPS=32
-NUM_CONCURRENT_CASES=32
-CANDIDATE_TOP_K=20
-TARGET_LANG=Chinese
-SKIP_EXISTING=1
-ENABLE_VERBOSE=0
+TOTAL_ROWS="${TOTAL_ROWS:-40000}"
+ROW_OFFSET="${ROW_OFFSET:-0}"
+# Infer NUM_TASKS from SLURM array size; fall back to env or default 12.
+if [[ -n "${SLURM_ARRAY_TASK_COUNT:-}" ]]; then
+  NUM_TASKS="${SLURM_ARRAY_TASK_COUNT}"
+elif [[ -n "${NUM_TASKS:-}" ]]; then
+  NUM_TASKS="${NUM_TASKS}"
+else
+  NUM_TASKS=12
+fi
+# All knobs below honor env-var overrides so per-policy sbatches can tune
+# without forking this common script.
+NUM_FUTURES="${NUM_FUTURES:-20}"
+SECONDARY_NUM_FUTURES="${SECONDARY_NUM_FUTURES:-10}"
+FUTURE_TOKENS="${FUTURE_TOKENS:-20}"
+MAX_CONSENSUS_STEPS="${MAX_CONSENSUS_STEPS:-32}"
+NUM_CONCURRENT_CASES="${NUM_CONCURRENT_CASES:-32}"
+CANDIDATE_TOP_K="${CANDIDATE_TOP_K:-100}"
+TARGET_LANG="${TARGET_LANG:-Chinese}"
+SKIP_EXISTING="${SKIP_EXISTING:-1}"
+ENABLE_VERBOSE="${ENABLE_VERBOSE:-0}"
 
 export HF_HOME="/data/user_data/haolingp/hf_cache"
 export HF_HUB_CACHE="/data/user_data/haolingp/hf_cache/hub"
@@ -51,7 +60,7 @@ if (( REMAINING < ROW_COUNT )); then
   ROW_COUNT="${REMAINING}"
 fi
 
-PORT_BASE=$(( 8100 + TASK_ID * 10 ))
+PORT_BASE="${PORT_BASE:-$(( 8100 + TASK_ID * 10 ))}"
 INSTRUCT_PORT=$(( PORT_BASE + 0 ))
 GEMMA_PORT=$(( PORT_BASE + 1 ))
 QWEN_PORT=$(( PORT_BASE + 2 ))

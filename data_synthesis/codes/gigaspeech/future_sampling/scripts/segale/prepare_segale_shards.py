@@ -22,9 +22,14 @@ def natural_key(p: Path):
 
 
 def collect_consensus_jsons(root: Path) -> List[Path]:
-    """Find consensus JSONs whether root is a parent (with job_* subdirs) or a job_* itself."""
+    """Find consensus JSONs whether root is a parent (with job_* subdirs), a job_* itself,
+    or a J-style prod root with per_utt subdirs under each task_*.
+    """
     nested = sorted(root.glob("job_*/task_*/*.json"), key=natural_key)
     direct = sorted(root.glob("task_*/*.json"), key=natural_key)
+    per_utt = sorted(root.glob("task_*/per_utt/*.json"), key=natural_key)
+    if per_utt:
+        return per_utt
     return nested if nested else direct
 
 
@@ -38,7 +43,20 @@ def main() -> None:
     ap.add_argument("--num-shards", type=int, default=8)
     ap.add_argument("--sys-id", default="consensus_run",
                     help="Logical system identifier written into system.jsonl rows.")
+    ap.add_argument("--include-utts", default=None,
+                    help="Optional text file of utt_ids (one per line). Only these utts will "
+                         "be sharded; --num-docs caps the total. Use for resume runs.")
     args = ap.parse_args()
+
+    include_set = None
+    if args.include_utts:
+        include_set = set()
+        with open(args.include_utts, "r", encoding="utf-8") as fin:
+            for line in fin:
+                u = line.strip()
+                if u:
+                    include_set.add(u)
+        print(f"--include-utts: {len(include_set)} utt_ids loaded from {args.include_utts}")
 
     cons_root = Path(args.consensus_root).resolve()
     out_root = Path(args.out_root).resolve()
@@ -47,6 +65,10 @@ def main() -> None:
 
     files = collect_consensus_jsons(cons_root)
     print(f"Found {len(files)} consensus jsons under {cons_root}")
+    if include_set is not None:
+        before = len(files)
+        files = [p for p in files if p.stem in include_set]
+        print(f"After --include-utts filter: {len(files)}/{before} retained")
     if len(files) < args.num_docs:
         print(f"WARNING: only {len(files)} available; using all of them")
     files = files[: args.num_docs]

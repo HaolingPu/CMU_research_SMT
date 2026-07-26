@@ -16,6 +16,14 @@ from vllm.sampling_params import GuidedDecodingParams
 
 LATENCY_LEVELS = ["low_latency", "medium_latency", "high_latency"]
 
+SUPPORTED_TARGET_LANGS = ("zh", "de", "ja")
+
+TARGET_LANG_FULL_NAME = {
+    "zh": "Chinese",
+    "de": "German",
+    "ja": "Japanese",
+}
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -55,7 +63,22 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--src-text-full-column",
         default="src_text_full",
-        help="Column that stores list-like sentence strings.",
+        help="Column that stores list-like sentence strings (used as LLM text input).",
+    )
+    parser.add_argument(
+        "--src-trajectory-column",
+        default="src_trajectory",
+        help=(
+            "Column that stores the streaming src trajectory (list of ~960ms ASR chunks). "
+            "Passed through to the output JSON for downstream timing alignment; "
+            "lets us skip MFA / 960ms forced alignment."
+        ),
+    )
+    parser.add_argument(
+        "--target-lang",
+        default="zh",
+        choices=SUPPORTED_TARGET_LANGS,
+        help="Target language for translation (zh, de, ja).",
     )
     parser.add_argument(
         "--save-per-sentence",
@@ -93,144 +116,47 @@ def setup_env() -> None:
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
-def build_prompt_refined_east(english_sentence: str) -> str:
-    return f"""You are a professional English-to-Chinese simultaneous interpreter.
+# Paper-style prompt: one Houston example per target language, paper-original wording.
+# Source side stays English; only the Target translation differs per language.
+_EAST_HOUSTON_EXAMPLE_TARGET = {
+    "zh": {
+        "low": ["休斯敦", "16日晚", "发出一系列", "龙卷风", "和严重雷暴", "警报。"],
+        "medium": ["休斯敦16日晚", "发出一系列", "龙卷风和严重雷暴警报。"],
+        "high": ["休斯敦16日晚", "发出一系列龙卷风和严重雷暴警报。"],
+    },
+    "de": {
+        "low": ["Houston", "am Abend des 16.", "gab eine Reihe von", "Tornado-", "und schweren Gewitterwarnungen", "heraus."],
+        "medium": ["Am Abend des 16. gab Houston", "eine Reihe von", "Tornado- und schweren Gewitterwarnungen heraus."],
+        "high": ["Am Abend des 16. gab Houston", "eine Reihe von Tornado- und schweren Gewitterwarnungen heraus."],
+    },
+    "ja": {
+        "low": ["ヒューストンは", "16日の夕方に", "一連の", "竜巻と", "激しい雷雨の", "警報を発令しました。"],
+        "medium": ["16日の夕方、ヒューストンは", "一連の", "竜巻と激しい雷雨の警報を発令しました。"],
+        "high": ["16日の夕方、ヒューストンは", "一連の竜巻と激しい雷雨の警報を発令しました。"],
+    },
+}
 
-Task: Segment the English sentence into THREE different granularities and translate each segment to Chinese.
-
-**CRITICAL RULES:**
-For EVERY granularity (low_latency, medium_latency, high_latency):
-- The English array MUST have EXACTLY the same number of items as the Chinese array
-- If English has N segments, Chinese MUST have N segments (no more, no less)
-- Each English[i] MUST correspond to Chinese[i] at the SAME index
-- DO NOT merge multiple English segments into one Chinese segment
-- DO NOT skip any segments
-
-==================== NEW CHUNK QUALITY RULES ====================
-
-Each English chunk MUST satisfy ALL of the following:
-
-A. Minimum length requirement:
-   - A chunk MUST contain at least TWO meaningful English words.
-   - Single-word chunks are NOT allowed.
-
-B. No punctuation chunks:
-   - A chunk CANNOT be a standalone symbol such as:
-     ".", "?", "!", ",", "...", "-", ":", ";", "。", "，"
-   - A chunk composed ONLY of punctuation is strictly forbidden.
-
-C. No empty chunks
-   - Segments must contain actual semantic content.
-
-   
-**Granularity Definitions:**
-
-**low_latency** (FINEST grain):
-- Split into MANY SHORT segments (1-3 words each)
-- Break at natural phrase boundaries
-- Keep functional words separate when possible
-
-**medium_latency** (MEDIUM grain):
-- Split into FEWER MEDIUM segments (3-8 words each)
-- Combine related phrases
-- Break at major clause boundaries
-
-**high_latency** (COARSE grain):
-- Split ONLY at major punctuation (periods, semicolons, commas between independent clauses)
-- Each segment = one complete clause or sentence
-- DO NOT output the entire input as one segment if it contains multiple clauses
-
----
-
-Example 1:
-Input: "Houston issued a series of tornado warnings on the evening of the 16th."
-
-{{
-  "low_latency": {{
-    "English": ["Houston", "issued", "a series of", "tornado warnings", "on the evening", "of the 16th."],
-    "Chinese": ["休斯敦", "发出了", "一系列", "龙卷风警报", "在傍晚", "16日。"]
-  }},
-  "medium_latency": {{
-    "English": ["Houston issued", "a series of tornado warnings", "on the evening of the 16th."],
-    "Chinese": ["休斯敦发出了", "一系列龙卷风警报", "在16日傍晚。"]
-  }},
-  "high_latency": {{
-    "English": ["Houston issued a series of tornado warnings on the evening of the 16th."],
-    "Chinese": ["休斯敦在16日傍晚发出了一系列龙卷风警报。"]
-  }}
-}}
-
-Example 2:
-Input: "The company announced new features and improved performance yesterday."
-
-{{
-  "low_latency": {{
-    "English": ["The company", "announced", "new features", "and", "improved performance", "yesterday."],
-    "Chinese": ["该公司", "宣布了", "新功能", "以及", "改进的性能", "昨天。"]
-  }},
-  "medium_latency": {{
-    "English": ["The company announced", "new features and improved performance", "yesterday."],
-    "Chinese": ["该公司宣布了", "新功能和改进的性能", "昨天。"]
-  }},
-  "high_latency": {{
-    "English": ["The company announced new features and improved performance yesterday."],
-    "Chinese": ["该公司昨天宣布了新功能和改进的性能。"]
-  }}
-}}
-
-Example 3 (Multiple clauses with punctuation):
-Input: "The weather was sunny in the morning, but it started raining in the afternoon, and the temperature dropped significantly."
-
-{{
-  "low_latency": {{
-    "English": ["The weather", "was sunny", "in the morning,", "but", "it started", "raining", "in the afternoon,", "and", "the temperature", "dropped", "significantly."],
-    "Chinese": ["天气", "是晴朗的", "在早上，", "但是", "开始", "下雨", "在下午，", "并且", "温度", "下降了", "显著。"]
-  }},
-  "medium_latency": {{
-    "English": ["The weather was sunny in the morning,", "but it started raining in the afternoon,", "and the temperature dropped significantly."],
-    "Chinese": ["早上天气晴朗，", "但下午开始下雨，", "温度显著下降。"]
-  }},
-  "high_latency": {{
-    "English": ["The weather was sunny in the morning,", "but it started raining in the afternoon,", "and the temperature dropped significantly."],
-    "Chinese": ["早上天气晴朗，", "但下午开始下雨，", "温度显著下降。"]
-  }}
-}}
-
-Example 4 (Short sentence - no punctuation to split):
-Input: "She loves reading books."
-
-{{
-  "low_latency": {{
-    "English": ["She", "loves", "reading", "books."],
-    "Chinese": ["她", "喜欢", "阅读", "书籍。"]
-  }},
-  "medium_latency": {{
-    "English": ["She loves", "reading books."],
-    "Chinese": ["她喜欢", "阅读书籍。"]
-  }},
-  "high_latency": {{
-    "English": ["She loves reading books."],
-    "Chinese": ["她喜欢阅读书籍。"]
-  }}
-}}
-
----
-
-Now process this input:
-Input: "{english_sentence}"
-
-**REMEMBER:**
-- For high_latency: Split at commas, periods, semicolons that separate clauses
-- NEVER output the entire sentence as one segment if it has multiple clauses
-- English and Chinese arrays MUST have the same length
-- Output ONLY the JSON object, no explanations"""
+_EAST_HOUSTON_SOURCE = {
+    "low": ["Houston", "on the evening of the 16th", "issued a series of", "tornado", "and severe thunderstorm", "warnings."],
+    "medium": ["On the evening of the 16th, Houston", "issued a series of", "tornado and severe thunderstorm warnings."],
+    "high": ["On the evening of the 16th, Houston", "issued a series of tornado and severe thunderstorm warnings."],
+}
 
 
+def build_prompt_east(english_sentence: str, target_lang: str = "zh") -> str:
+    if target_lang not in SUPPORTED_TARGET_LANGS:
+        raise ValueError(f"Unsupported target_lang: {target_lang}")
 
-def build_prompt_east(english_sentence: str) -> str:
-    prompt = """
+    target_full = TARGET_LANG_FULL_NAME[target_lang]
+    tgt = _EAST_HOUSTON_EXAMPLE_TARGET[target_lang]
+    src = _EAST_HOUSTON_SOURCE
+
+    def _arr(xs: List[str]) -> str:
+        return json.dumps(xs, ensure_ascii=False)
+
+    prompt = f"""
 As a professional simultaneous interpreter, your task is to segment sentences into independent
-semantic chunks and provide corresponding Chinese translations.
+semantic chunks and provide corresponding {target_full} translations.
 You will use three different granularities for segmentation:
 1. For low latency, the chunks would be fragmented into brief, coherent phrases that convey a complete thought.
 2. For medium latency, the chunks would be longer, possibly clause or sentence-long segments.
@@ -242,20 +168,22 @@ Input:
 English: Houston issued a series of tornado and severe thunderstorm warnings on the evening of the 16th.
 
 Output:
-{
-  "low_latency": {
-    "English": ["Houston", "on the evening of the 16th", "issued a series of", "tornado", "and severe thunderstorm", "warnings."],
-    "Chinese": ["休斯敦", "16日晚", "发出一系列", "龙卷风", "和严重雷暴", "警报。"]
-  },
-  "medium_latency": {
-    "English": ["On the evening of the 16th, Houston", "issued a series of", "tornado and severe thunderstorm warnings."],
-    "Chinese": ["休斯敦16日晚", "发出一系列", "龙卷风和严重雷暴警报。"]
-  },
-  "high_latency": {
-    "English": ["On the evening of the 16th, Houston", "issued a series of tornado and severe thunderstorm warnings."],
-    "Chinese": ["休斯敦16日晚", "发出一系列龙卷风和严重雷暴警报。"]
-  }
-}
+{{
+  "low_latency": {{
+    "Source": {_arr(src["low"])},
+    "Target": {_arr(tgt["low"])}
+  }},
+  "medium_latency": {{
+    "Source": {_arr(src["medium"])},
+    "Target": {_arr(tgt["medium"])}
+  }},
+  "high_latency": {{
+    "Source": {_arr(src["high"])},
+    "Target": {_arr(tgt["high"])}
+  }}
+}}
+
+Important: For each latency, the Source and Target arrays MUST contain the exact same number of elements (1-to-1 alignment).
 """
     return (
         prompt
@@ -271,26 +199,26 @@ JSON_SCHEMA = {
         "low_latency": {
             "type": "object",
             "properties": {
-                "English": {"type": "array", "items": {"type": "string"}},
-                "Chinese": {"type": "array", "items": {"type": "string"}},
+                "Source": {"type": "array", "items": {"type": "string"}},
+                "Target": {"type": "array", "items": {"type": "string"}},
             },
-            "required": ["English", "Chinese"],
+            "required": ["Source", "Target"],
         },
         "medium_latency": {
             "type": "object",
             "properties": {
-                "English": {"type": "array", "items": {"type": "string"}},
-                "Chinese": {"type": "array", "items": {"type": "string"}},
+                "Source": {"type": "array", "items": {"type": "string"}},
+                "Target": {"type": "array", "items": {"type": "string"}},
             },
-            "required": ["English", "Chinese"],
+            "required": ["Source", "Target"],
         },
         "high_latency": {
             "type": "object",
             "properties": {
-                "English": {"type": "array", "items": {"type": "string"}},
-                "Chinese": {"type": "array", "items": {"type": "string"}},
+                "Source": {"type": "array", "items": {"type": "string"}},
+                "Target": {"type": "array", "items": {"type": "string"}},
             },
-            "required": ["English", "Chinese"],
+            "required": ["Source", "Target"],
         },
     },
     "required": LATENCY_LEVELS,
@@ -360,41 +288,41 @@ def normalize_one_level(
     if not isinstance(level_obj, dict):
         if strict_pair_check:
             raise ValueError(f"{level_name} must be a dict.")
-        return {"English": [], "Chinese": []}
+        return {"Source": [], "Target": []}
 
-    english = level_obj.get("English", [])
-    chinese = level_obj.get("Chinese", [])
+    source = level_obj.get("Source", [])
+    target = level_obj.get("Target", [])
 
     # Fast path for generation stage: do not truncate/skip; keep raw model output shape.
     if not strict_pair_check:
-        if not isinstance(english, list):
-            english = [english]
-        if not isinstance(chinese, list):
-            chinese = [chinese]
+        if not isinstance(source, list):
+            source = [source]
+        if not isinstance(target, list):
+            target = [target]
         return {
-            "English": [str(x) for x in english],
-            "Chinese": [str(x) for x in chinese],
+            "Source": [str(x) for x in source],
+            "Target": [str(x) for x in target],
         }
 
-    if not isinstance(english, list) or not isinstance(chinese, list):
-        raise ValueError(f"{level_name}.English and {level_name}.Chinese must be lists.")
-    if len(english) != len(chinese):
+    if not isinstance(source, list) or not isinstance(target, list):
+        raise ValueError(f"{level_name}.Source and {level_name}.Target must be lists.")
+    if len(source) != len(target):
         raise ValueError(
-            f"{level_name} English/Chinese length mismatch: {len(english)} vs {len(chinese)}"
+            f"{level_name} Source/Target length mismatch: {len(source)} vs {len(target)}"
         )
 
-    eng_clean, zh_clean = [], []
-    for i, (e, z) in enumerate(zip(english, chinese)):
-        e_text = str(e).strip()
-        z_text = str(z).strip()
-        if not e_text:
-            raise ValueError(f"{level_name}.English[{i}] is empty.")
-        if not z_text:
-            raise ValueError(f"{level_name}.Chinese[{i}] is empty.")
-        eng_clean.append(e_text)
-        zh_clean.append(z_text)
+    src_clean, tgt_clean = [], []
+    for i, (s, t) in enumerate(zip(source, target)):
+        s_text = str(s).strip()
+        t_text = str(t).strip()
+        if not s_text:
+            raise ValueError(f"{level_name}.Source[{i}] is empty.")
+        if not t_text:
+            raise ValueError(f"{level_name}.Target[{i}] is empty.")
+        src_clean.append(s_text)
+        tgt_clean.append(t_text)
 
-    return {"English": eng_clean, "Chinese": zh_clean}
+    return {"Source": src_clean, "Target": tgt_clean}
 
 
 def normalize_response(
@@ -409,7 +337,7 @@ def normalize_response(
         if level not in parsed:
             if strict_pair_check:
                 raise ValueError(f"Missing level: {level}")
-            normalized[level] = {"English": [], "Chinese": []}
+            normalized[level] = {"Source": [], "Target": []}
             continue
         normalized[level] = normalize_one_level(
             parsed[level], level, strict_pair_check=strict_pair_check
@@ -422,10 +350,14 @@ def run_llm_batch(
     sampling_params: SamplingParams,
     sentences: List[str],
     strict_pair_check: bool,
+    target_lang: str,
 ) -> List[Dict[str, Dict[str, List[str]]]]:
     # One vLLM call handles multiple prompts.
     # With global batching, these prompts can come from different utt_ids.
-    messages = [[{"role": "user", "content": build_prompt_refined_east(s)}] for s in sentences]
+    messages = [
+        [{"role": "user", "content": build_prompt_east(s, target_lang=target_lang)}]
+        for s in sentences
+    ]
     outputs = llm.chat(messages=messages, sampling_params=sampling_params)
     if len(outputs) != len(sentences):
         raise RuntimeError(f"vLLM returned {len(outputs)} outputs for {len(sentences)} inputs.")
@@ -454,6 +386,7 @@ def flush_global_sentence_batch(
     pending_utts: Dict[str, Dict[str, Any]],
     strict_pair_check: bool,
     retry_single_on_fail: bool,
+    target_lang: str,
 ) -> Set[str]:
     """
     全局批处理的核心函数。
@@ -478,7 +411,10 @@ def flush_global_sentence_batch(
     # 从 sentence_tasks 提取纯文本，构造 chat messages
     # 每个 task 记录了它属于哪个 utt_id、是第几句（sentence_index）
     texts = [t["text"] for t in sentence_tasks]
-    messages = [[{"role": "user", "content": build_prompt_refined_east(s)}] for s in texts]
+    messages = [
+        [{"role": "user", "content": build_prompt_east(s, target_lang=target_lang)}]
+        for s in texts
+    ]
 
     try:
         # ---- 第二步：一次性把整个 batch 送进 vLLM ----
@@ -512,6 +448,7 @@ def flush_global_sentence_batch(
                             sampling_params,
                             [text],
                             strict_pair_check=strict_pair_check,
+                            target_lang=target_lang,
                         )[0]
                         state["results"][sent_idx] = parsed
                     except Exception as single_err:
@@ -551,6 +488,7 @@ def flush_global_sentence_batch(
                         sampling_params,
                         [text],
                         strict_pair_check=strict_pair_check,
+                        target_lang=target_lang,
                     )[0]
                     state["results"][sent_idx] = parsed
                 except Exception as single_err:
@@ -581,13 +519,13 @@ def aggregate_sentence_results(
     把句子级的 LLM 输出拼接成 utterance 级的完整结果。
 
     举例：一个 utterance 有 2 个句子，low_latency 下：
-      句子0 的 LLM 输出: English=["The cat", "sat"], Chinese=["猫", "坐了"]
-      句子1 的 LLM 输出: English=["on the", "mat."], Chinese=["在", "垫子上。"]
+      句子0 的 LLM 输出: Source=["The cat", "sat"], Target=["猫", "坐了"]
+      句子1 的 LLM 输出: Source=["on the", "mat."], Target=["在", "垫子上。"]
 
     聚合后：
-      English = ["The cat", "sat", "on the", "mat."]   (直接拼接)
-      Chinese = ["猫", "坐了", "在", "垫子上。"]
-      spans   = [[0, 2], [2, 4]]  (句子0 占 index 0~1，句子1 占 index 2~3)
+      Source = ["The cat", "sat", "on the", "mat."]   (直接拼接)
+      Target = ["猫", "坐了", "在", "垫子上。"]
+      spans  = [[0, 2], [2, 4]]  (句子0 占 index 0~1，句子1 占 index 2~3)
 
     spans 的作用：记录每个原始句子在拼接后数组中的位置范围，
     方便后续如果需要追溯某个 segment 来自哪个原始句子。
@@ -596,21 +534,21 @@ def aggregate_sentence_results(
     spans: Dict[str, List[List[int]]] = {}
 
     for level in LATENCY_LEVELS:
-        english_all: List[str] = []
-        chinese_all: List[str] = []
+        source_all: List[str] = []
+        target_all: List[str] = []
         level_spans: List[List[int]] = []
         cursor = 0  # 当前写入位置指针
 
         for sent in sentence_results:
-            eng = sent[level]["English"]
-            zh = sent[level]["Chinese"]
+            src = sent[level]["Source"]
+            tgt = sent[level]["Target"]
             # 记录这个句子的 segments 在最终数组中的 [start, end) 范围
-            level_spans.append([cursor, cursor + len(eng)])
-            english_all.extend(eng)  # 追加到总数组
-            chinese_all.extend(zh)
-            cursor += len(eng)
+            level_spans.append([cursor, cursor + len(src)])
+            source_all.extend(src)  # 追加到总数组
+            target_all.extend(tgt)
+            cursor += len(src)
 
-        aggregated[level] = {"English": english_all, "Chinese": chinese_all}
+        aggregated[level] = {"Source": source_all, "Target": target_all}
         spans[level] = level_spans
 
     return aggregated, spans
@@ -687,11 +625,12 @@ def main() -> None:
         tensor_parallel_size=args.tp,
         max_model_len=16384,
         gpu_memory_utilization=0.90,
+        enable_prefix_caching=True,
     )
 
     sampling_params = SamplingParams(
         temperature=0.0,
-        max_tokens=2048,
+        max_tokens=1024,
         repetition_penalty=1.1,
         guided_decoding=GuidedDecodingParams(json=JSON_SCHEMA),
     )
@@ -751,10 +690,20 @@ def main() -> None:
             continue
 
         # Register one utt state, then push all its sentences into global queue.
+        # NOTE: src_trajectory is propagated through so downstream timing alignment
+        # can use the manifest's existing 960ms ASR chunks instead of running MFA.
         meta_fields = {}
-        for k in ["audio", "n_frames", "speaker", "src_lang", "tgt_lang", "asr", "src_text"]:
+        passthrough_keys = [
+            "audio", "n_frames", "speaker",
+            "src_lang", "tgt_lang", "asr", "src_text",
+            args.src_text_full_column, args.src_trajectory_column,
+        ]
+        for k in passthrough_keys:
             if k in row:
                 meta_fields[k] = row[k]
+        # Force-record the target language we generated for, so downstream
+        # consumers don't have to trust the manifest's tgt_lang column.
+        meta_fields["target_lang"] = args.target_lang
         pending_utts[utt_id] = {
             "utt_id": utt_id,
             "row_index": row_idx,
@@ -785,6 +734,7 @@ def main() -> None:
                 pending_utts=pending_utts,
                 strict_pair_check=args.strict_pair_check,
                 retry_single_on_fail=args.retry_single_on_fail,
+                target_lang=args.target_lang,
             )
 
             for touched_utt in touched_utts:
@@ -815,6 +765,7 @@ def main() -> None:
             pending_utts=pending_utts,
             strict_pair_check=args.strict_pair_check,
             retry_single_on_fail=args.retry_single_on_fail,
+            target_lang=args.target_lang,
         )
         for touched_utt in touched_utts:
             state = pending_utts.get(touched_utt)

@@ -23,46 +23,50 @@ conda activate SMT
 BASE=/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_east
 
 # ===========================
-# 0) Fix LLM raw (方案 A：只修不筛): restore EN punct, sync ZH punct; no punct filter
+# 0) Fix LLM raw  -- SKIPPED
+#    (zh-specific punctuation sync; not safe for de/ja yet.)
 # ===========================
-rm -rf ${BASE}/llm_output_raw_fixed
+# rm -rf ${BASE}/llm_output_raw_fixed
+# python ${CODE}/fix_llm_raw.py \
+#   --in_dir         ${BASE}/llm_output_raw \
+#   --out_dir        ${BASE}/llm_output_raw_fixed \
+#   --out_good_jsonl ${BASE}/good_train_xl_east_fixed.jsonl \
+#   --sync_zh_punct \
+#   --zh_punct_allow_insert
 
-python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/fix_llm_raw.py \
-  --in_dir         ${BASE}/llm_output_raw \
-  --out_dir        ${BASE}/llm_output_raw_fixed \
-  --out_good_jsonl ${BASE}/good_train_xl_east_fixed.jsonl \
-  --sync_zh_punct \
-  --zh_punct_allow_insert
-
 # ===========================
-# 1) Post-process LLM output (raw_fixed -> merged_fixed)
+# 1) Post-process LLM output (raw -> merged)
+#    Reads target_lang from each JSON to choose the target join separator
+#    (space for de, none for zh/ja).
 # ===========================
-rm -rf ${BASE}/llm_output_merged_fixed
+rm -rf ${BASE}/llm_output_merged
 
 python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/post_process_llm_output_gigaspeech.py \
-  --input-dir  ${BASE}/llm_output_raw_fixed \
-  --output-dir ${BASE}/llm_output_merged_fixed \
+  --input-dir  ${BASE}/llm_output_raw \
+  --output-dir ${BASE}/llm_output_merged \
   --overwrite
 
 # ===========================
-# 2) Strict find_bad
+# 2) Strict find_bad  -- SKIPPED
+#    (used MFA TextGrid alignment; current path uses src_trajectory directly.)
 # ===========================
-python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/find_bad_json_gigaspeech.py \
-  --llm-dir    ${BASE}/llm_output_merged_fixed \
-  --mfa-dir    /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/gigaspeech_mfa_textgrid \
-  --corpus-dir /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/gigaspeech_mfa_corpus \
-  --good-jsonl ${BASE}/good_train_xl_east_mfa.jsonl \
-  --bad-jsonl  ${BASE}/bad_train_xl_east_mfa.jsonl
+# python ${CODE}/find_bad_json_gigaspeech.py \
+#   --llm-dir    ${BASE}/llm_output_merged \
+#   --mfa-dir    /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/gigaspeech_mfa_textgrid \
+#   --corpus-dir /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/gigaspeech_mfa_corpus \
+#   --good-jsonl ${BASE}/good_train_xl_east_mfa.jsonl \
+#   --bad-jsonl  ${BASE}/bad_train_xl_east_mfa.jsonl
 
 # ===========================
-# 3) Build trajectory (960ms)
+# 3) Build trajectory (960ms) using src_trajectory (no MFA)
+#    The manifest's src_trajectory is already the streaming-ASR 960ms grid;
+#    multi_trajectory aligns LLM Source chunks back to those windows by
+#    greedy token matching.
 # ===========================
 rm -rf ${BASE}/streaming_EAST_dataset
 
 python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/multi_trajectory_gigaspeech.py \
-  --llm-dir    ${BASE}/llm_output_merged_fixed \
-  --mfa-dir    /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/gigaspeech_mfa_textgrid \
-  --good-jsonl ${BASE}/good_train_xl_east_mfa.jsonl \
+  --llm-dir    ${BASE}/llm_output_merged \
   --output-dir ${BASE}/streaming_EAST_dataset \
   --chunk-ms 960 \
   --overwrite

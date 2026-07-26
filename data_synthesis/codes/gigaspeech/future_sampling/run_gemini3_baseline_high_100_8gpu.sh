@@ -64,13 +64,13 @@ nvidia-smi --query-gpu=index,name,memory.total,memory.free --format=csv
 
 CUDA_VISIBLE_DEVICES=0 python "/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_thinking_policy_gemini.py" \
   --input-tsv "/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_xl_case_robust_asr-filtered.tsv" \
-  --output-root "/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_future_sampling_thinking_gemini/gemini3_baseline_high_100_8gpu" \
+  --output-root "/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_future_sampling_thinking_gemini/gemini3_advanced_high_100" \
   --task-id "${TASK_ID}" \
   --num-tasks 8 \
   --max-rows "${MAX_ROWS}" \
   --base-model-path "/data/user_data/haolingp/models/Qwen3-4B-Base" \
   --thinking-model-name "gemini-3-flash-preview" \
-  --thinking-prompt-version "base" \
+  --thinking-prompt-version "advanced" \
   --gemini-include-thoughts \
   --thinking-reasoning-effort "high" \
   --parallel-utterances 8 \
@@ -82,7 +82,7 @@ CUDA_VISIBLE_DEVICES=0 python "/data/user_data/haolingp/data_synthesis/codes/gig
   --thinking-temperature 0.1 \
   --thinking-max-tokens 4096 \
   --align-device "cuda:0" \
-  --gpu-memory-utilization 0.85 \
+  --gpu-memory-utilization 0.95 \
   --overwrite
 
 echo "===== DONE TASK ${TASK_ID} ====="

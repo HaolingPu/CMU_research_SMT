@@ -21,10 +21,13 @@ import ast
 import json
 import math
 import os
+import random
 import re
 import urllib.error
 import urllib.request
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from threading import Lock
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
@@ -59,16 +62,20 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--mt-api-timeout", type=float, default=120.0)
     # LA parameters
     p.add_argument("--la-n", type=int, default=2)
-    p.add_argument("--segment-size", type=int, default=1)
+    p.add_argument("--segment-size", type=int, default=1,
+                   help="Fallback segment size; each utterance now samples 1..4 randomly.")
     p.add_argument("--lcp-mode", choices=["char", "word"], default="char")
     p.add_argument("--max-new-tokens", type=int, default=1024)
     p.add_argument("--target-lang", default="Chinese")
     # Output / row selection
     p.add_argument("--output-jsonl", default=None)
+    p.add_argument("--output-dir", default=None,
+                   help="Write one pretty-printed JSON file per utterance under this directory.")
     p.add_argument("--overwrite", action="store_true")
     p.add_argument("--row-idx", type=int, default=0)
     p.add_argument("--utt-id", default=None)
     p.add_argument("--max-rows", type=int, default=1)
+    p.add_argument("--num-concurrent-cases", type=int, default=1)
     p.add_argument("--test-one", action="store_true")
     return p.parse_args()
 
@@ -105,6 +112,10 @@ def build_source_observed(chunks: List[str], t: int) -> str:
     return join_source_chunks(chunks[: t + 1])
 
 
+def sanitize_filename(name: str) -> str:
+    return "".join(ch if ch.isalnum() or ch in "-_." else "_" for ch in str(name))
+
+
 def get_full_source_text(row: Dict[str, Any]) -> str:
     raw = row.get("src_text")
     if raw is None or pd.isna(raw):
@@ -113,6 +124,20 @@ def get_full_source_text(row: Dict[str, Any]) -> str:
     if not text or text.lower() == "nan":
         raise ValueError("src_text is empty")
     return text
+
+
+def get_source_subsentences(row: Dict[str, Any], full_source_text: str) -> List[str]:
+    raw = row.get("src_text_full")
+    if raw is not None and not pd.isna(raw):
+        try:
+            vals = ast.literal_eval(str(raw))
+            if isinstance(vals, list):
+                subs = [str(x).strip() for x in vals if str(x).strip()]
+                if subs:
+                    return subs
+        except Exception:
+            pass
+    return [full_source_text]
 
 
 def clean_model_text(text: str) -> str:
@@ -147,6 +172,16 @@ def _http_json(url: str, payload: Dict[str, Any], timeout: float) -> Dict[str, A
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             return json.loads(resp.read().decode("utf-8"))
     except urllib.error.HTTPError as e:
+        # 400 = bad request (e.g. prompt > model context window). Don't kill the
+        # whole task — return an empty completion so the caller falls through
+        # to "no commit" and the synthesis loop continues for this case.
+        if e.code == 400:
+            try:
+                body = e.read().decode("utf-8", errors="replace")
+            except Exception:
+                body = "<unreadable>"
+            print(f"[WARN] vLLM 400 (likely context-overflow), returning empty: {body[:240]}")
+            return {"choices": []}
         raise RuntimeError(f"HTTP {e.code}: {e.read().decode('utf-8', errors='replace')}") from e
     except urllib.error.URLError as e:
         raise RuntimeError(f"Cannot reach {url}: {e}") from e
@@ -398,7 +433,9 @@ def run_one_utterance(row: Dict[str, Any], args: argparse.Namespace,
     utt_id = str(row.get(args.id_column, row.get("id", f"row_{args.row_idx}")))
     chunks = parse_trajectory(row["src_trajectory"])
     full_source_text = get_full_source_text(row)
+    source_subsentences = get_source_subsentences(row, full_source_text)
     n_chunks = len(chunks)
+    segment_size = random.randint(1, 4)
 
     committed_text = ""                              # 已提交的翻译文本
     target_deltas: List[str] = [""] * n_chunks       # 每个 chunk 对应的翻译增量
@@ -407,7 +444,7 @@ def run_one_utterance(row: Dict[str, Any], args: argparse.Namespace,
 
     step_start = 0
     while step_start < n_chunks:
-        step_end = min(step_start + args.segment_size, n_chunks)  # 一次消耗 segment_size 个 chunk
+        step_end = min(step_start + segment_size, n_chunks)  # 一次消耗 segment_size 个 chunk
         is_last_step = (step_end == n_chunks)
         last_chunk_idx = step_end - 1
         source_observed = build_source_observed(chunks, last_chunk_idx)
@@ -445,15 +482,19 @@ def run_one_utterance(row: Dict[str, Any], args: argparse.Namespace,
             if len(recent_hypotheses) > args.la_n:
                 recent_hypotheses.pop(0)
 
-            # 3) 计算窗口内所有 hypothesis 的最长公共前缀 (LCP)
-            lcp = compute_lcp(recent_hypotheses, mode=args.lcp_mode)
-
-            # 4) 如果 LCP 比已提交的更长 → 提交新增部分 (delta)
-            if lcp.startswith(committed_text) and len(lcp) > len(committed_text):
-                delta = lcp[len(committed_text):]
-                committed_text = lcp
-            else:
+            # 3) 计算窗口内所有 hypothesis 的最长公共前缀 (LCP)。
+            #    LA-N 定义要求"窗口里 N 条 hypothesis 在前缀上 agree"才能 commit；
+            #    窗口未攒满 N 条之前不做 commit（否则等于无 agreement 验证）。
+            if len(recent_hypotheses) < args.la_n:
                 delta = ""
+            else:
+                lcp = compute_lcp(recent_hypotheses, mode=args.lcp_mode)
+                # 4) 如果 LCP 比已提交的更长 → 提交新增部分 (delta)
+                if lcp.startswith(committed_text) and len(lcp) > len(committed_text):
+                    delta = lcp[len(committed_text):]
+                    committed_text = lcp
+                else:
+                    delta = ""
 
             target_deltas[last_chunk_idx] = delta
             actions[last_chunk_idx] = "WRITE" if delta else "READ"
@@ -464,6 +505,11 @@ def run_one_utterance(row: Dict[str, Any], args: argparse.Namespace,
     reference_text = _extract_reference_text(row, args.target_lang)
     laal_value = float("nan")
     bleu_char_value = float("nan")
+    pred_chars = len(str(committed_text).replace(" ", ""))
+    ref_chars = len(str(reference_text or "").replace(" ", ""))
+    src_words = len(str(full_source_text).strip().split())
+    length_ratio_ref = pred_chars / ref_chars if ref_chars > 0 else float("nan")
+    length_ratio_src = pred_chars / src_words if src_words > 0 else float("nan")
     try:
         if reference_text:
             laal_value = compute_laal(chunks, target_deltas, actions, reference_text)
@@ -474,6 +520,7 @@ def run_one_utterance(row: Dict[str, Any], args: argparse.Namespace,
     return {
         "utt_id": utt_id,
         "src_trajectory": chunks,
+        "src_text_full": source_subsentences,
         "source_full_text": full_source_text,
         "target_trajectory": target_deltas,
         "actions": actions,
@@ -482,10 +529,19 @@ def run_one_utterance(row: Dict[str, Any], args: argparse.Namespace,
         "decoder_impl": {
             "method": "local_agreement",
             "la_n": args.la_n,
-            "segment_size": args.segment_size,
+            "segment_size": segment_size,
+            "segment_size_sampling": "random_uniform_1_4_per_case",
             "lcp_mode": args.lcp_mode,
         },
-        "metrics": {"laal_text": laal_value, "bleu_char": bleu_char_value},
+        "metrics": {
+            "laal_text": laal_value,
+            "bleu_char": bleu_char_value,
+            "pred_chars": pred_chars,
+            "ref_chars": ref_chars,
+            "src_words": src_words,
+            "length_ratio_ref": length_ratio_ref,
+            "length_ratio_src": length_ratio_src,
+        },
     }
 
 
@@ -509,10 +565,17 @@ def select_rows(df: pd.DataFrame, args: argparse.Namespace) -> pd.DataFrame:
 def main() -> None:
     setup_env()
     args = parse_args()
+    if args.la_n <= 0:
+        raise ValueError("--la-n must be positive")
+    if args.segment_size <= 0:
+        raise ValueError("--segment-size must be positive")
 
     df = pd.read_csv(args.input_tsv, sep="\t")
     rows = select_rows(df, args)
-    print(f"Processing {len(rows)} row(s)  LA-{args.la_n}  segment_size={args.segment_size}")
+    print(
+        f"Processing {len(rows)} row(s)  LA-{args.la_n}  "
+        "segment_size=random_uniform_1_4_per_case"
+    )
 
     models = verify_api(args.mt_api_base, args.mt_api_timeout)
     if args.mt_api_model not in models:
@@ -522,20 +585,67 @@ def main() -> None:
     mt_tokenizer = load_tokenizer(args.mt_tokenizer_path)
 
     out_fh = None
+    out_lock = Lock()
     if args.output_jsonl:
         os.makedirs(os.path.dirname(os.path.abspath(args.output_jsonl)), exist_ok=True)
         out_fh = open(args.output_jsonl, "w" if args.overwrite else "a", encoding="utf-8")
 
-    for _, row in rows.iterrows():
-        result = run_one_utterance(row.to_dict(), args, mt_tokenizer)
+    if args.output_dir:
+        os.makedirs(args.output_dir, exist_ok=True)
+
+    def _process_one_row(row_idx: int, row_dict: Dict[str, Any]) -> bool:
+        utt_id = str(row_dict.get(args.id_column, row_dict.get("id", f"row_{row_idx}")))
+        out_path = (
+            os.path.join(args.output_dir, f"{sanitize_filename(utt_id)}.json")
+            if args.output_dir else None
+        )
+        if out_path and os.path.exists(out_path) and not args.overwrite:
+            print(f"  {utt_id}  [SKIP existing]")
+            return True
+
+        result = run_one_utterance(row_dict, args, mt_tokenizer)
         m = result["metrics"]
-        print(f"  {result['utt_id']}  bleu={m['bleu_char']:.2f}  laal={m['laal_text']:.2f}")
+        seg = result["decoder_impl"]["segment_size"]
+        print(
+            f"  {result['utt_id']}  segment_size={seg}  "
+            f"bleu={m['bleu_char']:.2f}  laal={m['laal_text']:.2f}"
+        )
         if out_fh:
-            out_fh.write(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
-            out_fh.flush()
+            with out_lock:
+                out_fh.write(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
+                out_fh.flush()
+        if out_path:
+            with open(out_path, "w", encoding="utf-8") as fh:
+                json.dump(result, fh, ensure_ascii=False, indent=2)
+                fh.write("\n")
+        return False
+
+    row_items = [(idx, row.to_dict()) for idx, (_, row) in enumerate(rows.iterrows())]
+    failures: List[str] = []
+    num_concurrent = max(1, int(args.num_concurrent_cases))
+    if num_concurrent <= 1:
+        for row_idx, row_dict in row_items:
+            try:
+                _process_one_row(row_idx, row_dict)
+            except Exception as exc:
+                failures.append(f"row {row_idx}: {exc}")
+                print(f"[ERROR] row {row_idx}: {exc}")
+    else:
+        print(f"[Concurrent] {len(row_items)} rows, {num_concurrent} workers")
+        with ThreadPoolExecutor(max_workers=num_concurrent) as executor:
+            futs = {executor.submit(_process_one_row, ri, rd): ri for ri, rd in row_items}
+            for fut in as_completed(futs):
+                row_idx = futs[fut]
+                try:
+                    fut.result()
+                except Exception as exc:
+                    failures.append(f"row {row_idx}: {exc}")
+                    print(f"[ERROR] row {row_idx}: {exc}")
 
     if out_fh:
         out_fh.close()
+    if failures:
+        raise RuntimeError(f"{len(failures)} row(s) failed; first failure: {failures[0]}")
     print("Done.")
 
 

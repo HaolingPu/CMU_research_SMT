@@ -1,0 +1,221 @@
+<h1>Consensus Decoding for Simultaneous Speech Translation — Status Report</h1>
+<p><i>Haoling Pu — July 26, 2026. Prepared as a handoff document. All numbers are trained-model eval unless marked "synthesis-time".</i></p>
+
+<h2>1. Executive summary</h2>
+<ul>
+<li><b>What this is.</b> Consensus decoding is our <b>reference-free, future-blind</b> data-synthesis policy for simultaneous en→zh speech translation on GigaSpeech: two base LLMs sample plausible English continuations ("futures"), an instruct LLM supplies Chinese next-token distributions, and a token is committed only when the futures agree on it. Synthesized trajectories are then used to LoRA-finetune a Qwen3-Omni streaming model (the "infinisst-omni" checkpoint family), evaluated with simuleval on ACL 6060 dev and Simul-tst-COMMON.</li>
+<li><b>Current best system:</b> <code>consensus-top5-axis5</code> — 5 directed "narrative axis" futures × ~4 samples = 20 futures, strict 100% token intersection, decoded on the <b>old ASR</b> (<code>asr_filtered</code>) with MetricX-QE filtering. It is the ref-free COMET leader on ACL 6060 (0.808–0.817 at seg1920–3840) and the baseline every experiment is compared against.</li>
+<li><b>Key positive finding:</b> <b>directed diversity is the lever.</b> 20 directed futures beat 200 undirected ones on both COMET and BLEU at every latency; loosening the commit rule (soft-vote) and brute-force scaling (100 futures) do not help.</li>
+<li><b>Central open problem:</b> consensus trails the reference-based hibiki/word-align system by <b>~6.5–8.3 BLEU at matched latency with COMET tied</b>. We proved the gap is real (it survives monotonic references) and traced the root cause: the voting machinery systematically picks formal written Chinese (因此 / 将 / 与) where the reference uses plain spoken Chinese (所以 / 把 / 和). Every fix tried so far failed. In one sentence each — the change made on top of the original consensus decoder:
+  <ul>
+  <li><b>Post-edit, 3 variants (§5.2):</b> decoder unchanged; an LLM rewrites its committed output afterwards — as a strict minimal edit, a free re-translation, or a free polish. <i>All three scored worse than not editing.</i></li>
+  <li><b>Anchor-and-veto (§5.5):</b> the futures no longer choose the wording — a plain greedy translation of only the observed source ("anchor") writes the text, and the futures are demoted to only deciding how many of its tokens are safe to commit. <i>Won the synthesis-time smoke, but the trained model degenerated (over-generation on non-speech audio).</i></li>
+  <li><b>Hybrid (§5.5):</b> the unchanged consensus vote decides <i>when</i> and <i>how many</i> tokens to commit; the anchor's greedy text supplies <i>what</i> those tokens say. <i>+0.15 char-BLEU — proves the anchor's smoke win was timing, not wording.</i></li>
+  <li><b>Best-of-N selection, 2 variants (§5.6):</b> decoder unchanged; decode the same 40k utterances five ways and, per utterance, train on whichever version is closest to the reference. <i>+10.9 oracle BLEU at synthesis time became ~0 after training.</i></li>
+  <li><b>Present-ranked winner (§5.7):</b> keep the agreement gate unchanged, but pick among the surviving tokens using the no-future ("present") distribution instead of the future-averaged score. <i>−2.15; the strict gate leaves only 1–2 survivors, so the winner rule has no freedom.</i></li>
+  <li><b>Present-proposes / futures-verify (§5.8) — PENDING:</b> flip who authors the candidates — the no-future distribution proposes its top-6 tokens, and the futures only approve or veto each one by majority vote. <i>Smoke decode finished (500/500); the paired analysis has not been run yet.</i></li>
+  </ul></li>
+<li><b>Note on ASR data:</b> we also tried re-transcribing the audio with a new Qwen-ASR, but it regressed trained eval (−4–6 BLEU / −0.05 COMET) and no fix recovered it, so it was abandoned — everything in this report uses the old ASR.</li>
+<li><b>Where a new person should start:</b> Section 7 lists the open threads, and Section 6 lists everything that is conclusively dead and should not be rerun.</li>
+</ul>
+
+<h2>2. Setup: models, data, pipeline, evaluation</h2>
+
+<h3>2.1 Models</h3>
+<table border="1" cellpadding="4">
+<tr><th>Role</th><th>Model</th><th>Notes</th></tr>
+<tr><td>Base future samplers (dual-base)</td><td>Gemma-4-E2B-it + a Qwen3 base (recent runs serve Qwen3-30B-A3B-Instruct-2507-FP8 as the second sampler)</td><td>Sample English continuations of the observed source; they never emit Chinese</td></tr>
+<tr><td>Instruct probe / translator</td><td>Qwen3-30B-A3B-Instruct-2507-FP8, temperature 0</td><td>Supplies Chinese next-token distributions under each future; also generates the frozen reference and hibiki's targets (see §5.4 — same model, three decode modes)</td></tr>
+<tr><td>Frozen LLM reference</td><td>Same Qwen3-30B, whole-document greedy translation</td><td><code>train_xl_..._frozen_llm_reference.tsv</code>; used as the synthesis-time scoring target and QE reference</td></tr>
+<tr><td>QE filter</td><td>MetricX (reference-free), threshold ≤ 3.0</td><td>Applied per-sentence after SEGALE alignment</td></tr>
+<tr><td>Trained student</td><td>Qwen3-Omni, LoRA via Megatron-SWIFT</td><td>Checkpoints under <code>ckpts/infinisst-omni/</code>; streaming inference via vLLM + simuleval</td></tr>
+<tr><td>Eval metrics</td><td>BLEU, chrF, Unbabel/XCOMET-XL; latency = LongYAAL (CU, ms) / LAAL</td><td><b>Rank by COMET</b>, not BLEU (see §2.4)</td></tr>
+<tr><td>Explored, dropped</td><td>Qwen3.5-122B and Qwen3.6-35B thinking samplers; GPT/DeepSeek/Gemini API samplers</td><td>122B: ~205 s/row even at c=64 — not scalable to 40k. 35B: no quality gain (56.9 vs 59.5 char-BLEU) at ~30 min/case. Dropped 2026-07-19.</td></tr>
+</table>
+
+<h3>2.2 Data (group-shared copies for handoff)</h3>
+<p>The two datasets a follow-up experiment needs are copied to group storage (readable by li_lab):</p>
+<table border="1" cellpadding="4">
+<tr><th>Dataset</th><th>Group-shared path (use this)</th></tr>
+<tr><td><b>Old-ASR 40k source TSV</b> — ASR transcript + frozen LLM reference; the input to every consensus decode</td><td><code>/data/group_data/li_lab/haolingp/consensus_handoff/train_xl_case_robust_asr_filtered_frozen_llm_reference.tsv</code></td></tr>
+<tr><td><b>Simul-tst-COMMON test set</b> — 27 TED talks, 2,853 sentences, monotonic references (yaml/en/zh + audio)</td><td><code>/data/group_data/li_lab/haolingp/consensus_handoff/simul_tst_common/</code></td></tr>
+</table>
+<ul>
+<li><b>Source corpus:</b> GigaSpeech (train_xl), 40k-utterance production slice. Original TSV location in my personal dir: <code>/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/eval_datasets/</code> (not group-readable — use the group copy above).</li>
+<li><b>New Qwen-ASR (abandoned):</b> a re-transcription (<code>...qwenasr_sentsplit...tsv</code>, same eval_datasets dir) regressed trained eval −4–6 BLEU / −0.05 COMET across two decode methods and neither period-fix nor segmentation fixes recovered it — do not revisit.</li>
+<li><b>Eval sets:</b> ACL 6060 dev (en→zh, offline references) and Simul-tst-COMMON (group path above; our 2026-07-11 rebuild is diagnostic-grade — only 37% of NAIST's interpreter edits applied due to GPT drift; an email to the authors for the official file is drafted).</li>
+</ul>
+
+<h3>2.3 The production pipeline (unchanged "flagship recipe" used by every experiment)</h3>
+<p>decode 40k rows → period-fix (<code>period_fix_traj_nested.py</code>) → SEGALE alignment + MetricX QE ≤ 3 → length-ratio filter (0.7–1.5 vs reference) → sample 12,500 instances (<code>convert2swift_consensus.py</code>, seed 42) → Megatron-SWIFT LoRA train (~1 h) → HF export → simuleval inference at seg 960/1920/2880/3840 ms → omnisteval scoring (BLEU/chrF/XCOMET-XL/LongYAAL).</p>
+
+<h3>2.4 Two evaluation ground rules (hard-won, do not violate)</h3>
+<ul>
+<li><b>Synthesis-time BLEU does not predict trained-model BLEU.</b> Never rank configs by synthesis-time scores; only trained eval counts. (Extended in §5.6: even per-utterance oracle selection worth +10.9 synthesis BLEU transferred to ~0 trained BLEU.)</li>
+<li><b>Rank by COMET, not BLEU.</b> BLEU favors surface-form matches; EAST-even leads BLEU (~47) with mediocre COMET (~0.79), while consensus leads ref-free COMET at lower BLEU. Ignore BLEU gaps ≤2–3 when COMET is tied. Caveat: vs hibiki specifically, COMET is <i>tied</i>, not won — that is exactly the open problem of §5.</li>
+</ul>
+
+<h3>2.5 How consensus decoding works — the full data flow, step by step</h3>
+<p>Everything happens at <b>synthesis time</b>, on text: we take an ASR transcript, pretend it arrives incrementally in ~960 ms chunks, and use the decoder below to produce a <i>trajectory</i> — a translation broken into per-chunk committed pieces (an interleaved READ/WRITE recipe). The trained model then learns to imitate that trajectory from real streaming audio.</p>
+
+<p><b>The inner decode loop (runs per utterance):</b></p>
+<pre>
+ ┌─────────►[1 READ]──►[2 SAMPLE 20 futures]──►[3 TRANSLATE ×20]◄────┐
+ │                                                    │              │
+ │  no agreement                                 [4 AGREE?]          │
+ └────────────────────────────────────────────────────┤              │
+                                                  yes ▼              │
+                                            [5 WRITE one token]──────┘
+</pre>
+<ol>
+<li><b>READ</b> — reveal the next ~960 ms chunk of the ASR transcript; the observed source grows.</li>
+<li><b>SAMPLE 20 futures</b> — the two base LLMs each imagine plausible English continuations of the observed source (5 directed axes × ~4 samples = 20). The <i>future decoding window</i> controls how many recent source chunks the samplers see (flagship: win1 = the current chunk only).</li>
+<li><b>TRANSLATE 20 times</b> — the probe (Qwen3-30B, temperature 0) is asked for the next Chinese token 20 times, once per future: "observed source + future #i, committed prefix so far → next-token distribution".</li>
+<li><b>AGREE?</b> — the agreement gate: a token is eligible only if it appears in the top-6 candidates of <b>all 20</b> distributions (flagship: 100% intersection, top_k=6, min_p=0).</li>
+<li><b>WRITE</b> — commit the winner (highest average probability across the 20 futures), append it to the Chinese prefix, and go back to step 3 for the next token. When no token passes the gate → stop writing, go back to step 1 and READ more source. When the transcript is exhausted → finish with a free greedy completion.</li>
+</ol>
+
+<p><b>The outer synthesis → training pipeline (runs once per experiment):</b></p>
+<pre>
+ 40k utterances (ASR + LLM reference)
+   → consensus decode (loop above)
+   → period-fix
+   → QE filter (MetricX ≤ 3.0; ~18.6k survive)
+   → length-ratio filter (0.7–1.5 × reference)
+   → sample 12,500 → SWIFT training format
+   → LoRA train Qwen3-Omni (~1 h)
+   → streaming inference + scoring (BLEU · COMET · latency, vs baseline + hibiki)
+</pre>
+
+<p>Key knobs, in plain terms:</p>
+<ul>
+<li><b>Future decoding window:</b> how many of the most recent source chunks the base samplers are shown when they write hypothetical continuations (flagship: win1, i.e. the current chunk only).</li>
+<li><b>Agreement (the gate + the winner):</b> a Chinese token is only <i>eligible</i> if it appears in the top-6 candidates under <b>every one</b> of the 20 futures (the "-sv" soft-vote variant relaxed this to 75% of futures and lost 2–4 BLEU); among eligible tokens, the <i>winner</i> is the one with the highest average probability across futures.</li>
+<li><b>QE filter threshold:</b> MetricX quality-estimation score (lower = better), computed per aligned sentence; an utterance is kept only if its <b>worst</b> sentence is ≤ 3.0. This is the filter that prevented the catastrophic BLEU-6.9 collapse on unfiltered data (§4.2).</li>
+<li><b>Length-ratio filter:</b> output length must be 0.7–1.5× the frozen reference — a cheap guard against dropped content and the over-generation failure mode that later sank the anchor method.</li>
+</ul>
+
+<p><b>A worked example (real case from the smoke logs).</b> The transcript revealed so far ends with <i>"…this work is inevitably both"</i>. The 20 futures disagree about what comes next — some continue <i>"…both tedious and useless"</i>, others <i>"…both a burden and a joy"</i>. Under every future, the safe Chinese adverb <b>不可避免地</b> ("inevitably") is a top candidate → it passes the 100% gate and is committed. But the noun reading <b>双重性</b> ("duality", treating "both" as a noun and ending the sentence) is only plausible under futures where the sentence stops — it fails the gate, so the decoder stops writing and READs more source. Two chunks later, <i>"tedious and useless"</i> actually arrives and it commits <b>既单调又无用</b>. A plain translator without the vote (our "free re-translation" baseline) committed 双重性。 and closed the sentence — exactly the early-commitment mistake the agreement gate exists to prevent.</p>
+
+<h2>3. Current scoreboard (ACL 6060 dev, en→zh; headline rows)</h2>
+<table border="1" cellpadding="4">
+<tr><th>Checkpoint</th><th>seg</th><th>BLEU</th><th>COMET</th><th>LongYAAL (ms)</th><th>Comment</th></tr>
+<tr><td><b>consensus-top5-axis5</b> (old ASR, flagship)</td><td>1920</td><td>39.6</td><td><b>0.808</b></td><td>2176</td><td>ref-free COMET leader</td></tr>
+<tr><td><b>consensus-top5-axis5</b></td><td>3840</td><td>40.1</td><td><b>0.817</b></td><td>3107</td><td></td></tr>
+<tr><td>consensus-topk5 (futures=200 baseline)</td><td>3840</td><td>37.4</td><td>0.806</td><td>2855</td><td>beaten by 5-axis everywhere</td></tr>
+<tr><td>consensus-top5-axis5-sv (soft-vote)</td><td>3840</td><td>38.7</td><td>0.812</td><td>2894</td><td>negative result</td></tr>
+<tr><td>consensus-top5-axis5-fut100_n100</td><td>3840</td><td>39.3</td><td>0.816</td><td>2757</td><td>ties flagship at higher cost</td></tr>
+<tr><td>hibiki word-align (<b>ref-based</b>)</td><td>3840</td><td>46.8</td><td><b>0.820</b></td><td>3326</td><td>the system to beat on BLEU</td></tr>
+<tr><td>EAST-even (offline-translate-then-segment)</td><td>3840</td><td>46.8</td><td>0.789</td><td>3533</td><td>high BLEU, weak COMET</td></tr>
+<tr><td>PA-40k (rule-based)</td><td>1920</td><td>40.6</td><td>0.809</td><td>1954</td><td>strong rule-based point</td></tr>
+</table>
+<p>Source of truth: <code>ckpts/infinisst-omni/&lt;exp&gt;/&lt;version&gt;-hf/evaluation/acl_6060/&lt;lang&gt;/seg&lt;N&gt;/segmentation_output/scores.tsv</code>. Note: the <code>consensus-topk5_f200</code> checkpoint was deleted from disk and cannot be re-run.</p>
+
+<h2>4. What actually improves consensus</h2>
+
+<h3>4.1 5-axis directed futures vs soft-vote vs scaling (all trained end-to-end)</h3>
+<p><b>Question:</b> starting from the naive baseline (200 undirected futures, hard token intersection), which lever improves trained quality? <b>Answer: directed diversity wins; the other two fail.</b></p>
+<table border="1" cellpadding="4">
+<tr><th>Variant</th><th>Futures</th><th>COMET seg960/1920/2880/3840</th><th>BLEU seg960/1920/2880/3840</th></tr>
+<tr><td>futures200 baseline (topk5)</td><td>200 undirected</td><td>0.777 / 0.797 / 0.799 / 0.806</td><td>32.4 / 35.2 / 34.7 / 37.4</td></tr>
+<tr><td><b>5-axis (top5-axis5)</b> ⭐</td><td><b>20 directed</b> (5 narrative axes × ~4)</td><td><b>0.787 / 0.808 / 0.812 / 0.817</b></td><td><b>34.9 / 39.6 / 40.1 / 40.1</b></td></tr>
+<tr><td>soft-vote (min_voters_ratio=0.75)</td><td>20 directed</td><td>0.763 / 0.808 / 0.813 / 0.812</td><td>30.9 / 37.6 / 38.5 / 38.7</td></tr>
+<tr><td>fut100_n100 (scaled)</td><td>100 directed</td><td>0.767 / 0.805 / 0.807 / 0.816</td><td>32.1 / 36.9 / 38.4 / 39.3</td></tr>
+</table>
+<ul>
+<li><b>Efficiency headline:</b> 5-axis at seg1920 (COMET 0.808, 2176 ms) already exceeds the baseline's best point (seg3840, 0.806, 2855 ms) — peak quality ~680 ms sooner with 10× fewer futures.</li>
+<li><b>Soft-vote is a clean negative:</b> loosening the 100% intersection to a 75% majority loses 2–4 BLEU — the gap is <i>not</i> "too conservative".</li>
+<li><b>Scaling saturates at ~20 futures.</b></li>
+<li>The 5 axes are steering hints (named_actor, time_pivot, direct_speech, factual-aside, …) in <code>sample_source_futures_targeted_prefill</code> (~line 1290 of the instruct decoder).</li>
+</ul>
+
+<h3>4.2 QE filtering</h3>
+<p>MetricX-QE-MAX filtering is the single biggest guard against catastrophic collapse: on an unfiltered new-ASR control, seg960 collapsed to BLEU 6.9; QE filtering alone restored it to ~30 (+23 BLEU). Keep it on always.</p>
+
+<h2>5. The ~7 BLEU gap vs hibiki (the main research thread)</h2>
+
+<h3>5.1 The phenomenon</h3>
+<p>Consensus trails the ref-based hibiki/word-align checkpoint by ~6–8 BLEU at matched latency with COMET tied (consensus even edges COMET at seg2880/3840 on Simul-tst). Consensus is the only policy that is both <b>reference-free and future-blind</b>; the question the whole line asks is how much of the deficit is that honest constraint vs something fixable.</p>
+
+<h3>5.2 Post-edit — triple negative (2026-06)</h3>
+<p>Can an LLM post-edit recover BLEU? <b>No.</b> Synthesis-time char-BLEU vs frozen reference (5-case smoke): raw consensus 56.7; strict minimal-edit polish 52.4 (injects bad punctuation); free re-translation 46.2 (early commitment — e.g. committed "双重性。" and closed the sentence after seeing "...inevitably both"); free polish 12.8 (hallucination, length ratio 2.36×). Together with the soft-vote trained negative: <b>loose edits reintroduce anticipation, strict edits add noise — consensus's committed text is already at its fluency frontier.</b></p>
+
+<h3>5.3 Is the gap a reference-style artifact? — No (2026-07-11)</h3>
+<p>Re-scored all zh checkpoints on Simul-tst-COMMON (monotonic, interpreter-style references). The hibiki lead persists unchanged: <b>6.5–8.3 BLEU at matched latency, COMET tied</b>. The gap is real, not offline-reordering bias. (Bonus finding: EAST-even kept its BLEU lead there while posting the worst COMET — the rank-by-COMET rule survives on an independent test set.)</p>
+<table border="1" cellpadding="4">
+<tr><th>Ckpt (Simul-tst, seg960/1920/2880/3840)</th><th>BLEU</th><th>XCOMET</th></tr>
+<tr><td>hibiki word-align</td><td><b>38.3 / 40.4 / 40.8 / 41.1</b></td><td>.838 / .861 / .866 / .869</td></tr>
+<tr><td>consensus top5-axis5</td><td>27.5 / 32.1 / 34.1 / 34.2</td><td>.831 / .859 / <b>.867 / .872</b></td></tr>
+<tr><td>EAST-even</td><td>40.1 / 43.7 / 44.2 / 43.6</td><td>.765 / .817 / .837 / .846</td></tr>
+</table>
+
+<h3>5.4 Root cause: register forensics (2026-07-11)</h3>
+<p>Word-level forensics located exactly where the BLEU lives. Headline: <b>the SAME Qwen3-30B model at temperature 0 produces the frozen reference (whole-doc greedy), hibiki's targets (per-sub-sentence greedy) and consensus's token distributions — the gap is purely the decode procedure.</b></p>
+<ul>
+<li>Consensus training targets score only <b>59 char-BLEU vs the frozen reference</b> (4-gram overlap 0.48) — the two checkpoint families were trained toward surface distributions ~40 BLEU apart; the test-set gap is that divergence's shadow.</li>
+<li>The deficit compounds with n-gram order: −4.7% char 1-gram recall but <b>−19.2% at 4-grams</b> — sparse word swaps, content preserved (why COMET ties).</li>
+<li>The swaps are a systematic <b>spoken→written register shift</b>: 所以→因此 (×36), 和→与, 把→将, 可以→能够, 去→前往, …; consensus never says 但是.</li>
+<li><b>Mechanism:</b> formal connectives survive under more sampled continuations, so the future-intersection gate and the future-averaged winner rule both amplify them (voted body has 3× the 因此 of the same utterances' free-completion tails); the 5-axis hints skew conditioning formal; the incremental prefix drifts off the model's greedy manifold.</li>
+</ul>
+
+<h3>5.5 Anchor-and-veto — smoke win, trained failure (2026-07-12 → 07-19)</h3>
+<p><b>Design:</b> invert the roles — a greedy "anchor" continuation conditioned only on observed source (using hibiki's exact sub-sentence translation prompt) proposes the wording; futures only veto how far to commit (min-p gate under 100% of futures). Code: <code>consensus_decoding_anchor.py</code>.</p>
+<ul>
+<li><b>Smoke (500 utts, variants A–D):</b> strict gate A (min-p 0.05 / top-k 5 / voters 1.0) won <b>+6.98 paired char-BLEU</b> (67.25 vs 60.27), register normalized, quality monotone in gate strictness. Caveat: LAAL +1.8. Promoted to a full anchor_40k production decode + training run.</li>
+<li><b>Trained verdict: NEGATIVE.</b> BLEU 14.2/25.3/29.3/29.9 vs baseline 27.5/32.1/34.1/34.2 on Simul-tst. Root cause is <b>degenerate over-generation</b>, not waiting: +19% chars, onomatopoeia floods on non-speech audio (one talk emitted 8,456 chars of "呼！"; rep-4gram 0.115 vs baseline 0.043). The consensus vote's cross-future agreement was the trained model's built-in <i>silence brake</i> on contentless audio; the anchor removed it. The 12–35 s LAAL numbers are a scoring-alignment artifact of the floods.</li>
+<li><b>Hybrid follow-up (consensus decides WHEN, anchor decides WHAT): NEGATIVE</b> — +0.15 paired char-BLEU (gate was ≥ +4). This falsifies the wording hypothesis: config A's smoke gain came from its <i>timing</i> (waiting longer), not the anchor's wording. <b>Both halves of anchor-and-veto are individually falsified; method closed.</b></li>
+</ul>
+
+<h3>5.6 Reference-selected best-of-N — closed negative (2026-07-19)</h3>
+<p><b>Design:</b> keep the decoder ref-free but let selection use the reference: per utterance, pick the best of 5 complete 40k decodes (flagship, fut100, n100, softvote, anchor) by char-BLEU vs the frozen reference, QE- and length-guarded. Oracle headroom gate passed spectacularly: <b>+10.95 char-BLEU</b> (59.2 → 70.2).</p>
+<ul>
+<li><b>bestof5 trained: ≈0.</b> The +10.9 oracle became ~0 trained BLEU at useful latencies (only anomaly: tst seg960 blow-up from anchor-pool timing contamination).</li>
+<li><b>bestof4 (anchor excluded) trained: negative in every cell</b>, with its own timing blow-up (tst seg1920 YAAL 33 s) — per-utterance style switching between pools destabilizes the policy by itself.</li>
+<li><b>Conclusion:</b> per-utterance selection conclusively does not transfer to training; what training absorbs is a <i>systematic distribution shift</i>, not per-example picking. This extends "synthesis BLEU is not predictive" from config ranking to selection.</li>
+</ul>
+
+<h3>5.7 Present-ranked winner — negative, but diagnostic (2026-07-19)</h3>
+<p><b>Design:</b> keep the flagship strict gate; re-rank the gate's surviving tokens by the <i>present</i> (no-future) distribution instead of the future-averaged score. Fully ref-free. Code: <code>experimental/consensus_decoding_present_rank.py</code>.</p>
+<p><b>Result:</b> −2.15 paired char-BLEU on smoke500, hygiene perfectly clean, register markers statistically unmoved. <b>Diagnosis: the strict top-6 intersection typically leaves only 1–2 eligible tokens — the winner rule has no freedom. The register bias enters at the GATE (future-conditioned candidate sets), not the winner rule.</b> Prompt forensics also ruled out prompt misalignment: the probe and reference prompts are near-identical; the appended future text in [INPUT] is the shift.</p>
+
+<h3>5.8 Present-proposes / futures-verify — IN FLIGHT (the one open experiment)</h3>
+<p><b>Design (register fix #3):</b> invert who authors the candidate set — the present distribution PROPOSES its top-6 (the canonical-register manifold), futures only VERIFY (a proposal survives iff it appears in the top-6 of ≥15/20 future-conditioned distributions); winner = argmax present probability among survivors. Not a rerun of soft-vote: soft-vote relaxed the threshold over the same futures-proposed universe; here the proposal universe itself moves. Code: <code>experimental/consensus_decoding_present_propose.py</code>, smoke job 9370692.</p>
+<p><b>Status as of 2026-07-26: the smoke decode is complete (500/500 per-utterance JSONs in <code>consensus_decoding_prod/present_propose_smoke500/task_00/per_utt/</code>) but the paired analysis has not been run yet.</b> Next action: run <code>analyze_present_rank_smoke.py</code> (evaluation env, needs jieba) paired against the J_40k per-utt JSONs. Gates: proceed iff paired char-BLEU ≥ +2 AND hygiene clean (length-ratio tail, rep-4gram, LAAL family of J_40k); leading indicator = register markers move toward the reference profile (因此 9.9→~6, 将 63.8→~40, 把 35.3→~55 per 10k). <b>If killed with markers unmoved, the register bias is upstream of the candidate sets entirely and the decode-time family is exhausted → accept rank-by-COMET as the paper story.</b></p>
+
+<h2>6. Do-not-rerun ledger (all conclusively negative)</h2>
+<table border="1" cellpadding="4">
+<tr><th>Idea</th><th>Verdict</th><th>Evidence</th></tr>
+<tr><td>Post-edit (loose or strict) of committed text</td><td>Triple negative</td><td>−4 to −44 char-BLEU vs raw consensus</td></tr>
+<tr><td>Soft-vote loosening (75% majority over futures-proposed candidates)</td><td>Negative</td><td>−2..4 trained BLEU vs strict gate</td></tr>
+<tr><td>Scaling futures beyond ~20</td><td>No gain</td><td>fut100_n100 ties flagship at higher cost</td></tr>
+<tr><td>Anchor-and-veto (and timing-only / wording-only halves)</td><td>Both halves falsified</td><td>Trained degeneration; hybrid +0.15</td></tr>
+<tr><td>Per-utterance best-of-N selection (with or without ref)</td><td>Dead — no transfer</td><td>+10.9 oracle → ~0/negative trained; mixture destabilizes timing</td></tr>
+<tr><td>Present-ranked winner over the strict gate</td><td>Negative</td><td>−2.15; gate leaves no freedom</td></tr>
+<tr><td>Bigger/thinking future samplers (Qwen3.5-122B, Qwen3.6-35B)</td><td>Dropped</td><td>No quality gain; 205 s/row–30 min/case, not scalable</td></tr>
+<tr><td>New Qwen-ASR transcription (all variants and fixes)</td><td>Abandoned</td><td>−4–6 BLEU / −0.05 COMET vs old ASR across two decode methods; period-fix and segmentation fixes did not recover it</td></tr>
+</table>
+
+<h2>7. Open threads (suggested starting points for follow-up experiments)</h2>
+<ol>
+<li><b>Run the pending propose-gate analysis</b> (§5.8) — decode is done, one analysis script away from a decision. If positive: 40k decode → flagship recipe → train → eval vs top5-axis5 + hibiki (success bar: trained BLEU ≥ +2, COMET and LAAL held).</li>
+<li><b>Attack the vote itself</b> — per the anchor post-mortem, the remaining levers are inside the gate: future-context window, voter quality/diversity, register guidance in the probe conditioning (the "future text in [INPUT]" suspect from §5.7).</li>
+<li><b>Official Simul-tst-COMMON references</b> — our rebuild is diagnostic-grade (37% edit fidelity); a paper-grade rerun needs NAIST's final file (email drafted).</li>
+<li><b>Paper framing already supported by the data:</b> ref-free + future-blind consensus reaches COMET parity with the ref-based system at matched latency; the BLEU deficit is a register/canonicality effect of the voting machinery, proven not fixable by post-hoc editing, selection, or re-timing — and rank-by-COMET is validated on two independent test sets.</li>
+</ol>
+
+<h2>8. Code, data, and checkpoint map</h2>
+<p><b>Code:</b> all scripts below are pushed to the git repo on branch <code>feature/llm-wiki</code> — clone the repo rather than reading my personal dir. Repo root on disk: <code>/data/user_data/haolingp</code> (not group-readable). Full project knowledge is maintained in the LLM wiki at <code>data_synthesis/wiki/</code> inside the repo — start with <code>index.md</code> and the <code>consensus-decoding</code> concept page; every experiment above has a dedicated wiki page with full detail.</p>
+<p><b>Data:</b> the two datasets needed to reproduce/extend are group-shared at <code>/data/group_data/li_lab/haolingp/consensus_handoff/</code> (§2.2). Decode outputs and trained checkpoints below still live in my personal <code>/data/user_data/haolingp/</code> — ask me to copy any specific one to <code>consensus_handoff/</code> if you need it.</p>
+<table border="1" cellpadding="4">
+<tr><th>What</th><th>Path (under <code>data_synthesis/codes/gigaspeech/future_sampling/</code> unless noted)</th></tr>
+<tr><td><b>Flagship decoder</b> (5-axis, token-level, instruct probe)</td><td><code>consensus_decoding_token_id_level_instruct.py</code> — probe prompt :455-483, soft-vote :1265-1323, axis hints :742-792. ⚠ Post commit c5647b7 the file HEAD defaults to soft-vote (min_voters_ratio=0.75, the losing -sv variant); the flagship J_40k used the old strict 100% intersection.</td></tr>
+<tr><td>Other decoder variants</td><td><code>consensus_decoding.py</code> (text-level), <code>_token_id_level.py</code>, <code>_token_id_level_gpt.py</code> (OpenAI backend), <code>_anchor.py</code>, <code>_hybrid.py</code>, <code>_retranslate.py</code> (post-edit), <code>experimental/consensus_decoding_present_rank.py</code>, <code>experimental/consensus_decoding_present_propose.py</code></td></tr>
+<tr><td>Production decode harness</td><td><code>_run_J_40k_common.sh</code> (prod args :111-131; ⚠ its current default INPUT_TSV is qwenasr — changed after J_40k was decoded; J_40k's actual source is the OLD ASR), <code>run_anchor_40k_*.sbatch</code></td></tr>
+<tr><td>Smoke / analysis</td><td><code>run_anchor_smoke500.sbatch</code>, <code>analyze_anchor_smoke.py</code>, <code>analyze_present_rank_smoke.py</code>, <code>select_bestof5_headroom.py</code>, <code>select_bestof5_build.py</code></td></tr>
+<tr><td>QE / filtering</td><td><code>filter_consensus_by_metricx_qe*.py</code>, <code>filter_consensus_by_length_ratio.py</code>, <code>period_fix_traj_nested.py</code>, SEGALE scripts under <code>scripts/segale/</code></td></tr>
+<tr><td>Frozen reference & hibiki targets</td><td><code>build_llm_full_translation_cache.py</code> (:105-111); <code>../hibiki/code/translate_subsentences.py</code> (:176-200 — the canonical-register prompt)</td></tr>
+<tr><td>Training conversion</td><td><code>scripts/train/convert2swift_consensus.py</code> (SAMPLE_N=12500, seed 42)</td></tr>
+<tr><td>Inference / eval</td><td><code>scripts/infer/infer_slurm_simultst.sh</code>, <code>eval_all_ckpts*.sh</code>, <code>run_infer_after_train_simultst.sbatch</code></td></tr>
+<tr><td>Synthesis outputs</td><td><code>data_synthesis/outputs/gigaspeech/consensus_decoding_prod/</code> — <code>J_40k</code> (flagship), <code>J_40k_fut100 / _n100 / _softvote</code>, <code>anchor_40k</code>, <code>*_smoke500</code> dirs, <code>bestof{4,5}*_refsel</code></td></tr>
+<tr><td>Checkpoints</td><td><code>ckpts/infinisst-omni/gigaspeech-zh-consensus-*</code> (top5-axis5, -sv, -fut100_n100, FULL40k-win3[-nopfix/-splitfix/-clausesplit], top5-axis5-qwenasr[-fixed], anchor40k, bestof{4,5}refsel)</td></tr>
+</table>

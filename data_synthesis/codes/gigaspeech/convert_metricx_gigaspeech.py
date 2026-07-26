@@ -22,10 +22,18 @@ def normalize_text(s: str) -> str:
     return s
 
 
-def join_zh_segments(segments: List[str]) -> str:
-    text = "".join(str(x) for x in segments).strip()
+SPACE_JOIN_LANGS = {"de", "en", "fr", "es"}
+
+
+def join_target_segments(segments: List[str], target_lang: str = "") -> str:
+    sep = " " if (target_lang or "").lower() in SPACE_JOIN_LANGS else ""
+    text = sep.join(str(x) for x in segments).strip()
     text = re.sub(r"\s+", " ", text).strip()
     return text
+
+
+def join_zh_segments(segments: List[str]) -> str:
+    return join_target_segments(segments, target_lang="")
 
 
 def collect_json_files(root: str) -> List[str]:
@@ -104,7 +112,9 @@ def convert_dataset(stream_dir: str, output_file: str, keep_source_case: bool = 
                 skipped += 1
                 continue
 
-            source_text = source_raw if keep_source_case else normalize_text(source_raw)
+            source_text = source_raw
+
+            target_lang = str(data.get("target_lang") or data.get("tgt_lang") or "").lower()
 
             levels = detect_levels(data)
             if not levels:
@@ -117,7 +127,7 @@ def convert_dataset(stream_dir: str, output_file: str, keep_source_case: bool = 
                 if not isinstance(target_segments, list) or len(target_segments) == 0:
                     continue
 
-                hypothesis = join_zh_segments(target_segments)
+                hypothesis = join_target_segments(target_segments, target_lang)
                 if not hypothesis:
                     continue
 

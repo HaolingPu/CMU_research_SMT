@@ -1370,11 +1370,13 @@ def main() -> None:
 
     os.makedirs(args.output_root, exist_ok=True)
 
-    try:
-        import llm_future_sampling_core_v2 as simalign_v2
-    except Exception as e:
-        print(f"ERROR: Cannot import simalign helpers from llm_future_sampling_core_v2.py: {e}")
-        sys.exit(1)
+    simalign_v2 = None
+    if not args.disable_post_simalign_check:
+        try:
+            import llm_future_sampling_core_v2 as simalign_v2
+        except Exception as e:
+            print(f"ERROR: Cannot import simalign helpers from llm_future_sampling_core_v2.py: {e}")
+            sys.exit(1)
 
     thinking_api_bases = resolve_thinking_api_bases(args)
     try:
@@ -1393,12 +1395,16 @@ def main() -> None:
         print(f"[Thinking Pool] Server OK: {api_base} -> {model_ids}")
 
     # Alignment model for post-output safety check
-    print(f"[Align] Loading simalign on {args.align_device} ...")
-    align_model, align_tokenizer = simalign_v2.load_align_model(
-        cache_dir=os.environ.get("HF_HOME"),
-        device=args.align_device,
-    )
-    print("[Align] Loaded.")
+    if args.disable_post_simalign_check:
+        align_model, align_tokenizer = None, None
+        print("[Align] Disabled; raw deltas will be used without simalign post-check.")
+    else:
+        print(f"[Align] Loading simalign on {args.align_device} ...")
+        align_model, align_tokenizer = simalign_v2.load_align_model(
+            cache_dir=os.environ.get("HF_HOME"),
+            device=args.align_device,
+        )
+        print("[Align] Loaded.")
 
     # Base model for future sampling
     print(f"[Base] Loading {args.base_model_path} ...")

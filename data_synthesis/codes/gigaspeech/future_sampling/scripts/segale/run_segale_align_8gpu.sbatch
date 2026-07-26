@@ -8,7 +8,7 @@
 #SBATCH --mem=48G
 #SBATCH --partition=general
 #SBATCH --qos=normal
-#SBATCH --time=24:00:00
+#SBATCH --time=48:00:00
 #SBATCH --exclude=babel-t9-16
 #SBATCH -o /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_debug/slurm_logs/segale_align_%A_%a.out
 #SBATCH -e /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_debug/slurm_logs/segale_align_%A_%a.err

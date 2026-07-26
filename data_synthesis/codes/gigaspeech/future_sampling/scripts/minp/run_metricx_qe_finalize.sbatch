@@ -6,7 +6,7 @@
 #SBATCH --mem=12G
 #SBATCH --partition=general
 #SBATCH --qos=normal
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:L40S:1
 #SBATCH --time=01:00:00
 #SBATCH -o /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_debug/slurm_logs/minp_mfin_%j.out
 #SBATCH -e /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_debug/slurm_logs/minp_mfin_%j.err

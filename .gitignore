@@ -8,6 +8,8 @@ conda_envs/
 conda_pkgs/
 conda_user/
 .env
+.env.*
+!.env.example
 .venv/
 
 # ===== Data & outputs (DO NOT COMMIT) =====
@@ -35,3 +37,4 @@ data_synthesis/codes-refactored/viz_out/
 .codex
 CLAUDE.md
 launch.json
+.aux/.log/.out

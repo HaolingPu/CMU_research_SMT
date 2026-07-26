@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contextual Alignment Viewer</title>
+  <style>
+    :root {
+      --bg: #f7f2ea;
+      --panel: #fffaf3;
+      --panel-2: #f3eadf;
+      --line: #dccdb8;
+      --line-soft: #efe2d3;
+      --text: #241b14;
+      --muted: #7b6f62;
+      --blue: #2563eb;
+      --orange: #c2410c;
+      --green: #15803d;
+      --red: #b91c1c;
+      --hover: #f6eee3;
+      --active: #eaf2ff;
+      --radius: 14px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: Inter, "Segoe UI", "Noto Sans", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      background: linear-gradient(180deg, #fcf8f2 0%, var(--bg) 100%);
+      color: var(--text);
+      font-family: var(--sans);
+      height: 100%;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      border-right: 1px solid var(--line);
+      background: #f1e7db;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .sidebar-header {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      font-weight: 700;
+      color: var(--blue);
+      font-size: 14px;
+    }
+
+    .sidebar-controls {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .button,
+    .input,
+    .select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fffdf9;
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font: inherit;
+    }
+
+    .button {
+      cursor: pointer;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .list {
+      overflow: auto;
+      padding: 8px 6px 12px;
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      color: var(--text);
+      cursor: pointer;
+      border: 1px solid transparent;
+      margin-bottom: 4px;
+    }
+
+    .item:hover {
+      background: var(--hover);
+      border-color: var(--line);
+    }
+
+    .item.active {
+      background: var(--active);
+      border-color: #93c5fd;
+    }
+
+    .item-index {
+      width: 20px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 11px;
+      text-align: right;
+      flex: 0 0 auto;
+    }
+
+    .item-id {
+      font-family: var(--mono);
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .main {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow: auto;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fffdf9;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .record-id {
+      margin: 0;
+      font-family: var(--mono);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .pill {
+      border: 1px solid var(--line);
+      background: rgba(255, 250, 243, 0.96);
+      color: var(--muted);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .panel-body {
+      padding: 18px;
+    }
+
+    .panel-title {
+      margin: 0 0 12px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .panel-title.blue {
+      color: var(--blue);
+    }
+
+    .panel-title.orange {
+      color: var(--orange);
+    }
+
+    .full-text {
+      font-size: 16px;
+      line-height: 1.7;
+      color: #2a2119;
+      min-height: 120px;
+    }
+
+    .controls-row {
+      display: grid;
+      grid-template-columns: 48px 40px 40px 56px 1fr 110px;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 18px;
+    }
+
+    .play-btn,
+    .step-btn {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      border-radius: 12px;
+      height: 36px;
+      cursor: pointer;
+    }
+
+    .play-btn {
+      background: #dcfce7;
+      border-color: #86efac;
+      color: #166534;
+      font-weight: 700;
+    }
+
+    .step-indicator {
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .progress {
+      position: relative;
+      height: 6px;
+      border-radius: 999px;
+      background: #eadfce;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 0%;
+      background: linear-gradient(90deg, #22c55e, #3b82f6);
+    }
+
+    .speed-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .speed-wrap input {
+      width: 100%;
+    }
+
+    .growing {
+      min-height: 90px;
+      font-size: 16px;
+      line-height: 1.7;
+      color: #2a2119;
+    }
+
+    .chip {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid #93c5fd;
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .table-wrap {
+      max-height: 460px;
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 11px;
+      text-align: left;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    tbody td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line-soft);
+      vertical-align: top;
+    }
+
+    tbody tr:hover {
+      background: rgba(59, 130, 246, 0.06);
+    }
+
+    tbody tr.active-row {
+      background: rgba(59, 130, 246, 0.12);
+    }
+
+    .num {
+      width: 48px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .src-col,
+    .src-cum {
+      color: var(--blue);
+    }
+
+    .tgt-col,
+    .tgt-cum {
+      color: var(--orange);
+    }
+
+    .muted {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .empty-state {
+      padding: 36px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 1100px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        min-height: auto;
+      }
+
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .controls-row {
+        grid-template-columns: 48px 40px 40px 56px 1fr;
+      }
+
+      .speed-wrap {
+        grid-column: 1 / -1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar-header">Contextual Alignment Viewer</div>
+      <div class="sidebar-controls">
+        <label class="button" style="display:none;">
+          Load Hibiki-100 JSONs
+          <input id="fileInput" type="file" accept=".json,application/json" multiple webkitdirectory directory hidden />
+        </label>
+        <input id="searchInput" class="input" type="search" placeholder="Search ID..." />
+        <select id="sortSelect" class="select">
+          <option value="id-asc">Sort by ID ↑</option>
+          <option value="id-desc">Sort by ID ↓</option>
+        </select>
+      </div>
+      <div id="list" class="list"></div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="title-wrap">
+          <button id="prevRecordBtn" class="nav-btn" type="button">◀</button>
+          <h1 id="recordId" class="record-id">No record loaded</h1>
+          <button id="nextRecordBtn" class="nav-btn" type="button">▶</button>
+        </div>
+        <div class="toolbar">
+          <span id="countPill" class="pill">0 cases</span>
+          <span id="statusPill" class="pill">target: -</span>
+        </div>
+      </div>
+
+      <div id="emptyState" class="panel empty-state">
+        Loading records from <span style="font-family:var(--mono)">../output/hibiki-100/</span>...
+      </div>
+
+      <div id="viewer" style="display:none;">
+        <div class="grid-2">
+          <section class="panel">
+            <div class="panel-body">
+              <div class="panel-title blue">Source (English)</div>
+              <div id="sourceFull" class="full-text"></div>
+            </div>
+          </section>
+          <section class="panel">
+            <div class="panel-body">
+              <div class="panel-title orange">Target (Chinese)</div>
+              <div id="targetFull" class="full-text"></div>
+            </div>
+          </section>
+        </div>
+
+        <section class="panel">
+          <div class="controls-row">
+            <button id="playBtn" class="play-btn" type="button">▶</button>
+            <button id="prevStepBtn" class="step-btn" type="button">◀</button>
+            <button id="nextStepBtn" class="step-btn" type="button">▶</button>
+            <div id="stepIndicator" class="step-indicator">0 / 0</div>
+            <div class="progress"><div id="progressFill" class="progress-fill"></div></div>
+            <label class="speed-wrap">
+              <span>Speed</span>
+              <input id="speedInput" type="range" min="100" max="1500" step="50" value="500" />
+            </label>
+          </div>
+        </section>
+
+        <div class="grid-2">
+          <section class="panel">
+            <div class="panel-body">
+              <div class="panel-title blue">Source (Growing)</div>
+              <div id="sourceGrowing" class="growing"></div>
+            </div>
+          </section>
+          <section class="panel">
+            <div class="panel-body">
+              <div class="panel-title orange">Target (Growing)</div>
+              <div id="targetGrowing" class="growing"></div>
+            </div>
+          </section>
+        </div>
+
+        <section class="panel">
+          <div class="panel-body" style="padding-bottom:0;">
+            <div class="panel-title">Step-by-Step Alignment</div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>SRC CHUNK</th>
+                  <th>TGT CHUNK</th>
+                  <th>SRC CUMULATIVE</th>
+                  <th>TGT CUMULATIVE</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const state = {
+      records: [],
+      filtered: [],
+      activeRecordIndex: -1,
+      activeStep: 0,
+      playing: false,
+      timer: null,
+    };
+
+    const els = {
+      fileInput: document.getElementById("fileInput"),
+      searchInput: document.getElementById("searchInput"),
+      sortSelect: document.getElementById("sortSelect"),
+      list: document.getElementById("list"),
+      recordId: document.getElementById("recordId"),
+      countPill: document.getElementById("countPill"),
+      statusPill: document.getElementById("statusPill"),
+      emptyState: document.getElementById("emptyState"),
+      viewer: document.getElementById("viewer"),
+      sourceFull: document.getElementById("sourceFull"),
+      targetFull: document.getElementById("targetFull"),
+      sourceGrowing: document.getElementById("sourceGrowing"),
+      targetGrowing: document.getElementById("targetGrowing"),
+      tableBody: document.getElementById("tableBody"),
+      prevRecordBtn: document.getElementById("prevRecordBtn"),
+      nextRecordBtn: document.getElementById("nextRecordBtn"),
+      playBtn: document.getElementById("playBtn"),
+      prevStepBtn: document.getElementById("prevStepBtn"),
+      nextStepBtn: document.getElementById("nextStepBtn"),
+      stepIndicator: document.getElementById("stepIndicator"),
+      progressFill: document.getElementById("progressFill"),
+      speedInput: document.getElementById("speedInput"),
+    };
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function normalizeRecord(raw) {
+      const rec = Array.isArray(raw) ? raw[0] : raw;
+      const srcTrajectory = Array.isArray(rec.src_trajectory) ? rec.src_trajectory : [];
+      const targetTrajectory = Array.isArray(rec.target_trajectory) ? rec.target_trajectory : [];
+      const sourceText = rec.source_text_full || (Array.isArray(rec.src_text_full) ? rec.src_text_full.join(" ") : "");
+      const targetFull = rec.target_full_zh || "";
+      return {
+        ...rec,
+        source_text_full: sourceText,
+        src_trajectory: srcTrajectory,
+        target_trajectory: targetTrajectory,
+        _targetJoined: targetTrajectory.join(""),
+        _targetOk: targetTrajectory.join("") === targetFull,
+        _lengthOk: srcTrajectory.length === targetTrajectory.length,
+      };
+    }
+
+    function maybeAddSpace(left, right) {
+      if (!left || !right) return "";
+      if (/\s$/.test(left) || /^\s/.test(right)) return "";
+      if (/[A-Za-z0-9]$/.test(left) && /^[A-Za-z0-9]/.test(right)) return " ";
+      return "";
+    }
+
+    function joinSourceChunks(chunks, upto) {
+      let out = "";
+      for (const chunk of chunks.slice(0, upto + 1)) {
+        const piece = String(chunk ?? "");
+        if (!piece) continue;
+        out += maybeAddSpace(out, piece) + piece;
+      }
+      return out;
+    }
+
+    function cumulativeJoin(chunks, upto) {
+      return chunks.slice(0, upto + 1).join("");
+    }
+
+    function cumulativeSource(chunks, upto) {
+      return joinSourceChunks(chunks, upto);
+    }
+
+    function setRecord(index) {
+      state.activeRecordIndex = index;
+      state.activeStep = 0;
+      stopPlayback();
+      render();
+    }
+
+    function currentRecord() {
+      return state.filtered[state.activeRecordIndex] || null;
+    }
+
+    function applyFilters() {
+      const q = els.searchInput.value.trim().toLowerCase();
+      let arr = [...state.records];
+
+      if (q) {
+        arr = arr.filter((rec) => String(rec.id || "").toLowerCase().includes(q));
+      }
+
+      arr.sort((a, b) => {
+        const av = String(a.id || "");
+        const bv = String(b.id || "");
+        return els.sortSelect.value === "id-desc" ? bv.localeCompare(av) : av.localeCompare(bv);
+      });
+
+      state.filtered = arr;
+      els.countPill.textContent = `${arr.length} cases`;
+
+      if (!arr.length) {
+        state.activeRecordIndex = -1;
+      } else if (state.activeRecordIndex < 0 || state.activeRecordIndex >= arr.length) {
+        state.activeRecordIndex = 0;
+      }
+
+      renderList();
+      render();
+    }
+
+    async function autoLoadFromDirectory() {
+      try {
+        const dirUrl = "../output/hibiki-100/";
+        const response = await fetch(dirUrl);
+        if (!response.ok) {
+          throw new Error(`Failed to open ${dirUrl}: ${response.status}`);
+        }
+        const html = await response.text();
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const links = [...doc.querySelectorAll("a")]
+          .map((a) => a.getAttribute("href") || "")
+          .filter((href) => /^AUD.*\.json$/i.test(href))
+          .sort((a, b) => a.localeCompare(b));
+
+        const records = [];
+        for (const href of links) {
+          try {
+            const fileResp = await fetch(dirUrl + href);
+            if (!fileResp.ok) continue;
+            const raw = JSON.parse(await fileResp.text());
+            records.push(normalizeRecord(raw));
+          } catch (err) {
+            console.warn("Failed to load", href, err);
+          }
+        }
+
+        state.records = records;
+        state.activeRecordIndex = records.length ? 0 : -1;
+        state.activeStep = 0;
+        applyFilters();
+
+        if (!records.length) {
+          els.emptyState.textContent = "No JSON records found under ../output/hibiki-100/.";
+        }
+      } catch (err) {
+        console.warn(err);
+        els.emptyState.innerHTML = `
+          Could not auto-load <span style="font-family:var(--mono)">../output/hibiki-100/</span>.<br />
+          Make sure you opened the page through the local server from the hibiki root.
+        `;
+      }
+    }
+
+    function renderList() {
+      els.list.innerHTML = "";
+      state.filtered.forEach((rec, idx) => {
+        const div = document.createElement("div");
+        div.className = "item" + (idx === state.activeRecordIndex ? " active" : "");
+        div.innerHTML = `
+          <div class="item-index">${idx + 1}</div>
+          <div class="item-id">${escapeHtml(rec.id || "(no id)")}</div>
+        `;
+        div.addEventListener("click", () => setRecord(idx));
+        els.list.appendChild(div);
+      });
+    }
+
+    function renderTable(rec) {
+      const rows = [];
+      const maxLen = Math.max(rec.src_trajectory.length, rec.target_trajectory.length);
+      for (let i = 0; i < maxLen; i += 1) {
+        const src = rec.src_trajectory[i] ?? "";
+        const tgt = rec.target_trajectory[i] ?? "";
+        const srcCum = cumulativeSource(rec.src_trajectory, i);
+        const tgtCum = cumulativeJoin(rec.target_trajectory, i);
+        rows.push(`
+          <tr class="${i === state.activeStep ? "active-row" : ""}">
+            <td class="num">${i}</td>
+            <td class="src-col">${src ? escapeHtml(src) : '<span class="muted">-</span>'}</td>
+            <td class="tgt-col">${tgt ? escapeHtml(tgt) : '<span class="muted">-</span>'}</td>
+            <td class="src-cum">${srcCum ? escapeHtml(srcCum) : '<span class="muted">-</span>'}</td>
+            <td class="tgt-cum">${tgtCum ? escapeHtml(tgtCum) : '<span class="muted">-</span>'}</td>
+          </tr>
+        `);
+      }
+      els.tableBody.innerHTML = rows.join("");
+    }
+
+    function renderGrowing(rec) {
+      const srcCurrent = rec.src_trajectory[state.activeStep] || "";
+      const tgtCurrent = rec.target_trajectory[state.activeStep] || "";
+      const srcPrev = cumulativeSource(rec.src_trajectory, Math.max(0, state.activeStep - 1));
+      const tgtPrev = cumulativeJoin(rec.target_trajectory, Math.max(0, state.activeStep - 1));
+      const srcCum = cumulativeSource(rec.src_trajectory, state.activeStep);
+      const tgtCum = cumulativeJoin(rec.target_trajectory, state.activeStep);
+
+      let srcDisplay = escapeHtml(srcPrev);
+      if (srcCurrent) {
+        srcDisplay += `${srcPrev ? "" : ""}<span class="chip">${escapeHtml(srcCurrent)}</span>`;
+      }
+      els.sourceGrowing.innerHTML = srcDisplay || '<span class="muted">-</span>';
+      els.targetGrowing.textContent = tgtCum || tgtCurrent || "";
+
+      const totalSteps = Math.max(rec.src_trajectory.length, rec.target_trajectory.length);
+      els.stepIndicator.textContent = `${Math.min(state.activeStep + 1, totalSteps)} / ${totalSteps}`;
+      els.progressFill.style.width = totalSteps ? `${((state.activeStep + 1) / totalSteps) * 100}%` : "0%";
+    }
+
+    function render() {
+      const rec = currentRecord();
+      if (!rec) {
+        els.emptyState.style.display = "";
+        els.viewer.style.display = "none";
+        els.recordId.textContent = "No record loaded";
+        els.statusPill.textContent = "target: -";
+        return;
+      }
+
+      els.emptyState.style.display = "none";
+      els.viewer.style.display = "";
+      els.recordId.textContent = rec.id || "(no id)";
+      els.statusPill.textContent = rec._targetOk ? "target: ok" : "target: mismatch";
+      els.statusPill.style.color = rec._targetOk ? "var(--green)" : "var(--red)";
+      els.sourceFull.textContent = rec.source_text_full || "";
+      els.targetFull.textContent = rec.target_full_zh || "";
+
+      const totalSteps = Math.max(rec.src_trajectory.length, rec.target_trajectory.length);
+      if (state.activeStep >= totalSteps) {
+        state.activeStep = Math.max(0, totalSteps - 1);
+      }
+
+      renderGrowing(rec);
+      renderTable(rec);
+      renderList();
+    }
+
+    function stopPlayback() {
+      state.playing = false;
+      if (state.timer) {
+        clearTimeout(state.timer);
+        state.timer = null;
+      }
+      els.playBtn.textContent = "▶";
+    }
+
+    function tickPlayback() {
+      const rec = currentRecord();
+      if (!rec || !state.playing) return;
+      const totalSteps = Math.max(rec.src_trajectory.length, rec.target_trajectory.length);
+      if (state.activeStep >= totalSteps - 1) {
+        stopPlayback();
+        return;
+      }
+      state.activeStep += 1;
+      render();
+      state.timer = setTimeout(tickPlayback, Number(els.speedInput.value));
+    }
+
+    function togglePlayback() {
+      const rec = currentRecord();
+      if (!rec) return;
+      const totalSteps = Math.max(rec.src_trajectory.length, rec.target_trajectory.length);
+
+      if (state.playing) {
+        stopPlayback();
+        return;
+      }
+
+      if (state.activeStep >= totalSteps - 1) {
+        state.activeStep = 0;
+        render();
+      }
+
+      state.playing = true;
+      els.playBtn.textContent = "❚❚";
+      state.timer = setTimeout(tickPlayback, Number(els.speedInput.value));
+    }
+
+    async function loadFiles(files) {
+      const jsonFiles = [...files].filter((f) => f.name.endsWith(".json"));
+      const records = [];
+      for (const file of jsonFiles) {
+        try {
+          const raw = JSON.parse(await file.text());
+          records.push(normalizeRecord(raw));
+        } catch (err) {
+          console.warn("Failed to parse", file.name, err);
+        }
+      }
+      state.records = records;
+      state.activeRecordIndex = records.length ? 0 : -1;
+      state.activeStep = 0;
+      applyFilters();
+    }
+
+    els.fileInput.addEventListener("change", (event) => loadFiles(event.target.files));
+    els.searchInput.addEventListener("input", applyFilters);
+    els.sortSelect.addEventListener("change", applyFilters);
+    els.prevRecordBtn.addEventListener("click", () => {
+      if (state.activeRecordIndex > 0) setRecord(state.activeRecordIndex - 1);
+    });
+    els.nextRecordBtn.addEventListener("click", () => {
+      if (state.activeRecordIndex + 1 < state.filtered.length) setRecord(state.activeRecordIndex + 1);
+    });
+    els.prevStepBtn.addEventListener("click", () => {
+      stopPlayback();
+      state.activeStep = Math.max(0, state.activeStep - 1);
+      render();
+    });
+    els.nextStepBtn.addEventListener("click", () => {
+      const rec = currentRecord();
+      if (!rec) return;
+      stopPlayback();
+      const totalSteps = Math.max(rec.src_trajectory.length, rec.target_trajectory.length);
+      state.activeStep = Math.min(totalSteps - 1, state.activeStep + 1);
+      render();
+    });
+    els.playBtn.addEventListener("click", togglePlayback);
+
+    window.addEventListener("keydown", (event) => {
+      if (!currentRecord()) return;
+      if (event.code === "ArrowUp" && state.activeRecordIndex > 0) {
+        setRecord(state.activeRecordIndex - 1);
+      } else if (event.code === "ArrowDown" && state.activeRecordIndex + 1 < state.filtered.length) {
+        setRecord(state.activeRecordIndex + 1);
+      } else if (event.code === "KeyA") {
+        stopPlayback();
+        state.activeStep = Math.max(0, state.activeStep - 1);
+        render();
+      } else if (event.code === "KeyD") {
+        const rec = currentRecord();
+        const totalSteps = Math.max(rec.src_trajectory.length, rec.target_trajectory.length);
+        stopPlayback();
+        state.activeStep = Math.min(totalSteps - 1, state.activeStep + 1);
+        render();
+      } else if (event.code === "Space") {
+        event.preventDefault();
+        togglePlayback();
+      }
+    });
+
+    autoLoadFromDirectory();
+  </script>
+</body>
+</html>

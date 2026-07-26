@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 """
 Post-process GigaSpeech LLM outputs:
-- Merge one-word English chunks with neighboring chunks.
-- Keep English/Chinese array lengths aligned.
+- Merge one-word Source chunks with neighboring chunks.
+- Keep Source/Target array lengths aligned.
 - If sentence_spans exists, merge inside each sentence slice and update spans.
+
+Target-side join separator depends on target_lang:
+- de: space (German uses inter-word spaces)
+- zh / ja / others: no separator
 """
 
 import argparse
@@ -19,10 +23,13 @@ from tqdm import tqdm
 
 LATENCY_LEVELS = ["low_latency", "medium_latency", "high_latency", "offline"]
 
+# Target languages whose written form uses inter-word spaces.
+SPACE_JOIN_LANGS = {"de", "en", "fr", "es"}
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Merge one-word chunks in GigaSpeech LLM output JSON files."
+        description="Merge one-word Source chunks in GigaSpeech LLM output JSON files."
     )
     parser.add_argument("--input-dir", required=True, help="Input directory containing JSON files.")
     parser.add_argument("--output-dir", required=True, help="Output directory for processed JSON files.")
@@ -39,55 +46,64 @@ def is_single_word_chunk(text: str) -> bool:
     return len(words) <= 1
 
 
+def target_join_sep(target_lang: Optional[str]) -> str:
+    if target_lang and target_lang.lower() in SPACE_JOIN_LANGS:
+        return " "
+    return ""
+
+
 def merge_single_word_chunks(
-    eng_list: List[str],
-    zh_list: List[str],
+    src_list: List[str],
+    tgt_list: List[str],
+    tgt_sep: str,
 ) -> Tuple[List[str], List[str], bool]:
     """
-    Merge one-word chunks while preserving index alignment.
+    Merge one-word Source chunks while preserving index alignment.
     Strategy:
     - If single-word chunk is not the first output chunk, merge into previous.
     - If it is the first output chunk and next exists, merge with next.
+
+    The Target side uses `tgt_sep` for joining (space for de, empty for zh/ja).
     """
-    if len(eng_list) != len(zh_list):
-        raise ValueError(f"Length mismatch: English={len(eng_list)} Chinese={len(zh_list)}")
+    if len(src_list) != len(tgt_list):
+        raise ValueError(f"Length mismatch: Source={len(src_list)} Target={len(tgt_list)}")
 
-    if not eng_list:
-        return eng_list, zh_list, False
+    if not src_list:
+        return src_list, tgt_list, False
 
-    out_eng: List[str] = []
-    out_zh: List[str] = []
+    out_src: List[str] = []
+    out_tgt: List[str] = []
     changed = False
 
     i = 0
-    n = len(eng_list)
+    n = len(src_list)
     while i < n:
-        e = str(eng_list[i]).strip()
-        z = str(zh_list[i]).strip()
+        s = str(src_list[i]).strip()
+        t = str(tgt_list[i]).strip()
 
-        if is_single_word_chunk(e):
+        if is_single_word_chunk(s):
             # Normal case: merge to previous chunk.
-            if out_eng:
-                out_eng[-1] = (out_eng[-1] + " " + e).strip()
-                out_zh[-1] = (out_zh[-1] + z).strip()
+            if out_src:
+                out_src[-1] = (out_src[-1] + " " + s).strip()
+                out_tgt[-1] = (out_tgt[-1] + tgt_sep + t).strip()
                 changed = True
                 i += 1
                 continue
             # Edge case: first chunk is single-word -> merge with next chunk.
             if i + 1 < n:
-                e2 = str(eng_list[i + 1]).strip()
-                z2 = str(zh_list[i + 1]).strip()
-                out_eng.append((e + " " + e2).strip())
-                out_zh.append((z + z2).strip())
+                s2 = str(src_list[i + 1]).strip()
+                t2 = str(tgt_list[i + 1]).strip()
+                out_src.append((s + " " + s2).strip())
+                out_tgt.append((t + tgt_sep + t2).strip())
                 changed = True
                 i += 2
                 continue
 
-        out_eng.append(e)
-        out_zh.append(z)
+        out_src.append(s)
+        out_tgt.append(t)
         i += 1
 
-    return out_eng, out_zh, changed
+    return out_src, out_tgt, changed
 
 
 def valid_spans(spans: Any, total_len: int) -> bool:
@@ -106,38 +122,38 @@ def valid_spans(spans: Any, total_len: int) -> bool:
     return prev_end <= total_len
 
 
-def process_level_with_spans(data: Dict[str, Any], level: str) -> bool:
+def process_level_with_spans(data: Dict[str, Any], level: str, tgt_sep: str) -> bool:
     level_obj = data.get(level)
     spans_obj = data.get("sentence_spans", {}).get(level)
-    if not isinstance(level_obj, dict) or not valid_spans(spans_obj, len(level_obj.get("English", []))):
+    if not isinstance(level_obj, dict) or not valid_spans(spans_obj, len(level_obj.get("Source", []))):
         return False
 
-    eng_all = level_obj.get("English", [])
-    zh_all = level_obj.get("Chinese", [])
-    if not isinstance(eng_all, list) or not isinstance(zh_all, list):
+    src_all = level_obj.get("Source", [])
+    tgt_all = level_obj.get("Target", [])
+    if not isinstance(src_all, list) or not isinstance(tgt_all, list):
         return False
-    if len(eng_all) != len(zh_all):
+    if len(src_all) != len(tgt_all):
         return False
 
-    merged_eng_all: List[str] = []
-    merged_zh_all: List[str] = []
+    merged_src_all: List[str] = []
+    merged_tgt_all: List[str] = []
     new_spans: List[List[int]] = []
     cursor = 0
     changed_any = False
 
     for start, end in spans_obj:
-        sent_eng = eng_all[start:end]
-        sent_zh = zh_all[start:end]
-        merged_eng, merged_zh, changed = merge_single_word_chunks(sent_eng, sent_zh)
+        sent_src = src_all[start:end]
+        sent_tgt = tgt_all[start:end]
+        merged_src, merged_tgt, changed = merge_single_word_chunks(sent_src, sent_tgt, tgt_sep)
         changed_any = changed_any or changed
 
-        new_spans.append([cursor, cursor + len(merged_eng)])
-        merged_eng_all.extend(merged_eng)
-        merged_zh_all.extend(merged_zh)
-        cursor += len(merged_eng)
+        new_spans.append([cursor, cursor + len(merged_src)])
+        merged_src_all.extend(merged_src)
+        merged_tgt_all.extend(merged_tgt)
+        cursor += len(merged_src)
 
-    data[level]["English"] = merged_eng_all
-    data[level]["Chinese"] = merged_zh_all
+    data[level]["Source"] = merged_src_all
+    data[level]["Target"] = merged_tgt_all
     data["sentence_spans"][level] = new_spans
     return changed_any
 
@@ -149,15 +165,18 @@ def process_json_obj(data: Dict[str, Any]) -> Tuple[Dict[str, Any], bool]:
     updated = copy.deepcopy(data)
     changed_any = False
 
+    target_lang = updated.get("target_lang") or updated.get("tgt_lang")
+    tgt_sep = target_join_sep(target_lang)
+
     for level in LATENCY_LEVELS:
         if level not in updated:
             continue
         level_obj = updated[level]
         if not isinstance(level_obj, dict):
             continue
-        eng = level_obj.get("English")
-        zh = level_obj.get("Chinese")
-        if not isinstance(eng, list) or not isinstance(zh, list):
+        src = level_obj.get("Source")
+        tgt = level_obj.get("Target")
+        if not isinstance(src, list) or not isinstance(tgt, list):
             continue
 
         # Preferred path for GigaSpeech output: merge per sentence and update spans.
@@ -166,14 +185,14 @@ def process_json_obj(data: Dict[str, Any]) -> Tuple[Dict[str, Any], bool]:
             and isinstance(updated.get("sentence_spans"), dict)
             and level in updated["sentence_spans"]
         ):
-            changed = process_level_with_spans(updated, level)
+            changed = process_level_with_spans(updated, level, tgt_sep)
             changed_any = changed_any or changed
             continue
 
         # Fallback for files without sentence_spans.
-        merged_eng, merged_zh, changed = merge_single_word_chunks(eng, zh)
-        updated[level]["English"] = merged_eng
-        updated[level]["Chinese"] = merged_zh
+        merged_src, merged_tgt, changed = merge_single_word_chunks(src, tgt, tgt_sep)
+        updated[level]["Source"] = merged_src
+        updated[level]["Target"] = merged_tgt
         changed_any = changed_any or changed
 
     return updated, changed_any

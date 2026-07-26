@@ -50,6 +50,12 @@ from tqdm import tqdm
 from vllm import LLM, SamplingParams
 from openai import OpenAI, AsyncOpenAI
 
+
+DEFAULT_TRANSLATION_CACHE_DIR = (
+    "/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/"
+    "llm_full_translation_cache/train_xl_case_robust_asr_filtered"
+)
+
 # Lock that serialises base_llm.generate() when running parallel utterances.
 # None when running single-threaded (no overhead).
 _base_llm_lock: Optional[threading.Lock] = None
@@ -102,9 +108,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--test-one", action="store_true")
     p.add_argument("--utt-id", default=None)
     p.add_argument("--verbose", action="store_true")
-    p.add_argument("--translation-cache-dir", default=None,
+    p.add_argument("--translation-cache-dir", default=DEFAULT_TRANSLATION_CACHE_DIR,
                    help="Directory of pre-computed full translations (task_*.jsonl). "
-                        "If provided, used as reference instead of calling translate_final().")
+                        "Used as the frozen evaluation reference when available.")
     p.add_argument("--final-commit-backend", choices=["instruct", "base"], default="instruct",
                    help="Backend for end-of-utterance final commit. Use instruct to avoid base-model thinking leakage.")
     p.add_argument("--parallel-utterances", type=int, default=1,
@@ -330,6 +336,7 @@ def _vlog(log_file: Optional[Any], msg: str) -> None:
 def _extract_reference_text_from_row(row: Dict[str, str]) -> Optional[str]:
     """Best-effort extraction of reference translation text from a manifest row."""
     candidate_keys = [
+        "llm_reference_text",
         "tgt_text_full",
         "tgt_text",
         "target_text",
@@ -351,6 +358,32 @@ def _extract_reference_text_from_row(row: Dict[str, str]) -> Optional[str]:
         if text:
             return text
     return None
+
+
+def load_translation_cache(cache_dir: str) -> Dict[str, str]:
+    cache: Dict[str, str] = {}
+    if not cache_dir or not os.path.isdir(cache_dir):
+        return cache
+    import glob as _glob
+
+    jsonl_files = sorted(_glob.glob(os.path.join(cache_dir, "task_*.jsonl")))
+    print(f"[Cache] Loading translation cache from {cache_dir} ({len(jsonl_files)} files) ...")
+    for jf in jsonl_files:
+        with open(jf, "r", encoding="utf-8") as fh:
+            for line in fh:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    entry = json.loads(line)
+                    uid = str(entry.get("utt_id", "")).strip()
+                    tl = str(entry.get("llm_full_translation", "")).strip()
+                    if uid and tl:
+                        cache[uid] = tl
+                except Exception:
+                    pass
+    print(f"[Cache] Loaded {len(cache)} entries.")
+    return cache
 
 
 def compute_laal(
@@ -1655,23 +1688,31 @@ def process_one_utterance(
     action_list = [d[0] for d in decisions]
     system_output_text = "".join(d for d in target_deltas if d)
 
-    # LAAL reference: use pre-computed cache if available, otherwise call translate_final().
     laal_reference_text = ""
     laal_value = float("nan")
     laal_error: Optional[str] = None
     bleu_char_value = float("nan")
     bleu_char_error: Optional[str] = None
-    laal_reference_mode = "llm_full_translation"
+    laal_reference_mode = "reference_unavailable"
     try:
-        cached_translation = (translation_cache or {}).get(utt_id)
-        if cached_translation:
-            laal_reference_text = cached_translation
+        ref_text = (translation_cache or {}).get(utt_id)
+        if ref_text:
             laal_reference_mode = "cache"
         else:
-            laal_reference_text = translate_final(
-                api_base, instruct_model, instruct_tokenizer,
-                full_source_text, "",
-            )
+            ref_text = _extract_reference_text_from_row(row)
+            if ref_text:
+                laal_reference_mode = "manifest_reference"
+        if ref_text:
+            laal_reference_text = ref_text
+            result_reference_text = ref_text
+        else:
+            result_reference_text = None
+            raise ValueError("reference_text_unavailable")
+
+        if result_reference_text is not None:
+            result_reference_text = str(result_reference_text).strip()
+        if result_reference_text:
+            laal_reference_text = result_reference_text
         laal_value = compute_laal(
             trajectory,
             target_deltas,
@@ -1693,6 +1734,7 @@ def process_one_utterance(
         "source_future_sampling": trajectory,
         "target_future_sampling": target_deltas,
         "actions": action_list,
+        "reference_text": laal_reference_text,
         "laal_reference_text": laal_reference_text,
         "metrics": {
             "laal_text": laal_value,
@@ -1821,27 +1863,7 @@ def main() -> None:
     )
     print("[Base] Model loaded.")
 
-    # Load pre-computed translation cache (utt_id -> llm_full_translation)
-    translation_cache: Dict[str, str] = {}
-    if args.translation_cache_dir:
-        import glob as _glob
-        jsonl_files = sorted(_glob.glob(os.path.join(args.translation_cache_dir, "task_*.jsonl")))
-        print(f"[Cache] Loading translation cache from {args.translation_cache_dir} ({len(jsonl_files)} files) ...")
-        for jf in jsonl_files:
-            with open(jf, "r", encoding="utf-8") as fh:
-                for line in fh:
-                    line = line.strip()
-                    if not line:
-                        continue
-                    try:
-                        entry = json.loads(line)
-                        uid = str(entry.get("utt_id", "")).strip()
-                        tl = entry.get("llm_full_translation", "")
-                        if uid and tl:
-                            translation_cache[uid] = tl
-                    except Exception:
-                        pass
-        print(f"[Cache] Loaded {len(translation_cache)} entries.")
+    translation_cache = load_translation_cache(args.translation_cache_dir)
 
     # Resolve rows
     if getattr(args, "test_one", False):

@@ -65,7 +65,7 @@ vllm serve "${MODEL}" \
   --reasoning-parser qwen3 \
   --dtype auto \
   --port "${PORT}" \
-  --max-model-len 102928 \
+  --max-model-len 32768 \
   --gpu-memory-utilization 0.95 \
   --tensor-parallel-size 1 &
 

@@ -1,47 +1,69 @@
 #!/usr/bin/env python3
 """
 Build streaming trajectory JSONs for GigaSpeech using:
-  - merged LLM outputs
-  - MFA TextGrid alignments
-  - strict good-id list
+  - merged LLM outputs (with Source/Target schema and propagated src_trajectory)
+  - the manifest's src_trajectory itself as the timing grid (no MFA)
 
-Important: default chunk size is 960 ms (0.96 s), not 1.0 s.
+The src_trajectory column is a list of streaming ASR chunks emitted on a fixed
+~960 ms grid. We treat each entry's index as its emission window and align the
+LLM Source chunks back to those windows by greedy token matching.
+
+This replaces the previous MFA TextGrid alignment step entirely.
 """
 
 import argparse
+import ast
 import json
-import math
 import os
 import re
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-import tgt
 from tqdm import tqdm
 
 
 DEFAULT_CHUNK_MS = 960
 
+# Target languages whose written form uses inter-word spaces.
+SPACE_JOIN_LANGS = {"de", "en", "fr", "es"}
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Generate streaming trajectories from LLM + MFA for GigaSpeech."
+        description=(
+            "Generate streaming trajectories from LLM output + manifest src_trajectory "
+            "for GigaSpeech (no MFA required)."
+        )
     )
     parser.add_argument("--llm-dir", required=True, help="LLM JSON directory (recursive).")
-    parser.add_argument("--mfa-dir", required=True, help="MFA TextGrid directory (recursive).")
-    parser.add_argument("--good-jsonl", required=True, help="Good-list jsonl path.")
     parser.add_argument("--output-dir", required=True, help="Output directory for trajectory JSON files.")
+    parser.add_argument(
+        "--good-jsonl",
+        default=None,
+        help=(
+            "Optional good-list jsonl path. If omitted, every JSON under --llm-dir "
+            "that has a non-empty src_trajectory will be processed."
+        ),
+    )
+    parser.add_argument(
+        "--src-trajectory-key",
+        default="src_trajectory",
+        help="Top-level field name in the LLM JSON that holds the trajectory list.",
+    )
     parser.add_argument(
         "--chunk-ms",
         type=int,
         default=DEFAULT_CHUNK_MS,
-        help="Streaming chunk duration in milliseconds (default: 960).",
+        help=(
+            "Streaming chunk duration in milliseconds. Used only for output bookkeeping; "
+            "the actual emission grid is determined by src_trajectory entry indices."
+        ),
     )
     parser.add_argument(
         "--flat-output",
         action="store_true",
         help="Write files directly under output-dir (default: subdir by recording id).",
     )
-    parser.add_argument("--max-items", type=int, default=None, help="Only process first N good ids.")
+    parser.add_argument("--max-items", type=int, default=None, help="Only process first N ids.")
     parser.add_argument("--overwrite", action="store_true", help="Overwrite existing output files.")
     return parser.parse_args()
 
@@ -53,122 +75,137 @@ def normalize_text(s: str) -> str:
     return s
 
 
-def load_word_alignment(textgrid_path: str) -> Tuple[List[Dict[str, Any]], float]:
-    tg = tgt.read_textgrid(textgrid_path)
-    audio_duration = float(tg.end_time)
-    words = tg.get_tier_by_name("words").intervals
-    out = []
-    for w in words:
-        raw = (w.text or "").strip()
-        if not raw:
-            continue
-        out.append(
-            {
-                "word": raw,
-                "start": float(w.start_time),
-                "end": float(w.end_time),
-            }
-        )
-    return out, audio_duration
+def tokenize(s: str) -> List[str]:
+    n = normalize_text(s)
+    return n.split() if n else []
 
 
-def match_llm_chunks_to_mfa(llm_chunks: List[str], mfa_words: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def parse_trajectory(value: Any) -> List[str]:
+    """Coerce the manifest src_trajectory cell into a list[str]."""
+    if value is None:
+        return []
+    if isinstance(value, list):
+        return [str(x) for x in value]
+
+    raw = str(value).strip()
+    if not raw:
+        return []
+    try:
+        parsed = ast.literal_eval(raw)
+    except Exception:
+        # Not a python-literal list; treat as a single chunk.
+        return [raw]
+    if isinstance(parsed, list):
+        return [str(x) for x in parsed]
+    return [str(parsed)]
+
+
+def build_trajectory_token_grid(traj: List[str]) -> Tuple[List[str], List[int]]:
     """
-    Mono-global matching:
-    Keep one cursor across all chunks to prevent matching repeated words to earlier positions.
+    Flatten the trajectory into a per-token sequence and remember which trajectory
+    chunk (== emission window index) each token belongs to.
+
+    Returns:
+        tokens         : flat list of normalized tokens
+        chunk_of_token : same length; chunk_of_token[i] is the trajectory-entry index
+                         (== emission window index) that contributed token i
     """
-    mfa_tokens = [normalize_text(w["word"]) for w in mfa_words]
-    results = []
+    tokens: List[str] = []
+    chunk_of_token: List[int] = []
+    for ci, chunk in enumerate(traj):
+        for tok in tokenize(chunk):
+            tokens.append(tok)
+            chunk_of_token.append(ci)
+    return tokens, chunk_of_token
+
+
+def align_llm_chunks_to_trajectory(
+    llm_chunks: List[str],
+    traj_tokens: List[str],
+    chunk_of_token: List[int],
+) -> List[Optional[int]]:
+    """
+    For each LLM Source chunk, find the trajectory chunk index at which the LLM
+    chunk's last matched token appears. That index is the streaming window in
+    which the chunk becomes safe to emit.
+
+    Mono-global cursor: the same cursor advances across all LLM chunks so we
+    never re-match earlier trajectory positions (handles repeated words).
+
+    Returns: list of emit_chunk_index per LLM chunk (None if nothing matched).
+    """
+    results: List[Optional[int]] = []
     cursor = 0
 
     for chunk in llm_chunks:
-        tokens = normalize_text(chunk).split()
-        matched = []
+        toks = tokenize(chunk)
+        last_matched_pos: Optional[int] = None
 
-        for t in tokens:
-            found = False
-            for i in range(cursor, len(mfa_tokens)):
-                if mfa_tokens[i] == t:
-                    matched.append(i)
+        for t in toks:
+            for i in range(cursor, len(traj_tokens)):
+                if traj_tokens[i] == t:
+                    last_matched_pos = i
                     cursor = i + 1
-                    found = True
                     break
-            if not found:
-                # Keep scanning next token; strict filter should catch bad cases before this step.
-                continue
+            # If this token never matched, just keep going; we still emit on whatever
+            # we already matched. Strict pre-filtering should catch egregious cases.
 
-        if not matched:
-            results.append({"start": None, "end": None})
-            continue
-
-        results.append(
-            {
-                "start": mfa_words[matched[0]]["start"],
-                "end": mfa_words[matched[-1]]["end"],
-            }
-        )
+        if last_matched_pos is None:
+            results.append(None)
+        else:
+            results.append(chunk_of_token[last_matched_pos])
 
     return results
 
 
 def assign_chunks_by_window(
-    aligned_chunks: List[Dict[str, Any]],
-    chunk_seconds: float,
-    audio_duration: Optional[float] = None,
+    emit_indices: List[Optional[int]],
+    num_windows: int,
 ) -> List[Dict[str, Any]]:
-    valid = [x for x in aligned_chunks if x["end"] is not None]
-    if not valid:
-        return [{"chunk_index": 0, "emit_idx": []}]
+    """
+    Group LLM-chunk indices by the trajectory window in which they're emitted.
 
-    last_word_end = max(x["end"] for x in valid)
-    max_time = audio_duration if (audio_duration is not None and audio_duration > last_word_end) else last_word_end
-    eps = 1e-6
-    max_chunk_idx = int(math.ceil((max_time / chunk_seconds) - eps))
+    `emit_indices[i]` is the trajectory window index (0..num_windows-1) at which
+    LLM chunk `i` becomes ready. Any chunk that did not match is appended to the
+    last window so no source/target content is dropped.
+    """
+    windows: List[List[int]] = [[] for _ in range(max(num_windows, 1))]
+    unmatched: List[int] = []
 
-    emitted: Set[int] = set()
-    timeline = []
+    for li, w in enumerate(emit_indices):
+        if w is None or w < 0:
+            unmatched.append(li)
+            continue
+        if w >= len(windows):
+            w = len(windows) - 1
+        windows[w].append(li)
 
-    for idx in range(max_chunk_idx):
-        chunk_end = (idx + 1) * chunk_seconds
-        emit_idx = []
+    if unmatched:
+        windows[-1].extend(unmatched)
 
-        for i, item in enumerate(aligned_chunks):
-            if i in emitted:
-                continue
-            if item["end"] is not None and item["end"] <= chunk_end:
-                emit_idx.append(i)
-                emitted.add(i)
-
-        timeline.append({"chunk_index": idx, "emit_idx": emit_idx})
-
-    # Any segments not yet emitted (end=None or aligned beyond audio) are
-    # appended to the last window so no source/target content is dropped.
-    unemitted = [i for i in range(len(aligned_chunks)) if i not in emitted]
-    if unemitted:
-        if timeline:
-            timeline[-1]["emit_idx"].extend(unemitted)
-        else:
-            timeline.append({"chunk_index": 0, "emit_idx": unemitted})
-
-    return timeline
+    return [{"chunk_index": i, "emit_idx": idxs} for i, idxs in enumerate(windows)]
 
 
 def build_final_segments(
     timeline: List[Dict[str, Any]],
-    eng_chunks: List[str],
-    zh_chunks: List[str],
+    src_chunks: List[str],
+    tgt_chunks: List[str],
+    tgt_sep: str,
 ) -> Tuple[List[str], List[str]]:
-    sources = []
-    targets = []
-
+    sources, targets = [], []
     for entry in timeline:
         idxs = entry["emit_idx"]
-        src = " ".join(eng_chunks[i] for i in idxs).strip()
-        tgt = "".join(zh_chunks[i] for i in idxs).strip()
-        sources.append(src)
-        targets.append(tgt)
-
+        s = " ".join(src_chunks[i] for i in idxs).strip()
+        t = tgt_sep.join(tgt_chunks[i] for i in idxs).strip()
+        sources.append(s)
+        targets.append(t)
     return sources, targets
+
+
+def target_join_sep(target_lang: Optional[str]) -> str:
+    if target_lang and target_lang.lower() in SPACE_JOIN_LANGS:
+        return " "
+    return ""
 
 
 def list_files(root: str, suffix: str) -> List[str]:
@@ -201,7 +238,6 @@ def load_good_ids(good_jsonl: str) -> List[str]:
             utt = obj.get("file") or obj.get("utt_id")
             if isinstance(utt, str) and utt.strip():
                 good_ids.append(utt.strip())
-    # keep order, dedup
     seen: Set[str] = set()
     ordered = []
     for x in good_ids:
@@ -236,25 +272,28 @@ def main() -> None:
     os.makedirs(args.output_dir, exist_ok=True)
 
     llm_index = build_index(args.llm_dir, ".json")
-    mfa_index = build_index(args.mfa_dir, ".TextGrid")
-    good_ids = load_good_ids(args.good_jsonl)
-    if args.max_items is not None:
-        good_ids = good_ids[: args.max_items]
 
-    print(f"chunk_ms={args.chunk_ms} ({chunk_seconds:.3f}s)")
-    print(f"good_ids={len(good_ids)}, llm_index={len(llm_index)}, mfa_index={len(mfa_index)}")
+    if args.good_jsonl:
+        ids = load_good_ids(args.good_jsonl)
+    else:
+        ids = sorted(llm_index.keys())
+
+    if args.max_items is not None:
+        ids = ids[: args.max_items]
+
+    print(f"chunk_ms={args.chunk_ms} ({chunk_seconds:.3f}s) — alignment grid is src_trajectory itself")
+    print(f"ids={len(ids)}, llm_index={len(llm_index)}")
 
     ok = 0
     skipped_missing = 0
     skipped_existing = 0
     failed = 0
 
-    for utt_id in tqdm(good_ids, desc="Trajectory"):
+    for utt_id in tqdm(ids, desc="Trajectory"):
         llm_path = llm_index.get(utt_id)
-        tg_path = mfa_index.get(utt_id)
         out_path = output_path_for_utt(args.output_dir, utt_id, args.flat_output)
 
-        if llm_path is None or tg_path is None:
+        if llm_path is None:
             skipped_missing += 1
             continue
 
@@ -271,30 +310,52 @@ def main() -> None:
             if "error" in seg:
                 raise ValueError(f"LLM JSON has error field: {seg.get('error')}")
 
-            mfa_words, audio_duration = load_word_alignment(tg_path)
-            if not mfa_words:
-                raise ValueError("Empty MFA words")
+            traj = parse_trajectory(seg.get(args.src_trajectory_key))
+            if not traj:
+                raise ValueError(f"Empty/missing src_trajectory under key '{args.src_trajectory_key}'")
+
+            traj_tokens, chunk_of_token = build_trajectory_token_grid(traj)
+            if not traj_tokens:
+                raise ValueError("src_trajectory contains no tokens after normalization")
+
+            target_lang = seg.get("target_lang") or seg.get("tgt_lang")
+            tgt_sep = target_join_sep(target_lang)
 
             if "offline" in seg:
                 levels = ["offline"]
             else:
                 levels = ["low_latency", "medium_latency", "high_latency"]
 
-            out = {
+            out: Dict[str, Any] = {
                 "utt_id": utt_id,
                 "original_text": seg.get("input", ""),
+                "target_lang": target_lang,
+                "chunk_ms": args.chunk_ms,
+                "num_windows": len(traj),
             }
 
             for level in levels:
-                eng = seg[level]["English"]
-                zh = seg[level]["Chinese"]
+                level_obj = seg.get(level)
+                if not isinstance(level_obj, dict):
+                    raise ValueError(f"Missing or non-dict level: {level}")
+                src_chunks = level_obj.get("Source", [])
+                tgt_chunks = level_obj.get("Target", [])
+                if len(src_chunks) != len(tgt_chunks):
+                    raise ValueError(
+                        f"{level}: Source/Target length mismatch "
+                        f"({len(src_chunks)} vs {len(tgt_chunks)})"
+                    )
 
-                aligned = match_llm_chunks_to_mfa(eng, mfa_words)
-                timeline = assign_chunks_by_window(aligned, chunk_seconds=chunk_seconds, audio_duration=audio_duration)
-                src, tgt = build_final_segments(timeline, eng_chunks=eng, zh_chunks=zh)
+                emit_indices = align_llm_chunks_to_trajectory(
+                    src_chunks, traj_tokens, chunk_of_token
+                )
+                timeline = assign_chunks_by_window(emit_indices, num_windows=len(traj))
+                src_out, tgt_out = build_final_segments(
+                    timeline, src_chunks=src_chunks, tgt_chunks=tgt_chunks, tgt_sep=tgt_sep
+                )
 
-                out[f"source_{level}"] = src
-                out[f"target_{level}"] = tgt
+                out[f"source_{level}"] = src_out
+                out[f"target_{level}"] = tgt_out
 
             with open(out_path, "w", encoding="utf-8") as f:
                 json.dump(out, f, ensure_ascii=False, indent=2)
@@ -308,7 +369,6 @@ def main() -> None:
                         "utt_id": utt_id,
                         "error": str(e),
                         "llm_path": llm_path,
-                        "textgrid_path": tg_path,
                     },
                     f,
                     ensure_ascii=False,

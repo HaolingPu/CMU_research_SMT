@@ -30,6 +30,8 @@ import re
 import urllib.error
 import urllib.request
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from threading import Lock
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
@@ -71,10 +73,14 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--target-lang", default="Chinese")
     # Output / row selection
     p.add_argument("--output-jsonl", default=None)
+    p.add_argument("--output-dir", default=None,
+                   help="Write one pretty-printed JSON file per utterance under this directory.")
     p.add_argument("--overwrite", action="store_true")
     p.add_argument("--row-idx", type=int, default=0)
     p.add_argument("--utt-id", default=None)
     p.add_argument("--max-rows", type=int, default=1)
+    p.add_argument("--num-concurrent-cases", type=int, default=1)
+    p.add_argument("--skip-existing", action="store_true")
     p.add_argument("--test-one", action="store_true")
     return p.parse_args()
 
@@ -105,6 +111,10 @@ def join_source_chunks(chunks: List[str]) -> str:
         else:
             text += " " + piece
     return text.strip()
+
+
+def sanitize_filename(name: str) -> str:
+    return "".join(ch if ch.isalnum() or ch in "-_." else "_" for ch in str(name))
 
 
 def build_source_observed(chunks: List[str], t: int) -> str:
@@ -453,20 +463,72 @@ def main() -> None:
     mt_tokenizer = load_tokenizer(args.mt_tokenizer_path)
 
     out_fh = None
+    out_lock = Lock()
     if args.output_jsonl:
         os.makedirs(os.path.dirname(os.path.abspath(args.output_jsonl)), exist_ok=True)
         out_fh = open(args.output_jsonl, "w" if args.overwrite else "a", encoding="utf-8")
 
-    for _, row in rows.iterrows():
-        result = run_one_utterance(row.to_dict(), args, mt_tokenizer)
-        m = result["metrics"]
-        print(f"  {result['utt_id']}  bleu={m['bleu_char']:.2f}  laal={m['laal_text']:.2f}")
+    if args.output_dir:
+        os.makedirs(args.output_dir, exist_ok=True)
+
+    def _process_one_row(row_idx: int, row_dict: Dict[str, Any]) -> None:
+        utt_id = str(row_dict.get(args.id_column, row_dict.get("id", f"row_{row_idx}")))
+        out_path = (
+            os.path.join(args.output_dir, f"{sanitize_filename(utt_id)}.json")
+            if args.output_dir else None
+        )
+        if out_path and os.path.exists(out_path) and (args.skip_existing or not args.overwrite):
+            print(f"  {utt_id}  [SKIP existing]")
+            return
+
+        try:
+            result = run_one_utterance(row_dict, args, mt_tokenizer)
+            m = result["metrics"]
+            print(f"  {result['utt_id']}  bleu={m['bleu_char']:.2f}  laal={m['laal_text']:.2f}")
+        except Exception as exc:
+            # Write an error JSON so downstream tools can skip this utt.
+            print(f"  {utt_id}  [ERROR] {exc}")
+            result = {"utt_id": utt_id, "error": str(exc)}
+
         if out_fh:
-            out_fh.write(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
-            out_fh.flush()
+            with out_lock:
+                out_fh.write(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
+                out_fh.flush()
+        if out_path:
+            with open(out_path, "w", encoding="utf-8") as fh:
+                json.dump(result, fh, ensure_ascii=False, indent=2)
+                fh.write("\n")
+
+    row_items = [(idx, row.to_dict()) for idx, (_, row) in enumerate(rows.iterrows())]
+    failures: List[str] = []
+    num_concurrent = max(1, int(args.num_concurrent_cases))
+    if num_concurrent <= 1:
+        for row_idx, row_dict in row_items:
+            try:
+                _process_one_row(row_idx, row_dict)
+            except Exception as exc:
+                failures.append(f"row {row_idx}: {exc}")
+                print(f"[ERROR] row {row_idx}: {exc}")
+    else:
+        print(f"[Concurrent] {len(row_items)} rows, {num_concurrent} workers")
+        with ThreadPoolExecutor(max_workers=num_concurrent) as executor:
+            futs = {executor.submit(_process_one_row, ri, rd): ri for ri, rd in row_items}
+            for fut in as_completed(futs):
+                row_idx = futs[fut]
+                try:
+                    fut.result()
+                except Exception as exc:
+                    failures.append(f"row {row_idx}: {exc}")
+                    print(f"[ERROR] row {row_idx}: {exc}")
 
     if out_fh:
         out_fh.close()
+    # _process_one_row already writes an error JSON for per-utt failures;
+    # outer-level failures here are rare (e.g. disk I/O). Log but do not
+    # raise — allows task to finish with exit 0 so downstream pipeline
+    # (QE) can run.
+    if failures:
+        print(f"[WARN] {len(failures)} row(s) had outer-level failures; see individual [ERROR] lines above.")
     print("Done.")
 
 

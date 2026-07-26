@@ -42,10 +42,11 @@ for latency in ['low', 'medium', 'high']:
     pbar = tqdm(latency_traj, desc="Processing {} latency, skipped 0 instances".format(latency))
     n_skip = 0
     for traj in pbar:
-
+        #从原始 manifest 里用 utt_id 找到原音频片段
         audio_path, start, duration = orig_manifest[orig_manifest['id'] == traj['utt_id']].iloc[0]['audio'].split(':')
         wav, sr = sf.read(audio_path, start=int(start), frames=int(duration))
-
+        #读出这段 wav，采样率要求 16k
+        #按 15360 sample 切块，也就是 15360 / 16000 = 0.96s
         assert sr == 16000
         stepsize = 15360
 
@@ -55,17 +56,22 @@ for latency in ['low', 'medium', 'high']:
         os.makedirs(audio_clips_dir, exist_ok=True)
         audio_clip_paths = []
 
+        # 每个 chunk 写成一个单独 wav 文件
         for idx, i in enumerate(range(0, wav.shape[0], stepsize)):
             wav_clip = wav[i : i + stepsize]
             clip_path = os.path.join(audio_clips_dir, f"{idx}.wav")
             sf.write(clip_path, wav_clip, sr)
             audio_clip_paths.append(clip_path)
-
+        #如果 chunk 数和 traj['target'] 数对不上，就跳过这个样本
         if len(audio_clip_paths) != len(traj['target']):
             n_skip += 1
             pbar.set_description(f"Processing {latency} latency, skipped {n_skip} instances")
             continue
 
+        # 然后拼成一条多轮训练样本：
+        # system: “你是同传，按某种 latency 做英译中”
+        # user: <audio>
+        # assistant: 当前 chunk 对应目标文本
         n_chunk = min(len(audio_clip_paths), len(traj['target']))
 
         messages = [
@@ -85,3 +91,13 @@ with open(os.path.join(output_root, output_filename), 'w') as f:
     for latency in ['low', 'medium', 'high']:
         for instance in latency2instances[latency]:
             f.write(json.dumps(instance, ensure_ascii=False) + "\n")
+
+# #{
+#   "messages": [
+#     {"role": "system", "content": "...with low/medium/high latency."},
+#     {"role": "user", "content": "<audio>"},
+#     {"role": "assistant", "content": "..."},
+#     ...
+#   ],
+#   "audios": ["/path/0.wav", "/path/1.wav", ...]
+# }

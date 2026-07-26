@@ -85,7 +85,7 @@ SIMALIGN_MODEL="$SIMALIGN_MODEL" CUDA_VISIBLE_DEVICES=0 python "$PYTHON_SCRIPT" 
   --instruct-api-base "http://localhost:${INSTRUCT_PORT}/v1" \
   --parallel-utterances 16 \
   --future-sampling-batch-size 4 \
-  --num-candidates 20 \
+  --num-candidates 10 \
   --base-model-path "$BASE_MODEL" \
   --align-method simalign \
   --disable-sentence-path \
