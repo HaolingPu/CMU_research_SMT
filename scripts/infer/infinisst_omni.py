@@ -87,14 +87,18 @@ class InfiniSSTOmni(SpeechToTextAgent):
         self.top_p = args.top_p
         self.top_k = args.top_k
         self.temperature = args.temperature
+        self.repetition_penalty = args.repetition_penalty
+        self.frequency_penalty = args.frequency_penalty
+        self.presence_penalty = args.presence_penalty
 
-        self.generation_config = GenerationConfig(  
+        self.generation_config = GenerationConfig(
             num_beams=self.beam,
             do_sample=self.do_sample,
             temperature=self.temperature,
             top_p=self.top_p,
             top_k=self.top_k,
             max_new_tokens=self.max_new_tokens,
+            repetition_penalty=self.repetition_penalty,
         )
 
         # cache
@@ -140,9 +144,27 @@ class InfiniSSTOmni(SpeechToTextAgent):
             type=float,
             default=1.0,
         )
+        parser.add_argument(
+            "--repetition-penalty",
+            type=float,
+            default=1.0,
+            help="vLLM/HF repetition_penalty; >1.0 discourages repeated tokens.",
+        )
+        parser.add_argument(
+            "--frequency-penalty",
+            type=float,
+            default=0.0,
+            help="vLLM frequency_penalty; >0 penalizes proportional to count.",
+        )
+        parser.add_argument(
+            "--presence-penalty",
+            type=float,
+            default=0.0,
+            help="vLLM presence_penalty; >0 penalizes if token already seen.",
+        )
 
         parser.add_argument(
-            "--source-lang", 
+            "--source-lang",
             type=str,
             default='English',
         )
@@ -181,14 +203,18 @@ class InfiniSSTOmni(SpeechToTextAgent):
                 tensor_parallel_size=2,
                 limit_mm_per_prompt={'audio': self.max_cache_chunks},
                 max_num_seqs=1,
-                max_model_len=16384,
+                max_model_len=32768,
                 enable_prefix_caching=True,
+                enforce_eager=True,
             )
             self.sampling_params = SamplingParams(
                 temperature=self.temperature,
                 top_p=self.top_p,
                 top_k=self.top_k,
                 max_tokens=self.max_new_tokens,
+                repetition_penalty=self.repetition_penalty,
+                frequency_penalty=self.frequency_penalty,
+                presence_penalty=self.presence_penalty,
             )
         else:
             self.model = Qwen3OmniMoeForConditionalGeneration.from_pretrained(

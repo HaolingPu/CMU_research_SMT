@@ -1,19 +1,20 @@
 #!/usr/bin/env bash
+# Simul-tst-COMMON (monotonic references) variant of eval_all_ckpts.sh.
+# Scores instances.log produced by infer_slurm_simultst.sh.
 eval "$(conda shell.bash hook)"
 conda activate evaluation
 
-# HuggingFace auth for gated models like Unbabel/XCOMET-XL
 if [ -f "/home/haolingp/.keys/huggingface" ]; then
     export HF_TOKEN=$(cat /home/haolingp/.keys/huggingface)
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CKPTS_FILE="${SCRIPT_DIR}/ckpts.txt"
+CKPTS_FILE="${SCRIPT_DIR}/ckpts_simultst.txt"
 CKPT_ROOT=/data/user_data/haolingp/ckpts/infinisst-omni
 
-AUDIO_DEFINITION=/data/group_data/li_lab/siqiouya/datasets/acl_6060/dev.yaml
-TRANSCRIPT_FILE=/data/group_data/li_lab/siqiouya/datasets/acl_6060/dev/text/txt/ACL.6060.dev.en-xx.en.txt
-REFERENCE_FILE=/data/group_data/li_lab/siqiouya/datasets/acl_6060/dev/text/txt/ACL.6060.dev.en-xx.zh.txt
+AUDIO_DEFINITION=/data/user_data/haolingp/datasets/simul_tst_common/tst.yaml
+TRANSCRIPT_FILE=/data/user_data/haolingp/datasets/simul_tst_common/tst.en
+REFERENCE_FILE=/data/user_data/haolingp/datasets/simul_tst_common/tst.zh
 
 MOSES_TOKENIZER=zh
 SACREBLEU_TOKENIZER=zh
@@ -27,11 +28,9 @@ echo "Loaded ${#CKPTS[@]} checkpoints; will score ${#SEGS[@]} latencies each."
 
 for ckpt in "${CKPTS[@]}"; do
     for seg in "${SEGS[@]}"; do
-        out_dir="${CKPT_ROOT}/${ckpt}/evaluation/acl_6060/en-zh/seg${seg}"
+        out_dir="${CKPT_ROOT}/${ckpt}/evaluation/simul_tst_common/en-zh/seg${seg}"
         instances="${out_dir}/instances.log"
         seg_out="${out_dir}/segmentation_output"
-        resegmented="${seg_out}/instances.resegmented.jsonl"
-        segment_scores="${seg_out}/segment_scores.tsv"
         avg_scores="${seg_out}/scores.tsv"
 
         if [ ! -s "${instances}" ]; then
@@ -64,5 +63,4 @@ for ckpt in "${CKPTS[@]}"; do
     done
 done
 echo
-echo "All scoring done. Per-seg scores are at <ckpt>/evaluation/acl_6060/en-zh/seg<N>/segmentation_output/scores.tsv"
-# python "${SCRIPT_DIR}/aggregate_scores.py"  # not present; aggregate manually
+echo "All scoring done. Per-seg scores at <ckpt>/evaluation/simul_tst_common/en-zh/seg<N>/segmentation_output/scores.tsv"

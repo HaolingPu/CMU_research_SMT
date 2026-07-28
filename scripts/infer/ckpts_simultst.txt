@@ -1,0 +1,10 @@
+# Checkpoints to re-score on Simul-tst-COMMON (monotonic references).
+# Question: does the consensus-vs-hibiki BLEU gap survive monotonic refs?
+gigaspeech-zh-consensus-top5-axis5-s-bsz4/v0-20260516-121120-hf/
+gigaspeech-zh-hibiki-s-bsz4/v0-20260601-121643-hf/
+gigaspeech-zh-EAST-even-s-bsz4/v0-20260601-001001-hf/
+gigaspeech-zh-PA-40k-s-bsz4/v0-20260504-150226-hf/
+gigaspeech-zh-consensus-topk5_f200-s-bsz4/v0-20260502-125501-hf/
+gigaspeech-zh-consensus-anchor40k-s-bsz4/v0-20260717-141356-hf/
+gigaspeech-zh-consensus-bestof4refsel-s-bsz4/v0-20260719-152000-hf/
+gigaspeech-zh-consensus-bestof5refsel-s-bsz4/v0-20260719-153718-hf/
