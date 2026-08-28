@@ -120,11 +120,12 @@ echo "SERVERS_READY=$(date)" >> "${TASK_DIR}/timing.log"
   --targeted-sampler2-api-base "http://127.0.0.1:${PORT_INSTRUCT}/v1" \
   --targeted-sampler2-api-model "qwen3-instruct" \
   --targeted-sampler2-tokenizer-path "${INSTRUCT_TOK}" \
-  --targeted-num-futures 20 \
+  --targeted-num-futures "${TARGETED_NUM_FUTURES:-20}" \
   --future-source-window-chunks "${FUTURE_SRC_WINDOW:-1}" \
+  --min-voters-ratio "${MIN_VOTERS_RATIO:-0.75}" \
   --row-idx "${START_ROW}" \
   --max-rows "${ROWS_PER_TASK}" \
-  --num-concurrent-cases 16 \
+  --num-concurrent-cases "${NUM_CONCURRENT_CASES:-16}" \
   --skip-existing \
   --output-jsonl "${TASK_DIR}/per_utt/_.jsonl" \
   --verbose --verbose-dir "${TASK_DIR}/verbose" \

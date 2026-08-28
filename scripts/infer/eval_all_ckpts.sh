@@ -8,7 +8,7 @@ if [ -f "/home/haolingp/.keys/huggingface" ]; then
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CKPTS_FILE="${SCRIPT_DIR}/ckpts.txt"
+CKPTS_FILE="${CKPTS_FILE:-${SCRIPT_DIR}/ckpts.txt}"
 CKPT_ROOT=/data/user_data/haolingp/ckpts/infinisst-omni
 
 AUDIO_DEFINITION=/data/group_data/li_lab/siqiouya/datasets/acl_6060/dev.yaml

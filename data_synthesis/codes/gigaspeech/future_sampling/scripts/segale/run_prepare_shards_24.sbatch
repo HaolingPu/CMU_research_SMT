@@ -27,7 +27,7 @@ CONSENSUS_ROOT="${CONSENSUS_ROOT:?CONSENSUS_ROOT required}"
 OUT_ROOT="${OUT_ROOT:?OUT_ROOT required}"
 NUM_DOCS="${NUM_DOCS:-40000}"
 SYS_ID="${SYS_ID:-$(basename ${CONSENSUS_ROOT})}"
-NUM_SHARDS=24
+NUM_SHARDS="${NUM_SHARDS:-24}"
 
 mkdir -p "${OUT_ROOT}" \
          /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_prod/slurm_logs

@@ -28,7 +28,7 @@ export PYTHONNOUSERSITE=1
 ALIGNED_FILE="${ALIGNED_FILE:?ALIGNED_FILE required}"
 CONSENSUS_ROOT="${CONSENSUS_ROOT:?CONSENSUS_ROOT required}"
 METRICX_RUN_DIR="${METRICX_RUN_DIR:?METRICX_RUN_DIR required}"
-NUM_SHARDS=24
+NUM_SHARDS="${NUM_SHARDS:-24}"
 
 mkdir -p "${METRICX_RUN_DIR}"
 mkdir -p /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_prod/slurm_logs

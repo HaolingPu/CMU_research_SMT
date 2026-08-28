@@ -30,7 +30,7 @@ export PYTHONNOUSERSITE=1
 METRICX_RUN_DIR="${METRICX_RUN_DIR:?METRICX_RUN_DIR required}"
 QE_FILTERED_DIR="${QE_FILTERED_DIR:?QE_FILTERED_DIR required}"
 QE_THRESHOLD="${QE_THRESHOLD:-3.0}"
-NUM_SHARDS=24
+NUM_SHARDS="${NUM_SHARDS:-24}"
 
 CODE=/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling
 MERGED="${METRICX_RUN_DIR}/metricx_output.jsonl"
