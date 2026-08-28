@@ -1,0 +1,463 @@
+####################################################################################################
+# utt_id=AUD0000000003_1011   segment_size=1   la_n=2
+# n_chunks=28   n_steps=28   target_lang=Chinese
+# full_source: They were so huge that the spoons they used were as large as spades, And their forks as big as hay-forks with these they lifted whole bucketfuls of broth and great joints of meat out of an enormous pot which was set on the ground between them. Niels was startled and rather scared at first, but he comforted himself with the thought that the giants were a good way off,
+# reference  : 他们个子大得惊人，用的勺子像铁锹一样大，叉子也和草叉一样大。他们用这些餐具从两人中间放在地上的一个巨大锅里，把一桶桶肉汤和大块大块的肉直接舀出来。尼尔斯起初大吃一惊，有点害怕，但他安慰自己说，巨人离他们还远着呢。
+####################################################################################################
+
+───── step 0  chunks=[0..0]  LCP-decision step ─────
+  decision chunk[0]: ''
+  source_observed (sent to MT): ''
+  committed_text BEFORE step  : ''
+  >> empty source prefix; skip MT, keep step as READ.
+
+───── step 1  chunks=[1..1]  LCP-decision step ─────
+  decision chunk[1]: 'They were so'
+  source_observed (sent to MT): 'They were so'
+  committed_text BEFORE step  : ''
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '他们如此'
+  sliding window (la_n=2) BEFORE append:
+    (empty)
+  sliding window AFTER append:
+    [h0] 他们如此
+  LCP skipped: window has 1 hyp(s) < la_n=2
+  >> LA-2 requires 2 hyps to agree → no commit (READ)
+  committed_text AFTER step   : ''
+
+───── step 2  chunks=[2..2]  LCP-decision step ─────
+  decision chunk[2]: 'huge that the'
+  source_observed (sent to MT): 'They were so huge that the'
+  committed_text BEFORE step  : ''
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，以至于'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 他们如此
+  sliding window AFTER append:
+    [h0] 他们如此
+    [h1] 它们大得惊人，以至于
+  LCP(char, |window|=2)       : ''
+  >> LCP == committed_text  → no extension, no commit (READ)
+  committed_text AFTER step   : ''
+
+───── step 3  chunks=[3..3]  LCP-decision step ─────
+  decision chunk[3]: 'spoons they'
+  source_observed (sent to MT): 'They were so huge that the spoons they'
+  committed_text BEFORE step  : ''
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得连勺子都……'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 他们如此
+    [h1] 它们大得惊人，以至于
+  dropped oldest hyp from window: '他们如此'…
+  sliding window AFTER append:
+    [h0] 它们大得惊人，以至于
+    [h1] 它们大得连勺子都……
+  LCP(char, |window|=2)       : '它们大得'
+  >> LCP extends committed by 4 chars  → COMMIT delta: '它们大得'
+  committed_text AFTER step   : '它们大得'
+
+───── step 4  chunks=[4..4]  LCP-decision step ─────
+  decision chunk[4]: 'used were as'
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as'
+  committed_text BEFORE step  : '它们大得'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得使用勺子都和'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得惊人，以至于
+    [h1] 它们大得连勺子都……
+  dropped oldest hyp from window: '它们大得惊人，以至于'…
+  sliding window AFTER append:
+    [h0] 它们大得连勺子都……
+    [h1] 它们大得使用勺子都和
+  LCP(char, |window|=2)       : '它们大得'
+  >> LCP == committed_text  → no extension, no commit (READ)
+  committed_text AFTER step   : '它们大得'
+
+───── step 5  chunks=[5..5]  LCP-decision step ─────
+  decision chunk[5]: 'large as'
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as'
+  committed_text BEFORE step  : '它们大得'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，所用的勺子竟有如此之大。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得连勺子都……
+    [h1] 它们大得使用勺子都和
+  dropped oldest hyp from window: '它们大得连勺子都……'…
+  sliding window AFTER append:
+    [h0] 它们大得使用勺子都和
+    [h1] 它们大得惊人，所用的勺子竟有如此之大。
+  LCP(char, |window|=2)       : '它们大得'
+  >> LCP == committed_text  → no extension, no commit (READ)
+  committed_text AFTER step   : '它们大得'
+
+───── step 6  chunks=[6..6]  LCP-decision step ─────
+  decision chunk[6]: 'spades, And their'
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as spades, And their'
+  committed_text BEFORE step  : '它们大得'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而且他们的'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得使用勺子都和
+    [h1] 它们大得惊人，所用的勺子竟有如此之大。
+  dropped oldest hyp from window: '它们大得使用勺子都和'…
+  sliding window AFTER append:
+    [h0] 它们大得惊人，所用的勺子竟有如此之大。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而且他们的
+  LCP(char, |window|=2)       : '它们大得惊人，'
+  >> LCP extends committed by 3 chars  → COMMIT delta: '惊人，'
+  committed_text AFTER step   : '它们大得惊人，'
+
+───── step 7  chunks=[7..7]  LCP-decision step ─────
+  decision chunk[7]: 'forks as'
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as spades, And their forks as'
+  committed_text BEFORE step  : '它们大得惊人，'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子也如同'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得惊人，所用的勺子竟有如此之大。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而且他们的
+  dropped oldest hyp from window: '它们大得惊人，所用的勺子竟有如此之大。'…
+  sliding window AFTER append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而且他们的
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子也如同
+  LCP(char, |window|=2)       : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而'
+  >> LCP extends committed by 16 chars  → COMMIT delta: '他们使用的勺子竟像铁锹一样大，而'
+  committed_text AFTER step   : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而'
+
+───── step 8  chunks=[8..8]  LCP-decision step ─────
+  decision chunk[8]: 'big as hay-forks'
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as spades, And their forks as big as hay-forks'
+  committed_text BEFORE step  : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而且他们的
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子也如同
+  dropped oldest hyp from window: '它们大得惊人，他们使用的勺子竟像铁锹一样大，而且他们的'…
+  sliding window AFTER append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子也如同
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大。
+  LCP(char, |window|=2)       : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子'
+  >> LCP extends committed by 5 chars  → COMMIT delta: '他们的叉子'
+  committed_text AFTER step   : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子'
+
+───── step 9  chunks=[9..9]  LCP-decision step ─────
+  decision chunk[9]: 'with'
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as spades, And their forks as big as hay-forks with'
+  committed_text BEFORE step  : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子也和草叉一样巨大。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子也如同
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大。
+  dropped oldest hyp from window: '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子也如同'…
+  sliding window AFTER append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子也和草叉一样巨大。
+  LCP(char, |window|=2)       : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子'
+  >> LCP == committed_text  → no extension, no commit (READ)
+  committed_text AFTER step   : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子'
+
+───── step 10  chunks=[10..10]  LCP-decision step ─────
+  decision chunk[10]: 'these they'
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as spades, And their forks as big as hay-forks with these they'
+  committed_text BEFORE step  : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用着这些工具'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子也和草叉一样巨大。
+  dropped oldest hyp from window: '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大。'…
+  sliding window AFTER append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子也和草叉一样巨大。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用着这些工具
+  LCP(char, |window|=2)       : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子'
+  >> LCP == committed_text  → no extension, no commit (READ)
+  committed_text AFTER step   : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子'
+
+───── step 11  chunks=[11..11]  LCP-decision step ─────
+  decision chunk[11]: 'lifted whole bucketfuls'
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as spades, And their forks as big as hay-forks with these they lifted whole bucketfuls'
+  committed_text BEFORE step  : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一铲一铲地舀起整桶的食物。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子也和草叉一样巨大。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用着这些工具
+  dropped oldest hyp from window: '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子也和草叉一样巨大。'…
+  sliding window AFTER append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用着这些工具
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一铲一铲地舀起整桶的食物。
+  LCP(char, |window|=2)       : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用'
+  >> LCP extends committed by 10 chars  → COMMIT delta: '则和草叉一样巨大，用'
+  committed_text AFTER step   : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用'
+
+───── step 12  chunks=[12..12]  LCP-decision step ─────
+  decision chunk[12]: 'of broth'
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as spades, And their forks as big as hay-forks with these they lifted whole bucketfuls of broth'
+  committed_text BEFORE step  : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶汤。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用着这些工具
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一铲一铲地舀起整桶的食物。
+  dropped oldest hyp from window: '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用着这些工具'…
+  sliding window AFTER append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一铲一铲地舀起整桶的食物。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶汤。
+  LCP(char, |window|=2)       : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一'
+  >> LCP extends committed by 9 chars  → COMMIT delta: '这些工具，他们能一'
+  committed_text AFTER step   : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一'
+
+───── step 13  chunks=[13..13]  LCP-decision step ─────
+  decision chunk[13]: 'and great'
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as spades, And their forks as big as hay-forks with these they lifted whole bucketfuls of broth and great'
+  committed_text BEFORE step  : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，还有大块的肉。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一铲一铲地舀起整桶的食物。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶汤。
+  dropped oldest hyp from window: '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一铲一铲地舀起整桶的食物。'…
+  sliding window AFTER append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶汤。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，还有大块的肉。
+  LCP(char, |window|=2)       : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶'
+  >> LCP extends committed by 8 chars  → COMMIT delta: '勺就舀起满满一桶'
+  committed_text AFTER step   : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶'
+
+───── step 14  chunks=[14..14]  LCP-decision step ─────
+  decision chunk[14]: 'joints of meat out of'
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as spades, And their forks as big as hay-forks with these they lifted whole bucketfuls of broth and great joints of meat out of'
+  committed_text BEFORE step  : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶汤。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，还有大块的肉。
+  dropped oldest hyp from window: '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶汤。'…
+  sliding window AFTER append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，还有大块的肉。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+  LCP(char, |window|=2)       : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，'
+  >> LCP extends committed by 3 chars  → COMMIT delta: '肉汤，'
+  committed_text AFTER step   : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，'
+
+───── step 15  chunks=[15..15]  LCP-decision step ─────
+  decision chunk[15]: 'an enormous'
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as spades, And their forks as big as hay-forks with these they lifted whole bucketfuls of broth and great joints of meat out of an enormous'
+  committed_text BEFORE step  : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，还有大块的肉。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+  dropped oldest hyp from window: '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，还有'…
+  sliding window AFTER append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+  LCP(char, |window|=2)       : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+  >> LCP extends committed by 7 chars  → COMMIT delta: '或是一大块肉。'
+  committed_text AFTER step   : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+
+───── step 16  chunks=[16..16]  LCP-decision step ─────
+  decision chunk[16]: 'pot which was'
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as spades, And their forks as big as hay-forks with these they lifted whole bucketfuls of broth and great joints of meat out of an enormous pot which was'
+  committed_text BEFORE step  : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+  dropped oldest hyp from window: '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是'…
+  sliding window AFTER append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+  LCP(char, |window|=2)       : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+  >> LCP == committed_text  → no extension, no commit (READ)
+  committed_text AFTER step   : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+
+───── step 17  chunks=[17..17]  LCP-decision step ─────
+  decision chunk[17]: 'set on the ground'
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as spades, And their forks as big as hay-forks with these they lifted whole bucketfuls of broth and great joints of meat out of an enormous pot which was set on the ground'
+  committed_text BEFORE step  : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+  dropped oldest hyp from window: '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是'…
+  sliding window AFTER append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+  LCP(char, |window|=2)       : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+  >> LCP == committed_text  → no extension, no commit (READ)
+  committed_text AFTER step   : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+
+───── step 18  chunks=[18..18]  LCP-decision step ─────
+  decision chunk[18]: 'between them. '
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as spades, And their forks as big as hay-forks with these they lifted whole bucketfuls of broth and great joints of meat out of an enormous pot which was set on the ground between them.'
+  committed_text BEFORE step  : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+  dropped oldest hyp from window: '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是'…
+  sliding window AFTER append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+  LCP(char, |window|=2)       : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+  >> LCP == committed_text  → no extension, no commit (READ)
+  committed_text AFTER step   : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+
+───── step 19  chunks=[19..19]  LCP-decision step ─────
+  decision chunk[19]: ''
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as spades, And their forks as big as hay-forks with these they lifted whole bucketfuls of broth and great joints of meat out of an enormous pot which was set on the ground between them.'
+  committed_text BEFORE step  : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+  dropped oldest hyp from window: '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是'…
+  sliding window AFTER append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+  LCP(char, |window|=2)       : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+  >> LCP == committed_text  → no extension, no commit (READ)
+  committed_text AFTER step   : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+
+───── step 20  chunks=[20..20]  LCP-decision step ─────
+  decision chunk[20]: 'Niels was startled'
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as spades, And their forks as big as hay-forks with these they lifted whole bucketfuls of broth and great joints of meat out of an enormous pot which was set on the ground between them. Niels was startled'
+  committed_text BEFORE step  : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯惊呆了。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+  dropped oldest hyp from window: '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是'…
+  sliding window AFTER append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯惊呆了。
+  LCP(char, |window|=2)       : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+  >> LCP == committed_text  → no extension, no commit (READ)
+  committed_text AFTER step   : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+
+───── step 21  chunks=[21..21]  LCP-decision step ─────
+  decision chunk[21]: 'and rather scared at'
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as spades, And their forks as big as hay-forks with these they lifted whole bucketfuls of broth and great joints of meat out of an enormous pot which was set on the ground between them. Niels was startled and rather scared at'
+  committed_text BEFORE step  : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯被这情景吓了一跳，心里有些害怕。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯惊呆了。
+  dropped oldest hyp from window: '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是'…
+  sliding window AFTER append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯惊呆了。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯被这情景吓了一跳，心里有些害怕。
+  LCP(char, |window|=2)       : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯'
+  >> LCP extends committed by 3 chars  → COMMIT delta: '尼尔斯'
+  committed_text AFTER step   : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯'
+
+───── step 22  chunks=[22..22]  LCP-decision step ─────
+  decision chunk[22]: 'first, '
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as spades, And their forks as big as hay-forks with these they lifted whole bucketfuls of broth and great joints of meat out of an enormous pot which was set on the ground between them. Niels was startled and rather scared at first,'
+  committed_text BEFORE step  : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯惊呆了。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯被这情景吓了一跳，心里有些害怕。
+  dropped oldest hyp from window: '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是'…
+  sliding window AFTER append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯被这情景吓了一跳，心里有些害怕。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕。
+  LCP(char, |window|=2)       : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯'
+  >> LCP == committed_text  → no extension, no commit (READ)
+  committed_text AFTER step   : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯'
+
+───── step 23  chunks=[23..23]  LCP-decision step ─────
+  decision chunk[23]: 'but he'
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as spades, And their forks as big as hay-forks with these they lifted whole bucketfuls of broth and great joints of meat out of an enormous pot which was set on the ground between them. Niels was startled and rather scared at first, but he'
+  committed_text BEFORE step  : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯被这情景吓了一跳，心里有些害怕。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕。
+  dropped oldest hyp from window: '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是'…
+  sliding window AFTER append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他
+  LCP(char, |window|=2)       : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕'
+  >> LCP extends committed by 13 chars  → COMMIT delta: '起初感到震惊，甚至有些害怕'
+  committed_text AFTER step   : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕'
+
+───── step 24  chunks=[24..24]  LCP-decision step ─────
+  decision chunk[24]: 'comforted himself with the'
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as spades, And their forks as big as hay-forks with these they lifted whole bucketfuls of broth and great joints of meat out of an enormous pot which was set on the ground between them. Niels was startled and rather scared at first, but he comforted himself with the'
+  committed_text BEFORE step  : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他安慰自己说，'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕。
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他
+  dropped oldest hyp from window: '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是'…
+  sliding window AFTER append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他安慰自己说，
+  LCP(char, |window|=2)       : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他'
+  >> LCP extends committed by 3 chars  → COMMIT delta: '，但他'
+  committed_text AFTER step   : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他'
+
+───── step 25  chunks=[25..25]  LCP-decision step ─────
+  decision chunk[25]: 'thought that the'
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as spades, And their forks as big as hay-forks with these they lifted whole bucketfuls of broth and great joints of meat out of an enormous pot which was set on the ground between them. Niels was startled and rather scared at first, but he comforted himself with the thought that the'
+  committed_text BEFORE step  : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他安慰自己想到，'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他安慰自己说，
+  dropped oldest hyp from window: '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是'…
+  sliding window AFTER append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他安慰自己说，
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他安慰自己想到…
+  LCP(char, |window|=2)       : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他安慰自己'
+  >> LCP extends committed by 4 chars  → COMMIT delta: '安慰自己'
+  committed_text AFTER step   : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他安慰自己'
+
+───── step 26  chunks=[26..26]  LCP-decision step ─────
+  decision chunk[26]: 'giants were a good way'
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as spades, And their forks as big as hay-forks with these they lifted whole bucketfuls of broth and great joints of meat out of an enormous pot which was set on the ground between them. Niels was startled and rather scared at first, but he comforted himself with the thought that the giants were a good way'
+  committed_text BEFORE step  : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他安慰自己'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他安慰自己，这些巨人离得还远。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他安慰自己说，
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他安慰自己想到…
+  dropped oldest hyp from window: '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是'…
+  sliding window AFTER append:
+    [h0] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他安慰自己想到…
+    [h1] 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他安慰自己，这…
+  LCP(char, |window|=2)       : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他安慰自己'
+  >> LCP == committed_text  → no extension, no commit (READ)
+  committed_text AFTER step   : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他安慰自己'
+
+───── step 27  chunks=[27..27]  FORCE_COMPLETE (last step) ─────
+  decision chunk[27]: 'off, '
+  source_observed (sent to MT): 'They were so huge that the spoons they used were as large as spades, And their forks as big as hay-forks with these they lifted whole bucketfuls of broth and great joints of meat out of an enormous pot which was set on the ground between them. Niels was startled and rather scared at first, but he comforted himself with the thought that the giants were a good way off,'
+  committed_text BEFORE step  : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他安慰自己'
+  >> FORCE_COMPLETE: pass full_source to MT, prefix-constrain on committed.
+  MT continuation delta       : '，那些巨人离他还很远。'
+  committed_text AFTER step   : '它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他安慰自己，那些巨人离他还很远。'
+
+====================================================================================================
+FINAL prediction : 它们大得惊人，他们使用的勺子竟像铁锹一样大，而他们的叉子则和草叉一样巨大，用这些工具，他们能一勺就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，甚至有些害怕，但他安慰自己，那些巨人离他还很远。
+FINAL reference  : 他们个子大得惊人，用的勺子像铁锹一样大，叉子也和草叉一样大。他们用这些餐具从两人中间放在地上的一个巨大锅里，把一桶桶肉汤和大块大块的肉直接舀出来。尼尔斯起初大吃一惊，有点害怕，但他安慰自己说，巨人离他们还远着呢。
+metrics: bleu_char=35.53  laal_text=5.22  pred_chars=99  ref_chars=106  src_words=70
+====================================================================================================

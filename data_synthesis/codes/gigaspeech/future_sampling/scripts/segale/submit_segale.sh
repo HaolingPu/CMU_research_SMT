@@ -88,7 +88,7 @@ echo "[qe prepare]     ${QE_PREP_JOB}"
 
 echo
 echo "[5/6] Submitting 8-GPU MetricX predict (afterok:${QE_PREP_JOB})..."
-TOPK_DIR=/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/scripts/topk
+TOPK_DIR=/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/scripts/topk
 QE_PREDICT_JOB=$(sbatch --parsable \
   --dependency="afterok:${QE_PREP_JOB}" \
   --exclude=babel-t9-16 \

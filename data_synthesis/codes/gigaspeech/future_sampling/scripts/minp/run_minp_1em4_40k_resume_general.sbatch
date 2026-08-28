@@ -22,7 +22,7 @@ MIN_P_LABEL="1em4"
 
 TASK_ID="${SLURM_ARRAY_TASK_ID:-0}"
 
-CODE_DIR="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling"
+CODE_DIR="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling"
 GEMMA4_ENV="/data/user_data/haolingp/conda_envs/gemma4"
 PYTHON="${GEMMA4_ENV}/bin/python"
 VLLM="${GEMMA4_ENV}/bin/vllm"

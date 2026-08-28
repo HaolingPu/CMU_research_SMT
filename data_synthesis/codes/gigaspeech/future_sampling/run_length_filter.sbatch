@@ -28,7 +28,7 @@ LEN_FILTERED_DIR="${LEN_FILTERED_DIR:?LEN_FILTERED_DIR not set}"
 MAX_RATIO_REF="${MAX_RATIO_REF:-1.5}"
 MAX_RATIO_SRC="${MAX_RATIO_SRC:-2.5}"
 
-FILTER_SCRIPT="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/filter_consensus_by_length_ratio.py"
+FILTER_SCRIPT="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/filter_consensus_by_length_ratio.py"
 REPORT_JSONL="${LEN_FILTERED_DIR}/length_filter_report.jsonl"
 
 mkdir -p "${LEN_FILTERED_DIR}"

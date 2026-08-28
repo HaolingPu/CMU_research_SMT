@@ -41,7 +41,7 @@ echo "ALIGNED_FILE    : ${ALIGNED_FILE}"
 echo "CONSENSUS_ROOT  : ${CONSENSUS_ROOT}"
 echo "METRICX_RUN_DIR : ${METRICX_RUN_DIR}"
 
-python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/convert_metricx_consensus_aligned.py \
+python /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/convert_metricx_consensus_aligned.py \
   --aligned        "${ALIGNED_FILE}" \
   --consensus-root "${CONSENSUS_ROOT}" \
   --output         "${INPUT_JSONL}" \

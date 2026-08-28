@@ -1,0 +1,584 @@
+1
+00:00:00,000 --> 00:00:23,560
+How would you like to be better than you are? Suppose I said that with just a few changes
+
+2
+00:00:23,560 --> 00:00:30,680
+in your genes you could get a better memory, more precise, more accurate, and quicker.
+
+3
+00:00:30,680 --> 00:00:36,680
+Or maybe you'd like to be more fit, stronger, with more stamina. Would you like to be more
+
+4
+00:00:36,680 --> 00:00:43,980
+attractive and self-confident? How about living longer, with good health? Or perhaps you're
+
+5
+00:00:43,980 --> 00:00:52,120
+one of those who's always yearned for more creativity. Which one would you like the most?
+
+6
+00:00:52,120 --> 00:00:59,640
+Which would you like if you could have just one? Creativity. How many people would choose
+
+7
+00:00:59,640 --> 00:01:03,840
+creativity? Raise your hands, let me see. A few, probably about as many as there are
+
+8
+00:01:03,840 --> 00:01:12,120
+creative people here, that's very good. How many would opt for memory? Quite a few more.
+
+9
+00:01:12,120 --> 00:01:19,540
+How about fitness? A few less. What about longevity? Ah, the majority, that makes me
+
+10
+00:01:19,540 --> 00:01:25,180
+feel very good as a doctor. If you could have any one of these, it would be a very
+
+11
+00:01:25,180 --> 00:01:33,420
+different world. Is it just imaginary? Or is it perhaps possible? Evolution has been
+
+12
+00:01:33,420 --> 00:01:39,780
+a perennial topic here at the TED conference. But I want to give you today one doctor's
+
+13
+00:01:39,780 --> 00:01:46,840
+take on the subject. The great 20th century geneticist, T.G. Dobzhansky, who was also
+
+14
+00:01:46,840 --> 00:01:53,120
+a communicant in the Russian Orthodox Church, once wrote an essay that he titled, Nothing
+
+15
+00:01:53,120 --> 00:02:00,280
+in Biology Makes Sense Except in the Light of Evolution. Now, if you are one of those
+
+16
+00:02:00,280 --> 00:02:05,520
+who does not accept the evidence for biological evolution, this would be a very good time
+
+17
+00:02:05,520 --> 00:02:09,440
+to turn off your hearing aid, take out your personal communications device, I give you
+
+18
+00:02:09,440 --> 00:02:14,480
+permission, and perhaps take another look at Catherine Schultz's book on being wrong,
+
+19
+00:02:14,480 --> 00:02:20,840
+because nothing in the rest of this talk is going to make any sense whatsoever to you.
+
+20
+00:02:20,840 --> 00:02:29,960
+But if you do accept biological evolution, consider this. Is it just about the past?
+
+21
+00:02:29,960 --> 00:02:37,420
+Or is it about the future? Does it apply to others? Or does it apply to us? This is another
+
+22
+00:02:37,420 --> 00:02:44,580
+look at the tree of life. In this picture, I've put a bush with a center branching out
+
+23
+00:02:44,580 --> 00:02:50,660
+in all directions, because if you look at the edges of the tree of life, every existing
+
+24
+00:02:50,660 --> 00:02:56,780
+species at the tips of those branches has succeeded in evolutionary terms. It has survived.
+
+25
+00:02:56,780 --> 00:03:05,020
+It has demonstrated a fitness to its environment. The human part of this branch, way out on
+
+26
+00:03:05,020 --> 00:03:12,460
+one end, is of course the one that we are most interested in. We branch off of a common
+
+27
+00:03:12,460 --> 00:03:19,420
+ancestor to modern chimpanzees about six or eight million years ago. In the interval,
+
+28
+00:03:19,420 --> 00:03:27,660
+there have been perhaps 20 or 25 different species of hominids. Some have come and gone.
+
+29
+00:03:27,660 --> 00:03:34,220
+We have been here for about 130,000 years. It may seem like we're quite remote from other
+
+30
+00:03:34,220 --> 00:03:41,820
+parts of this tree of life, but actually for the most part, the basic machinery of
+
+31
+00:03:41,820 --> 00:03:48,340
+our cells is pretty much the same. Do you realize that we can take advantage and commandeer
+
+32
+00:03:48,340 --> 00:03:54,860
+the machinery of a common bacterium to produce the protein of human insulin used to treat
+
+33
+00:03:54,860 --> 00:04:00,860
+diabetics? This is not like human insulin. This is the same protein that is chemically
+
+34
+00:04:00,860 --> 00:04:08,300
+indistinguishable from what comes out of your pancreas. And speaking of bacteria, do
+
+35
+00:04:08,300 --> 00:04:14,900
+you realize that each of us carries in our gut more bacteria than there are cells in
+
+36
+00:04:14,900 --> 00:04:19,740
+the rest of our body? Maybe 10 times more. I mean, think of it. When Anthony Damasio
+
+37
+00:04:19,740 --> 00:04:28,980
+asks about your self-image, do you think about the bacteria? Our gut is a wonderfully hospitable
+
+38
+00:04:28,980 --> 00:04:35,020
+environment for those bacteria. It's warm. It's dark. It's moist. It's very cozy. And
+
+39
+00:04:35,020 --> 00:04:38,340
+you're going to provide all the nutrition that they could possibly want with no effort
+
+40
+00:04:38,340 --> 00:04:44,740
+on their part. It's really like an easy street for bacteria with the occasional interruption
+
+41
+00:04:44,740 --> 00:04:52,220
+of the unintended forced rush to the exit. But otherwise, you are a wonderful environment
+
+42
+00:04:52,220 --> 00:04:57,860
+for those bacteria, just as they are essential to your life. They help in the digestion of
+
+43
+00:04:57,860 --> 00:05:04,500
+essential nutrients, and they protect you against certain diseases. But what will come
+
+44
+00:05:04,500 --> 00:05:11,820
+in the future? Are we at some kind of evolutionary equipoise as a species, or are we destined
+
+45
+00:05:11,820 --> 00:05:19,580
+to become something different, something perhaps even better adapted to the environment? Now
+
+46
+00:05:19,580 --> 00:05:25,660
+let's take a step back in time to the Big Bang. Fourteen billion years ago, the Earth,
+
+47
+00:05:25,660 --> 00:05:31,140
+the solar system about four and a half billion years, the first signs of proto-life maybe
+
+48
+00:05:31,140 --> 00:05:37,020
+three to four billion years ago on Earth, the first multi-celled organisms perhaps as
+
+49
+00:05:37,020 --> 00:05:46,380
+much as 800 or a billion years ago, and then the human species finally emerging in the
+
+50
+00:05:46,380 --> 00:05:53,220
+last 130,000 years. In this vast unfinished symphony of the universe, life on Earth is
+
+51
+00:05:53,220 --> 00:06:01,740
+like a brief measure, the animal kingdom like a single, single measure, and human life
+
+52
+00:06:01,740 --> 00:06:08,980
+a small grace note. That was us. That also constitutes the entertainment portion of this
+
+53
+00:06:08,980 --> 00:06:16,700
+talk, so I hope you enjoyed it. Now, when I was a freshman in college, I took my first
+
+54
+00:06:16,700 --> 00:06:23,780
+biology class. I was fascinated by the elegance and beauty of biology. I became enamored of
+
+55
+00:06:23,780 --> 00:06:29,780
+the power of evolution, and I realized something very fundamental. In most of the existence
+
+56
+00:06:29,780 --> 00:06:35,700
+of life in single-celled organisms, each cell simply divides, and all of the genetic energy
+
+57
+00:06:35,700 --> 00:06:41,980
+of that cell is carried on in both daughter cells. But at the time multi-celled organisms
+
+58
+00:06:41,980 --> 00:06:49,820
+come online, things start to change. Sexual reproduction enters the picture, and very
+
+59
+00:06:49,820 --> 00:06:55,780
+importantly, with the introduction of sexual reproduction that passes on the genome, the
+
+60
+00:06:55,780 --> 00:07:04,540
+rest of the body becomes expendable. In fact, you could say that the inevitability of the
+
+61
+00:07:04,540 --> 00:07:11,180
+death of our bodies enters in evolutionary time at the same moment as sexual reproduction.
+
+62
+00:07:11,180 --> 00:07:17,660
+Now, I have to confess, when I was a college undergraduate, I thought, okay, sex, death,
+
+63
+00:07:17,660 --> 00:07:24,740
+sex, death, death for sex seemed pretty reasonable at the time, but with each passing year, I've
+
+64
+00:07:24,740 --> 00:07:30,140
+come to have increasing doubts. I've come to understand the sentiments of George Burns,
+
+65
+00:07:30,140 --> 00:07:34,540
+who was performing still in Las Vegas well into his 90s, and one night, there's a knock
+
+66
+00:07:34,540 --> 00:07:40,120
+at his hotel room door. He answers the door. Standing before him is a gorgeous, scantily
+
+67
+00:07:40,120 --> 00:07:46,780
+clad showgirl. She looks at him and says, I'm here for super sex. That's fine, says
+
+68
+00:07:46,780 --> 00:07:58,660
+George. I'll take the soup. I came to realize, as a physician, that I was working toward
+
+69
+00:07:58,660 --> 00:08:05,240
+a goal which was different from the goal of evolution, not necessarily contradictory,
+
+70
+00:08:05,240 --> 00:08:10,380
+just different. I was trying to preserve the body. I wanted to keep us healthy. I wanted
+
+71
+00:08:10,380 --> 00:08:16,720
+to restore health from disease. I wanted us to live long and healthy lives. Evolution
+
+72
+00:08:16,720 --> 00:08:23,660
+is all about passing on the genome to the next generation, adapting and surviving through
+
+73
+00:08:23,660 --> 00:08:30,060
+generation after generation. From an evolutionary point of view, you and I are like the booster
+
+74
+00:08:30,060 --> 00:08:34,980
+rockets designed to send the genetic payload into the next level of orbit and then drop
+
+75
+00:08:34,980 --> 00:08:41,100
+off into the sea. I think we would all understand the sentiment that Woody Allen expressed when
+
+76
+00:08:41,100 --> 00:08:46,020
+he said, I don't want to achieve immortality through my work. I want to achieve it through
+
+77
+00:08:46,020 --> 00:08:55,640
+not dying. Evolution does not necessarily favor the longest lived. It doesn't necessarily
+
+78
+00:08:55,640 --> 00:09:01,060
+favor the biggest or the strongest or the fastest and not even the smartest. Evolution
+
+79
+00:09:01,060 --> 00:09:10,900
+favors those creatures best adapted to their environment. That is the sole test of survival
+
+80
+00:09:10,900 --> 00:09:17,260
+and success. At the bottom of the ocean, bacteria that are thermophilic and can survive
+
+81
+00:09:17,260 --> 00:09:22,540
+at the steam vent heat that would otherwise produce if fish were there, sous vide cooked
+
+82
+00:09:22,540 --> 00:09:31,940
+fish, nevertheless have managed to make that a hospitable environment for them. So what
+
+83
+00:09:31,940 --> 00:09:38,640
+does this mean as we look back at what has happened in evolution and as we think about
+
+84
+00:09:38,640 --> 00:09:46,400
+the place again of humans in evolution and particularly as we look ahead to the next
+
+85
+00:09:46,400 --> 00:09:56,400
+phase? I would say that there are a number of possibilities. The first is that we will
+
+86
+00:09:56,400 --> 00:10:04,800
+not evolve. We have reached a kind of equipoise. And the reasoning behind that would be first,
+
+87
+00:10:04,800 --> 00:10:09,920
+we have through medicine managed to preserve a lot of genes that would otherwise be selected
+
+88
+00:10:09,920 --> 00:10:16,560
+out and be removed from the population. And secondly, we as a species have so configured
+
+89
+00:10:16,560 --> 00:10:23,720
+our environment that we have managed to make it adapt to us as well as we adapt to it.
+
+90
+00:10:23,720 --> 00:10:29,200
+And by the way, we immigrate and circulate and intermix so much that you can't any longer
+
+91
+00:10:29,200 --> 00:10:37,240
+have the isolation that is necessary for evolution to take place. A second possibility
+
+92
+00:10:37,240 --> 00:10:45,240
+is that there will be evolution of the traditional kind, natural, imposed by the forces of nature.
+
+93
+00:10:45,240 --> 00:10:52,720
+And the argument here would be that the wheels of evolution grind slowly but they are inexorable.
+
+94
+00:10:52,720 --> 00:10:57,720
+And as far as isolation goes, when we as a species do colonize distant planets, there
+
+95
+00:10:57,760 --> 00:11:03,640
+will be the isolation and the environmental changes that could produce evolution in the
+
+96
+00:11:03,640 --> 00:11:11,400
+natural way. But there's a third possibility, an enticing, intriguing, and frightening possibility.
+
+97
+00:11:11,400 --> 00:11:18,720
+I call it neo-evolution, the new evolution that is not simply natural but guided and
+
+98
+00:11:18,720 --> 00:11:26,840
+chosen by us as individuals in the choices that we will make. Now, how could this come
+
+99
+00:11:26,960 --> 00:11:35,480
+about? How could it be possible that we would do this? Consider first the reality that people
+
+100
+00:11:35,480 --> 00:11:41,240
+today in some cultures are making choices about their offspring. They're in some cultures
+
+101
+00:11:41,240 --> 00:11:46,640
+choosing to have more males than females. It's not necessarily good for the society
+
+102
+00:11:46,640 --> 00:11:54,640
+but it's what the individual and the family are choosing. Think also if it were possible,
+
+103
+00:11:54,760 --> 00:12:01,760
+ever, for you not simply to choose the sex of your child but for you in your body to
+
+104
+00:12:03,120 --> 00:12:09,760
+make the genetic adjustments that would cure or prevent diseases. What if you could make
+
+105
+00:12:09,760 --> 00:12:16,200
+the genetic changes to eliminate diabetes or Alzheimer's or reduce the risk of cancer
+
+106
+00:12:16,200 --> 00:12:23,200
+or eliminate stroke? Wouldn't you want to make those changes in your genes? If we look
+
+107
+00:12:24,720 --> 00:12:33,520
+ahead, these kind of changes are going to be increasingly possible. The Human Genome
+
+108
+00:12:33,520 --> 00:12:44,840
+Project started in 1990 and it took 13 years. It cost $2.7 billion. The year after it was
+
+109
+00:12:44,840 --> 00:12:53,200
+finished in 2004, you could do the same job for $20 million in three to four months. Today,
+
+110
+00:12:53,200 --> 00:12:57,280
+you can have a complete sequence of the three billion base pairs in the human genome at
+
+111
+00:12:57,280 --> 00:13:03,820
+a cost of about $20,000 and in the space of about a week. It won't be very long before
+
+112
+00:13:03,820 --> 00:13:09,660
+the reality will be the $1,000 human genome and it will be increasingly available for
+
+113
+00:13:09,660 --> 00:13:16,660
+everyone. Just a week ago, the National Academy of Engineering awarded its Draper Prize to
+
+114
+00:13:17,660 --> 00:13:23,660
+Francis Arnold and Willem Stemmer II, scientists who independently developed techniques to
+
+115
+00:13:23,660 --> 00:13:29,660
+encourage the natural process of evolution to work faster and to lead to desirable proteins
+
+116
+00:13:29,660 --> 00:13:36,660
+in a more efficient way, what Francis Arnold calls directed evolution. A couple of years
+
+117
+00:13:36,660 --> 00:13:43,660
+ago, the Lasker Prize was awarded to the scientist Shinya Yamanaka for his research in which
+
+118
+00:13:43,660 --> 00:13:50,660
+he took an adult skin cell, a fibroblast, and by manipulating just four genes, he induced
+
+119
+00:13:52,000 --> 00:13:59,000
+that cell to revert to a pluripotential stem cell, a cell potentially capable of becoming
+
+120
+00:14:00,180 --> 00:14:07,180
+any cell in your body. These changes are coming. The same technology that has produced the
+
+121
+00:14:07,380 --> 00:14:13,440
+human insulin and bacteria can make viruses that will not only protect you against themselves
+
+122
+00:14:13,440 --> 00:14:18,580
+but induce immunity against other viruses. Believe it or not, there's an experimental
+
+123
+00:14:18,580 --> 00:14:25,580
+trial going on with vaccine against influenza that has been grown in the cells of a tobacco
+
+124
+00:14:25,900 --> 00:14:32,900
+plant. Can you imagine something good coming out of tobacco? These are all reality today
+
+125
+00:14:33,500 --> 00:14:40,500
+and the future will be ever more possible. Imagine then just two other little changes.
+
+126
+00:14:41,480 --> 00:14:46,360
+You can change the cells in your body, but what if you could change the cells in your
+
+127
+00:14:46,360 --> 00:14:52,120
+offspring? What if you could change the sperm and the ova or change the newly fertilized
+
+128
+00:14:52,120 --> 00:14:58,480
+egg and give your offspring a better chance at a healthier life? Eliminate the diabetes,
+
+129
+00:14:58,480 --> 00:15:03,760
+eliminate the hemophilia, reduce the risk of cancer. Who doesn't want healthier children?
+
+130
+00:15:03,780 --> 00:15:10,780
+And then that same analytic technology, that same engine of science that can produce the
+
+131
+00:15:10,900 --> 00:15:17,900
+changes to prevent disease will also enable us to adopt super attributes, hyper capacities,
+
+132
+00:15:22,020 --> 00:15:26,900
+that better memory. Why not have the quick wit of a Ken Jennings, especially if you can
+
+133
+00:15:26,900 --> 00:15:32,560
+augment it with the next generation of the Watson machine? Why not have the quick twitch
+
+134
+00:15:32,580 --> 00:15:39,580
+muscle that will enable you to run faster and longer? Why not live longer? These will
+
+135
+00:15:41,020 --> 00:15:47,680
+be irresistible and when we are at a position where we can pass it on to the next generation
+
+136
+00:15:47,680 --> 00:15:54,680
+and we can adopt the attributes we want, we will have converted old style evolution into
+
+137
+00:15:56,980 --> 00:16:01,780
+neo evolution. We'll take a process that normally might require a hundred thousand years and
+
+138
+00:16:01,800 --> 00:16:08,720
+we can compress it down to a thousand years and maybe even in the next 100 years. These
+
+139
+00:16:08,720 --> 00:16:15,720
+are choices that your grandchildren or their grandchildren are going to have before them.
+
+140
+00:16:16,920 --> 00:16:23,920
+Will we use these choices to make a society that is better, that is more successful, that
+
+141
+00:16:24,600 --> 00:16:31,600
+is kinder or will we selectively choose different attributes that we want for some of us and
+
+142
+00:16:31,700 --> 00:16:38,700
+not for others of us? Will we make a society that is more boring and more uniform or more
+
+143
+00:16:39,680 --> 00:16:45,660
+robust and more versatile? These are the kinds of questions that we will have to face and
+
+144
+00:16:45,660 --> 00:16:52,660
+most profoundly of all, will we ever be able to develop the wisdom and to inherit the wisdom
+
+145
+00:16:53,400 --> 00:16:58,660
+that we'll need to make these choices wisely? For better or worse and sooner than you may
+
+146
+00:16:58,660 --> 00:17:03,720
+think, these choices will be up to us. Thank you.
+

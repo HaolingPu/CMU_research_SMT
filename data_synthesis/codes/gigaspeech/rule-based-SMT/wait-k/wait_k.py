@@ -537,10 +537,10 @@ if __name__ == "__main__":
 
 
 # # 先跑一条测试
-# python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/wait_k.py \
+# python /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/wait_k.py \
 #   --mt-api-base http://localhost:8100 \
 #   --mt-api-model qwen3-instruct \
 #   --mt-tokenizer-path /data/user_data/haolingp/models/Qwen3-30B-A3B-Instruct-2507-FP8 \
 #   --wait-k 3 --target-lang Chinese \
 #   --test-one --overwrite \
-#   --output-jsonl /data/user_data/haolingp/data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/output/waitk3_test.jsonl
+#   --output-jsonl /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/output/waitk3_test.jsonl

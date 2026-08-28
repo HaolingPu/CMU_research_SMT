@@ -21,7 +21,7 @@ source ~/.bashrc
 conda activate vllm
 
 MANIFEST="/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_xl_case_robust_asr-filtered.tsv"
-PYTHON_SCRIPT="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_majority_vote.py"
+PYTHON_SCRIPT="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_majority_vote.py"
 OUTPUT_ROOT="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_future_sampling_final/llm_batch_output_final_majority_vote_v2_m20_simalign_100"
 
 BASE_MODEL="/data/user_data/haolingp/models/Qwen3-4B-Base"

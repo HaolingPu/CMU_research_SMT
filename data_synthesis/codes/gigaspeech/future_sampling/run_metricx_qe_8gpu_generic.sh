@@ -2,7 +2,7 @@
 # ============================================================
 # Generic MetricX QE prediction (8-GPU array job)
 # Usage:
-#   sbatch --export=ALL,BASE_OUTPUT_DIR=/abs/output_dir         #     /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/run_metricx_qe_8gpu_generic.sh
+#   sbatch --export=ALL,BASE_OUTPUT_DIR=/abs/output_dir         #     /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/run_metricx_qe_8gpu_generic.sh
 # ============================================================
 #SBATCH --job-name=fs_metricx8
 #SBATCH --array=0-7%8
@@ -52,7 +52,7 @@ echo "BASE_OUTPUT_DIR=${BASE_OUTPUT_DIR}"
 echo "INPUT=${INPUT}"
 echo "OUTPUT=${OUTPUT}"
 
-cd /data/user_data/haolingp/data_synthesis/codes/metricx
+cd /home/haolingp/CMU_research_SMT/data_synthesis/codes/metricx
 PYTHONNOUSERSITE=1 python -m metricx24.predict           --tokenizer /data/user_data/haolingp/models/mt5-xl           --model_name_or_path /data/user_data/haolingp/models/metricx-24-hybrid-xl-v2p6           --max_input_length 1536           --batch_size 1           --input_file "${INPUT}"           --output_file "${OUTPUT}"           --qe
 
 echo "===== MetricX shard ${SLURM_ARRAY_TASK_ID:-0} DONE $(date) ====="

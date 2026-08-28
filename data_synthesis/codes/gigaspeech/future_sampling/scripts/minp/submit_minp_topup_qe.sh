@@ -10,7 +10,7 @@ set -e
 #   4. QE finalize + filter
 #   5. Merge: copy topup QE-passed JSONs into existing qe3 dir
 
-SCRIPT_DIR="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/scripts/minp"
+SCRIPT_DIR="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/scripts/minp"
 OUTPUT_BASE="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_debug/minp"
 QE_THRESHOLD=3.0
 

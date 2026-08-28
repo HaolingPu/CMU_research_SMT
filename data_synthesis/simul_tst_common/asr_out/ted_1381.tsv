@@ -1,0 +1,116 @@
+start	end	text
+0	22440	So a couple of years ago, I started a program to try to get the rock star tech and design
+22440	27520	people to take a year off and work in the one environment that represents pretty much
+27520	34400	everything they're supposed to hate. We have them work in government. The program is called
+34400	39720	Code for America, and it's a little bit like a Peace Corps for geeks. We select a few fellows
+39720	46100	every year, and we have them work with city governments. Instead of sending them off into
+46100	50280	the third world, we send them into the wilds of city hall, and there they make great apps.
+50280	54280	They work with city staffers, but really what they're doing is they're showing what's possible
+54280	61640	with technology today. So meet Al. Al is a fire hydrant in the city of Boston. Here it kind of
+61640	65960	looks like he's looking for a date, but what he's really looking for is for someone to shovel him
+65960	69960	out when he gets snowed in because he knows he's not very good at fighting fires when he's covered
+69960	76480	in four feet of snow. Now how did he come to be looking for help in this very unique manner? We
+76480	80240	had a team of fellows in Boston last year through the Code for America program. They were there in
+80240	85040	February, and it snowed a lot in February last year, and they noticed that the city never gets
+85040	90680	to digging out these fire hydrants. But one fellow in particular, a guy named Eric Michael Ober,
+90680	95800	noticed something else, and that's that citizens are shoveling out sidewalks right in front of
+95800	101200	these things. So he did what any good developer would do. He wrote an app. It's a cute little app
+101200	106360	where you can adopt a fire hydrant. So you agree to dig it out when it snows. If you do, you get to
+106360	111720	name it. He called the first one Al, and if you don't, someone can steal it from you. So it's got
+111720	117560	cute little game dynamics on it. So this is a modest little app. It's probably the smallest of
+117560	122360	the 21 apps that the fellows wrote last year, but it's doing something that no other government
+122360	129480	technology does. It's spreading virally. There's a guy in the IT department of the city of Honolulu
+129480	135400	who saw this app and realized that he could use it, not for snow, but to get citizens to adopt
+135440	141720	tsunami sirens. It's very important that these tsunami sirens work, but people steal the batteries
+141720	146880	out of them, so he's getting citizens to check on them. And then Seattle decided to use it to get
+146880	151960	citizens to clear out clogged storm drains, and Chicago just rolled it out to get people to sign
+151960	158320	up to shovel sidewalks when it snows. So we now know of nine cities that are planning to use this,
+158320	164400	and this is spread just frictionlessly, organically, naturally. If you know anything about government
+164400	170000	technology, you know that this isn't how it normally goes. Procuring software usually takes
+170000	175600	a couple of years. We had a team that worked on a project in Boston last year that took three
+175600	179920	people about two and a half months. It was a way that parents could figure out which were the right
+179920	184680	public schools for their kids. We were told afterwards that if that had gone through normal
+184680	190120	channels, it would have taken at least two years, and it would have cost about two million dollars.
+190120	196040	And that's nothing. There is one project in the California court system right now that so far
+196040	203000	cost taxpayers two billion dollars, and it doesn't work. And there are projects like this at every
+203000	209640	level of government. So an app that takes, you know, a couple of days to write and then spreads
+209640	215120	virally, that's sort of a shot across the bow to the institution of government. It suggests how
+215120	220440	government could work better. Not more like a private company, as many people think it should,
+220440	226320	and not even more like a tech company, but more like the internet itself. And that means
+226320	235040	permissionless, it means open, it means generative. And that's important. But what's more important
+235040	239680	about this app is that it represents how a new generation is tackling the problem of government.
+239680	247160	Not as the problem of an ossified institution, but as a problem of collective action. And that's
+247160	251920	great news, because it turns out we're very good at collective action with digital technology.
+251920	257040	Now there's a very large community of people that are building the tools that we need to do things
+257040	261920	together effectively. It's not just Code for America fellows, there are hundreds of people
+261920	267560	all over the country that are standing and writing civic apps every day in their own communities.
+267560	273960	They haven't given up on government. They are frustrated as hell with it, but they're not
+273960	279480	complaining about it, they're fixing it. And these folks know something that we've lost sight of,
+279480	285440	and that's that when you strip away all your feelings about politics and the line at the DMV
+285440	292240	and all those other things that we're really mad about, government is at its core, in the words of
+292240	300360	Tim O'Reilly, what we do together that we can't do alone. Now a lot of people have given up on
+300360	306520	government, and if you're one of those people I would ask that you reconsider, because things are
+306520	314800	changing. Politics is not changing, government is changing. And because government ultimately derives
+314800	321360	its power from us, remember we the people, how we think about it is going to affect how that change
+321360	327280	happens. Now I didn't know very much about government when I started this program, and like a lot of
+327280	332240	people I thought government was basically about getting people elected to office. Well after two
+332240	339600	years I've come to the conclusion that especially local government is about possums. This is the call
+339600	344800	center for the services and information line, it's generally where you will get if you call 311 in
+344800	351000	your city. If you should ever have the chance to staff your city's call center as our fellow Scott
+351040	356360	Silverman did as part of the program, in fact they all do that, you will find that people call
+356360	362280	government with a very wide range of issues, including having a possum stuck in your house. So Scott
+362280	367520	gets this call, he types possum into this official knowledge base, he doesn't really come up with
+367520	371760	anything, he starts with animal control, and finally he says look, you know, can you just open all the
+371760	377040	doors to your house and play music really loud and see if the thing leaves? So that worked, so
+377280	383200	boo you off for Scott. But that wasn't the end of the possums, Boston doesn't just have a call center,
+383200	388440	it has an app, a web and mobile app called Citizens Connect. Now we didn't write this app, this is the
+388440	393400	work of the very smart people in the Office of New Urban Mechanics in Boston, so one day this is an
+393400	400040	actual report, this came in, possum in my trash can, can't tell if it's dead, how do I get this removed?
+400040	407240	But what happens in Citizens Connect is different, so Scott was speaking person to person, but in
+407240	412520	Citizens Connect everything is public, so everybody can see this, and in this case a neighbor saw it,
+412520	419080	and the next report we got said, I walked over to this location, found the trash can behind the
+419080	425200	house, possum check, living, yep, turned trash can on its side, walked home, good night sweet possum.
+425200	434400	Pretty simple. So this is great, this is the digital meeting the physical, and it's also a great example
+434400	439720	of government getting in on the crowdsourcing game, but it's also a great example of government as a
+439720	445680	platform, and I don't mean necessarily a technological definition of platform here, I'm just talking about
+445680	452800	a platform for people to help themselves and to help others. So one citizen helped another citizen,
+452800	458800	but government played a key role here, it connected those two people, and it could have connected them
+458800	463360	with government services if they'd been needed, but a neighbor is a far better and cheaper
+463360	469200	alternative to government services. When one neighbor helps another, we strengthen our communities,
+469200	476520	we call animal control, it just costs a lot of money. Now one of the important things we need to
+476520	482120	think about government is that it's not the same thing as politics, and most people get that, but
+482120	487440	they think that one is the input to the other, that our input to the system of government is voting.
+487440	493240	Now how many times have we elected a political leader, and sometimes we spend a lot of energy
+493240	498680	getting a new political leader elected, and then we sit back and we expect government to reflect
+498680	507240	our values and meet our needs, and then not that much changes. That's because government is like a
+507360	515640	vast ocean, and politics is the six-inch layer on top, and what's under that is what we call bureaucracy,
+515640	523600	and we say that word with such contempt, but it's that contempt that keeps this thing that we own
+523600	531720	and we pay for as something that's working against us, this other thing, and then we're disempowering
+531720	538080	ourselves. People seem to think politics is sexy. If we want this institution to work for us,
+538080	544160	we're going to have to make bureaucracy sexy, because that's where the real work of government
+544160	550960	happens. We have to engage with the machinery of government, so that's what the Occupy SEC movement
+550960	555240	has done. Have you seen these guys? It's a group of concerned citizens that have written a very
+555360	561920	detailed 325-page report that's a response to the SEC's request for comment on the financial
+561920	569840	reform bill. That's not being politically active. That's being bureaucratically active. Now for those
+569840	575000	of us who've given up on government, it's time that we asked ourselves about the world that we
+575000	580240	want to leave for our children. You have to see the enormous challenges that they're going to
+580240	586840	face. Do we really think we're going to get where we need to go without fixing the one institution
+586840	593520	that can act on behalf of all of us? We can't do without government, but we do need it to be more
+593520	599200	effective. The good news is that technology is making it possible to fundamentally reframe the
+599200	606360	function of government in a way that can actually scale by strengthening civil society, and there's
+606360	610760	a generation out there that's grown up on the internet, and they know that it's not that hard
+610760	618280	to do things together. You just have to architect the systems the right way. Now the average age of
+618280	625560	our fellows is 28, so I am begrudgingly almost a generation older than most of them. This is a
+625560	630920	generation that's grown up taking their voices pretty much for granted. They're not fighting
+630920	636520	that battle that we're all fighting about who gets to speak. They all get to speak. They can
+636520	643240	express their opinion on any channel at any time, and they do. So when they're faced with the problem
+643240	651480	of government, they don't care as much about using their voices. They're using their hands. They're
+651480	656760	using their hands to write applications that make government work better, and those applications let
+656840	664200	us use our hands to make our communities better. That could be shoveling out a hydrant, pulling a
+664200	670920	weed, turning over a garbage can with a possum in it, and certainly we could have been shoveling out
+670920	677000	those fire hydrants all along, and many people do, but these apps are like little digital reminders
+677000	682280	that we're not just consumers, and we're not just consumers of government putting in our taxes and
+682280	690520	getting back services. We're more than that. We're citizens, and we're not going to fix government
+690520	699000	until we fix citizenship. So the question I have for all of you here, when it comes to the big
+699000	705960	important things that we need to do together, all of us together, are we just going to be a crowd of
+705960	713640	voices, or are we also going to be a crowd of hands? Thank you.

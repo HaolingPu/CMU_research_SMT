@@ -23,7 +23,7 @@ BASE_PYTHON="${CONDA_BASE}/bin/python"
 
 EXPERIMENT_DIR="${EXPERIMENT_DIR:-/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_debug/consensus-100-calib}"
 METRICX_RUN_DIR="${METRICX_RUN_DIR:-/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_debug/consensus-100-calib-metricx}"
-SUMMARY_SCRIPT="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/summarize_consensus_metrics.py"
+SUMMARY_SCRIPT="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/summarize_consensus_metrics.py"
 SUMMARY_TXT="${SUMMARY_TXT:-${METRICX_RUN_DIR}/overall_metrics.txt}"
 
 mkdir -p "$(dirname "${SUMMARY_TXT}")"

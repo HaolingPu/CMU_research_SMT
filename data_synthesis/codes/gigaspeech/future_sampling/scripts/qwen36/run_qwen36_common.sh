@@ -18,7 +18,7 @@ LABEL="${1:?Usage: bash run_qwen36_common.sh <label>}"
 TASK_ID="${SLURM_ARRAY_TASK_ID:-0}"
 JOB_ID="${OUTPUT_JOB_ID:-${SLURM_ARRAY_JOB_ID:-manual}}"
 
-CODE_DIR="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling"
+CODE_DIR="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling"
 GEMMA4_ENV="/data/user_data/haolingp/conda_envs/gemma4"
 PYTHON="${GEMMA4_ENV}/bin/python"
 VLLM="${GEMMA4_ENV}/bin/vllm"

@@ -1,0 +1,5 @@
+gigaspeech-ja-EAST-latency2mult-s_origin-bsz4_ja/v0-20260508-124226-hf/
+gigaspeech-ja-Simul-MuST-C-s_origin-bsz4_ja/v0-20260512-005349-hf/
+gigaspeech-ja-EAST-latency2mult-s_origin-bsz4_ja/v1-20260513-000506-hf/
+gigaspeech-ja-Simul-MuST-C-s_origin-bsz4_ja/v1-20260513-113320-hf/
+gigaspeech-ja-EAST-low-s_origin-bsz4_ja/v0-20260513-120121-hf/

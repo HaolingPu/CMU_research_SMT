@@ -26,7 +26,7 @@ conda activate vllm
 TASK_ID="${SLURM_ARRAY_TASK_ID:-0}"
 NUM_TASKS=8
 MANIFEST="/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_xl_case_robust_asr-filtered.tsv"
-PY_SCRIPT="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/gemini/llm_future_sampling_thinking_policy_gemini_future_distribution.py"
+PY_SCRIPT="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/gemini/llm_future_sampling_thinking_policy_gemini_future_distribution.py"
 OUTPUT_ROOT="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_future_sampling_thinking_gemini/gemini_future_distribution_local30b_100"
 SLURM_LOG_DIR="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_future_sampling_thinking_gemini/slurm_logs"
 

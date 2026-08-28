@@ -33,7 +33,7 @@ RUN_PYTHON="${GEMMA4_ENV}/bin/python"
 VLLM_BIN="${VLLM_BIN:-${GEMMA4_ENV}/bin/vllm}"
 export PATH="${GEMMA4_ENV}/bin:${PATH}"
 
-SCRIPT_DIR="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling"
+SCRIPT_DIR="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling"
 SERVE_SCRIPT_INSTRUCT="${SCRIPT_DIR}/serve_instruct_gpu0.sh"
 SERVE_SCRIPT_DUALBASE="${SCRIPT_DIR}/serve_dual_base_gpu1.sh"
 SCRIPT_PATH="${SCRIPT_DIR}/consensus_decoding_token_id_level.py"

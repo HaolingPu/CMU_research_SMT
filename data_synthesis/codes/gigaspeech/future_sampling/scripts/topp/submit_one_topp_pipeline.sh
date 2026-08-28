@@ -9,8 +9,8 @@ set -e
 LABEL="${1:?Usage: bash submit_one_topp_pipeline.sh <label> <val>}"
 VAL="${2:?Usage: bash submit_one_topp_pipeline.sh <label> <val>}"
 
-SCRIPT_DIR="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/scripts/topp"
-MINP_QE_DIR="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/scripts/minp"
+SCRIPT_DIR="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/scripts/topp"
+MINP_QE_DIR="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/scripts/minp"
 OUTPUT_ROOT="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_debug/topp/consensus_decoding_en_zh_topp_${VAL}"
 QE_THRESHOLD=3.0
 

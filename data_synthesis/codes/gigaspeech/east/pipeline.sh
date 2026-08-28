@@ -41,7 +41,7 @@ BASE=/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_east
 # ===========================
 rm -rf ${BASE}/llm_output_merged
 
-python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/post_process_llm_output_gigaspeech.py \
+python /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/post_process_llm_output_gigaspeech.py \
   --input-dir  ${BASE}/llm_output_raw \
   --output-dir ${BASE}/llm_output_merged \
   --overwrite
@@ -65,14 +65,14 @@ python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/post_process_llm
 # ===========================
 rm -rf ${BASE}/streaming_EAST_dataset
 
-python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/multi_trajectory_gigaspeech.py \
+python /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/multi_trajectory_gigaspeech.py \
   --llm-dir    ${BASE}/llm_output_merged \
   --output-dir ${BASE}/streaming_EAST_dataset \
   --chunk-ms 960 \
   --overwrite
 
 # 3-check) Quality check on streaming dataset
-python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/check_streaming_dataset.py \
+python /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/check_streaming_dataset.py \
   --stream_dir ${BASE}/streaming_EAST_dataset \
   --tsv        /data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_xl_case_robust_asr-filtered.tsv \
   --report     ${BASE}/check_streaming_report.json \
@@ -85,7 +85,7 @@ python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/check_streaming_
 conda deactivate
 conda activate metricx
 
-python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/convert_metricx_gigaspeech.py \
+python /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/convert_metricx_gigaspeech.py \
   --stream_dir ${BASE}/streaming_EAST_dataset \
   --output     ${BASE}/metricx_input.jsonl
 
@@ -108,7 +108,7 @@ split -d -n l/8 \
 # export PYARROW_IGNORE_TIMEZONE=1
 # export MKL_SERVICE_FORCE_INTEL=1
 
-# cd /data/user_data/haolingp/data_synthesis/codes/metricx
+# cd /home/haolingp/CMU_research_SMT/data_synthesis/codes/metricx
 # PYTHONNOUSERSITE=1 python -m metricx24.predict \
 #   --tokenizer /data/user_data/haolingp/models/mt5-xl \
 #   --model_name_or_path /data/user_data/haolingp/models/metricx-24-hybrid-xl-v2p6 \
@@ -127,7 +127,7 @@ cat ${BASE}/metricx_shards/output_*.jsonl \
 # ===========================
 # 6) Filter MetricX
 # ===========================
-python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/filter_metricx_gigaspeech.py \
+python /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/filter_metricx_gigaspeech.py \
   --input     ${BASE}/metricx_output.jsonl \
   --output    ${BASE}/metricx_filtered_t3.0.jsonl \
   --threshold 3.0
@@ -137,13 +137,13 @@ python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/filter_metricx_g
 # ===========================
 rm -rf ${BASE}/final_jsonl_dataset
 
-python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/final_output_gigaspeech.py \
+python /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/final_output_gigaspeech.py \
   --metricx_jsonl ${BASE}/metricx_filtered_t3.0.jsonl \
   --stream_dir    ${BASE}/streaming_EAST_dataset \
   --output_dir    ${BASE}/final_jsonl_dataset
 
 # 7-check) Quality check on final output
-python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/check_salami_final.py \
+python /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/check_salami_final.py \
   --tsv       /data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_xl_case_robust_asr-filtered.tsv \
   --manifest  ${BASE}/metricx_filtered_t3.0.jsonl \
   --final_dir ${BASE}/final_jsonl_dataset \

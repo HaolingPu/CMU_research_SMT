@@ -1,0 +1,181 @@
+start	end	text
+0	17920	Good afternoon, everybody.
+17920	40040	I got something to show you.
+40040	43480	Think about this as a pixel, a flying pixel.
+43480	46600	This is what we call in our lab sensible design.
+46600	48240	Let me tell you a bit about it.
+48240	52460	If you take this picture, I'm Italian originally, and every boy in Italy grows up with this
+52460	55160	picture on the wall of his bedroom.
+55160	59680	But the reason I'm showing you this is that something very interesting happened in Formula
+59680	62700	One racing over the past couple of decades.
+62700	67880	Now some time ago, if you wanted to win a Formula One race, you take a budget and you
+67880	72960	bet your budget on a good driver and a good car, and if the car and the driver were good
+72960	75440	enough, then you win the race.
+75440	80040	Today, if you want to win the race, actually you need also something like this.
+80040	85800	Something that monitors the car in real time, has a few thousand sensors collecting information
+85800	91360	from the car, transmitting this information into the system, and then processing it and
+91360	96720	using it in order to go back to the car with decisions and changing things in real time
+96720	98860	as information is collected.
+98860	103680	This is what in engineering terms you would call a real-time control system.
+103680	109800	And basically, it's a system made of two components, sensing and an actuating component.
+109800	114200	What is interesting today is that real-time control systems are entering, starting to
+114200	116120	enter into our life.
+116120	122820	Our cities, over the past few years, just have been blanketed with networks, electronics.
+122820	127080	They're becoming like computers in open air, and as computers in open air, they're starting
+127080	132220	to respond in a different way, to be able to be sensed and to be actuated.
+132220	134300	If we fix cities, actually it's a big deal.
+134300	139660	Just as an aside, I wanted to mention cities are only 2% of the Earth's crust, but they
+139660	142500	are 50% of the world's population.
+142500	148780	They're 75% of energy consumption, up to 80% of CO2 emissions.
+148780	152220	So if you're able to do something with cities, that's a big deal.
+152220	159220	Beyond cities, all of this, sensing and actuating, is entering our everyday objects.
+159260	164620	That's from an exhibition that Paolo Antonelli is organizing at MoMA later this year, during
+164620	168780	the summer, it's called Talk to Me, where our objects, our environment, is starting
+168780	170380	to talk back to us.
+170380	175520	In a certain sense, it's almost as if every atom out there were becoming both a sensor
+175520	180540	and an actuator, and that is radically changing the interaction we have as humans with the
+180540	182660	environment out there.
+182660	187600	In a certain sense, it's almost as if the old dream of Michelangelo, when Michelangelo
+187600	191960	sculpted the Moses, at the end it's said that he took the hammer, threw it at the Moses,
+191960	198960	actually you can still see a small chip underneath, and said, shouted, why don't you talk?
+199280	203400	Well today, for the first time, our environment is starting to talk back to us.
+203400	208040	And I'll show just a few examples, again with this idea of sensing our environment
+208040	209720	and actuating it.
+209720	211000	Let's start with sensing.
+211000	215540	Well, the first project I wanted to share with you is actually one of the first projects
+215540	216540	by our lab.
+216540	221980	Which was four and a half years ago in Italy, and what we did there was actually use a new
+221980	226580	type of network at the time that had been deployed all across the world, that's a cell
+226580	230740	phone network, and use anonymous aggregated information from that network that's collected
+230740	235900	anyway by the operator in order to understand how the city works.
+235900	242160	The summer was a lucky summer, 2006, it's when Italy won the soccer World Cup.
+242160	245820	Some of you might remember it was Italy and France playing, and then Zidane at the end
+245820	249780	the head-butting, anyway, Italy won at the end.
+249780	256780	Now, look at what happened that day just by monitoring activity happening on the network.
+257300	264300	Here you see the city, you see the Colosseum in the middle, the river Tevere, it's morning
+265560	271900	before the match, you see the timeline on the top, early afternoon, people here and
+271900	275080	there making calls and moving.
+275080	281820	The match begins, silence, France scores, Italy scores, half-time, people make a quick
+281820	288820	call and go to the bathroom, second half, end of normal time, first overtime, second,
+289120	296120	Zidane the head-butting in the moment, Italy wins, yeah.
+298480	303300	Well that night everybody went to celebrate in the center, you saw the big peak, the following
+303320	308820	day again, everybody went to the center to meet the winning team and the Prime Minister
+308820	312860	at the time, and then everybody moved down, you see it in the image at the place called
+312860	317440	Chirco Massimo, where since Roman times people go to celebrate, to have a big party and you
+317440	319380	see the peak at the end of the day.
+319380	323600	Well that's just one example how we can sense the city today in a way that we couldn't have
+323600	325800	done just a few years ago.
+325800	330600	Another quick example about sensing, it's about, not about people, but it's about things
+330600	332120	we use and consume.
+332120	337460	Well today we know everything about where our objects come from, this is a map that
+337460	343420	shows you all the chips that form a Mac computer, how they came together, but we know very little
+343420	344960	about where things go.
+344960	351100	So in this project we actually developed some small tags to track trash as it moves through
+351100	352140	the system.
+352140	357900	So we actually started with a number of volunteers who helped us in Seattle just over a year
+357900	364800	ago to tag what they were throwing away, different type of things as you can see here, things
+364800	371400	they would throw away anyway, then we put a little chip, little tag onto the trash and
+371400	373320	then started following it.
+373320	379060	Here are the results we just obtained.
+379060	387480	From Seattle.
+387480	413720	Another one week.
+413720	417560	With this information we realised there's a lot of inefficiencies in the system, we
+417560	422120	can actually do the same thing with much less energy, this data was not available before
+422120	426100	but there's a lot of wasted transportation and convoluted things happening.
+426100	430260	But the other thing is that we believe that actually if we see everyday that the cap we
+430260	434460	are throwing away, it doesn't disappear, it's still somewhere on the planet and the plastic
+434460	438560	bottle we are throwing away everyday still stays there and we show that to people, then
+438560	440960	we can also promote some behavioural change.
+440960	446000	So that was the reason for the project, my colleague could tell you much more about sensing
+446000	449720	and many other wonderful things we can do with sensing but I wanted to go to the second
+449720	453760	part we discussed at the beginning and that's actuating our environment.
+453760	459240	And the first project is something we did a couple of years ago in Zaragoza, Spain.
+459240	464400	It started with a question by the mayor of the city who came to us saying that Spain
+464400	470040	and southern Europe have a beautiful tradition of using water in public space, in architecture,
+470040	474400	and the question was how could technology, new technology be added to that?
+474400	477600	And one of the ideas was developed at MIT in a workshop was imagine you've got this
+477600	483880	pipe and you've got valves, solenoid valves, tabs, opening and closing you create like
+483880	489940	a water curtain with pixels made of water, those pixels fall and you can write on it,
+489940	495120	you can show patterns, images, text and even you can approach it and it will open up to
+495120	499400	let you jump through as you see in this image.
+499400	503800	Well we presented this to Mayor Belioc, he liked it very much and we got a commission
+503800	506560	to design a building at the entrance of the expo.
+506560	514920	We called it Digital Water Pavilion, the whole building is made of water.
+514920	518800	There's no doors or windows but when you approach it, it will open up to let you in.
+529400	540260	The roof also is covered with water and if there's a bit of wind, if you want to minimize
+540260	547400	splashing you can actually lower the roof or you could close the building and the whole
+547400	551080	architecture will disappear like in this case.
+551080	554160	You know these days they always get emails during the winter when they take the roof
+554160	557800	down of people who've been there and say you know they demolished the building and no they
+557800	562480	didn't demolish it, just when it goes down the architecture almost disappear.
+562480	568000	Here's the building working, you see the person puzzled about what was going inside.
+568000	572880	Here it was myself trying not to get wet, testing the sensors that opened the water.
+572880	578120	Well I should tell you now what happened one night when all of the sensors stopped working
+578120	581080	but actually that night it was even more fun.
+581080	584760	All the kids from Zaragoza came to the building because the way of engaging with the building
+584760	586000	became something different.
+586000	589680	Not anymore a building that would open up to let you in but a building that would still
+589680	607080	make cuts and holes through the water and you had to jump without getting wet.
+607080	612080	And that was for us was very interesting because as architects, as engineers, as designers
+612080	616400	we always think about how people will use the things we design but then reality is always
+616400	621640	unpredictable and that's the beauty of doing things that are used and interact with people.
+621640	627000	Here is an image then of the building with the physical pixels, the pixels made of water
+627000	631240	and then projections on them and this is what led us to think about the following project
+631240	632640	I'll show you now.
+632640	635600	That's imagine those pixels could actually start flying.
+635600	640760	Imagine you know you could have small helicopters that move in the air and then each of them
+640760	646360	with a small pixel and changing lights almost as a cloud that can move in space.
+646360	653960	Here is the idea.
+653960	666600	So imagine one helicopter like the one we saw before moving with others in synchrony
+666600	675680	so you can have this cloud.
+675680	681160	You can have a kind of flexible screen or display like this, a regular configuration
+681160	693840	in two dimensions or in regular but in three dimensions where the thing that change is
+693840	707040	the light, not the pixels position.
+707040	711480	You can play with different type, imagine your screen could just appear in different
+711480	729200	scale or sizes, different type of resolution but then the whole thing can be a 3D kind
+729200	736200	of cloud of pixels that you can approach and move through it and see from many directions.
+736200	741600	Here is the real fly fire control and going down from the regular grid as before.
+741600	745420	When you turn on the light actually you see this, so the same we saw before and imagine
+745420	747400	each of them then controlled by people.
+747400	751680	You can have each pixel having an input that comes from people, from people's movement
+751680	752680	or so on.
+752680	756280	So I wanted to show you something here for the first time is we've been working with
+756280	761760	Roberto Bolle, one of today's top ballet dancers, the Etoualles at Metropolitan in New York
+761760	767120	and Lascale in Milan and actually captured his movement in 3D in order to use it as an
+767120	768760	input for fly fire.
+768760	774560	And here you can see Roberto dancing.
+774560	779320	You see on the left the pixels, the different resolution being captured, it's both 3D scanning
+779320	783680	in real time and motion capture.
+783680	788280	So you can reconstruct the whole movement.
+788280	797040	You can go all the way to...
+797040	800740	But then once you have the pixels then you can play with them and play with color and
+800740	805080	movement and gravity and rotation.
+805080	827720	So we want to use this as one of the possible inputs for fly fire.
+827720	830080	I wanted to show you the last project we are working on.
+830080	832680	It's something we're working on for the lantern Olympics.
+832680	833680	It's called the cloud.
+833680	838720	And the idea here is imagine that, again, we can involve people in doing something and
+838720	844320	changing our environment and almost doing what we call cloud raising, like barn raising
+844320	845320	but with a cloud.
+845320	848520	Imagine you can have everybody make a small donation for one pixel.
+848520	853340	And I think what is remarkable that happens over the past couple of years is that over
+853340	858160	the past couple of decades we went from the physical world to the digital one.
+858160	862520	This has been digitizing everything, knowledge and making that accessible through the internet.
+862520	866980	Now today for the first time, and the Obama campaign showed us that, we can go from the
+866980	872120	digital world, from the self-organizing power of networks to the physical one.
+872120	876560	This can be in our case we want to use it for designing and doing a symbol, doing something
+876560	878280	built in a city.
+878280	883240	But tomorrow it can be in order to tackle today's pressing challenges, think about climate
+883240	887800	change or CO2 emission, how we can go from the digital world to the physical one.
+887800	892280	So the idea that can we actually involve people in doing this thing together collectively,
+892280	897280	our cloud is a cloud again made of pixel in the same way as a real cloud is a cloud
+897280	900600	made of particles and those particles are water.
+900600	904700	Where our cloud is a cloud of pixel, is a physical structure in London but covered with
+904700	905700	pixel.
+905700	909200	You can move inside with different type of experiences, you can actually see it from
+909200	916560	underneath, sharing the main moments for the Olympics in 2012 and beyond and really using
+916560	918740	it as a way to connect with the community.
+918740	926940	So both physical cloud into the sky and something you can go to the top like a London's new
+926940	933120	mountain top, you can enter inside it and a kind of new digital beacon for the night
+933120	938260	but most importantly a new type of experience for anybody who will go to the top.
+938260	938540	Thank you.

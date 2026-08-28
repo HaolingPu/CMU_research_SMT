@@ -3,7 +3,7 @@ set -e
 
 # Submit the min-p=0.1 (1em1) pipeline: gen + QE prepare/predict/finalize.
 
-MINP_DIR="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/scripts/minp"
+MINP_DIR="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/scripts/minp"
 OUTPUT_ROOT="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_debug/minp/consensus_decoding_en_zh_minp_0.1"
 QE_THRESHOLD=3.0
 

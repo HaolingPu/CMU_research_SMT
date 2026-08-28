@@ -1,0 +1,81 @@
+start	end	text
+0	29400	In the 1980s, in the communist Eastern Germany, if you owned a typewriter,
+29400	38400	you had to register it with the government. You had to register a sample sheet of text out of the typewriter,
+38400	43400	and this was done so the government could track where text was coming from.
+43400	53400	If they found a paper which had wrong kinds of thoughts, they could track down who created that thought.
+53400	62400	And we in the West couldn't understand how anybody would do this, how much this would restrict freedom of speech.
+62400	67400	We would never do that in our own countries.
+67400	79400	But today, in 2011, if you go and buy a color laser printer from any major laser printer manufacturer and print a page,
+79400	92400	that page will end up having slight yellow dots printed on every single page in a pattern which makes the page unique to you and to your printer.
+92400	102400	This is happening to us today. And nobody seems to be making a fuss about it.
+103400	116400	And this is an example on the ways that our own governments are using technology against us, the citizens.
+116400	121400	And this is one of the main three sources of online problems today.
+121400	127400	If we look at what's really happening in the online world, we can group the attacks based on the attackers.
+127400	129400	We have three main groups.
+129400	135400	We have online criminals, like here we have Mr. Dmitry Kolubov from the city of Kiev in Ukraine.
+135400	140400	And the motives of online criminals are very easy to understand.
+140400	142400	These guys make money.
+142400	148400	They use online attacks to make lots of money, and lots and lots of it.
+148400	155400	We actually have several cases of millionaires online, multi-millionaires who made money with their attacks.
+155400	158400	Here's Vladimir Cacin from Tartu in Estonia.
+158400	164400	This is Alfred Gonzalez. This is Steven Watt. This is Björn Sundin.
+164400	169400	This is Matthew Anderson, Tariq Aldeur, and so on and so on.
+169400	182400	These guys make their fortunes online, but they make it through the illegal means of using things like banking trojans to steal money from our bank accounts while we do online banking.
+182400	190400	Or with keyloggers to collect our credit card information while we are doing online shopping from an infected computer.
+190400	198400	The US Secret Service two months ago froze the Swiss bank account of Mr. Sam Jain right here.
+198400	203400	And that bank account had 14.9 million US dollars on it when it was frozen.
+203400	207400	Mr. Jain himself is on the loose. Nobody knows where he is.
+208400	221400	And I claim it's already today that it's more likely for any of us to become a victim of a crime online than here in the real world.
+221400	229400	And it's very obvious that this is only going to get worse. In the future, the majority of crime will be happening online.
+230400	238400	The second major group of attackers that we are watching today are not motivated by money. They're motivated by something else.
+238400	244400	Motivated by protest, motivated by an opinion, motivated by the laughs.
+244400	254400	Groups like Anonymous have risen up over the last 12 months and have become a major player in the field of online attacks.
+255400	259400	So those are the three main attackers. Criminals who do it for the money.
+259400	263400	Hacktivists like Anonymous doing it for the protest.
+263400	269400	But then the last group are nation states. Governments doing the attacks.
+271400	275400	And then we look at cases like what happened in Diginotar.
+275400	281400	This is a prime example of what happens when governments attacks against their own citizens.
+282400	288400	Diginotar is a certificate authority from the Netherlands. Or actually it was.
+288400	295400	It was running the bankruptcy last fall because they were hacked into.
+295400	299400	Somebody broke into and they hacked it thoroughly.
+299400	306400	And I asked last week in a meeting with Dutch government representatives.
+307400	319400	I asked one of the leaders of the team whether he found plausible that people died because of the Diginotar hack.
+321400	324400	And his answer was yes.
+325400	330400	So how do people die as a result of a hack like this?
+330400	336400	Well Diginotar is a CA. They sell certificates. What do you do with certificates?
+336400	342400	Well you need a certificate if you have a website that has HTTPS, SSL encrypted services.
+342400	346400	Services like Gmail.
+346400	350400	Now we all, a big part of us, uses Gmail as one of their competitors.
+350400	356400	But these services are especially popular in totalitarian states like Iran.
+356400	361400	Where dissidents use foreign services like Gmail.
+361400	367400	Because they know they are more trustworthy than the local services and they are encrypted over SSL connections.
+367400	371400	So the local government can snoop on their discussions.
+371400	376400	Except they can if they hack into a foreign CA and issue rogue certificates.
+376400	381400	And this is exactly what happened with the case of Diginotar.
+382400	389400	What about Arab Spring and things that have been happening for example in Egypt?
+389400	397400	Well in Egypt the rioters looted the headquarters of the Egypt secret police in April 2011.
+397400	400400	And when they were looting the building they found lots of papers.
+400400	404400	Among those papers this binder titled Fin Fisher.
+404400	409400	And within that binder were notes from a company based in Germany.
+409400	420400	Which had sold the Egypt government a set of tools for intercepting and in very large scale all the communication of the citizens of the country.
+420400	425400	They had sold this tool for 280,000 euros to the Egypt government.
+425400	428400	The company headquarters are right here.
+428400	435400	So western governments are providing totalitarian governments with tools to do this against their own citizens.
+435400	439400	But western governments are doing it themselves as well.
+439400	446400	For example in Germany just a couple of weeks ago the so called Stadts Trojan was found.
+446400	452400	Which was a Trojan used by German government officials to investigate their own citizens.
+452400	458400	If you are a suspect in a criminal case, well it's pretty obvious your phone will be tapped.
+458400	461400	But today it goes beyond that.
+461400	468400	They will tap your internet connection, they will even use tools like Stadts Trojan to infect your computer with a Trojan.
+468400	477400	Which enables them to watch all your communication, to listen to your online discussions, to collect your passwords.
+477400	494400	And when we think deeper about things like this, the obvious response from people should be that okay well that sounds bad.
+494400	498400	But that doesn't really affect me because I'm a legal citizen.
+498400	501400	Why should I worry because I have nothing to hide.
+501400	505400	And this is an argument which doesn't make sense.
+506400	513400	Privacy is implied. Privacy is not up for discussion.
+513400	522400	This is not a question between privacy against security.
+522400	528400	It's a question of freedom against control.
+529400	539400	And while we might trust our governments right now, right here in 2011, any rights we give away will be given away for good.
+539400	547400	And do we trust, do we blindly trust any future government, a government we might have 50 years from now?
+551400	556400	And these are the questions that we have to worry about for the next 50 years.
+558400	562400	Thank you for watching.

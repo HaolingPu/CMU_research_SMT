@@ -1,0 +1,198 @@
+start	end	text
+0	7000	Because I usually take the role of trying to explain to people how wonderful the new
+22200	27520	technologies that are coming along are going to be. And I thought that since I was among
+27520	34520	friends here, I would tell you what I really think. And try to look back and try to understand
+35000	42000	what is really going on here with these amazing jumps in technology. It seems so fast that
+43960	48760	we can barely keep on top of it. So I'm going to start out by showing just one very boring
+48760	55760	technology slide. And then, so if you can just turn on the slide that's on. This is
+55760	62720	just a random slide that I picked out of my file. And what I want to show you is not so
+62720	66680	much the details of this slide, but the general form of it. This happens to be a slide of
+66680	72560	some analysis that we were doing about the power of risk microprocessors versus the power
+72560	79480	of local area networks. And the interesting thing about it is that this slide, like so
+79480	85000	many technology slides that we're used to, is a sort of a straight line on a semi-log
+85000	92000	curve. In other words, every step here represents an order of magnitude and performance gain.
+92160	96920	And we're sort of the, this is a new thing that we talk about technology on semi-log
+96920	101440	curve. Something really weird is going on here. And that's basically what I'm going
+101440	108440	to be talking about. So if you bring up the lights. If you could bring up the lights higher
+109680	114960	because I'm just going to use a piece of paper here. Now, why do we draw technology curves
+114960	120480	on semi-log curves? Well, the answer is if I drew it on a normal curve, where let's say
+120480	127000	this is years, this is time of some sort, and this is whatever measure of the technology
+127000	134000	that I'm trying to graph, the graphs look sort of silly. They sort of go like this.
+134840	141840	And they don't tell us much. Now, if I graph, for instance, some other technology, say transportation
+143400	147680	technology, on a semi-log curve, it would look very stupid. It would look like a flat
+147680	153280	line. But when something like this happens, things are qualitatively changing. So if transportation
+153280	159680	technology was moving along as fast as microprocessor technology, then sort of day after tomorrow
+159760	165560	I would be able to get in a taxi cab and be in Tokyo in 30 seconds. It's not moving like
+165560	170040	that. And there's nothing precedented in the history of technology development of this
+170040	175640	kind of self-feeding growth where you go by orders of magnitude every few years. Now,
+175640	181920	the question that I'd like to ask is if you look at these exponential curves, they don't
+181920	188920	go on forever. Things just can't possibly keep changing as fast as they are. One of
+189240	195520	two things is going to happen. Either it's going to turn into sort of classical S-curve
+195520	202520	like this until something totally different comes along. Or maybe it's going to do this.
+203000	207800	That's about all it can do. Now, I'm an optimist, so I sort of think it's probably going to
+207800	212900	do something like that. If so, that means that what we're in the middle of right now
+212900	217600	is a transition. We're sort of on this line in a transition from the way that the world
+217600	222880	used to be to some new way that the world is. And so what I'm trying to ask, and I've
+222880	227840	been asking myself, is what's this new way that the world is? What's the new state that
+227840	233160	the world is heading toward? Because the transition seems very, very confusing when we're right
+233160	240040	in the middle of it. Now, when I was a kid growing up, the future was kind of the year
+240040	247040	2000. And people used to talk about what would happen in the year 2000. Now, here's a conference
+247200	251040	in which people talk about the future. And you notice that the future is still at about
+251040	255400	the year 2000. That's about as far as we go out. So, in other words, the future has kind
+255400	262400	of been shrinking one year per year for my whole lifetime. Now, I think that the reason
+264760	270040	is, is because we all feel that something's happening there. That transition is happening.
+270040	274680	We can all sense it. And we know that it just doesn't make too much sense to think out 30,
+274680	279280	30, 50 years. Because everything's going to be so different that a simple extrapolation
+279280	284280	of what we're doing just doesn't make any sense at all. So, what I would like to talk
+284280	290480	about is what that could be, what that transition could be that we're going through. Now, in
+290480	295840	order to do that, I'm going to have to talk about a bunch of stuff that really has nothing
+295840	300280	to do with technology and computers. Because I think the only way to understand this is
+300320	306440	to really step back and take a long time scale look at things. So, the time scale that I
+306440	313440	would like to look at this on is the time scale of life on Earth. So, I think this picture
+315480	321440	makes sense if you look at it a few billion years at a time. So, if you go back about
+321440	327000	two and a half billion years, the Earth was this big, sterile hunk of rock with a lot
+327040	333080	of chemicals floating around on it. And if you look at the way that the chemicals got
+333080	339360	organized, we begin to get a pretty good idea of how they do it. And I think that there's
+339360	342440	theories that are beginning to understand about how it started with RNA. But I'm going
+342440	348060	to tell a sort of simple story of it, which is that at that time there were little drops
+348060	353560	of oil floating around with all kinds of different recipes of chemicals in them. And some of
+353600	358400	those drops of oils had a particular combination of chemicals in them, which caused them to
+358400	363640	incorporate chemicals from the outside and grow the drops of oil. And those that were
+363640	369480	like that started to split and divide. And those were the most primitive forms of cells
+369480	374600	in a sense, those little drops of oil. But now, those drops of oil weren't really life
+374600	379120	as we say it now because every one of them was a little random recipe of chemicals. And
+379120	384920	sometime it divided something different. I mean, it got sort of unequal division of
+384920	390000	the chemicals within it. And so every drop was a little bit different. In fact, the drops
+390000	393920	that were different in a way that caused them to be better at incorporating chemicals around
+393920	399880	them grew more, incorporated more chemicals, and divided more. So those tended to live
+399880	406880	longer, get expressed more. Now, that's sort of just a very simple chemical form of life.
+407880	414880	But when things got interesting was when these drops learned a trick of abstraction. Somehow,
+417240	422120	by ways that we don't quite understand, these little drops learned to write down information.
+422120	427760	They learned to record the information that was the recipe of the cell onto a particular
+427760	434080	kind of chemical called DNA. So in other words, they worked out in this sort of mindless evolutionary
+434080	439600	way a form of writing that let them write down what they were so that that way of writing
+439600	444680	it down could get copied. The amazing thing is that that way of writing seems to have
+444680	449320	stayed steady since it evolved two and a half billion years ago. In fact, the recipe for
+449320	454680	us, our genes is exactly that same code in that same way of writing. In fact, every living
+454680	460000	creature is sort of written in exactly the same set of letters in the same code. In fact,
+460000	464040	one of the things that I did just for amusement purposes is we can now write things in this
+464040	471040	code. And I've got here a little 100 micrograms of white powder, which I try not to let the
+473000	480000	security people see at airports. But this has in it, what I did is I took this code.
+480760	485000	The code has standard letters that we use for symbolizing it. And I wrote my business
+485000	490880	card onto a piece of DNA and amplified it 10 to the 22 times. So if anyone would like
+490880	494800	100 million copies of my business card, I have money for everyone in the room, and in
+494800	501800	fact everyone in the world. And it's right here. So if I had really been an egotist,
+508480	515480	I would have put it into a virus and released it in the room. So what was the next step?
+521520	525920	Writing down the DNA was an interesting step. And that caused these cells to, that kept
+525920	529920	them happy for another billion years. But then there was another really interesting
+529920	534540	step where things became completely different, which is these cells started exchanging and
+534540	538840	communicating information so that they began to get communities of cells. I don't know
+538840	544400	if you know this, but bacteria can actually exchange DNA. That's why, for instance, antibiotic
+544400	549400	resistance has evolved. Some bacteria figured out how to stay away from psilon, and it went
+549440	554680	around sort of trading its little DNA information with other bacteria, and now we have a lot
+554680	560480	of bacteria that are resistant to psilon because bacteria communicate. Now what this communication
+560480	565520	allowed was communities to form that in some sense were in the same boat together. They
+565520	571800	were synergistic. So they survived or they failed together, which means that if a community
+571800	577760	was very successful, all the individuals in that community were repeated more, and they
+577800	583320	were favored by evolution. Now the transition point happened when these communities got
+583320	588320	so close that in fact they got together and decided to write down the whole recipe for
+588320	594240	the community together on one string of DNA. And so the next stage that's interesting
+594240	600320	in life took about another billion years. And at that stage, we have multicellular communities,
+600320	604280	communities of lots of different types of cells working together as a single organism.
+604560	609880	And in fact, we're such a multicellular community. We have lots of cells that are not out for
+609880	616360	themselves anymore. Your skin cell is really useless without a heart cell, a muscle cell,
+616360	621880	a brain cell, and so on. So these communities began to evolve so that the interesting level
+621880	626560	on which evolution was taking place was no longer a cell, but a community which we call
+626560	633560	an organism. Now the next step that happened is within these communities, these communities
+634040	639520	of cells again began to abstract information. And they began building very special structures
+639520	644600	that did nothing but process information within the community. And those are the neural structures.
+644600	649520	So neurons are the information processing apparatus of those communities of cells built
+649520	655040	up. And in fact, they began to get specialists in the community in special structures that
+655040	660960	were responsible for recording, understanding, learning information. And that was the brains
+661000	666400	and the nervous system of those communities. And that gave them an evolutionary advantage
+666400	673400	because at that point, an individual, things, learning could happen within the time span
+674240	680440	of a single organism instead of over this evolutionary time span. So an organism could
+680440	684360	for instance learn not to eat a certain kind of fruit because it tasted bad and it got
+684360	689760	sick last time it ate it. That could happen within the lifetime of a single organism whereas
+689800	694280	before they had built those special information processing structures, that would have had
+694280	700720	to be learned evolutionarily over hundreds of thousands of years by the individuals dying
+700720	705480	off today that kind of fruit. So that nervous system, the fact that they built those special
+705480	710560	information structures tremendously speeded up the whole process of evolution because
+710560	716920	evolution could now happen within an individual. It could happen in learning time scale. Then
+716920	722360	what happened was the individuals worked out, of course, tricks of communicating. And
+722360	727400	for example, the most sophisticated version that we're aware of is human language. It's
+727400	732760	really a pretty amazing invention if you think about it. Here I have a very complicated messy
+732760	738280	confused idea in my head. I'm sitting here making grunting sounds basically and hopefully
+738280	743480	constructing a similar messy confused idea in your head that bears some analogy to it.
+743480	747960	So we're taking something very complicated, turning it into sound, sequence of sounds
+747960	754960	and producing something very complicated in your brain. So this allows us now to begin
+755000	762000	to start functioning as a single organism. And so in fact what we've done is we, humanity,
+763800	768120	have started abstracting out, we're going through the same levels that multicellular
+768120	773760	organisms have gone through, abstracting out our methods of recording, presenting, processing
+773760	780760	information. So for example, the invention of language was a tiny step in that direction.
+780760	787160	Telephony, computers, videotapes, CD-ROMs, so on are all our specialized mechanisms that
+787160	794160	we've now built within our society for handling that information. And it all connects us together
+794360	801360	into something that is much bigger and much faster and able to evolve than what we were
+802640	808920	before. So now evolution can take place on the scale of microseconds. And you saw Kai's
+808920	813440	little evolutionary example where he sort of did a little bit of evolution of a convolution
+813440	817960	program right before your eyes. So now we've speeded up the timescales once again. So the
+817960	822360	first steps of the story that I told you about took a billion years of peace. And the next
+822400	828400	steps like nervous systems and brains took a few hundred million years. And the next
+828400	833760	steps like language and so on took less than a million years. And these next steps like
+833760	838480	electronics seems to be taking only a few decades. And the process is feeding on itself
+838480	844360	and becoming I guess autocatalytic is the word for it. When something reinforces its
+844360	848800	rate of change, the more it changes the faster it changes. And I think that that's what we're
+848840	854120	seeing here in this explosion of curve. We're seeing this process feeding back on itself.
+854120	861120	Now I design computers for a living. And I know the mechanisms that I use to design computers
+862000	868240	would be impossible without recent advances in computers. So right now what I do is I
+868240	873360	design objects at such complexity that it's really impossible for me to design them in
+873360	877880	the traditional sense. I don't know what every transistor in a connection machine does. There
+877960	884960	are billions of them. Instead what I do and what the designers at Thinking Machines do
+884960	889560	is we think at some level of abstraction and then we hand it to the machine and the machine
+889560	894240	takes it beyond what we could ever do. Much farther and faster than what we could ever
+894240	900560	do. And in fact sometimes it takes it by methods that we don't quite even understand. One method
+900560	907120	that's particularly interesting that I've been using a lot lately is evolution itself.
+907120	913200	So what we do is we put inside the machine a process of evolution that takes place on
+913200	919480	the microsecond time scale. So for example in the most extreme cases we can actually
+919480	926300	evolve a program by starting out with random sequences of instructions. Say computer would
+926300	930840	you please make a hundred million random sequences of instructions. Now would you please run
+930840	934960	all of those random sequences of instructions, run all of those programs and pick out the
+934960	940240	ones that came closest to do what I wanted. So in other words I define what I wanted.
+940240	945160	Let's say I want to sort numbers as a simple example I've done. So find the programs that
+945160	950040	come closest to sorting numbers. So of course random sequences of instructions are very
+950040	954800	unlikely to sort numbers. So none of them will really do it. But one of them by luck
+954800	961280	may put two numbers in the right order. And I say to the computer would you please now
+961320	966280	take the 10% of those random sequences that did the best job, save those, kill off the
+966280	972480	rest and now let's reproduce the ones that sorted numbers the best. And let's reproduce
+972480	977640	them by a process of recombination analogous to sex. Take two programs and they produce
+977640	983120	children by exchanging their subroutines and the children inherit the traits, the subroutines
+983120	988160	of the two programs. So I've got now a new generation of programs that are produced by
+988160	994040	combinations of the programs that did a little bit better job. Say please repeat that process,
+994040	998440	score them again, introduce some mutations perhaps and try that again and do that for
+998440	1003720	another generation. Well every one of those generations just takes a few milliseconds.
+1003720	1008400	So I can do the equivalent of millions of years of evolution on that within the computer
+1008400	1013840	in a few minutes or in the complicated cases in a few hours. At the end of that I end up
+1013880	1018320	with programs that are absolutely perfect at sorting numbers. In fact they are programs
+1018320	1022760	that are much more efficient than programs I could have ever written by hand. Now if
+1022760	1026920	I look at those programs I can't tell you how they work. I've tried looking at them
+1026920	1032480	and tell you how they work. They're obscure, weird programs. But they do the job and in
+1032480	1036880	fact I know I'm very confident that they do the job because they come from a line of hundreds
+1036880	1041880	of thousands of programs that did the job. In fact their life depended on doing the job.
+1041880	1048880	I was writing in a 747 with Marvin Minsky once and he pulls out this card and he said
+1052640	1058960	oh look, look at this, it says this plane has hundreds of thousands of tiny parts working
+1058960	1065960	together to make you a safe flight. Doesn't that make you feel confident? In fact we know
+1066600	1070920	that the engineering process doesn't work very well when it gets complicated. So we're
+1070960	1076960	beginning to depend on computers to do a process that's very different than engineering. And
+1076960	1082640	it lets us produce things of much more complexity than normal engineering lets us produce. And
+1082640	1086800	yet we don't quite understand the objects of it. So in a sense it's getting ahead of
+1086800	1091840	us. We're now using those programs to make much faster computers so that we'll be able
+1091840	1098280	to run this process much faster. So it's feeding back on itself. The thing is becoming faster
+1098280	1102520	and that's why I think it seems so confusing because all of these technologies are feeding
+1102520	1108920	back on themselves. We're taking off. And what we are is we're at a point in time which
+1108920	1113880	is analogous to when single cell organisms were turning into multi cell organisms. So
+1113880	1118520	we're the amoebas and we can't quite figure out what the hell this thing is we're creating.
+1118520	1123060	We're right at that point of transition. But I think that there really is something coming
+1123060	1127540	along after us. I think it's very haughty of us to think that we're the end product
+1127540	1134540	of evolution. And I think all of us here are a part of producing whatever that next thing
+1134660	1140660	is. So lunch is coming along and I think I will stop at that point before I get selected
+1140660	1140940	out.

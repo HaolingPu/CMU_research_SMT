@@ -1,0 +1,65 @@
+{
+  "utt_id": "AUD0000000003_1148",
+  "src_trajectory": [
+    "Which killed him in a",
+    "few minutes, for he",
+    "thought to himself,",
+    "if his friend",
+    "dies the other will forget",
+    "his pilgrimage, and will",
+    "stay here and marry my",
+    "daughter",
+    "when the king's",
+    "son awoke the next",
+    "morning he inquired of the",
+    "servants where his friend had",
+    "gone, as he did not see",
+    "him. "
+  ],
+  "source_full_text": "Which killed him in a few minutes, for he thought to himself, if his friend dies the other will forget his pilgrimage, and will stay here and marry my daughter when the king's son awoke the next morning he inquired of the servants where his friend had gone, as he did not see him.",
+  "target_trajectory": [
+    "",
+    "",
+    "",
+    "",
+    "这让他在几分钟内就死了，因为他心想，如果他的朋友死了，另一个就会忘记。",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "他的朝圣之旅，会留下来娶我的女儿。当国王的儿子第二天早上醒来时，他问仆人他的朋友去了哪里，因为他没有看到他。"
+  ],
+  "actions": [
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "WRITE",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "WRITE"
+  ],
+  "prediction": "这让他在几分钟内就死了，因为他心想，如果他的朋友死了，另一个就会忘记。他的朝圣之旅，会留下来娶我的女儿。当国王的儿子第二天早上醒来时，他问仆人他的朋友去了哪里，因为他没有看到他。",
+  "reference_text": "这让他在几分钟内就死了，因为他心想，如果他的朋友死了，另一个就会忘记自己的朝圣之旅，留下来和我的女儿结婚。当国王的儿子第二天早上醒来时，他问仆人他的朋友去哪儿了，因为他没看到他。",
+  "decoder_impl": {
+    "method": "local_agreement",
+    "la_n": 2,
+    "segment_size": 5,
+    "segment_size_sampling": "random_uniform_1_12_per_case",
+    "lcp_mode": "char"
+  },
+  "metrics": {
+    "laal_text": 13.932584269662922,
+    "bleu_char": 80.79532162108188
+  }
+}

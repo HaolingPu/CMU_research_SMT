@@ -1,0 +1,2 @@
+Python 3.13.9
+pip 25.3 from /home/haolingp/miniconda3/lib/python3.13/site-packages/pip (python 3.13)

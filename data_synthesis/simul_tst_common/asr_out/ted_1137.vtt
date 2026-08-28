@@ -1,0 +1,542 @@
+WEBVTT
+
+00:00.000 --> 00:17.920
+Good afternoon, everybody.
+
+00:17.920 --> 00:40.040
+I got something to show you.
+
+00:40.040 --> 00:43.480
+Think about this as a pixel, a flying pixel.
+
+00:43.480 --> 00:46.600
+This is what we call in our lab sensible design.
+
+00:46.600 --> 00:48.240
+Let me tell you a bit about it.
+
+00:48.240 --> 00:52.460
+If you take this picture, I'm Italian originally, and every boy in Italy grows up with this
+
+00:52.460 --> 00:55.160
+picture on the wall of his bedroom.
+
+00:55.160 --> 00:59.680
+But the reason I'm showing you this is that something very interesting happened in Formula
+
+00:59.680 --> 01:02.700
+One racing over the past couple of decades.
+
+01:02.700 --> 01:07.880
+Now some time ago, if you wanted to win a Formula One race, you take a budget and you
+
+01:07.880 --> 01:12.960
+bet your budget on a good driver and a good car, and if the car and the driver were good
+
+01:12.960 --> 01:15.440
+enough, then you win the race.
+
+01:15.440 --> 01:20.040
+Today, if you want to win the race, actually you need also something like this.
+
+01:20.040 --> 01:25.800
+Something that monitors the car in real time, has a few thousand sensors collecting information
+
+01:25.800 --> 01:31.360
+from the car, transmitting this information into the system, and then processing it and
+
+01:31.360 --> 01:36.720
+using it in order to go back to the car with decisions and changing things in real time
+
+01:36.720 --> 01:38.860
+as information is collected.
+
+01:38.860 --> 01:43.680
+This is what in engineering terms you would call a real-time control system.
+
+01:43.680 --> 01:49.800
+And basically, it's a system made of two components, sensing and an actuating component.
+
+01:49.800 --> 01:54.200
+What is interesting today is that real-time control systems are entering, starting to
+
+01:54.200 --> 01:56.120
+enter into our life.
+
+01:56.120 --> 02:02.820
+Our cities, over the past few years, just have been blanketed with networks, electronics.
+
+02:02.820 --> 02:07.080
+They're becoming like computers in open air, and as computers in open air, they're starting
+
+02:07.080 --> 02:12.220
+to respond in a different way, to be able to be sensed and to be actuated.
+
+02:12.220 --> 02:14.300
+If we fix cities, actually it's a big deal.
+
+02:14.300 --> 02:19.660
+Just as an aside, I wanted to mention cities are only 2% of the Earth's crust, but they
+
+02:19.660 --> 02:22.500
+are 50% of the world's population.
+
+02:22.500 --> 02:28.780
+They're 75% of energy consumption, up to 80% of CO2 emissions.
+
+02:28.780 --> 02:32.220
+So if you're able to do something with cities, that's a big deal.
+
+02:32.220 --> 02:39.220
+Beyond cities, all of this, sensing and actuating, is entering our everyday objects.
+
+02:39.260 --> 02:44.620
+That's from an exhibition that Paolo Antonelli is organizing at MoMA later this year, during
+
+02:44.620 --> 02:48.780
+the summer, it's called Talk to Me, where our objects, our environment, is starting
+
+02:48.780 --> 02:50.380
+to talk back to us.
+
+02:50.380 --> 02:55.520
+In a certain sense, it's almost as if every atom out there were becoming both a sensor
+
+02:55.520 --> 03:00.540
+and an actuator, and that is radically changing the interaction we have as humans with the
+
+03:00.540 --> 03:02.660
+environment out there.
+
+03:02.660 --> 03:07.600
+In a certain sense, it's almost as if the old dream of Michelangelo, when Michelangelo
+
+03:07.600 --> 03:11.960
+sculpted the Moses, at the end it's said that he took the hammer, threw it at the Moses,
+
+03:11.960 --> 03:18.960
+actually you can still see a small chip underneath, and said, shouted, why don't you talk?
+
+03:19.280 --> 03:23.400
+Well today, for the first time, our environment is starting to talk back to us.
+
+03:23.400 --> 03:28.040
+And I'll show just a few examples, again with this idea of sensing our environment
+
+03:28.040 --> 03:29.720
+and actuating it.
+
+03:29.720 --> 03:31.000
+Let's start with sensing.
+
+03:31.000 --> 03:35.540
+Well, the first project I wanted to share with you is actually one of the first projects
+
+03:35.540 --> 03:36.540
+by our lab.
+
+03:36.540 --> 03:41.980
+Which was four and a half years ago in Italy, and what we did there was actually use a new
+
+03:41.980 --> 03:46.580
+type of network at the time that had been deployed all across the world, that's a cell
+
+03:46.580 --> 03:50.740
+phone network, and use anonymous aggregated information from that network that's collected
+
+03:50.740 --> 03:55.900
+anyway by the operator in order to understand how the city works.
+
+03:55.900 --> 04:02.160
+The summer was a lucky summer, 2006, it's when Italy won the soccer World Cup.
+
+04:02.160 --> 04:05.820
+Some of you might remember it was Italy and France playing, and then Zidane at the end
+
+04:05.820 --> 04:09.780
+the head-butting, anyway, Italy won at the end.
+
+04:09.780 --> 04:16.780
+Now, look at what happened that day just by monitoring activity happening on the network.
+
+04:17.300 --> 04:24.300
+Here you see the city, you see the Colosseum in the middle, the river Tevere, it's morning
+
+04:25.560 --> 04:31.900
+before the match, you see the timeline on the top, early afternoon, people here and
+
+04:31.900 --> 04:35.080
+there making calls and moving.
+
+04:35.080 --> 04:41.820
+The match begins, silence, France scores, Italy scores, half-time, people make a quick
+
+04:41.820 --> 04:48.820
+call and go to the bathroom, second half, end of normal time, first overtime, second,
+
+04:49.120 --> 04:56.120
+Zidane the head-butting in the moment, Italy wins, yeah.
+
+04:58.480 --> 05:03.300
+Well that night everybody went to celebrate in the center, you saw the big peak, the following
+
+05:03.320 --> 05:08.820
+day again, everybody went to the center to meet the winning team and the Prime Minister
+
+05:08.820 --> 05:12.860
+at the time, and then everybody moved down, you see it in the image at the place called
+
+05:12.860 --> 05:17.440
+Chirco Massimo, where since Roman times people go to celebrate, to have a big party and you
+
+05:17.440 --> 05:19.380
+see the peak at the end of the day.
+
+05:19.380 --> 05:23.600
+Well that's just one example how we can sense the city today in a way that we couldn't have
+
+05:23.600 --> 05:25.800
+done just a few years ago.
+
+05:25.800 --> 05:30.600
+Another quick example about sensing, it's about, not about people, but it's about things
+
+05:30.600 --> 05:32.120
+we use and consume.
+
+05:32.120 --> 05:37.460
+Well today we know everything about where our objects come from, this is a map that
+
+05:37.460 --> 05:43.420
+shows you all the chips that form a Mac computer, how they came together, but we know very little
+
+05:43.420 --> 05:44.960
+about where things go.
+
+05:44.960 --> 05:51.100
+So in this project we actually developed some small tags to track trash as it moves through
+
+05:51.100 --> 05:52.140
+the system.
+
+05:52.140 --> 05:57.900
+So we actually started with a number of volunteers who helped us in Seattle just over a year
+
+05:57.900 --> 06:04.800
+ago to tag what they were throwing away, different type of things as you can see here, things
+
+06:04.800 --> 06:11.400
+they would throw away anyway, then we put a little chip, little tag onto the trash and
+
+06:11.400 --> 06:13.320
+then started following it.
+
+06:13.320 --> 06:19.060
+Here are the results we just obtained.
+
+06:19.060 --> 06:27.480
+From Seattle.
+
+06:27.480 --> 06:53.720
+Another one week.
+
+06:53.720 --> 06:57.560
+With this information we realised there's a lot of inefficiencies in the system, we
+
+06:57.560 --> 07:02.120
+can actually do the same thing with much less energy, this data was not available before
+
+07:02.120 --> 07:06.100
+but there's a lot of wasted transportation and convoluted things happening.
+
+07:06.100 --> 07:10.260
+But the other thing is that we believe that actually if we see everyday that the cap we
+
+07:10.260 --> 07:14.460
+are throwing away, it doesn't disappear, it's still somewhere on the planet and the plastic
+
+07:14.460 --> 07:18.560
+bottle we are throwing away everyday still stays there and we show that to people, then
+
+07:18.560 --> 07:20.960
+we can also promote some behavioural change.
+
+07:20.960 --> 07:26.000
+So that was the reason for the project, my colleague could tell you much more about sensing
+
+07:26.000 --> 07:29.720
+and many other wonderful things we can do with sensing but I wanted to go to the second
+
+07:29.720 --> 07:33.760
+part we discussed at the beginning and that's actuating our environment.
+
+07:33.760 --> 07:39.240
+And the first project is something we did a couple of years ago in Zaragoza, Spain.
+
+07:39.240 --> 07:44.400
+It started with a question by the mayor of the city who came to us saying that Spain
+
+07:44.400 --> 07:50.040
+and southern Europe have a beautiful tradition of using water in public space, in architecture,
+
+07:50.040 --> 07:54.400
+and the question was how could technology, new technology be added to that?
+
+07:54.400 --> 07:57.600
+And one of the ideas was developed at MIT in a workshop was imagine you've got this
+
+07:57.600 --> 08:03.880
+pipe and you've got valves, solenoid valves, tabs, opening and closing you create like
+
+08:03.880 --> 08:09.940
+a water curtain with pixels made of water, those pixels fall and you can write on it,
+
+08:09.940 --> 08:15.120
+you can show patterns, images, text and even you can approach it and it will open up to
+
+08:15.120 --> 08:19.400
+let you jump through as you see in this image.
+
+08:19.400 --> 08:23.800
+Well we presented this to Mayor Belioc, he liked it very much and we got a commission
+
+08:23.800 --> 08:26.560
+to design a building at the entrance of the expo.
+
+08:26.560 --> 08:34.920
+We called it Digital Water Pavilion, the whole building is made of water.
+
+08:34.920 --> 08:38.800
+There's no doors or windows but when you approach it, it will open up to let you in.
+
+08:49.400 --> 09:00.260
+The roof also is covered with water and if there's a bit of wind, if you want to minimize
+
+09:00.260 --> 09:07.400
+splashing you can actually lower the roof or you could close the building and the whole
+
+09:07.400 --> 09:11.080
+architecture will disappear like in this case.
+
+09:11.080 --> 09:14.160
+You know these days they always get emails during the winter when they take the roof
+
+09:14.160 --> 09:17.800
+down of people who've been there and say you know they demolished the building and no they
+
+09:17.800 --> 09:22.480
+didn't demolish it, just when it goes down the architecture almost disappear.
+
+09:22.480 --> 09:28.000
+Here's the building working, you see the person puzzled about what was going inside.
+
+09:28.000 --> 09:32.880
+Here it was myself trying not to get wet, testing the sensors that opened the water.
+
+09:32.880 --> 09:38.120
+Well I should tell you now what happened one night when all of the sensors stopped working
+
+09:38.120 --> 09:41.080
+but actually that night it was even more fun.
+
+09:41.080 --> 09:44.760
+All the kids from Zaragoza came to the building because the way of engaging with the building
+
+09:44.760 --> 09:46.000
+became something different.
+
+09:46.000 --> 09:49.680
+Not anymore a building that would open up to let you in but a building that would still
+
+09:49.680 --> 10:07.080
+make cuts and holes through the water and you had to jump without getting wet.
+
+10:07.080 --> 10:12.080
+And that was for us was very interesting because as architects, as engineers, as designers
+
+10:12.080 --> 10:16.400
+we always think about how people will use the things we design but then reality is always
+
+10:16.400 --> 10:21.640
+unpredictable and that's the beauty of doing things that are used and interact with people.
+
+10:21.640 --> 10:27.000
+Here is an image then of the building with the physical pixels, the pixels made of water
+
+10:27.000 --> 10:31.240
+and then projections on them and this is what led us to think about the following project
+
+10:31.240 --> 10:32.640
+I'll show you now.
+
+10:32.640 --> 10:35.600
+That's imagine those pixels could actually start flying.
+
+10:35.600 --> 10:40.760
+Imagine you know you could have small helicopters that move in the air and then each of them
+
+10:40.760 --> 10:46.360
+with a small pixel and changing lights almost as a cloud that can move in space.
+
+10:46.360 --> 10:53.960
+Here is the idea.
+
+10:53.960 --> 11:06.600
+So imagine one helicopter like the one we saw before moving with others in synchrony
+
+11:06.600 --> 11:15.680
+so you can have this cloud.
+
+11:15.680 --> 11:21.160
+You can have a kind of flexible screen or display like this, a regular configuration
+
+11:21.160 --> 11:33.840
+in two dimensions or in regular but in three dimensions where the thing that change is
+
+11:33.840 --> 11:47.040
+the light, not the pixels position.
+
+11:47.040 --> 11:51.480
+You can play with different type, imagine your screen could just appear in different
+
+11:51.480 --> 12:09.200
+scale or sizes, different type of resolution but then the whole thing can be a 3D kind
+
+12:09.200 --> 12:16.200
+of cloud of pixels that you can approach and move through it and see from many directions.
+
+12:16.200 --> 12:21.600
+Here is the real fly fire control and going down from the regular grid as before.
+
+12:21.600 --> 12:25.420
+When you turn on the light actually you see this, so the same we saw before and imagine
+
+12:25.420 --> 12:27.400
+each of them then controlled by people.
+
+12:27.400 --> 12:31.680
+You can have each pixel having an input that comes from people, from people's movement
+
+12:31.680 --> 12:32.680
+or so on.
+
+12:32.680 --> 12:36.280
+So I wanted to show you something here for the first time is we've been working with
+
+12:36.280 --> 12:41.760
+Roberto Bolle, one of today's top ballet dancers, the Etoualles at Metropolitan in New York
+
+12:41.760 --> 12:47.120
+and Lascale in Milan and actually captured his movement in 3D in order to use it as an
+
+12:47.120 --> 12:48.760
+input for fly fire.
+
+12:48.760 --> 12:54.560
+And here you can see Roberto dancing.
+
+12:54.560 --> 12:59.320
+You see on the left the pixels, the different resolution being captured, it's both 3D scanning
+
+12:59.320 --> 13:03.680
+in real time and motion capture.
+
+13:03.680 --> 13:08.280
+So you can reconstruct the whole movement.
+
+13:08.280 --> 13:17.040
+You can go all the way to...
+
+13:17.040 --> 13:20.740
+But then once you have the pixels then you can play with them and play with color and
+
+13:20.740 --> 13:25.080
+movement and gravity and rotation.
+
+13:25.080 --> 13:47.720
+So we want to use this as one of the possible inputs for fly fire.
+
+13:47.720 --> 13:50.080
+I wanted to show you the last project we are working on.
+
+13:50.080 --> 13:52.680
+It's something we're working on for the lantern Olympics.
+
+13:52.680 --> 13:53.680
+It's called the cloud.
+
+13:53.680 --> 13:58.720
+And the idea here is imagine that, again, we can involve people in doing something and
+
+13:58.720 --> 14:04.320
+changing our environment and almost doing what we call cloud raising, like barn raising
+
+14:04.320 --> 14:05.320
+but with a cloud.
+
+14:05.320 --> 14:08.520
+Imagine you can have everybody make a small donation for one pixel.
+
+14:08.520 --> 14:13.340
+And I think what is remarkable that happens over the past couple of years is that over
+
+14:13.340 --> 14:18.160
+the past couple of decades we went from the physical world to the digital one.
+
+14:18.160 --> 14:22.520
+This has been digitizing everything, knowledge and making that accessible through the internet.
+
+14:22.520 --> 14:26.980
+Now today for the first time, and the Obama campaign showed us that, we can go from the
+
+14:26.980 --> 14:32.120
+digital world, from the self-organizing power of networks to the physical one.
+
+14:32.120 --> 14:36.560
+This can be in our case we want to use it for designing and doing a symbol, doing something
+
+14:36.560 --> 14:38.280
+built in a city.
+
+14:38.280 --> 14:43.240
+But tomorrow it can be in order to tackle today's pressing challenges, think about climate
+
+14:43.240 --> 14:47.800
+change or CO2 emission, how we can go from the digital world to the physical one.
+
+14:47.800 --> 14:52.280
+So the idea that can we actually involve people in doing this thing together collectively,
+
+14:52.280 --> 14:57.280
+our cloud is a cloud again made of pixel in the same way as a real cloud is a cloud
+
+14:57.280 --> 15:00.600
+made of particles and those particles are water.
+
+15:00.600 --> 15:04.700
+Where our cloud is a cloud of pixel, is a physical structure in London but covered with
+
+15:04.700 --> 15:05.700
+pixel.
+
+15:05.700 --> 15:09.200
+You can move inside with different type of experiences, you can actually see it from
+
+15:09.200 --> 15:16.560
+underneath, sharing the main moments for the Olympics in 2012 and beyond and really using
+
+15:16.560 --> 15:18.740
+it as a way to connect with the community.
+
+15:18.740 --> 15:26.940
+So both physical cloud into the sky and something you can go to the top like a London's new
+
+15:26.940 --> 15:33.120
+mountain top, you can enter inside it and a kind of new digital beacon for the night
+
+15:33.120 --> 15:38.260
+but most importantly a new type of experience for anybody who will go to the top.
+
+15:38.260 --> 15:38.540
+Thank you.
+

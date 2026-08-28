@@ -1,0 +1,98 @@
+====================================================================================================
+CASE: seg=1 (commit-every-chunk)   utt=AUD0000000003_1011
+  segment_size=1  la_n=2  n_chunks=28  n_steps=28
+  reference: 他们个子大得惊人，用的勺子像铁锹一样大，叉子也和草叉一样大。他们用这些餐具从两人中间放在地上的一个巨大锅里，把一桶桶肉汤和大块大块的肉直接舀出来。尼尔斯起初大吃一惊，有点害怕，但他安慰自己说，巨人离他们还远着呢。
+  prediction: 他们如此巨大，以至于他们使用的勺子大得像铁锹，而他们的叉子则大得像草叉，用这些工具，他们能一勺子就舀起满满一桶肉汤，或是一大块肉。尼尔斯起初感到震惊，有些害怕，但很快安慰自己，那些巨人离他还很远。
+  metrics: {'laal_text': 4.5754716981132075, 'bleu_char': 23.26090205926184, 'pred_chars': 98, 'ref_chars': 106, 'src_words': 70, 'length_ratio_ref': 0.9245283018867925, 'length_ratio_src': 1.4}
+----------------------------------------------------------------------------------------------------
+step chunk  role            action src_word                delta                       committed_so_far
+----------------------------------------------------------------------------------------------------
+0    0      LCP-decision    READ   <silence>               ''                          
+1    1      LCP-decision    WRITE  They were so            '他们如此'                      他们如此
+2    2      LCP-decision    READ   huge that the           '<RESET>'                   
+3    3      LCP-decision    WRITE  spoons they             '巨大，以至于'                    巨大，以至于
+4    4      LCP-decision    WRITE  used were as            '<RESET>他们'                 他们
+5    5      LCP-decision    WRITE  large as                '<RESET>使用的勺子'              使用的勺子
+6    6      LCP-decision    WRITE  spades, And their       '<RESET>大得'                 大得
+7    7      LCP-decision    WRITE  forks as                '<RESET>像铁锹，而'              像铁锹，而
+8    8      LCP-decision    WRITE  big as hay-forks        '<RESET>他们的叉子'              他们的叉子
+9    9      LCP-decision    WRITE  with                    '<RESET>则大得'                则大得
+10   10     LCP-decision    READ   these they              '<RESET>'                   
+11   11     LCP-decision    WRITE  lifted whole bucketful  '像草叉，用'                     像草叉，用
+12   12     LCP-decision    WRITE  of broth                '<RESET>这些工具，他们能一'          这些工具，他们能一
+13   13     LCP-decision    WRITE  and great               '<RESET>勺子就舀起满满一桶'          勺子就舀起满满一桶
+14   14     LCP-decision    WRITE  joints of meat out of   '<RESET>肉汤，'                肉汤，
+15   15     LCP-decision    WRITE  an enormous             '<RESET>或是一大块肉。'            或是一大块肉。
+16   16     LCP-decision    READ   pot which was           '<RESET>'                   
+17   17     LCP-decision    READ   set on the ground       ''                          
+18   18     LCP-decision    READ   between them.           ''                          
+19   19     LCP-decision    READ   <silence>               ''                          
+20   20     LCP-decision    READ   Niels was startled      ''                          
+21   21     LCP-decision    WRITE  and rather scared at    '尼尔斯'                       尼尔斯
+22   22     LCP-decision    READ   first,                  '<RESET>'                   
+23   23     LCP-decision    WRITE  but he                  '起初感到震惊，'                   起初感到震惊，
+24   24     LCP-decision    WRITE  comforted himself with  '<RESET>有些害怕，但'             有些害怕，但
+25   25     LCP-decision    READ   thought that the        '<RESET>'                   
+26   26     LCP-decision    WRITE  giants were a good way  '很快安慰自己'                    很快安慰自己
+27   27     force_complete  WRITE  off,                    '<RESET>，那些巨人离他还很远。'        ，那些巨人离他还很远。
+
+====================================================================================================
+CASE: seg=2   utt=AUD0000000003_100
+  segment_size=2  la_n=2  n_chunks=15  n_steps=8
+  reference: 当这些东西被带到国王面前时，他立刻召见了王子，并问他是否就是那位前来救援他们的人。是的，陛下，正是我，王子回答道。
+  prediction: 当这些被带到国王面前时，他立即将王子召来，问他是否就是前来救援他们的人。是的，陛下，正是我回答了王子。
+  metrics: {'laal_text': 11.0, 'bleu_char': 63.119745322479325, 'pred_chars': 51, 'ref_chars': 57, 'src_words': 36, 'length_ratio_ref': 0.8947368421052632, 'length_ratio_src': 1.4166666666666667}
+----------------------------------------------------------------------------------------------------
+step chunk  role            action src_word                delta                       committed_so_far
+----------------------------------------------------------------------------------------------------
+0    0      pre-read        READ   <silence>               ''                          
+0    1      LCP-decision    WRITE  When these were         '当这些被'                      当这些被
+1    2      pre-read        READ   brought to the king     '<RESET>'                   
+1    3      LCP-decision    READ   he sent for the         ''                          
+2    4      pre-read        READ   prince at               ''                          
+2    5      LCP-decision    WRITE  once and asked          '带到国王面前时，他'                 带到国王面前时，他
+3    6      pre-read        READ   if it                   '<RESET>'                   
+3    7      LCP-decision    WRITE  had been                '立'                         立
+4    8      pre-read        READ   he who had come to the  '<RESET>'                   
+4    9      LCP-decision    READ   rescue.                 ''                          
+5    10     pre-read        READ   <silence>               ''                          
+5    11     LCP-decision    WRITE  Yes, your               '即将王子召来，'                   即将王子召来，
+6    12     pre-read        READ   majesty, it was         '<RESET>'                   
+6    13     LCP-decision    WRITE  I answered              '问他是否就是前来救援他们的人。是的，陛下'      问他是否就是前来救援他们的人。是的，陛下
+7    14     force_complete  WRITE  the prince.             '<RESET>，正是我回答了王子。'         ，正是我回答了王子。
+
+====================================================================================================
+CASE: seg=3   utt=AUD0000000003_0
+  segment_size=3  la_n=2  n_chunks=25  n_steps=9
+  reference: 而这些介绍不可避免地既单调又无用。一种文学上的诚实感迫使编辑不断重复说明自己只是编辑，而非童话故事的作者，正如一位杰出的科学家只是自然的编辑，而非自然的作者。
+  prediction: 而这些介绍是不可避免地单调且无用的。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非童话故事的作者，正如一位杰出的科学家只是自然的编辑，而非自然的作者。
+  metrics: {'laal_text': 8.518987341772151, 'bleu_char': 85.6517682670131, 'pred_chars': 78, 'ref_chars': 79, 'src_words': 49, 'length_ratio_ref': 0.9873417721518988, 'length_ratio_src': 1.5918367346938775}
+----------------------------------------------------------------------------------------------------
+step chunk  role            action src_word                delta                       committed_so_far
+----------------------------------------------------------------------------------------------------
+0    0      pre-read        READ   <silence>               ''                          
+0    1      pre-read        READ   And these               ''                          
+0    2      LCP-decision    WRITE  introductions are       '而这些介绍是'                    而这些介绍是
+1    3      pre-read        READ   inevitably              '<RESET>'                   
+1    4      pre-read        READ   both                    ''                          
+1    5      LCP-decision    READ   monotonous and          ''                          
+2    6      pre-read        READ   unavailing.             ''                          
+2    7      pre-read        READ   A sense of              ''                          
+2    8      LCP-decision    WRITE  literary                '不可避免地单调且'                  不可避免地单调且
+3    9      pre-read        READ   honesty                 '<RESET>'                   
+3    10     pre-read        READ   compels the editor      ''                          
+3    11     LCP-decision    WRITE  to keep                 '无用的。一种文学上的'                无用的。一种文学上的
+4    12     pre-read        READ   repeating that he is    '<RESET>'                   
+4    13     pre-read        READ   the editor,             ''                          
+4    14     LCP-decision    WRITE  and not                 '诚实感迫使编辑'                   诚实感迫使编辑
+5    15     pre-read        READ   the author              '<RESET>'                   
+5    16     pre-read        READ   of the fairy            ''                          
+5    17     LCP-decision    WRITE  tales,                  '不断重复自己只是编辑，而非'             不断重复自己只是编辑，而非
+6    18     pre-read        READ   just as a               '<RESET>'                   
+6    19     pre-read        READ   distinguished man of    ''                          
+6    20     LCP-decision    WRITE  science is              '童话故事的作者'                   童话故事的作者
+7    21     pre-read        READ   only the                '<RESET>'                   
+7    22     pre-read        READ   editor, Not the         ''                          
+7    23     LCP-decision    WRITE  author of               '，正如一位杰出的科学家'               ，正如一位杰出的科学家
+8    24     force_complete  WRITE  nature.                 '<RESET>只是自然的编辑，而非自然的作者。'   只是自然的编辑，而非自然的作者。
+

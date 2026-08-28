@@ -25,7 +25,7 @@ QE_THRESHOLD="${QE_THRESHOLD:-3.0}"
 NUM_SHARDS=8
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TOPK_DIR=/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/scripts/topk
+TOPK_DIR=/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/scripts/topk
 
 echo "CONSENSUS_ROOT : ${CONSENSUS_ROOT}"
 echo "OUT_ROOT       : ${OUT_ROOT}"

@@ -18,7 +18,7 @@ set -e
 source ~/.bashrc
 conda activate vllm
 
-HIBIKI_DIR="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/hibiki"
+HIBIKI_DIR="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/hibiki"
 CODE_DIR="$HIBIKI_DIR/code"
 PYTHON_SCRIPT="$CODE_DIR/contextual_alignment_jieba.py"
 MODEL_PATH="/data/user_data/haolingp/models/Qwen3-30B-A3B-Instruct-2507-FP8"

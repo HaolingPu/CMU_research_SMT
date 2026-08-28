@@ -16,7 +16,7 @@ CONSENSUS_ROOT="${CONSENSUS_ROOT:?}"
 OUT_ROOT="${OUT_ROOT:?}"
 mkdir -p /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_debug/slurm_logs
 /data/user_data/haolingp/conda_envs/evaluation/bin/python \
-  /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/scripts/segale/prepare_segale_shards.py \
+  /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/scripts/segale/prepare_segale_shards.py \
   --consensus-root "${CONSENSUS_ROOT}" \
   --out-root "${OUT_ROOT}" \
   --num-docs 12500 \

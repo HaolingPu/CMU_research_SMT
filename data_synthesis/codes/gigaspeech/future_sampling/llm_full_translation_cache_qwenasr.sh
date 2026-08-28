@@ -19,7 +19,7 @@ conda activate vllm
 
 # Cleaned manifest with more accurate quotations (qwenasr-filtered variant).
 MANIFEST="/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_xl_case_robust_qwenasr-filtered.tsv"
-CODE="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/build_llm_full_translation_cache.py"
+CODE="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/build_llm_full_translation_cache.py"
 OUT_ROOT="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/llm_full_translation_cache/train_xl_case_robust_qwenasr_filtered"
 
 MODEL_PATH="/data/user_data/haolingp/models/Qwen3-30B-A3B-Instruct-2507-FP8"

@@ -30,4 +30,4 @@
 
 LABEL="${LABEL:-gpt_test10}"
 
-bash /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/scripts/gpt/run_gpt_common.sh "${LABEL}"
+bash /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/scripts/gpt/run_gpt_common.sh "${LABEL}"

@@ -1,0 +1,22 @@
+# What the Mac copy contains (everything under repo root MINUS exclude.txt), ~450 MB
+# This file is documentation; the staging script rsyncs the repo root with exclude.txt.
+
+README.md  install.sh  .gitignore  .env.example  vllm_requirements.txt
+.claude/                                   # Claude Code project config
+docs/
+datasets/                                  # small eval-set metadata (985K)
+scripts/                                   # train/infer/synth/debug/babysitter (~100M after log excludes)
+EMNLP_2026_Future_Aware_Data_Synthesis/    # paper latex, figures, literature survey (42M)
+data_synthesis/
+  MIGRATION_PLAN.md
+  migration/                               # this package (env captures, docs, manifests)
+  wiki/                                    # LLM Wiki — project knowledge base
+  codes/                                   # synthesis + eval source (~100M after excludes)
+  codes-refactored/                        # consensus/wait-k/LA refactor
+  datasets/                                # granary manifest TSV (54M)
+  reports/  refactor_view/  .claude/
+  simul_tst_common/                        # eval-set build scripts + small text artifacts (~25M after excludes)
+
+# Kept small result artifacts on purpose (research reasoning): scores/registry txt files
+# (scripts/infer/ckpts*.txt), plots (png/pdf), JSON/JSONL summaries inside codes/,
+# wiki scoreboard, reports/*.html.

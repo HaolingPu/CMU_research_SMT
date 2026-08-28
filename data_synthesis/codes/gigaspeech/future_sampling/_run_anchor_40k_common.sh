@@ -14,7 +14,7 @@ set -e
 
 TASK_ID="${SLURM_ARRAY_TASK_ID:-0}"
 
-FS_DIR="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling"
+FS_DIR="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling"
 GEMMA4_ENV="/data/user_data/haolingp/conda_envs/gemma4"
 EVAL_ENV="/data/user_data/haolingp/conda_envs/evaluation"
 PYTHON="${GEMMA4_ENV}/bin/python"

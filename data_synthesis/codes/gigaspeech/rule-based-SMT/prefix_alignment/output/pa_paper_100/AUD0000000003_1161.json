@@ -1,0 +1,51 @@
+{
+  "id": "AUD0000000003_1161",
+  "source": [
+    "And",
+    "tried to make the people of",
+    "the land happy and",
+    "contented too. "
+  ],
+  "target": [
+    "",
+    "并",
+    "",
+    "且也试图让当地人民感到快乐和满足。"
+  ],
+  "source_full": "And tried to make the people of the land happy and contented too.",
+  "target_full": "并且也试图让当地人民感到快乐和满足。",
+  "full_mt": "并且也试图让当地人民感到幸福和满足。",
+  "method": "prefix_alignment_trajectory",
+  "utt_id": "AUD0000000003_1161",
+  "src_trajectory": [
+    "And",
+    "tried to make the people of",
+    "the land happy and",
+    "contented too. "
+  ],
+  "source_full_text": "And tried to make the people of the land happy and contented too.",
+  "target_trajectory": [
+    "",
+    "并",
+    "",
+    "且也试图让当地人民感到快乐和满足。"
+  ],
+  "actions": [
+    "READ",
+    "WRITE",
+    "READ",
+    "WRITE"
+  ],
+  "prediction": "并且也试图让当地人民感到快乐和满足。",
+  "reference_text": "并且也试图让当地人民感到快乐和满足。",
+  "decoder_impl": {
+    "method": "prefix_alignment",
+    "scorer": "bertscore",
+    "target_unit": "char",
+    "lcp_mode": "char"
+  },
+  "metrics": {
+    "laal_text": 6.527777777777778,
+    "bleu_char": 100.0
+  }
+}

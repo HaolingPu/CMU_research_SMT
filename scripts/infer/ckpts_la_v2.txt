@@ -1,0 +1,2 @@
+gigaspeech-zh-LA-40k-s-bsz4/v0-20260506-221535-hf/
+gigaspeech-zh-LA-40k-seg13-s-bsz4/v0-20260507-214653-hf/

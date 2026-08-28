@@ -42,7 +42,7 @@ echo "MISSING utts count : $(wc -l < ${MISSING_UTTS_FILE})"
 echo "SYS_ID             : ${SYS_ID}"
 echo "NUM_SHARDS         : ${NUM_SHARDS}"
 
-python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/scripts/segale/prepare_segale_shards.py \
+python /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/scripts/segale/prepare_segale_shards.py \
   --consensus-root "${CONSENSUS_ROOT}" \
   --out-root       "${RESUME_OUT_ROOT}" \
   --num-docs       100000 \

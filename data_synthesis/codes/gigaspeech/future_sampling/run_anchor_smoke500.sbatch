@@ -17,7 +17,7 @@
 # top5-axis5 data). See wiki: 2026-07-consensus-register-forensics.
 set -e
 
-FS_DIR="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling"
+FS_DIR="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling"
 GEMMA4_ENV="/data/user_data/haolingp/conda_envs/gemma4"
 EVAL_ENV="/data/user_data/haolingp/conda_envs/evaluation"
 PYTHON="${GEMMA4_ENV}/bin/python"

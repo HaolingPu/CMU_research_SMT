@@ -8,7 +8,7 @@
 # ============================================================
 set -e
 
-MAIN_SUBMIT="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/submit_consensus_dualbase_60k_per_sentence_qe3_len.sh"
+MAIN_SUBMIT="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/submit_consensus_dualbase_60k_per_sentence_qe3_len.sh"
 
 EXP_ROOT="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_debug/topp/consensus_decoding_en_zh_top_p_0.9_v2" \
 TOTAL_ROWS=70000 \

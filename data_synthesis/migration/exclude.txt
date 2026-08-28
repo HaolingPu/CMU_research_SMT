@@ -1,0 +1,58 @@
+# rsync exclude patterns — relative to repo root /data/user_data/haolingp/
+# Used by migration/stage_to_home.sh and by any direct pull. Do NOT add --delete anywhere.
+
+# --- git junk (Mac gets history via git clone instead) ---
+.git/
+
+# --- caches / binary envs (not portable) ---
+.cache/
+hf_cache/
+conda_envs/
+conda_pkgs/
+conda_user/
+pip_cache/
+uv_cache/
+vscode-server/
+__pycache__/
+*.pyc
+whisper_venv/
+
+# --- secrets ---
+.env
+.codex
+
+# --- model weights / checkpoints / big artifacts (Category B: metadata in BABEL_PATHS.md) ---
+/ckpts/
+/models/
+/code/
+/tools/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+
+# --- synthesis outputs & big generated data ---
+data_synthesis/outputs/
+data_synthesis/MFA_backup/
+data_synthesis/codes/gigaspeech/hibiki/output/
+data_synthesis/simul_tst_common/models/
+data_synthesis/simul_tst_common/mfa_tmp/
+
+# --- logs ---
+slurm_logs/
+*.log
+wandb/
+
+# --- old course projects / stale snapshots (Category D — re-include on request) ---
+ANLP/
+IDL_final_3small/
+IDL_final_3small_deploy.tar.gz
+scripts_2026-03-28.tar.gz
+test.txt
+
+# NOTE deliberately NOT excluded:
+#   datasets/                      (top level, 985K — small manifests/eval sets)
+#   data_synthesis/datasets/       (54M — one manifest TSV)
+#   *.bin is not excluded globally (no large .bin inside the include set; the big ones
+#   live under models/ and hf_cache/ which are excluded wholesale)
+#   scripts/infer/slurm_logs/ etc. are covered by the generic slurm_logs/ pattern

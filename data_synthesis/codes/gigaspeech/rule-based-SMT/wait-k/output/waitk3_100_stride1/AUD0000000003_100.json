@@ -1,0 +1,65 @@
+{
+  "utt_id": "AUD0000000003_100",
+  "src_trajectory": [
+    "",
+    "When these were",
+    "brought to the king",
+    "he sent for the",
+    "prince at",
+    "once and asked",
+    "if it",
+    "had been",
+    "he who had come to their",
+    "rescue. ",
+    "",
+    "Yes, your",
+    "majesty, it was",
+    "I answered",
+    "the prince. "
+  ],
+  "source_full_text": "When these were brought to the king he sent for the prince at once and asked if it had been he who had come to their rescue. Yes, your majesty, it was I answered the prince.",
+  "target_trajectory": [
+    "",
+    "",
+    "",
+    "当这些东西被带到国王面前时，他派人去召。",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "王子立刻前来，问他是否就是那个前来救援他们的人。",
+    "",
+    "是的，陛下。",
+    "",
+    "正是我。",
+    "王子回答道。"
+  ],
+  "actions": [
+    "READ",
+    "READ",
+    "READ",
+    "WRITE",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "WRITE",
+    "READ",
+    "WRITE",
+    "READ",
+    "WRITE",
+    "WRITE"
+  ],
+  "prediction": "当这些东西被带到国王面前时，他派人去召。王子立刻前来，问他是否就是那个前来救援他们的人。是的，陛下。正是我。王子回答道。",
+  "reference_text": "当这些东西被带到国王面前时，他立刻召见了王子，并问他是否就是那位前来救援他们的人。是的，陛下，正是我，王子回答道。",
+  "decoder_impl": {
+    "method": "wait_k",
+    "k": 3
+  },
+  "metrics": {
+    "laal_text": 5.533333333333333,
+    "bleu_char": 66.81034675434562
+  }
+}

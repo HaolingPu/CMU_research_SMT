@@ -1,0 +1,17 @@
+
+# conda environments:
+#
+# * -> active
+# + -> frozen
+evaluation               /data/user_data/haolingp/conda_envs/evaluation
+gemma4                   /data/user_data/haolingp/conda_envs/gemma4
+nb                       /data/user_data/haolingp/conda_envs/nb
+segale                   /data/user_data/haolingp/conda_envs/segale
+base                 *   /home/haolingp/miniconda3
+SMT                      /home/haolingp/miniconda3/envs/SMT
+SMT_CMU                  /home/haolingp/miniconda3/envs/SMT_CMU
+llama_hw                 /home/haolingp/miniconda3/envs/llama_hw
+llama_hw_clean           /home/haolingp/miniconda3/envs/llama_hw_clean
+metricx                  /home/haolingp/miniconda3/envs/metricx
+vllm                     /home/haolingp/miniconda3/envs/vllm
+

@@ -1,0 +1,982 @@
+{
+  "format_version": 3,
+  "encoding": "utf-8",
+  "matching_unit": "line",
+  "editing_unit": "character",
+  "operations": [
+    {
+      "op": "edit_line",
+      "line_hash": "253b7fbdee67f8d1bf3e39f8933ec315645ed04acc84c47924ec34b8bd020a92",
+      "character_edits": [
+        {
+          "op": "insert",
+          "start": 0,
+          "end": 0,
+          "text": "Now "
+        }
+      ]
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "e0572af33012b9f8c56f29e4814a547ad1d44894a1925453c1d5dc7d3b613cad",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 32,
+          "end": 35,
+          "text": "ULC"
+        }
+      ]
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "0ce64b70b19d26c8ae09c5237a6d549a68f770efbd3dfc7d786c273246aa82fb",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 0,
+          "end": 1,
+          "text": "Ans s"
+        }
+      ]
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "b7f14d80f55ad96f7800fb41ea5a28e5294d1aa9f2f6536f4adb8e9ddc1412c0",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 0,
+          "end": 1,
+          "text": "So a"
+        }
+      ]
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "d46bd105a62ef5480f02d5f3ad89a53e57627e05fc1da651ad4e09e47b7812b6",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 0,
+          "end": 1,
+          "text": "So a"
+        }
+      ]
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "bfbc944e93ab17d7f98873aa48dca2a2c398d2607e518dd1bb12f974bd44e41c",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 0,
+          "end": 1,
+          "text": "So t"
+        }
+      ]
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "2410d5feb1981af26095663be703b2e1e0e908fb3c42c2a9705c4d02c576f44f",
+      "character_edits": [
+        {
+          "op": "delete",
+          "start": 21,
+          "end": 22
+        },
+        {
+          "op": "delete",
+          "start": 23,
+          "end": 25
+        }
+      ]
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "827e0d3c0be126b5197245ec2f67a801e70f74f250a7f20ea6ecfa936449eb1f",
+      "character_edits": [
+        {
+          "op": "delete",
+          "start": 114,
+          "end": 117
+        },
+        {
+          "op": "insert",
+          "start": 118,
+          "end": 118,
+          "text": "two"
+        }
+      ]
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "9a3cc8d8b9747a6d5ec1f3e5949c3e3ddc567930dc2611ecabda3db9a887bb9d",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 1,
+          "end": 3,
+          "text": "f"
+        },
+        {
+          "op": "delete",
+          "start": 4,
+          "end": 5
+        }
+      ]
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "111b1a393b477fde3052bd311b1dae996568bb4b6f8ff0bcda1d50f6f1c49e8e",
+      "character_edits": [
+        {
+          "op": "delete",
+          "start": 26,
+          "end": 28
+        }
+      ]
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "f4c93bf67fc0f4537807d9acf1c7af7b0e05f4e5922de948faf8445fccfb1c69",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 0,
+          "end": 2,
+          "text": "There'"
+        },
+        {
+          "op": "delete",
+          "start": 3,
+          "end": 4
+        }
+      ]
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "ee4d379894118976578a35e2d911a05ca63a4c923b430c128e6b3d1832a09003",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 0,
+          "end": 3,
+          "text": "I"
+        },
+        {
+          "op": "replace",
+          "start": 4,
+          "end": 27,
+          "text": "'"
+        },
+        {
+          "op": "delete",
+          "start": 35,
+          "end": 138
+        }
+      ]
+    },
+    {
+      "op": "insert_line_after",
+      "anchor_hash": "ee4d379894118976578a35e2d911a05ca63a4c923b430c128e6b3d1832a09003",
+      "text": "It's that those connections, your connections to all the things around you, literally define who you are.\n"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "3701544f8a9a9d6f898bd5000f971a3f883138bf28f357afd7dcd302504c5181",
+      "character_edits": [
+        {
+          "op": "delete",
+          "start": 14,
+          "end": 118
+        }
+      ]
+    },
+    {
+      "op": "insert_line_after",
+      "anchor_hash": "3701544f8a9a9d6f898bd5000f971a3f883138bf28f357afd7dcd302504c5181",
+      "text": "Secondhand shopping allows me to reduce the impact my wardrobe has on the environment and on my wallet.\n"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "0ab9c914d68ad347f0b406f6d635411969a41c6c499dcf02a963eb4e6f943da7",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 0,
+          "end": 1,
+          "text": "And m"
+        }
+      ]
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 0,
+          "end": 2,
+          "text": "I w"
+        },
+        {
+          "op": "replace",
+          "start": 4,
+          "end": 5,
+          "text": "t"
+        },
+        {
+          "op": "replace",
+          "start": 9,
+          "end": 10,
+          "text": " to imagine two couples in the middle of 1979 on the exact same day at the exact same moment each conceiving a baby, OK?"
+        }
+      ]
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "f377a902a6756e11ac2b08b59374c2d1eb8d0030946b3393a8f12b3b1106f51f"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "83e814f7b776d2f7f1beff71d8c523bcd5045f7e3e011546c7b56bbbb4a38e9b",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 0,
+          "end": 1,
+          "text": "An"
+        },
+        {
+          "op": "insert",
+          "start": 2,
+          "end": 2,
+          "text": "the"
+        }
+      ]
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "eb223a3bd062597bcd5946207668b8e903589afa8cb08336019e6f0809af631e",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 0,
+          "end": 1,
+          "text": "U"
+        },
+        {
+          "op": "replace",
+          "start": 2,
+          "end": 4,
+          "text": "derstand"
+        }
+      ]
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "9d872d1c4c73e3167804506b3a8b243d558656b426c6b81934c1b40e447c3608",
+      "character_edits": [
+        {
+          "op": "insert",
+          "start": 65,
+          "end": 65,
+          "text": " Martin Luther King he offers us something of a solution in his eye of a dream speech."
+        }
+      ]
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "a68b56e569f4924aea640d2e44a81a3dceee1fc82a9ed1b7122f23970cbc8db0"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "657e74f64e49b492f70ec830822cdfaf2b35ed6407a88849ada3d1814d6aeb89",
+      "character_edits": [
+        {
+          "op": "insert",
+          "start": 100,
+          "end": 100,
+          "text": " Poston, who said, I need to see you."
+        }
+      ]
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "5772163333bf57cf94c1874a2ae37e403143061ae65fc27925c467fc55b7b8bc"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "95652937669d673077d7cc768dd94e4ebdceb2da0233e335a61ccd779d8114ee",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 0,
+          "end": 1,
+          "text": "C"
+        }
+      ]
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "bb96f13468a98037e68413a864d40db19a69ee06180d82c0c65207118ec8c53f",
+      "character_edits": [
+        {
+          "op": "insert",
+          "start": 47,
+          "end": 47,
+          "text": " Dmitry Kolubov from the city of Kiev in Ukraine."
+        }
+      ]
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "84d5131a5dbd332f5b279547a5f9ddbfb41a805acc2f576c837efd551f457859"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "705e12f00b39d2450e24286981147762cf2ff531a0592845e46b00f28cb6e407",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 16,
+          "end": 17,
+          "text": "Ts"
+        },
+        {
+          "op": "replace",
+          "start": 18,
+          "end": 19,
+          "text": "sts"
+        }
+      ]
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "17570402c87704eee924ab4c4621cc65248d5b0c5fd3cac8ced96f2012a52e4b",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 10,
+          "end": 11,
+          "text": "o"
+        }
+      ]
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "700b88853d516d1aa50f3efdadce4d0223c405a0089d9e3ad0d806106622c40e",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 34,
+          "end": 36,
+          "text": "-Dao"
+        }
+      ]
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "425ceff58f9271bdd8c933121253ec051ee65d4b232009989c24621e491177f6",
+      "character_edits": [
+        {
+          "op": "insert",
+          "start": 72,
+          "end": 72,
+          "text": " Sam Jain right here."
+        }
+      ]
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "162bcc220177509a6cc1d0fbd9e867379fb3e91d64835966e871010cc62f5373"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "1a24b7688c199c24d87b5984d152b37d1d528911ec852d9cdf98c3ef29b916ea",
+      "character_edits": [
+        {
+          "op": "insert",
+          "start": 3,
+          "end": 3,
+          "text": " Jain himself is on the loose."
+        }
+      ]
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "07320fd2bad891d28d98e7a12ea41c4e06c4fcd5ea3528816c49280ed5856c6c"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "022c6057c8515f1b0eb982642aee6e68e83635a396decabe6f44568d23f87078"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "e9b6fa4736b7a7fbb102c51ffe41be2bf20923a7e67a63772c172227d051ec52",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 0,
+          "end": 10,
+          "text": "H"
+        }
+      ]
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "54966be250061d5bdee2793e2bb9053ff2937b70c543e0f1e4eefe5027985108",
+      "character_edits": [
+        {
+          "op": "insert",
+          "start": 42,
+          "end": 42,
+          "text": " Drucker."
+        }
+      ]
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "2159ba4b33f39aa59fec3c352d67905cf5bff47658e7e5082abad95660c414c4",
+      "character_edits": [
+        {
+          "op": "insert",
+          "start": 0,
+          "end": 0,
+          "text": "I was a resident at a teaching hospital here in Toronto when Mrs. "
+        },
+        {
+          "op": "insert",
+          "start": 7,
+          "end": 7,
+          "text": " was brought to the emergency department at the hospital where I was working"
+        }
+      ]
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "e39c324400b3794c1e67b5add3836be0ae332da6c71bec8caf656235553cbf7c"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "b0de221d08868ef7cea561dbf8c8672f15144e7cabaa185bca0ab6525f49482b"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "cde29bd9c15a33c5b53da6b4fdf54950370c17b35796753e747f6c6c339407e5",
+      "character_edits": [
+        {
+          "op": "insert",
+          "start": 14,
+          "end": 14,
+          "text": " Drucker, and she was breathless, and when I listened to her, she was making a wheezy sound."
+        }
+      ]
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "f139dd0736665cc1b2ec507eb9e46b86c6e477e2dad8de4180a52fcd69489f7b"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "8d2d6b563fd89fe7546094d2817e4c1cae9b167223d22b4310ab449e6993fc2d",
+      "character_edits": [
+        {
+          "op": "insert",
+          "start": 98,
+          "end": 98,
+          "text": " Drucker, do you think it's okay if she goes home?"
+        }
+      ]
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "7160526dd5502677e983cb4275774d732f0c4e1f5b9d34c7ca2ad4aeebd839de"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "6e9859e599960e64d7ff0ffce31f120ec808f1d47c2e89ba17eddf156c7f6b5f",
+      "character_edits": [
+        {
+          "op": "insert",
+          "start": 180,
+          "end": 180,
+          "text": " Drucker before, but another nurse said three words to me that are the three words that most emergency physicians I know dread."
+        }
+      ]
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8104354b1fd5008aa5050f3259d705062c6f8cc3eeb1fa9529b071b33d36d7f1"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "26b341ee55d596e90c1ff439f215732eaa418f86f8baeb15b01826545a287133",
+      "character_edits": [
+        {
+          "op": "insert",
+          "start": 4,
+          "end": 4,
+          "text": " Drucker, a wife, a mother and a grandmother."
+        }
+      ]
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "2724b2496af66421ebd5e71ea9627d343915d68f3696bfbadaeaecaa6204b412"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "a9f09cd460977a350283d82e588af01e835444904932d910e1cd4869d3b371f2",
+      "character_edits": [
+        {
+          "op": "insert",
+          "start": 62,
+          "end": 62,
+          "text": " it with"
+        }
+      ]
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "6ae61e116bfbbd5a2f19cc8d6b0d44c796240afe7717096f777d882f2fd6379a",
+      "character_edits": [
+        {
+          "op": "delete",
+          "start": 6,
+          "end": 152
+        }
+      ]
+    },
+    {
+      "op": "insert_line_after",
+      "anchor_hash": "6ae61e116bfbbd5a2f19cc8d6b0d44c796240afe7717096f777d882f2fd6379a",
+      "text": "It says this box belongs to.\n"
+    },
+    {
+      "op": "insert_line_after",
+      "anchor_hash": "6ae61e116bfbbd5a2f19cc8d6b0d44c796240afe7717096f777d882f2fd6379a",
+      "text": "And so I type in my name and actually become a character in the book.\n"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "347049ec73e9e1ae6b6fb86fc8d2c8dfaa12321231e2f84ed4f5db5b4d6d9f0c",
+      "character_edits": [
+        {
+          "op": "insert",
+          "start": 2,
+          "end": 2,
+          "text": ","
+        },
+        {
+          "op": "replace",
+          "start": 9,
+          "end": 73,
+          "text": "!"
+        }
+      ]
+    },
+    {
+      "op": "insert_line_after",
+      "anchor_hash": "347049ec73e9e1ae6b6fb86fc8d2c8dfaa12321231e2f84ed4f5db5b4d6d9f0c",
+      "text": "Oh, my God!\n"
+    },
+    {
+      "op": "insert_line_after",
+      "anchor_hash": "347049ec73e9e1ae6b6fb86fc8d2c8dfaa12321231e2f84ed4f5db5b4d6d9f0c",
+      "text": "Oh, my God!\n"
+    },
+    {
+      "op": "insert_line_after",
+      "anchor_hash": "347049ec73e9e1ae6b6fb86fc8d2c8dfaa12321231e2f84ed4f5db5b4d6d9f0c",
+      "text": "Whoo!\n"
+    },
+    {
+      "op": "insert_line_after",
+      "anchor_hash": "347049ec73e9e1ae6b6fb86fc8d2c8dfaa12321231e2f84ed4f5db5b4d6d9f0c",
+      "text": "Oh, my God!\n"
+    },
+    {
+      "op": "insert_line_after",
+      "anchor_hash": "347049ec73e9e1ae6b6fb86fc8d2c8dfaa12321231e2f84ed4f5db5b4d6d9f0c",
+      "text": "Wow!\n"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "2c9f11aaa51d832ab69e1a235daaf4fdfc19fcf55e6821f9a89141cd9edf7378",
+      "character_edits": [
+        {
+          "op": "insert",
+          "start": 10,
+          "end": 10,
+          "text": " Nelson from Mystery Science Theater was one of the first people to post a joke about the video on Twitter."
+        }
+      ]
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "88daf716ac573e29cf5ee500a318ea6833e66928beb95379e9a3b566c9c7900b"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "1e233d46ef2eba5f778aedc02990a0a4f8f17794155eee3b03c620e3f36d2b17",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 0,
+          "end": 3,
+          "text": "Ev"
+        },
+        {
+          "op": "insert",
+          "start": 4,
+          "end": 4,
+          "text": "n"
+        }
+      ]
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "db62ac97b5755ce8bcaa0e9c500a064a7ea96fa59d51a08db1db1bc9118e6221",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 0,
+          "end": 2,
+          "text": "Ta"
+        },
+        {
+          "op": "replace",
+          "start": 3,
+          "end": 6,
+          "text": "te"
+        }
+      ]
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "5270abaf54eb832f93e07a27ea7eca0e9afb3755c05a40b383ae6a2effc82a1a",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 0,
+          "end": 2,
+          "text": "2"
+        }
+      ]
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "8569efc4ed5a6273140c2b6ec0ab8d99f4398210808fbb7c0cbbae4fbcc21350"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "f1b0ed14ef93feadcfcf24d03dda71806080714a107684f47dfa2316a7fdb988",
+      "character_edits": [
+        {
+          "op": "insert",
+          "start": 58,
+          "end": 58,
+          "text": " Stevenson, you give talks, you make speeches."
+        }
+      ]
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "baf3eb9c5dc9a5ae1eb246c6667d81e51284035ce0a0f6b22936da49e37d0f9c"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "c1ef6a8476d70346f41a6ea2f320b4a7e72a3f22020b379dc2034f2355fd6bf1",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 1,
+          "end": 2,
+          "text": "a"
+        }
+      ]
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "bd7676b51d45df5a09db77530ac13a10b22fd8bd641c2d456e29f27c7b127d5d",
+      "character_edits": [
+        {
+          "op": "insert",
+          "start": 315,
+          "end": 315,
+          "text": " King."
+        }
+      ]
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "187f5d6c98393ebdeeade1a236d3933a2c018f70583e0f47c422086790ec5689"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "26b1b21c63d19d5d74e484a04b5a3cb5641c9b3c11ffe8bdd6d4f553320ea463",
+      "character_edits": [
+        {
+          "op": "insert",
+          "start": 26,
+          "end": 26,
+          "text": " Carr would call me, and she'd say, Brian, Ms."
+        }
+      ]
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "6a5bfdb9ed7a3c0eebe6454f9ebf6fbee5cd8c4c9f9a80bfc388e25c09791e05"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "e6dde54cbe814692ba27f4ceafcbf575861eb86cb4b7ec9df3455b30838c4ec5",
+      "character_edits": [
+        {
+          "op": "insert",
+          "start": 19,
+          "end": 19,
+          "text": " Carr leaned forward."
+        }
+      ]
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "ff7dab58ec0120dd13e8c1d67732719c03d23c0cb017eabe342eddb2c808791a"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "fc08e58a5c3558bc3d29473100638dad6ed9312e9c76c8b82a6926ba17b81ea2",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 16,
+          "end": 17,
+          "text": "tha"
+        }
+      ]
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "4be69def75e7198f0909e2016514baf82454ac88ca8d69fcf3d57cbd7c7e2896",
+      "character_edits": [
+        {
+          "op": "insert",
+          "start": 12,
+          "end": 12,
+          "text": " Stevenson, did you write this crazy motion?"
+        }
+      ]
+    },
+    {
+      "op": "delete_line",
+      "line_hash": "75cfe6e1f94c8c4a54de065fc6d67dd64c4857b9f5734d4b7a5ae3d9166834f7"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "0146c2045b1037102ba28f6eb71b0962d3acf82c8e554a9558cc3cbf456eced8",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 0,
+          "end": 1,
+          "text": "M"
+        },
+        {
+          "op": "insert",
+          "start": 2,
+          "end": 2,
+          "text": "dules made of ceme"
+        },
+        {
+          "op": "replace",
+          "start": 3,
+          "end": 4,
+          "text": "t of a fixed measu"
+        },
+        {
+          "op": "delete",
+          "start": 6,
+          "end": 20
+        },
+        {
+          "op": "insert",
+          "start": 22,
+          "end": 22,
+          "text": "nt"
+        },
+        {
+          "op": "replace",
+          "start": 25,
+          "end": 30,
+          "text": "a"
+        },
+        {
+          "op": "replace",
+          "start": 32,
+          "end": 52,
+          "text": "f"
+        },
+        {
+          "op": "replace",
+          "start": 55,
+          "end": 58,
+          "text": "toge"
+        },
+        {
+          "op": "delete",
+          "start": 61,
+          "end": 64
+        },
+        {
+          "op": "delete",
+          "start": 65,
+          "end": 67
+        }
+      ]
+    },
+    {
+      "op": "insert_line_after",
+      "anchor_hash": "0146c2045b1037102ba28f6eb71b0962d3acf82c8e554a9558cc3cbf456eced8",
+      "text": "Very quickly concrete blocks became the most used construction unit in the world.\n"
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "13de5bc81c81de46ea97793638dccc2651cfeab39eabfbce1739837b1a093f3f",
+      "character_edits": [
+        {
+          "op": "delete",
+          "start": 69,
+          "end": 70
+        },
+        {
+          "op": "delete",
+          "start": 71,
+          "end": 73
+        }
+      ]
+    },
+    {
+      "op": "edit_line",
+      "line_hash": "bd63f6cde56c40e7b200e291f5f91a9f1d8d40156a2f41a57851ae7765084f20",
+      "character_edits": [
+        {
+          "op": "replace",
+          "start": 0,
+          "end": 2,
+          "text": "But"
+        }
+      ]
+    }
+  ]
+}

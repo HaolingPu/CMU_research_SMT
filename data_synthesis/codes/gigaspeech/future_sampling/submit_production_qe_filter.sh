@@ -20,7 +20,7 @@ FILTERED_OUTPUT_DIR="${OUTPUT_ROOT}/job_${CONSENSUS_JOB_ID}-qe3"
 QE_THRESHOLD="${QE_THRESHOLD:-3.0}"
 NUM_SHARDS=8
 
-SCRIPT_DIR="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling"
+SCRIPT_DIR="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling"
 
 echo "============================================"
 echo "Production QE Filter Pipeline (8 GPU)"

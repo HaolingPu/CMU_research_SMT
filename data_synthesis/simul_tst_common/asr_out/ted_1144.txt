@@ -1,0 +1,57 @@
+My name is Amit and 18 months ago I had another job at Google and I pitched this idea of doing
+something with museums and art to my boss who is actually here and she allowed me to
+do it. It took 18 months, a lot of fun negotiations and stories I can tell you with 17 very interesting
+museums from 9 countries but I'm going to focus on the demo. There are a lot of stories
+about why we did this. I think my personal story is explained very simply in the slide
+and it's access. I grew up in India, had a great education, not complaining, but I didn't
+have access to a lot of these museums and these artworks. When I started traveling and
+going to these museums I started learning a lot and while working at Google I tried
+to put this desire to make it more accessible with technology together. So we formed a team,
+a great team of people and we started doing this. I'm going to probably get into the demo
+and then tell you a couple of the interesting things we've had since launch. So simple,
+you come to googleartproject.com, you look around all these museums here, you've got
+the Uffizi, you've got the MoMA, the Hermitage, the Rikes, the Van Gogh. I'm going to actually
+get to one of my favorites, the Metropolitan Museum of Art in New York. Two ways of going
+in, very simple, click and bang, you're in this museum, doesn't matter where you are,
+Bombay, Mexico, doesn't really matter. You move around, you have fun, you want to navigate
+around the museum, open the plan up and in one click jump. You're in there, you want
+to go to the end of the corridor, keep going, have fun, explore. Thanks, I haven't come
+to the best part. So now I'm in front of one of my favorite paintings, The Harvesters by
+Peter Bruegel at the Met. I see this plus sign, if the museum has given us the image,
+you click on it. Now this is one of the images, so this is all the metadata information for
+those of you who are truly interested in art, you can click this, but I'm going to
+click this off right now. This is one of these images that we captured in what we call gigapixel
+technology. This image, for example, has close to I think around 10 billion pixels. I get
+a lot of people asking me, what do you get for 10 billion pixels? I'm going to try and
+show you what you really get for 10 billion pixels. You can zoom around very simply, you
+see some fun stuff happening here. I love this guy, his expression is priceless. But
+then you really want to go deep. And so I started playing around, and I found something
+going on over here. And I was like, hold on, that sounds interesting. Went in, and I started
+noticing that these kids were actually beating something. I did a little research, spoke
+to a couple of my contacts at the Met, and I actually found out that this is a game called
+Skull, which involves beating a goose with a stick on Shrove Tuesday. And apparently
+it was quite popular. I don't know why they did it, but you know, I learned something
+about it. Now, just, you know, we're really deep in, you can really get the cracks. Now
+just to give you some perspective, I'm going to zoom out so you really see what you get.
+Here is where we were, and this is the painting. So, the best is yet to come, so in a second.
+So now, let's just quickly jump into the MoMA, again in New York. So, another one of my favorites,
+the Starry Night. Now, the example I showed you was all about finding details. But what
+if you want to see brush strokes? And what if you want to see, you know, how Van Gogh
+actually created this masterpiece? You zoom in, you really go in, I'm going to go to one
+of my favorite parts in this painting, and I'm really going to get to the cracks. This
+is the Starry Night, I think, you know, never seen like this before. I'm going to show you
+my other favorite feature. There's a lot of other stuff here, but I don't have time.
+This is the real cool part. It's called Collections. Any one of you, anybody, doesn't matter if
+you're rich, if you're poor, if you have, you know, a fancy, you know, house, doesn't
+matter. You can go and create your own museum online, create your own collection across
+all these images. Very simply, you go in, and I've created this called The Power of
+Zoom. You can just zoom around. This is the Ambassadors, based in the National Gallery.
+You can annotate the stuff, send it to your friends, and really get a conversation going
+about what you're feeling when you go through these masterpieces. So I think in conclusion,
+for me, the main thing is that all the amazing stuff here does not really come from Google.
+It doesn't, in my opinion, even come from the museums. Probably shouldn't say that.
+It really comes from these artists. And, you know, that's been my humbling experience in
+this. I mean, I hope in this digital medium that we do justice to their artwork and represent
+it properly online. And the biggest question I get asked nowadays is, did you do this to
+replicate the experience of going to a museum? And the answer is no. It's to supplement the
+experience. And that's it. Thank you.

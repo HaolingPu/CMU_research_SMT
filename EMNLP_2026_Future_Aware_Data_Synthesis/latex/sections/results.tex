@@ -1,0 +1,74 @@
+\section{Results}
+\label{sec:results}
+
+\subsection{Main Results}
+
+[TODO: main quality--latency comparison against EAST, Simul-MuST-C, LA-N,
+wait-$k$, TAF, and InfiniSST on EN$\rightarrow$ZH (GigaSpeech),
+EN$\rightarrow$DE, and EN$\rightarrow$JA.]
+
+\subsection{Ablation: Candidate Selection Policy}
+
+We compare the three candidate-selection rules introduced in
+Section~\ref{sec:method} (top-$k$, min-$p$, top-$p$) under matched
+synthesis budgets, holding the future sampler, instruction-tuned model,
+and minimum-horizon filter fixed. Table~\ref{tab:ablation-policy} reports
+translation quality, latency, and the average length of synthesised
+trajectories.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lcccc}
+\hline
+\textbf{Policy} & \textbf{BLEU} $\uparrow$ & \textbf{COMET} $\uparrow$ & \textbf{LAAL} $\downarrow$ & \textbf{\#tok / utt} \\
+\hline
+top-$k{=}4$       & --   & --   & --   & -- \\
+top-$k{=}6$       & --   & --   & --   & -- \\
+top-$k{=}10$      & --   & --   & --   & -- \\
+\hline
+min-$p{=}10^{-2}$ & --   & --   & --   & -- \\
+min-$p{=}10^{-3}$ & --   & --   & --   & -- \\
+min-$p{=}10^{-4}$ & --   & --   & --   & -- \\
+min-$p{=}10^{-5}$ & --   & --   & --   & -- \\
+\hline
+top-$p{=}0.5$     & --   & --   & --   & -- \\
+top-$p{=}0.7$     & --   & --   & --   & -- \\
+top-$p{=}0.95$    & --   & --   & --   & -- \\
+top-$p{=}0.99$    & --   & --   & --   & -- \\
+\hline
+\end{tabular}
+\caption{Effect of the candidate-selection policy on synthesised data.
+All rows use $M{=}30$ futures and $h_{\min}{=}1$. Numbers will be filled
+in once the sweep completes. \textbf{[placeholder]}}
+\label{tab:ablation-policy}
+\end{table}
+
+\subsection{Ablation: Number of Futures}
+
+We vary the total number of sampled futures $M$ while keeping the
+candidate-selection policy at its best setting from
+Table~\ref{tab:ablation-policy}. Table~\ref{tab:ablation-futures} reports
+the resulting trade-off between consensus reliability, synthesis cost,
+and downstream model quality.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{ccccc}
+\hline
+$M$ & \textbf{BLEU} $\uparrow$ & \textbf{COMET} $\uparrow$ & \textbf{LAAL} $\downarrow$ & \textbf{cost} (rel.) \\
+\hline
+5    & -- & -- & -- & -- \\
+10   & -- & -- & -- & -- \\
+20   & -- & -- & -- & -- \\
+30   & -- & -- & -- & -- \\
+50   & -- & -- & -- & -- \\
+100  & -- & -- & -- & -- \\
+200  & -- & -- & -- & -- \\
+\hline
+\end{tabular}
+\caption{Effect of the number of futures $M$. ``cost'' is wall-clock
+synthesis time relative to $M{=}20$. \textbf{[placeholder]}}
+\label{tab:ablation-futures}
+\end{table}

@@ -45,10 +45,10 @@ FILTERED_OUTPUT_DIR="${FILTERED_OUTPUT_DIR:-/data/user_data/haolingp/data_synthe
 QE_THRESHOLD="${QE_THRESHOLD:-3.0}"
 FILTER_BY_QE="${FILTER_BY_QE:-1}"
 
-CONVERTER="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/convert_metricx_consensus.py"
-SUMMARY="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/summarize_metricx_qe.py"
-FILTER_JSONS="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/filter_consensus_by_metricx_qe.py"
-METRICX_ROOT="/data/user_data/haolingp/data_synthesis/codes/metricx"
+CONVERTER="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/convert_metricx_consensus.py"
+SUMMARY="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/summarize_metricx_qe.py"
+FILTER_JSONS="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/filter_consensus_by_metricx_qe.py"
+METRICX_ROOT="/home/haolingp/CMU_research_SMT/data_synthesis/codes/metricx"
 TOKENIZER="/data/user_data/haolingp/models/mt5-xl"
 MODEL="/data/user_data/haolingp/models/metricx-24-hybrid-xl-v2p6"
 

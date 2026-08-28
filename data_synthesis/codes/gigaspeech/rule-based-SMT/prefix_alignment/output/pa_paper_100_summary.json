@@ -1,0 +1,13 @@
+{
+  "method": "PA (paper, BERTScore zh, char)",
+  "n_jsons": 100,
+  "n_qe": 100,
+  "bleu_char": 100.0,
+  "laal_text": 14.489780371499094,
+  "metricx_avg": 3.023662109375,
+  "qe_pass_count": 59,
+  "qe_pass_pct": 59.0,
+  "qe_threshold": 3.0,
+  "run_dir": "/data/user_data/haolingp/data_synthesis/codes/gigaspeech/rule-based-SMT/prefix_alignment/output/pa_paper_100",
+  "metricx_output": "/data/user_data/haolingp/data_synthesis/codes/gigaspeech/rule-based-SMT/prefix_alignment/output/pa_paper_100_metricx_output.jsonl"
+}

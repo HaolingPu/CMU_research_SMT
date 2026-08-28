@@ -5,7 +5,7 @@
 # 8 GPUs in parallel via SLURM array, total 100 outputs.
 #
 # Usage:
-#   sbatch /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/run_gemini_flash_json_pro_fallback_uqd_100_8gpu.sh
+#   sbatch /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/run_gemini_flash_json_pro_fallback_uqd_100_8gpu.sh
 # ============================================================
 #SBATCH --job-name=gem_flash_nosim100
 #SBATCH --nodes=1
@@ -29,7 +29,7 @@ conda activate vllm
 TASK_ID="${SLURM_ARRAY_TASK_ID:-0}"
 NUM_TASKS=8
 MANIFEST="/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_xl_case_robust_asr-filtered.tsv"
-PY_SCRIPT="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/gemini/llm_future_sampling_thinking_policy_gemini_json_flash_pro_fallback.py"
+PY_SCRIPT="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/gemini/llm_future_sampling_thinking_policy_gemini_json_flash_pro_fallback.py"
 OUTPUT_ROOT="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_future_sampling_thinking_gemini/gemini_flash_json_pro_nosimalign_nosecond_100"
 SLURM_LOG_DIR="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_future_sampling_thinking_gemini/slurm_logs"
 

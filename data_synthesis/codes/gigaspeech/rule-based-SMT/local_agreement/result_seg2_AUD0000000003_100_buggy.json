@@ -1,0 +1,77 @@
+{
+  "utt_id": "AUD0000000003_100",
+  "src_trajectory": [
+    "",
+    "When these were",
+    "brought to the king",
+    "he sent for the",
+    "prince at",
+    "once and asked",
+    "if it",
+    "had been",
+    "he who had come to their",
+    "rescue. ",
+    "",
+    "Yes, your",
+    "majesty, it was",
+    "I answered",
+    "the prince. "
+  ],
+  "src_text_full": [
+    "When these were brought to the king he sent for the prince at once and asked if it had been he who had come to their rescue.",
+    "Yes, your majesty, it was I answered the prince."
+  ],
+  "source_full_text": "When these were brought to the king he sent for the prince at once and asked if it had been he who had come to their rescue. Yes, your majesty, it was I answered the prince.",
+  "target_trajectory": [
+    "",
+    "当这些被",
+    "",
+    "",
+    "",
+    "带到国王面前时，他",
+    "",
+    "立刻",
+    "",
+    "召见了王子，并问他是否",
+    "",
+    "就是",
+    "",
+    "",
+    "那位前来救援的人。是的，陛下，正是我回答了王子。"
+  ],
+  "actions": [
+    "READ",
+    "WRITE",
+    "READ",
+    "READ",
+    "READ",
+    "WRITE",
+    "READ",
+    "WRITE",
+    "READ",
+    "WRITE",
+    "READ",
+    "WRITE",
+    "READ",
+    "READ",
+    "WRITE"
+  ],
+  "prediction": "当这些被带到国王面前时，他立刻召见了王子，并问他是否就是那位前来救援的人。是的，陛下，正是我回答了王子。",
+  "reference_text": "当这些东西被带到国王面前时，他立刻召见了王子，并问他是否就是那位前来救援他们的人。是的，陛下，正是我，王子回答道。",
+  "decoder_impl": {
+    "method": "local_agreement",
+    "la_n": 2,
+    "segment_size": 2,
+    "segment_size_sampling": "fixed_for_verbose_replay",
+    "lcp_mode": "char"
+  },
+  "metrics": {
+    "laal_text": 10.298245614035087,
+    "bleu_char": 77.5118716832798,
+    "pred_chars": 52,
+    "ref_chars": 57,
+    "src_words": 36,
+    "length_ratio_ref": 0.9122807017543859,
+    "length_ratio_src": 1.4444444444444444
+  }
+}

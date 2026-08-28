@@ -36,9 +36,9 @@ RUN_PYTHON="${RUN_PYTHON:-${GEMMA4_ENV}/bin/python}"
 VLLM_BIN="${VLLM_BIN:-${GEMMA4_ENV}/bin/vllm}"
 export PATH="${GEMMA4_ENV}/bin:${PATH}"
 
-SERVE_SCRIPT_INSTRUCT="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/serve_instruct_gpu0.sh"
-SERVE_SCRIPT_DUALBASE="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/serve_dual_base_gpu1.sh"
-SCRIPT_PATH="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/consensus_decoding_token_id_level.py"
+SERVE_SCRIPT_INSTRUCT="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/serve_instruct_gpu0.sh"
+SERVE_SCRIPT_DUALBASE="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/serve_dual_base_gpu1.sh"
+SCRIPT_PATH="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/consensus_decoding_token_id_level.py"
 INSTRUCT_TOKENIZER_PATH="${INSTRUCT_TOKENIZER_PATH:-/data/user_data/haolingp/models/Qwen3-30B-A3B-Instruct-2507-FP8}"
 
 INPUT_TSV="${INPUT_TSV:-/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/eval_datasets/train_xl_case_robust_asr_filtered_frozen_llm_reference_subsentence_ref.tsv}"

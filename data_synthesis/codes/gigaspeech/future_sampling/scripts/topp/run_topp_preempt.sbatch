@@ -17,4 +17,4 @@
 TOPP="${TOPP:?Set TOPP via --export=ALL,TOPP=<float> e.g. 0.9}"
 LABEL="${LABEL:-${TOPP//./p}}"
 
-bash /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/scripts/topp/run_topp_common.sh "${TOPP}" "${LABEL}"
+bash /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/scripts/topp/run_topp_common.sh "${TOPP}" "${LABEL}"

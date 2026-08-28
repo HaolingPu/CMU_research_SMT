@@ -25,7 +25,7 @@ export HF_HOME="/data/user_data/haolingp/hf_cache"
 INPUT_TSV="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/eval_datasets/train_xl_case_robust_asr_filtered_frozen_llm_reference_subsentence_ref.tsv"
 OUTPUT_ROOT="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/eval_datasets/subsentence_ref_shards_ja"
 MODEL_PATH="/data/user_data/haolingp/models/Qwen3-30B-A3B-Instruct-2507-FP8"
-CODE="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/hibiki/code/translate_subsentences.py"
+CODE="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/hibiki/code/translate_subsentences.py"
 
 mkdir -p /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/hibiki_logs
 mkdir -p "${OUTPUT_ROOT}"

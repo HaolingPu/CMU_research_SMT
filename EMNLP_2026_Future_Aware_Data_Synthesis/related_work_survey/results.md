@@ -1,0 +1,3219 @@
+# Literature survey: future-aware sampling, lookahead, and consensus decoding for data synthesis in simultaneous (and speech) machine translation
+
+_Source: Semantic Scholar Graph API. Year ≥ 2018. Total papers: 636._
+
+## Round-by-round adds
+
+| Round | New in-scope papers |
+|---|---|
+| 0 | 295 |
+| 1 | 215 |
+| 2 | 123 |
+| 3 | 3 |
+
+## Counts by venue
+
+| Venue | Papers |
+|---|---|
+| ACL | 213 |
+| EMNLP | 184 |
+| NAACL | 53 |
+| ICLR | 28 |
+| ICML | 23 |
+| NeurIPS | 15 |
+| ICASSP | 64 |
+| Interspeech | 56 |
+
+## ACL (213)
+
+- **Magnet: Multi-turn Tool-use Data Synthesis and Distillation via Graph Translation** (2025) — Fan Yin, Zifeng Wang, I-Hung Hsu, Jun Yan, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 23
+  - https://www.semanticscholar.org/paper/4d4c46badc6e84cca48282bd0486733014f0d0b9
+  - arXiv:2503.07826 · doi:10.48550/arXiv.2503.07826
+  - Large language models (LLMs) have exhibited the ability to effectively utilize external tools to address user queries. However, their performance may be limited in complex, multi-turn interactions involving users and multiple tools. To address this, we propose Magnet, a principled framework for synthesizing high-quality training trajectories to enhance the function calling capability of large lang…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **SeqPO-SiMT: Sequential Policy Optimization for Simultaneous Machine Translation** (2025) — Ting Xu, Zhichao Huang, Jiankai Sun, Shanbo Cheng, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 11
+  - https://www.semanticscholar.org/paper/05253c154bd9ff393503a7311d4d7cef7c8a79d3
+  - arXiv:2505.20622 · doi:10.48550/arXiv.2505.20622
+  - We present Sequential Policy Optimization for Simultaneous Machine Translation (SeqPO-SiMT), a new policy optimization framework that defines the simultaneous machine translation (SiMT) task as a sequential decision making problem, incorporating a tailored reward to enhance translation quality while reducing latency. In contrast to popular Reinforcement Learning from Human Feedback (RLHF) methods,…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Understanding In-Context Machine Translation for Low-Resource Languages: A Case Study on Manchu** (2025) — Renhao Pei, Yihong Liu, Peiqin Lin, Franccois Yvon, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 11
+  - https://www.semanticscholar.org/paper/ec6c8e547141b4250f87ee07d93f424faf7e2921
+  - arXiv:2502.11862 · doi:10.48550/arXiv.2502.11862
+  - In-context machine translation (MT) with large language models (LLMs) is a promising approach for low-resource MT, as it can readily take advantage of linguistic resources such as grammar books and dictionaries. Such resources are usually selectively integrated into the prompt so that LLMs can directly perform translation without any specific training, via their in-context learning capability (ICL…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **Proverbs Run in Pairs: Evaluating Proverb Translation Capability of Large Language Model** (2025) — Minghan Wang, V. Pham, Farhad Moghimifar, Thuy-Trang Vu — _Annual Meeting of the Association for Computational Linguistics_ — cites: 9
+  - https://www.semanticscholar.org/paper/eb999977b22a7dde653e338f6a4c90722d62522e
+  - arXiv:2501.11953 · doi:10.48550/arXiv.2501.11953
+  - Despite achieving remarkable performance, machine translation (MT) research remains underexplored in terms of translating cultural elements in languages, such as idioms, proverbs, and colloquial expressions. This paper investigates the capability of state-of-the-art neural machine translation (NMT) and large language models (LLMs) in translating proverbs, which are deeply rooted in cultural contex…
+  - via: `query:large language simultaneous translation` (round 1)
+- **InfiniSST: Simultaneous Translation of Unbounded Speech with Large Language Model** (2025) — Siqi Ouyang, Xi Xu, Lei Li — _Annual Meeting of the Association for Computational Linguistics_ — cites: 8
+  - https://www.semanticscholar.org/paper/c970555ef29b703addc4d95035a7cb657c351d2d
+  - arXiv:2503.02969 · doi:10.48550/arXiv.2503.02969
+  - Simultaneous translation of unbounded streaming speech remains a challenging problem due to the need for effectively processing the history speech context and past translations so that quality and latency, including computation overhead, can be balanced. Most prior works assume pre-segmented speech, limiting their real-world applicability. In this paper, we propose InfiniSST, a novel approach that…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Enhancing Machine Translation with Self-Supervised Preference Data** (2025) — Haoxiang Sun, Ruize Gao, Pei Zhang, Baosong Yang, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 7
+  - https://www.semanticscholar.org/paper/3fb5ac41e3d8195dff2afc31cf88f02676da848e
+  - doi:10.18653/v1/2025.acl-long.1165
+  - Model alignment methods like Direct Preference Optimization (Rafailov et al., 2024) and Contrastive Preference Optimization (Xu et al., 2024b) have enhanced machine translation performance by leveraging preference data to enable models to reject suboptimal outputs. During preference data construction, previous approaches primarily rely on humans, strong models like GPT4 (OpenAI, 2023) or model sel…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **Asymmetric Conflict and Synergy in Post-training for LLM-based Multilingual Machine Translation** (2025) — Tong Zheng, Yan Wen, Huiwen Bao, Junfeng Guo, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 6
+  - https://www.semanticscholar.org/paper/aab39c2a805f5166dd8cb1234b4cbcca0ad61d2d
+  - arXiv:2502.11223 · doi:10.48550/arXiv.2502.11223
+  - The emergence of Large Language Models (LLMs) has advanced the multilingual machine translation (MMT), yet the Curse of Multilinguality (CoM) remains a major challenge. Existing work in LLM-based MMT typically mitigates this issue via scaling up training and computation budget, which raises a critical question: Is scaling up the training and computation budget truly necessary for high-quality MMT,…
+  - via: `query:translation quality machine translation` (round 1)
+- **AskQE: Question Answering as Automatic Evaluation for Machine Translation** (2025) — Dayeon Ki, Kevin Duh, Marine Carpuat — _Annual Meeting of the Association for Computational Linguistics_ — cites: 5
+  - https://www.semanticscholar.org/paper/0d385ec738107d81ccbdbb692450b3d316a17a69
+  - arXiv:2504.11582 · doi:10.48550/arXiv.2504.11582
+  - How can a monolingual English speaker determine whether an automatic translation in French is good enough to be shared? Existing MT error detection and quality estimation (QE) techniques do not address this practical scenario. We introduce AskQE, a question generation and answering framework designed to detect critical MT errors and provide actionable feedback, helping users decide whether to acce…
+  - via: `query:translation quality machine translation` (round 1)
+- **LLMs Can Achieve High-quality Simultaneous Machine Translation as Efficiently as Offline** (2025) — Biao Fu, Minpeng Liao, Kai Fan, Chengxi Li, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 4
+  - https://www.semanticscholar.org/paper/b4930c3a1764297c5a15c6e84c178743213adc06
+  - arXiv:2504.09570 · doi:10.48550/arXiv.2504.09570
+  - When the complete source sentence is provided, Large Language Models (LLMs) perform excellently in offline machine translation even with a simple prompt"Translate the following sentence from [src lang] into [tgt lang]:". However, in many real scenarios, the source tokens arrive in a streaming manner and simultaneous machine translation (SiMT) is required, then the efficiency and performance of dec…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **SimulS2S-LLM: Unlocking Simultaneous Inference of Speech LLMs for Speech-to-Speech Translation** (2025) — Keqi Deng, Wenxi Chen, Xie Chen, Phil Woodland — _Annual Meeting of the Association for Computational Linguistics_ — cites: 4
+  - https://www.semanticscholar.org/paper/3c143c1a7c47438333354105bbf65d694d417e5b
+  - arXiv:2504.15509 · doi:10.48550/arXiv.2504.15509
+  - Simultaneous speech translation (SST) outputs translations in parallel with streaming speech input, balancing translation quality and latency. While large language models (LLMs) have been extended to handle the speech modality, streaming remains challenging as speech is prepended as a prompt for the entire generation process. To unlock LLM streaming capability, this paper proposes SimulS2S-LLM, wh…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **LACA: Improving Cross-lingual Aspect-Based Sentiment Analysis with LLM Data Augmentation** (2025) — Jakub Šmíd, P. Přibáň, Pavel Král — _Annual Meeting of the Association for Computational Linguistics_ — cites: 4
+  - https://www.semanticscholar.org/paper/122d8dfa575544765c8cb63a7f42ba9fa1951857
+  - arXiv:2508.09515 · doi:10.18653/v1/2025.acl-long.41
+  - Cross-lingual aspect-based sentiment analysis (ABSA) involves detailed sentiment analysis in a target language by transferring knowledge from a source language with available annotated data. Most existing methods depend heavily on often unreliable translation tools to bridge the language gap. In this paper, we propose a new approach that leverages a large language model (LLM) to generate high-qual…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Combining the Best of Both Worlds: A Method for Hybrid NMT and LLM Translation** (2025) — Zhanglin Wu, Daimeng Wei, Xiaoyu Chen, Hengchao Shang, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 4
+  - https://www.semanticscholar.org/paper/8f1b4e1a6dd7b29f3e0c727af0ad0b0b2f81d57d
+  - arXiv:2505.13554 · doi:10.48550/arXiv.2505.13554
+  - Large language model (LLM) shows promising performances in a variety of downstream tasks, such as machine translation (MT). However, using LLMs for translation suffers from high computational costs and significant latency. Based on our evaluation, in most cases, translations using LLMs are comparable to that generated by neural machine translation (NMT) systems. Only in particular scenarios, LLM a…
+  - via: `query:machine translation nmt machine translation` (round 1)
+- **CRPO: Confidence-Reward Driven Preference Optimization for Machine Translation** (2025) — Guofeng Cui, Pichao Wang, Yang Liu, Zemian Ke, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 3
+  - https://www.semanticscholar.org/paper/fbcc487e65cb9fad7a78cc1a59b1799ec626b5a0
+  - arXiv:2501.13927 · doi:10.48550/arXiv.2501.13927
+  - Large language models (LLMs) have shown great potential in natural language processing tasks, but their application to machine translation (MT) remains challenging due to pretraining on English-centric data and the complexity of reinforcement learning from human feedback (RLHF). Direct Preference Optimization (DPO) has emerged as a simpler and more efficient alternative, but its performance depend…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **Memorization Inheritance in Sequence-Level Knowledge Distillation for Neural Machine Translation** (2025) — Verna Dankers, Vikas Raunak — _Annual Meeting of the Association for Computational Linguistics_ — cites: 3
+  - https://www.semanticscholar.org/paper/4071ec1b6084eee055aff922470d372f13148676
+  - arXiv:2502.01491 · doi:10.48550/arXiv.2502.01491
+  - In this work, we explore how instance-level memorization in the teacher Neural Machine Translation (NMT) model gets inherited by the student model in sequence-level knowledge distillation (SeqKD). We find that despite not directly seeing the original training data, students memorize more than baseline models (models of the same size, trained on the original data) -- 3.4% for exact matches and 57%…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **Going Beyond Your Expectations in Latency Metrics for Simultaneous Speech Translation** (2025) — Jorge Iranzo-Sánchez, Javier Iranzo-Sánchez, Adrià Giménez, Jorge Civera — _Annual Meeting of the Association for Computational Linguistics_ — cites: 1
+  - https://www.semanticscholar.org/paper/748d154acc0a432890424ae483e2f2cb21039c76
+  - doi:10.18653/v1/2025.findings-acl.937
+  - ,
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **A Self-Distillation Recipe for Neural Machine Translation** (2025) — Hongfei Xu, Zhuofei Liang, Qiuhui Liu, Lingling Mu — _Annual Meeting of the Association for Computational Linguistics_ — cites: 1
+  - https://www.semanticscholar.org/paper/9f86aeb7603dbe604e6684553359f2b032110f5a
+  - doi:10.18653/v1/2025.findings-acl.261
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **A Semantic Uncertainty Sampling Strategy for Back-Translation in Low-Resources Neural Machine Translation** (2025) — Yepai Jia, Yatu Ji, Xiang Xue, Lei Shi, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 1
+  - https://www.semanticscholar.org/paper/3670d5f73b69689aa72bfcae8372893e4e11cba1
+  - doi:10.18653/v1/2025.acl-srw.35
+  - Back-translation has been proven effective in enhancing the performance of Neural Machine Translation (NMT), with its core mechanism relying on synthesizing parallel corpora to strengthen model training. However, while traditional back-translation methods alleviate the data scarcity in low-resource machine translation, their dependence on random sampling strategies ignores the semantic quality of…
+  - via: `query:back-translation simultaneous` (round 0)
+- **Alleviating Distribution Shift in Synthetic Data for Machine Translation Quality Estimation** (2025) — Xiang Geng, Zhejian Lai, Jiajun Chen, Hao Yang, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 1
+  - https://www.semanticscholar.org/paper/ea10f25033e66409dae39f37bbb6e2ca649e468e
+  - arXiv:2502.19941 · doi:10.48550/arXiv.2502.19941
+  - Quality Estimation (QE) models evaluate the quality of machine translations without reference translations, serving as the reward models for the translation task. Due to the data scarcity, synthetic data generation has emerged as a promising solution. However, synthetic QE data often suffers from distribution shift, which can manifest as discrepancies between pseudo and real translations, or in ps…
+  - via: `query:translation quality simultaneous translation` (round 1)
+- **MockConf: A Student Interpretation Dataset: Analysis, Word- and Span-level Alignment and Baselines** (2025) — D'avid Javorsk'y, O. Bojar, Franccois Yvon — _Annual Meeting of the Association for Computational Linguistics_ — cites: 1
+  - https://www.semanticscholar.org/paper/6235f98b978dea70553cfe2ff265cf401b2d6bbd
+  - arXiv:2506.04848 · doi:10.48550/arXiv.2506.04848
+  - In simultaneous interpreting, an interpreter renders a source speech into another language with a very short lag, much sooner than sentences are finished. In order to understand and later reproduce this dynamic and complex task automatically, we need dedicated datasets and tools for analysis, monitoring, and evaluation, such as parallel speech corpora, and tools for their automatic annotation. Exi…
+  - via: `cite_of:56665fd91f7d05842380fe0f928461d66f10c5de` (round 2)
+- **Low-Resource Grammatical Error Correction: Selective Data Augmentation with Round-Trip Machine Translation** (2025) — F. Gomez, Alla Rozovskaya — _Annual Meeting of the Association for Computational Linguistics_ — cites: 0
+  - https://www.semanticscholar.org/paper/59866ccddfc2f0cd480fd84f2d84ba7ec4d4266b
+  - doi:10.18653/v1/2025.findings-acl.1322
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Is linguistically-motivated data augmentation worth it?** (2025) — Ray Groshan, Michael Ginn, Alexis Palmer — _Annual Meeting of the Association for Computational Linguistics_ — cites: 0
+  - https://www.semanticscholar.org/paper/20fef1d86f266084d6303ddb225e449de1155ead
+  - arXiv:2506.03593 · doi:10.48550/arXiv.2506.03593
+  - Data augmentation, a widely-employed technique for addressing data scarcity, involves generating synthetic data examples which are then used to augment available training data. Researchers have seen surprising success from simple methods, such as random perturbations from natural examples, where models seem to benefit even from data with nonsense words, or data that doesn't conform to the rules of…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Towards Building Large Scale Datasets and State-of-the-Art Automatic Speech Translation Systems for 14 Indian Languages** (2025) — Ashwin Sankar, Sparsh Jain, N. Narasimhan, Devilal Choudhary, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 0
+  - https://www.semanticscholar.org/paper/bda47dae82583acf4808b6624b6894ab9cb9a9aa
+  - doi:10.18653/v1/2025.acl-long.1582
+  - Speech translation for Indian languages remains a challenging task due to the scarcity of large-scale, publicly available datasets that capture the linguistic diversity and domain coverage essential for real-world applications. Existing datasets cover a fraction of Indian languages and lack the breadth needed to train robust models that generalize beyond curated benchmarks. To bridge this gap, we…
+  - via: `query:streaming speech translation` (round 0)
+- **Visualising Policy-Reward Interplay to Inform Zeroth-Order Preference Optimisation of Large Language Models** (2025) — Alessio Galatolo, Zhenbang Dai, Katie Winkle, Meriem Beloucif — _Annual Meeting of the Association for Computational Linguistics_ — cites: 0
+  - https://www.semanticscholar.org/paper/90b0ba69862926fb323e65929098a910befe5745
+  - arXiv:2503.03460 · doi:10.48550/arXiv.2503.03460
+  - Fine-tuning Large Language Models (LLMs) with first-order methods like back-propagation is computationally intensive. Zeroth-Order (ZO) optimisation uses function evaluations instead of gradients, reducing memory usage, but suffers from slow convergence in high-dimensional models. As a result, ZO research in LLMs has mostly focused on classification, overlooking more complex generative tasks. In t…
+  - via: `query:back-translation simultaneous` (round 0)
+- **DoCIA: An Online Document-Level Context Incorporation Agent for Speech Translation** (2025) — Xinglin Lyu, Wei Tang, Yuang Li, Xiaofeng Zhao, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 0
+  - https://www.semanticscholar.org/paper/4f9abe1556d42e81142c38786cc3d847cb4ea880
+  - arXiv:2504.05122 · doi:10.48550/arXiv.2504.05122
+  - Document-level context is crucial for handling discourse challenges in text-to-text document-level machine translation (MT). Despite the increased discourse challenges introduced by noise from automatic speech recognition (ASR), the integration of document-level context in speech translation (ST) remains insufficiently explored. In this paper, we develop DoCIA, an online framework that enhances ST…
+  - via: `query:machine translation nmt speech translation` (round 1)
+- **DialUp! Modeling the Language Continuum by Adapting Models to Dialects and Dialects to Models** (2025) — Niyati Bafna, Emily Chang, N. R. Robinson, David R. Mortensen, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 0
+  - https://www.semanticscholar.org/paper/4417c8641f69062c46649f39e44c16c619481036
+  - arXiv:2501.16581 · doi:10.18653/v1/2025.acl-long.989
+  - Most of the world's languages and dialects are low-resource, and lack support in mainstream machine translation (MT) models. However, many of them have a closely-related high-resource language (HRL) neighbor, and differ in linguistically regular ways from it. This underscores the importance of model robustness to dialectal variation and cross-lingual generalization to the HRL dialect continuum. We…
+  - via: `cite_of:595306f993993e44e2c2f674367103f44df03d9b` (round 1)
+- **Large Language Models Can Learn Temporal Reasoning** (2024) — Siheng Xiong, Ali Payani, R. Kompella, F. Fekri — _Annual Meeting of the Association for Computational Linguistics_ — cites: 174
+  - https://www.semanticscholar.org/paper/5ff337e94bb710bab34c340e06b0618612126961
+  - arXiv:2401.06853 · doi:10.48550/arXiv.2401.06853
+  - While large language models (LLMs) have demonstrated remarkable reasoning capabilities, they are not without their flaws and inaccuracies. Recent studies have introduced various methods to mitigate these limitations. Temporal reasoning (TR), in particular, presents a significant challenge for LLMs due to its reliance on diverse temporal concepts and intricate temporal logic. In this paper, we prop…
+  - via: `query:large language simultaneous translation` (round 1)
+- **MathGenie: Generating Synthetic Data with Question Back-translation for Enhancing Mathematical Reasoning of LLMs** (2024) — Zimu Lu, Aojun Zhou, Houxing Ren, Ke Wang, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 96
+  - https://www.semanticscholar.org/paper/135da052891fdcf3842901b6b7585ca8c258f1c2
+  - arXiv:2402.16352 · doi:10.48550/arXiv.2402.16352
+  - Large language models (LLMs) have exhibited great potential in mathematical reasoning. However, there remains a performance gap in this area between existing open-source models and closed-source models such as GPT-4. In this paper, we introduce MathGenie, a novel method for generating diverse and reliable math problems from a small-scale problem-solution dataset (denoted as seed data). We augment…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Enhancing Multilingual Capabilities of Large Language Models through Self-Distillation from Resource-Rich Languages** (2024) — Yuan Zhang, Yile Wang, Zijun Liu, Shuo Wang, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 45
+  - https://www.semanticscholar.org/paper/5e5f04a5ab1d22ffad0e96585469e269369ec676
+  - arXiv:2402.12204 · doi:10.48550/arXiv.2402.12204
+  - While large language models (LLMs) have been pre-trained on multilingual corpora, their performance still lags behind in most languages compared to a few resource-rich languages. One common approach to mitigate this issue is to translate training data from resource-rich languages into other languages and then continue training. However, using the data obtained solely relying on translation while i…
+  - via: `query:large language llms simultaneous translation` (round 1)
+- **StreamSpeech: Simultaneous Speech-to-Speech Translation with Multi-task Learning** (2024) — Shaolei Zhang, Qingkai Fang, Shoutao Guo, Zhengrui Ma, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 24
+  - https://www.semanticscholar.org/paper/7c333a7c080f80f39884df76cff57ed22e8da350
+  - arXiv:2406.03049 · doi:10.48550/arXiv.2406.03049
+  - Simultaneous speech-to-speech translation (Simul-S2ST, a.k.a streaming speech translation) outputs target speech while receiving streaming speech inputs, which is critical for real-time communication. Beyond accomplishing translation between speech, Simul-S2ST requires a policy to control the model to generate corresponding target speech at the opportune moment within speech inputs, thereby posing…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **DRT: Deep Reasoning Translation via Long Chain-of-Thought** (2024) — Jiaan Wang, Fandong Meng, Yunlong Liang, Jie Zhou — _Annual Meeting of the Association for Computational Linguistics_ — cites: 22
+  - https://www.semanticscholar.org/paper/528596245892d8b822d41ae68f914d2eb2b4e055
+  - arXiv:2412.17498 · doi:10.18653/v1/2025.findings-acl.351
+  - Recently, O1-like models have emerged as representative examples, illustrating the effectiveness of long chain-of-thought (CoT) in reasoning tasks such as math and coding tasks. In this paper, we introduce DRT, an attempt to bring the success of long CoT to neural machine translation (MT). Specifically, in view of the literature books that might involve similes and metaphors, translating these tex…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **StreamAtt: Direct Streaming Speech-to-Text Translation with Attention-based Audio History Selection** (2024) — Sara Papi, Marco Gaido, Matteo Negri, L. Bentivogli — _Annual Meeting of the Association for Computational Linguistics_ — cites: 21
+  - https://www.semanticscholar.org/paper/547fbeebdb4da444a1631fa26a4fcbefa506941d
+  - arXiv:2406.06097 · doi:10.48550/arXiv.2406.06097
+  - Streaming speech-to-text translation (StreamST) is the task of automatically translating speech while incrementally receiving an audio stream. Unlike simultaneous ST (SimulST), which deals with pre-segmented speech, StreamST faces the challenges of handling continuous and unbounded audio streams. This requires additional decisions about what to retain of the previous history, which is impractical…
+  - via: `query:streaming speech translation` (round 0)
+- **LLaST: Improved End-to-end Speech Translation System Leveraged by Large Language Models** (2024) — Xi Chen, Songyang Zhang, Qibing Bai, Kai Chen, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 21
+  - https://www.semanticscholar.org/paper/f4259f5d0b63f55859795161859b830e155318af
+  - arXiv:2407.15415 · doi:10.48550/arXiv.2407.15415
+  - We introduces LLaST, a framework for building high-performance Large Language model based Speech-to-text Translation systems. We address the limitations of end-to-end speech translation(E2E ST) models by exploring model architecture design and optimization techniques tailored for LLMs. Our approach includes LLM-based speech translation architecture design, ASR-augmented training, multilingual data…
+  - via: `query:streaming speech translation` (round 0)
+- **A Non-autoregressive Generation Framework for End-to-End Simultaneous Speech-to-Any Translation** (2024) — Zhengrui Ma, Qingkai Fang, Shaolei Zhang, Shoutao Guo, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 20
+  - https://www.semanticscholar.org/paper/e6b7bb81c863235ffe22f25b316b6270080d28e4
+  - arXiv:2406.06937 · doi:10.18653/v1/2024.acl-long.85
+  - Simultaneous translation models play a crucial role in facilitating communication. However, existing research primarily focuses on text-to-text or speech-to-text models, necessitating additional cascade components to achieve speech-to-speech translation. These pipeline methods suffer from error propagation and accumulate delays in each cascade component, resulting in reduced synchronization betwee…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Don't Rank, Combine! Combining Machine Translation Hypotheses Using Quality Estimation** (2024) — Giorgos Vernikos, A. Popescu-Belis — _Annual Meeting of the Association for Computational Linguistics_ — cites: 20
+  - https://www.semanticscholar.org/paper/e21e5e9f87c3ac0c281264f4e8d94d15924591d6
+  - arXiv:2401.06688 · doi:10.48550/arXiv.2401.06688
+  - Neural machine translation systems estimate probabilities of target sentences given source sentences, yet these estimates may not align with human preferences. This work introduces QE-fusion, a method that synthesizes translations using a quality estimation metric (QE), which correlates better with human judgments. QE-fusion leverages a pool of candidates sampled from a model, combining spans from…
+  - via: `query:translation quality machine translation` (round 1)
+- **Low-resource neural machine translation with morphological modeling** (2024) — Antoine Nzeyimana — _NAACL-HLT_ — cites: 16
+  - https://www.semanticscholar.org/paper/886f04fa5cb313a10b6b8ed2da4ab16faecc2a19
+  - arXiv:2404.02392 · doi:10.48550/arXiv.2404.02392
+  - Morphological modeling in neural machine translation (NMT) is a promising approach to achieving open-vocabulary machine translation for morphologically-rich languages. However, existing methods such as sub-word tokenization and character-based models are limited to the surface forms of the words. In this work, we propose a framework-solution for modeling complex morphology in low-resource settings…
+  - via: `cite_of:143cd4b4717651caf276c7256502dc491454e197` (round 1)
+- **Decoder-only Streaming Transformer for Simultaneous Translation** (2024) — Shoutao Guo, Shaolei Zhang, Yang Feng — _Annual Meeting of the Association for Computational Linguistics_ — cites: 15
+  - https://www.semanticscholar.org/paper/f308bbbd7e45cc0d3caec562d29b4cebd318ed47
+  - arXiv:2406.03878 · doi:10.48550/arXiv.2406.03878
+  - Simultaneous Machine Translation (SiMT) generates translation while reading source tokens, essentially producing the target prefix based on the source prefix. To achieve good performance, it leverages the relationship between source and target prefixes to exact a policy to guide the generation of translations. Although existing SiMT methods primarily focus on the Encoder-Decoder architecture, we e…
+  - via: `query:prefix-to-prefix translation` (round 0)
+- **wav2vec-S: Adapting Pre-trained Speech Models for Streaming** (2024) — Biao Fu, Kai Fan, Minpeng Liao, Yidong Chen, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 14
+  - https://www.semanticscholar.org/paper/b04ac01ebb9aaec98bdf4cbef5fb693d1ea7243d
+  - doi:10.18653/v1/2024.findings-acl.681
+  - Pre-trained speech models, such as wav2vec 2.0, have significantly advanced speech-related tasks, including speech recognition and translation. However, their applicability in streaming scenarios is limited because these models are trained on complete utterances, leading to a mismatch with incremental streaming inputs. This paper identifies three critical de-sign aspects within the architecture of…
+  - via: `query:streaming speech translation` (round 0)
+- **Can We Achieve High-quality Direct Speech-to-Speech Translation without Parallel Speech Data?** (2024) — Qingkai Fang, Shaolei Zhang, Zhengrui Ma, Min Zhang, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 13
+  - https://www.semanticscholar.org/paper/7bad3c27c5381798c9cd41001f2155dd16627a23
+  - arXiv:2406.07289 · doi:10.48550/arXiv.2406.07289
+  - Recently proposed two-pass direct speech-to-speech translation (S2ST) models decompose the task into speech-to-text translation (S2TT) and text-to-speech (TTS) within an end-to-end model, yielding promising results. However, the training of these models still relies on parallel speech data, which is extremely challenging to collect. In contrast, S2TT and TTS have accumulated a large amount of data…
+  - via: `query:streaming speech translation` (round 0)
+- **M-MAD: Multidimensional Multi-Agent Debate for Advanced Machine Translation Evaluation** (2024) — Zhaopeng Feng, Jiayuan Su, Jiamei Zheng, Jiahan Ren, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 12
+  - https://www.semanticscholar.org/paper/d4eb693f9a09bc0338c70db0268f59ce548eab71
+  - arXiv:2412.20127 · doi:10.18653/v1/2025.acl-long.351
+  - Recent advancements in large language models (LLMs) have given rise to the LLM-as-a-judge paradigm, showcasing their potential to deliver human-like judgments. However, in the field of machine translation (MT) evaluation, current LLM-as-a-judge methods fall short of learned automatic metrics. In this paper, we propose Multidimensional Multi-Agent Debate (M-MAD), a systematic LLM-based multi-agent…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **MultiMed: Multilingual Medical Speech Recognition via Attention Encoder Decoder** (2024) — Khai Le-Duc, Phuc Phan, Tan-Hanh Pham, Bach Phan Tat, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 12
+  - https://www.semanticscholar.org/paper/d483dfb5a2813c33d4d8dfcbb3cee089e9e702a9
+  - arXiv:2409.14074 · doi:10.48550/arXiv.2409.14074
+  - Multilingual automatic speech recognition (ASR) in the medical domain serves as a foundational task for various downstream applications such as speech translation, spoken language understanding, and voice-activated assistants. This technology improves patient care by enabling efficient communication across language barriers, alleviating specialized workforce shortages, and facilitating improved di…
+  - via: `query:available https github speech translation` (round 2)
+- **Continual Learning with Semi-supervised Contrastive Distillation for Incremental Neural Machine Translation** (2024) — Yunlong Liang, Fandong Meng, Jiaan Wang, Jinan Xu, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 11
+  - https://www.semanticscholar.org/paper/ebf7a9e27ec603dd75068b761ebcc5435452adbe
+  - doi:10.18653/v1/2024.acl-long.588
+  - Incrementally expanding the capability of an existing translation model to solve new domain tasks over time is a fundamental and practical problem, which usually suffers from catastrophic forgetting. Generally, multi-domain learning can be seen as a good solution. However, there are two drawbacks: 1) it requires having the training data for all domains available at the same time, which may be unre…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **Uni-Dubbing: Zero-Shot Speech Synthesis from Visual Articulation** (2024) — Songju Lei, Xize Cheng, M. Lyu, Jianqiao Hu, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 11
+  - https://www.semanticscholar.org/paper/fcd9252fd7058ef8901e4b6d0d32b4537bdfcb04
+  - doi:10.18653/v1/2024.acl-long.543
+  - In the field of speech synthesis, there is a growing emphasis on employing multimodal speech to enhance robustness. A key challenge in this area is the scarcity of datasets that pair audio with corresponding video. We employ a methodology that incorporates modality alignment during the pre-training phase on multimodal datasets, uniquely facilitating Zero-Shot generalization through the process of…
+  - via: `query:available https github speech translation` (round 2)
+- **Label-Synchronous Neural Transducer for E2E Simultaneous Speech Translation** (2024) — Keqi Deng, Phil Woodland — _Annual Meeting of the Association for Computational Linguistics_ — cites: 9
+  - https://www.semanticscholar.org/paper/e4dc2fcad427cc2da436dcf1fb0fdaca4cf45bc0
+  - arXiv:2406.04541 · doi:10.48550/arXiv.2406.04541
+  - While the neural transducer is popular for online speech recognition, simultaneous speech translation (SST) requires both streaming and re-ordering capabilities. This paper presents the LS-Transducer-SST, a label-synchronous neural transducer for SST, which naturally possesses these two properties. The LS-Transducer-SST dynamically decides when to emit translation tokens based on an Auto-regressiv…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **A Novel Two-step Fine-tuning Framework for Transfer Learning in Low-Resource Neural Machine Translation** (2024) — Yuan Gao, Feng Hou, Ruili Wang — _NAACL-HLT_ — cites: 9
+  - https://www.semanticscholar.org/paper/29df32ed8017f7fa67c024f88b23ee153996ee7a
+  - doi:10.18653/v1/2024.findings-naacl.203
+  - Existing transfer learning methods for neural 001 machine translation typically use a well-trained 002 translation model (i.e., a parent model ) of a 003 high-resource language pair to directly initial-004 ize a translation model (i.e., a child model ) of 005 a low-resource language pair, and the child 006 model is then fine-tuned with corresponding 007 datasets. In this paper, we propose a novel…
+  - via: `cite_of:595306f993993e44e2c2f674367103f44df03d9b` (round 1)
+- **Self-Modifying State Modeling for Simultaneous Machine Translation** (2024) — Donglei Yu, Xiaomian Kang, Yuchen Liu, Yu Zhou, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 8
+  - https://www.semanticscholar.org/paper/7cad4e7d1a43052a98680be0236d19e66631610d
+  - arXiv:2406.02237 · doi:10.48550/arXiv.2406.02237
+  - Simultaneous Machine Translation (SiMT) generates target outputs while receiving stream source inputs and requires a read/write policy to decide whether to wait for the next source token or generate a new target token, whose decisions form a \textit{decision path}. Existing SiMT methods, which learn the policy by exploring various decision paths in training, face inherent limitations. These method…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **Watching the Watchers: Exposing Gender Disparities in Machine Translation Quality Estimation** (2024) — Emmanouil Zaranis, Giuseppe Attanasio, Sweta Agrawal, Andr'e F. T. Martins — _Annual Meeting of the Association for Computational Linguistics_ — cites: 8
+  - https://www.semanticscholar.org/paper/a6fe3087a42cfafca8596fe1eb4ef64b957c6f71
+  - arXiv:2410.10995 · doi:10.48550/arXiv.2410.10995
+  - Quality estimation (QE)-the automatic assessment of translation quality-has recently become crucial across several stages of the translation pipeline, from data curation to training and decoding. While QE metrics have been optimized to align with human judgments, whether they encode social biases has been largely overlooked. Biased QE risks favoring certain demographic groups over others, e.g., by…
+  - via: `query:translation quality simultaneous translation` (round 1)
+- **Boosting LLM Translation Skills without General Ability Loss via Rationale Distillation** (2024) — Junhong Wu, Yang Zhao, Yangyifan Xu, Bing Liu, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 7
+  - https://www.semanticscholar.org/paper/a7819d1f502b3aafe803f00964f4445187cf8e39
+  - arXiv:2410.13944 · doi:10.48550/arXiv.2410.13944
+  - Large Language Models (LLMs) have achieved impressive results across numerous NLP tasks but still encounter difficulties in machine translation. Traditional methods to improve translation have typically involved fine-tuning LLMs using parallel corpora. However, vanilla fine-tuning often leads to catastrophic forgetting of the instruction-following capabilities and alignment with human preferences,…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **A Lightweight Mixture-of-Experts Neural Machine Translation Model with Stage-wise Training Strategy** (2024) — Fan Zhang, Mei Tu, Song Liu, Jinyao Yan — _NAACL-HLT_ — cites: 6
+  - https://www.semanticscholar.org/paper/5b053e8e85e67c05107989a0e684630a85db4738
+  - doi:10.18653/v1/2024.findings-naacl.154
+  - Dealing with language heterogeneity has always been one of the challenges in neural machine translation (NMT). The idea of us-ing mixture-of-experts (MoE) naturally excels in addressing this issue by employing different experts to take responsibility for different problems. However, the parameter-inefficiency problem in MoE results in less performance improvement when boosting the number of parame…
+  - via: `cite_of:8ae292cbd9144acbf4b42b7ead82b079faf33192` (round 2)
+- **Language Model Priors and Data Augmentation Strategies for Low-resource Machine Translation: A Case Study Using Finnish to Northern Sámi** (2024) — Jonne Sälevä, Constantine Lignos — _Annual Meeting of the Association for Computational Linguistics_ — cites: 5
+  - https://www.semanticscholar.org/paper/b41495f3ef08bfc7771e26a999e72747a16ff7c6
+  - doi:10.18653/v1/2024.findings-acl.768
+  - We investigate ways of using monolingual data in both the source and target languages for improving low-resource machine translation. As a case study, we experiment with translation from Finnish to Northern Sámi. Our experiments show that while conventional backtrans-lation remains a strong contender, using synthetic target-side data when training backtrans-lation models can be helpful as well. We…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Textless Acoustic Model with Self-Supervised Distillation for Noise-Robust Expressive Speech-to-Speech Translation** (2024) — Min-Jae Hwang, Ilia Kulikov, Benjamin N. Peloquin, Hongyu Gong, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 5
+  - https://www.semanticscholar.org/paper/6b3fdf3a3d09ebed37140c64f71dd4c9c4dfa9b4
+  - arXiv:2406.02733 · doi:10.48550/arXiv.2406.02733
+  - In this paper, we propose a textless acoustic model with a self-supervised distillation strategy for noise-robust expressive speech-to-speech translation (S2ST). Recently proposed expressive S2ST systems have achieved impressive expressivity preservation performances by cascading unit-to-speech (U2S) generator to the speech-to-unit translation model. However, these systems are vulnerable to the pr…
+  - via: `query:streaming speech translation` (round 0)
+- **Speech Sense Disambiguation: Tackling Homophone Ambiguity in End-to-End Speech Translation** (2024) — Tengfei Yu, Xuebo Liu, Liang Ding, Kehai Chen, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 4
+  - https://www.semanticscholar.org/paper/0c427c5be363b75fedc9cdeaad6f12feaa8e7a4a
+  - doi:10.18653/v1/2024.acl-long.435
+  - End-to-end speech translation (ST) presents notable disambiguation challenges as it necessitates simultaneous cross-modal and cross-lingual transformations. While word sense disambiguation is an extensively investigated topic in textual machine translation, the exploration of disambiguation strategies for ST models remains limited. Addressing this gap, this paper introduces the concept of speech s…
+  - via: `query:simultaneous speech translation` (round 0)
+- **POMP: Probability-driven Meta-graph Prompter for LLMs in Low-resource Unsupervised Neural Machine Translation** (2024) — Shilong Pan, Zhiliang Tian, Liang Ding, Zhen Huang, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 4
+  - https://www.semanticscholar.org/paper/22c4e5c458abef1635ee796b5e33437aa1df8b1d
+  - arXiv:2401.05596 · doi:10.48550/arXiv.2401.05596
+  - Low-resource languages (LRLs) face challenges in supervised neural machine translation due to limited parallel data, prompting research into unsupervised methods. Unsupervised neural machine translation (UNMT) methods, including back-translation, transfer learning, and pivot-based translation, offer practical solutions for LRL translation, but they are hindered by issues like synthetic data noise,…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **CTC-based Non-autoregressive Textless Speech-to-Speech Translation** (2024) — Qingkai Fang, Zhengrui Ma, Yan Zhou, Min Zhang, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 4
+  - https://www.semanticscholar.org/paper/10d87e58ac817c8a37c142517ed6981fd826bd17
+  - arXiv:2406.07330 · doi:10.48550/arXiv.2406.07330
+  - Direct speech-to-speech translation (S2ST) has achieved impressive translation quality, but it often faces the challenge of slow decoding due to the considerable length of speech sequences. Recently, some research has turned to non-autoregressive (NAR) models to expedite decoding, yet the translation quality typically lags behind autoregressive (AR) models significantly. In this paper, we investig…
+  - via: `query:translation quality speech translation` (round 1)
+- **Addressing Entity Translation Problem via Translation Difficulty and Context Diversity** (2024) — Tian Liang, Xing Wang, Mingming Yang, Yujiu Yang, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 4
+  - https://www.semanticscholar.org/paper/d916a9bcb2202963cc80db901d76c5429408b461
+  - doi:10.18653/v1/2024.findings-acl.691
+  - Neural machine translation (NMT) systems often produce inadequate translations for named entities. In this study, we conducted prelimi-nary experiments to examine the factors affecting the translation accuracy of named entities, specifically focusing on their translation difficulty and context diversity. Based on our observations, we propose a novel data augmentation strategy to enhance the accura…
+  - via: `cite_of:101141b047d119ef9c8fda8dd83d3d9eb3fbfd1f` (round 2)
+- **Domain-Aware k-Nearest-Neighbor Knowledge Distillation for Machine Translation** (2024) — Zhexuan Wang, Shudong Liu, Xuebo Liu, Miao Zhang, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 3
+  - https://www.semanticscholar.org/paper/e291e1c2d0a78ed9175c09741e411e9d24295e85
+  - doi:10.18653/v1/2024.findings-acl.563
+  - k NN-MT has utilized neighborhood knowledge for auxiliary decoding, significantly improving translation performance. Subsequently, k NN-KD transitions the use of neighborhood knowledge from the decoding phase to the training phase, to address the temporal and spatial inefficiencies inherent in k NN-MT. However, k NN-KD transfers all the k NN knowledge arbitrarily, which has the potential to restri…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **Translation Deserves Better: Analyzing Translation Artifacts in Cross-lingual Visual Question Answering** (2024) — chaeHun Park, Ko-tik Lee, Hyesu Lim, Jaeseok Kim, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 3
+  - https://www.semanticscholar.org/paper/c65ba6328d1a7663839876c5d25deb11066f15bb
+  - arXiv:2406.02331 · doi:10.48550/arXiv.2406.02331
+  - Building a reliable visual question answering~(VQA) system across different languages is a challenging problem, primarily due to the lack of abundant samples for training. To address this challenge, recent studies have employed machine translation systems for the cross-lingual VQA task. This involves translating the evaluation samples into a source language (usually English) and using monolingual…
+  - via: `cite_of:8b5b8bd0942d5f39d01c1f4b89d174fb3fde99cc` (round 1)
+- **Exploiting Target Language Data for Neural Machine Translation Beyond Back Translation** (2024) — Abudurexiti Reheman, Yingfeng Luo, Junhao Ruan, Chunliang Zhang, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 2
+  - https://www.semanticscholar.org/paper/b3f06422bc615f4f4a6239856df7ff6cd5ae07d6
+  - doi:10.18653/v1/2024.findings-acl.727
+  - ,
+  - via: `query:back-translation simultaneous` (round 0)
+- **CoVoSwitch: Machine Translation of Synthetic Code-Switched Text Based on Intonation Units** (2024) — Yeeun Kang — _Annual Meeting of the Association for Computational Linguistics_ — cites: 2
+  - https://www.semanticscholar.org/paper/1795efc8da50cde1c5f659b4b7902e45355ee5e7
+  - arXiv:2407.14295 · doi:10.48550/arXiv.2407.14295
+  - Multilingual code-switching research is often hindered by the lack and linguistically biased status of available datasets. To expand language representation, we synthesize code-switching data by replacing intonation units detected through PSST, a speech segmentation model fine-tuned from OpenAI's Whisper, using a speech-to-text translation dataset, CoVoST 2. With our dataset, CoVoSwitch, spanning…
+  - via: `query:machine translation nmt speech translation` (round 1)
+- **Decoupled Vocabulary Learning Enables Zero-Shot Translation from Unseen Languages** (2024) — Carlos Mullov, Ngoc-Quan Pham, Alexander Waibel — _Annual Meeting of the Association for Computational Linguistics_ — cites: 2
+  - https://www.semanticscholar.org/paper/d28ae8d330f47b222f0a2cc3937d2a8dc617e56c
+  - arXiv:2408.02290 · doi:10.48550/arXiv.2408.02290
+  - Multilingual neural machine translation systems learn to map sentences of different languages into a common representation space. Intuitively, with a growing number of seen languages the encoder sentence representation grows more flexible and easily adaptable to new languages. In this work, we test this hypothesis by zero-shot translating from unseen languages. To deal with unknown vocabularies fr…
+  - via: `cite_of:48925fef94500cf19ee220ed74217816f1ab5e60` (round 2)
+- **A Measure of the System Dependence of Automated Metrics** (2024) — Pius von Daniken, Jan Deriu, Mark Cieliebak — _Annual Meeting of the Association for Computational Linguistics_ — cites: 2
+  - https://www.semanticscholar.org/paper/017a5cb0dd05a23b72cdcacb44c61527524f6330
+  - arXiv:2412.03152 · doi:10.48550/arXiv.2412.03152
+  - Automated metrics for Machine Translation have made significant progress, with the goal of replacing expensive and time-consuming human evaluations. These metrics are typically assessed by their correlation with human judgments, which captures the monotonic relationship between human and metric scores. However, we argue that it is equally important to ensure that metrics treat all systems fairly a…
+  - via: `cite_of:01508f386eb2ca5181fde7bb6da4920e250d7498` (round 2)
+- **Context Consistency between Training and Inference in Simultaneous Machine Translation** (2024) — M. Zhong, Lemao Liu, Kehai Chen, Mingming Yang, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 1
+  - https://www.semanticscholar.org/paper/402b63d12063b2e555e587063c7777a6929b1510
+  - doi:10.18653/v1/2024.acl-long.727
+  - Simultaneous Machine Translation (SiMT) 001 aims to yield a real-time partial translation 002 with a monotonically growing source-side 003 context. However, there is a counterintuitive 004 phenomenon about the context usage between 005 training and inference: e.g. , in wait-k inference, 006 model consistently trained with wait-k is much 007 worse than that model inconsistently trained 008 with wai…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **On the Hallucination in Simultaneous Machine Translation** (2024) — M. Zhong, Kehai Chen, Zhengshan Xue, Lemao Liu, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 1
+  - https://www.semanticscholar.org/paper/d98577103396281bbb01555dd18f1fd074e16b86
+  - arXiv:2406.07239 · doi:10.48550/arXiv.2406.07239
+  - It is widely known that hallucination is a critical issue in Simultaneous Machine Translation (SiMT) due to the absence of source-side information. While many efforts have been made to enhance performance for SiMT, few of them attempt to understand and analyze hallucination in SiMT. Therefore, we conduct a comprehensive analysis of hallucination in SiMT from two perspectives: understanding the dis…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Deterministic Reversible Data Augmentation for Neural Machine Translation** (2024) — Jiashu Yao, Heyan Huang, Zeming Liu, Yuhang Guo — _Annual Meeting of the Association for Computational Linguistics_ — cites: 1
+  - https://www.semanticscholar.org/paper/c848ba9db8b4a2aa08f28c29dd8f612ccd43d24f
+  - arXiv:2406.02517 · doi:10.48550/arXiv.2406.02517
+  - Data augmentation is an effective way to diversify corpora in machine translation, but previous methods may introduce semantic inconsistency between original and augmented data because of irreversible operations and random subword sampling procedures. To generate both symbolically diverse and semantically consistent augmentation data, we propose Deterministic Reversible Data Augmentation (DRDA), a…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Unveiling the Power of Source: Source-based Minimum Bayes Risk Decoding for Neural Machine Translation** (2024) — Boxuan Lyu, Hidetaka Kamigaito, Kotaro Funakoshi, Manabu Okumura — _Annual Meeting of the Association for Computational Linguistics_ — cites: 0
+  - https://www.semanticscholar.org/paper/98b264884e12e30b17285046f40224a427f75499
+  - arXiv:2406.11632 · doi:10.48550/arXiv.2406.11632
+  - Maximum a posteriori decoding, a commonly used method for neural machine translation (NMT), aims to maximize the estimated posterior probability. However, high estimated probability does not always lead to high translation quality. Minimum Bayes Risk (MBR) decoding offers an alternative by seeking hypotheses with the highest expected utility. Inspired by Quality Estimation (QE) reranking which use…
+  - via: `query:machine translation nmt machine translation` (round 1)
+- **Democratizing LLMs for Low-Resource Languages by Leveraging their English Dominant Abilities with Linguistically-Diverse Prompts** (2023) — Xuan-Phi Nguyen, Sharifah Mahani Aljunied, Shafiq R. Joty, Lidong Bing — _Annual Meeting of the Association for Computational Linguistics_ — cites: 65
+  - https://www.semanticscholar.org/paper/e534e65562e945cc67f4075ac2757051fc188ea8
+  - arXiv:2306.11372 · doi:10.48550/arXiv.2306.11372
+  - Large language models (LLMs) are known to effectively perform tasks by simply observing few exemplars. However, in low-resource languages, obtaining such hand-picked exemplars can still be challenging, where unsupervised techniques may be necessary. Moreover, competent generative capabilities of LLMs are observed only in high-resource languages, while their performances among under-represented lan…
+  - via: `cite_of:48925fef94500cf19ee220ed74217816f1ab5e60` (round 2)
+- **Small Data, Big Impact: Leveraging Minimal Data for Effective Machine Translation** (2023) — Jean Maillard, Cynthia Gao, Elahe Kalbassi, Kaushik Ram Sadagopan, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 44
+  - https://www.semanticscholar.org/paper/dca2bf9d98af7587bb5fa506ae22ffa806c18659
+  - doi:10.18653/v1/2023.acl-long.154
+  - For many languages, machine translation progress is hindered by the lack of reliable training data. Models are trained on whatever pre-existing datasets may be available and then augmented with synthetic data, because it is often not economical to pay for the creation of large-scale datasets. But for the case of low-resource languages, would the creation of a few thousand professionally translated…
+  - via: `ref_of:166d1e5361465f8e235747d14641249cbb3b6fd2` (round 1)
+- **Rethinking Multimodal Entity and Relation Extraction from a Translation Point of View** (2023) — Changmeng Zheng, Junhao Feng, Yi Cai, Xiaoyong Wei, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 42
+  - https://www.semanticscholar.org/paper/da48e902e5e431fd9939bb36d7830f4c5cbd07fd
+  - doi:10.18653/v1/2023.acl-long.376
+  - We revisit the multimodal entity and relation extraction from a translation point of view. Special attention is paid on the misalignment issue in text-image datasets which may mislead the learning. We are motivated by the fact that the cross-modal misalignment is a similar problem of cross-lingual divergence issue in machine translation. The problem can then be transformed and existing solutions c…
+  - via: `query:available https github machine translation` (round 2)
+- **DUB: Discrete Unit Back-translation for Speech Translation** (2023) — Dong Zhang, Rong Ye, Tom Ko, Mingxuan Wang, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 34
+  - https://www.semanticscholar.org/paper/9d4254074690c4b2f162c0b9631f36363cbd5c7b
+  - arXiv:2305.11411 · doi:10.48550/arXiv.2305.11411
+  - How can speech-to-text translation (ST) perform as well as machine translation (MT)? The key point is to bridge the modality gap between speech and text so that useful MT techniques can be applied to ST. Recently, the approach of representing speech with unsupervised discrete units yields a new way to ease the modality problem. This motivates us to propose Discrete Unit Back-translation (DUB) to a…
+  - via: `query:back-translation simultaneous` (round 0)
+- **PEIT: Bridging the Modality Gap with Pre-trained Models for End-to-End Image Translation** (2023) — Shaolin Zhu, Shangjie Li, Yikun Lei, Deyi Xiong — _Annual Meeting of the Association for Computational Linguistics_ — cites: 33
+  - https://www.semanticscholar.org/paper/0d47f107827c9f38142c0365c67e1a156ae421ab
+  - doi:10.18653/v1/2023.acl-long.751
+  - Image translation is a task that translates an image containing text in the source language to the target language. One major challenge with image translation is the modality gap between visual text inputs and textual inputs/outputs of machine translation (MT). In this paper, we propose PEIT, an end-to-end image translation framework that bridges the modality gap with pre-trained models. It is com…
+  - via: `cite_of:e4d99f390901df5caac0b587ff685f9cde100342` (round 2)
+- **Understanding and Bridging the Modality Gap for Speech Translation** (2023) — Qingkai Fang, Yang Feng — _Annual Meeting of the Association for Computational Linguistics_ — cites: 31
+  - https://www.semanticscholar.org/paper/4b020c57aeb2a1109ff532c9b232752e87b58bfa
+  - arXiv:2305.08706 · doi:10.48550/arXiv.2305.08706
+  - How to achieve better end-to-end speech translation (ST) by leveraging (text) machine translation (MT) data? Among various existing techniques, multi-task learning is one of the effective ways to share knowledge between ST and MT in which additional MT data can help to learn source-to-target mapping. However, due to the differences between speech and text, there is always a gap between ST and MT.…
+  - via: `query:machine translation nmt speech translation` (round 1)
+- **LM-CPPF: Paraphrasing-Guided Data Augmentation for Contrastive Prompt-Based Few-Shot Fine-Tuning** (2023) — Amirhossein Abaskohi, S. Rothe, Yadollah Yaghoobzadeh — _Annual Meeting of the Association for Computational Linguistics_ — cites: 30
+  - https://www.semanticscholar.org/paper/10b0cbc35fa2e53a9b2db66de7af65b3212d9f11
+  - arXiv:2305.18169 · doi:10.18653/v1/2023.acl-short.59
+  - In recent years, there has been significant progress in developing pre-trained language models for NLP. However, these models often struggle when fine-tuned on small datasets. To address this issue, researchers have proposed various adaptation approaches. Prompt-based tuning is arguably the most common way, especially for larger models. Previous research shows that adding contrastive learning to p…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Neural Machine Translation Methods for Translating Text to Sign Language Glosses** (2023) — Dele Zhu, Vera Czehmann, Eleftherios Avramidis — _Annual Meeting of the Association for Computational Linguistics_ — cites: 29
+  - https://www.semanticscholar.org/paper/065f19a17ac5a6d7fe91d0f0b5ad2de7193856d5
+  - doi:10.18653/v1/2023.acl-long.700
+  - State-of-the-art techniques common to low resource Machine Translation (MT) are applied to improve MT of spoken language text to Sign Language (SL) glosses. In our experiments, we improve the performance of the transformer-based models via (1) data augmentation, (2) semi-supervised Neural Machine Translation (NMT), (3) transfer learning and (4) multilingual NMT. The proposed methods are implemente…
+  - via: `query:machine translation nmt machine translation` (round 1)
+- **End-to-End Simultaneous Speech Translation with Differentiable Segmentation** (2023) — Shaolei Zhang, Yang Feng — _Annual Meeting of the Association for Computational Linguistics_ — cites: 28
+  - https://www.semanticscholar.org/paper/222da50f8f3853838b7ce4ca2bf6646fb458addc
+  - arXiv:2305.16093 · doi:10.18653/v1/2023.findings-acl.485
+  - End-to-end simultaneous speech translation (SimulST) outputs translation while receiving the streaming speech inputs (a.k.a. streaming speech translation), and hence needs to segment the speech inputs and then translate based on the current received speech. However, segmenting the speech inputs at unfavorable moments can disrupt the acoustic integrity and adversely affect the performance of the tr…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Hybrid Transducer and Attention based Encoder-Decoder Modeling for Speech-to-Text Tasks** (2023) — Yun Tang, Anna Sun, H. Inaguma, Xinyue Chen, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 28
+  - https://www.semanticscholar.org/paper/82e0cae01a57fd1d18f80dffd6367f85a4c92536
+  - arXiv:2305.03101 · doi:10.48550/arXiv.2305.03101
+  - Transducer and Attention based Encoder-Decoder (AED) are two widely used frameworks for speech-to-text tasks. They are designed for different purposes and each has its own benefits and drawbacks for speech-to-text tasks. In order to leverage strengths of both modeling methods, we propose a solution by combining Transducer and Attention based Encoder-Decoder (TAED) for speech-to-text tasks. The new…
+  - via: `cite_of:9d3480e46cc506b73d5291387c6452998690fdd3` (round 1)
+- **ESPnet-ST-v2: Multipurpose Spoken Language Translation Toolkit** (2023) — Brian Yan, Jiatong Shi, Yun Tang, H. Inaguma, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 23
+  - https://www.semanticscholar.org/paper/dab8e7dc79085774eea58bcb9ea2ed0ee20377eb
+  - arXiv:2304.04596 · doi:10.48550/arXiv.2304.04596
+  - ESPnet-ST-v2 is a revamp of the open-source ESPnet-ST toolkit necessitated by the broadening interests of the spoken language translation community. ESPnet-ST-v2 supports 1) offline speech-to-text translation (ST), 2) simultaneous speech-to-text translation (SST), and 3) offline speech-to-speech translation (S2ST) – each task is supported with a wide variety of approaches, differentiating ESPnet-S…
+  - via: `query:simultaneous speech translation` (round 0)
+- **Learning Language-Specific Layers for Multilingual Machine Translation** (2023) — Telmo Pires, Robin M. Schmidt, Yi-Hsiu Liao, Stephan Peitz — _Annual Meeting of the Association for Computational Linguistics_ — cites: 22
+  - https://www.semanticscholar.org/paper/ad2f06f572281068609dfb0881c8f95c61447fb8
+  - arXiv:2305.02665 · doi:10.48550/arXiv.2305.02665
+  - Multilingual Machine Translation promises to improve translation quality between non-English languages. This is advantageous for several reasons, namely lower latency (no need to translate twice), and reduced error cascades (e.g., avoiding losing gender and formality information when translating through English).On the downside, adding more languages reduces model capacity per language, which is u…
+  - via: `cite_of:4789355a00650afa29682d331d7d9a49a301b43b` (round 2)
+- **Boosting Distress Support Dialogue Responses with Motivational Interviewing Strategy** (2023) — A. Welivita, Pearl Pu — _Annual Meeting of the Association for Computational Linguistics_ — cites: 22
+  - https://www.semanticscholar.org/paper/f9128b360de74811bf964ddc7c045ef67a70b31e
+  - arXiv:2305.10195 · doi:10.48550/arXiv.2305.10195
+  - AI-driven chatbots have become an emerging solution to address psychological distress. Due to the lack of psychotherapeutic data, researchers use dialogues scraped from online peer support forums to train them. But since the responses in such platforms are not given by professionals, they contain both conforming and non-conforming responses. In this work, we attempt to recognize these conforming a…
+  - via: `cite_of:bface38422b7e53287134c4d01a39fa58edd4469` (round 2)
+- **Knowledge Transfer in Incremental Learning for Multilingual Neural Machine Translation** (2023) — Kaiyu Huang, Peng Li, Jin Ma, Ting Yao, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 22
+  - https://www.semanticscholar.org/paper/55f68ac30765d943364b700817cecfcc596e5221
+  - doi:10.18653/v1/2023.acl-long.852
+  - In the real-world scenario, a longstanding goal of multilingual neural machine translation (MNMT) is that a single model can incrementally adapt to new language pairs without accessing previous training data. In this scenario, previous studies concentrate on overcoming catastrophic forgetting while lacking encouragement to learn new knowledge from incremental language pairs, especially when the in…
+  - via: `query:multilingual machine translation simultaneous translation` (round 3)
+- **Learning Optimal Policy for Simultaneous Machine Translation via Binary Search** (2023) — Shoutao Guo, Shaolei Zhang, Yang Feng — _Annual Meeting of the Association for Computational Linguistics_ — cites: 19
+  - https://www.semanticscholar.org/paper/8c10ff429ce113afccfd98f7ecb56955abb9c73e
+  - arXiv:2305.12774 · doi:10.48550/arXiv.2305.12774
+  - Simultaneous machine translation (SiMT) starts to output translation while reading the source sentence and needs a precise policy to decide when to output the generated translation. Therefore, the policy determines the number of source tokens read during the translation of each target token. However, it is difficult to learn a precise translation policy to achieve good latency-quality trade-offs,…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **ParaAMR: A Large-Scale Syntactically Diverse Paraphrase Dataset by AMR Back-Translation** (2023) — Kuan-Hao Huang, Varun Iyer, I-Hung Hsu, Anoop Kumar, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 18
+  - https://www.semanticscholar.org/paper/45f02191fc0fd83a2104bb71d30d465d46681d52
+  - arXiv:2305.16585 · doi:10.48550/arXiv.2305.16585
+  - Paraphrase generation is a long-standing task in natural language processing (NLP). Supervised paraphrase generation models, which rely on human-annotated paraphrase pairs, are cost-inefficient and hard to scale up. On the other hand, automatically annotated paraphrase pairs (e.g., by machine back-translation), usually suffer from the lack of syntactic diversity – the generated paraphrase sentence…
+  - via: `query:back-translation simultaneous` (round 0)
+- **Back Translation for Speech-to-text Translation Without Transcripts** (2023) — Qingkai Fang, Yang Feng — _Annual Meeting of the Association for Computational Linguistics_ — cites: 18
+  - https://www.semanticscholar.org/paper/035f35df68d12607351df80701b6f14064e2c341
+  - arXiv:2305.08709 · doi:10.48550/arXiv.2305.08709
+  - The success of end-to-end speech-to-text translation (ST) is often achieved by utilizing source transcripts, e.g., by pre-training with automatic speech recognition (ASR) and machine translation (MT) tasks, or by introducing additional ASR and MT data. Unfortunately, transcripts are only sometimes available since numerous unwritten languages exist worldwide. In this paper, we aim to utilize large…
+  - via: `query:back-translation simultaneous` (round 0)
+- **Towards Understanding and Improving Knowledge Distillation for Neural Machine Translation** (2023) — Songming Zhang, Yunlong Liang, Shuaibo Wang, Wenjuan Han, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 17
+  - https://www.semanticscholar.org/paper/b256974aa41d0d205a0a7791868bc0573676a579
+  - arXiv:2305.08096 · doi:10.48550/arXiv.2305.08096
+  - Knowledge distillation (KD) is a promising technique for model compression in neural machine translation. However, where the knowledge hides in KD is still not clear, which may hinder the development of KD. In this work, we first unravel this mystery from an empirical perspective and show that the knowledge comes from the top-1 predictions of teachers, which also helps us build a potential connect…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **Towards Higher Pareto Frontier in Multilingual Machine Translation** (2023) — Yi-Chong Huang, Xiaocheng Feng, Xinwei Geng, Baohang Li, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 17
+  - https://www.semanticscholar.org/paper/f8d61c049d4ffa1bd7e1b1c42991a9d724277d03
+  - arXiv:2305.15718 · doi:10.48550/arXiv.2305.15718
+  - Multilingual neural machine translation has witnessed remarkable progress in recent years. However, the long-tailed distribution of multilingual corpora poses a challenge of Pareto optimization, i.e., optimizing for some languages may come at the cost of degrading the performance of others.Existing balancing training strategies are equivalent to a series of Pareto optimal solutions, which trade of…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **BigVideo: A Large-scale Video Subtitle Translation Dataset for Multimodal Machine Translation** (2023) — Liyan Kang, Luyang huang, Ningxin Peng, Peihao Zhu, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 17
+  - https://www.semanticscholar.org/paper/98d51a14f808f5fcb9194ad5a20bc11eaec2f966
+  - arXiv:2305.18326 · doi:10.48550/arXiv.2305.18326
+  - We present a large-scale video subtitle translation dataset, BigVideo, to facilitate the study of multi-modality machine translation. Compared with the widely used How2 and VaTeX datasets, BigVideo is more than 10 times larger, consisting of 4.5 million sentence pairs and 9,981 hours of videos. We also introduce two deliberately designed test sets to verify the necessity of visual information: Amb…
+  - via: `query:machine translation nmt machine translation` (round 1)
+- **kNN-TL: k-Nearest-Neighbor Transfer Learning for Low-Resource Neural Machine Translation** (2023) — Shudong Liu, Xuebo Liu, Derek F. Wong, Zhao Li, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 15
+  - https://www.semanticscholar.org/paper/8e3bb30746a2f263e663b4558300a59d5f49dece
+  - doi:10.18653/v1/2023.acl-long.105
+  - Transfer learning has been shown to be an effective technique for enhancing the performance of low-resource neural machine translation (NMT). This is typically achieved through either fine-tuning a child model with a pre-trained parent model, or by utilizing the out- put of the parent model during the training of the child model. However, these methods do not make use of the parent knowledge durin…
+  - via: `query:machine translation nmt machine translation` (round 1)
+- **Better Simultaneous Translation with Monotonic Knowledge Distillation** (2023) — Shushu Wang, Jing Wu, Kai Fan, Wei Luo, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 14
+  - https://www.semanticscholar.org/paper/69d2239b1307e45467ad7e69650a443f3a6bf07f
+  - doi:10.18653/v1/2023.acl-long.131
+  - Simultaneous machine translation (SiMT) presents a unique challenge as it requires generating target tokens before the source sentence is fully consumed. This can lead to the hallucination problem, where target tokens are generated without support from the source sentence. The prefix-to-prefix training data used to train SiMT models are not always parallel, due to divergent word order between the…
+  - via: `query:prefix-to-prefix translation` (round 0)
+- **CTC-based Non-autoregressive Speech Translation** (2023) — Chen Xu, Xiaoqian Liu, Xiaowen Liu, Qingxuan Sun, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 14
+  - https://www.semanticscholar.org/paper/e4d382633a0a759f9308c10ac51bc179f7144c3f
+  - arXiv:2305.17358 · doi:10.48550/arXiv.2305.17358
+  - Combining end-to-end speech translation (ST) and non-autoregressive (NAR) generation is promising in language and speech processing for their advantages of less error propagation and low latency.In this paper, we investigate the potential of connectionist temporal classification (CTC) for non-autoregressive speech translation (NAST).In particular, we develop a model consisting of two encoders that…
+  - via: `query:bleu points speech translation` (round 2)
+- **CKDST: Comprehensively and Effectively Distill Knowledge from Machine Translation to End-to-End Speech Translation** (2023) — Yikun Lei, Zhengshan Xue, Xiaohu Zhao, Haoran Sun, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 13
+  - https://www.semanticscholar.org/paper/38b062b9544ab3b35ef8fe8c6bbddfc7a3ec092b
+  - doi:10.18653/v1/2023.findings-acl.195
+  - Distilling knowledge from a high-resource task, e.g., machine translation, is an effective way to alleviate the data scarcity problem of end-to-end speech translation. However, previous works simply use the classical knowledge distillation that does not allow for adequate transfer of knowledge from machine translation. In this paper, we propose a comprehensive knowledge distillation framework for…
+  - via: `query:simultaneous speech translation` (round 0)
+- **Target-Side Augmentation for Document-Level Machine Translation** (2023) — Guangsheng Bao, Zhiyang Teng, Yue Zhang — _Annual Meeting of the Association for Computational Linguistics_ — cites: 12
+  - https://www.semanticscholar.org/paper/3e7f42253d1594196847a5ccea60939eee7f2267
+  - arXiv:2305.04505 · doi:10.48550/arXiv.2305.04505
+  - Document-level machine translation faces the challenge of data sparsity due to its long input length and a small amount of training data, increasing the risk of learning spurious patterns. To address this challenge, we propose a target-side augmentation method, introducing a data augmentation (DA) model to generate many potential translations for each source document. Learning on these wider range…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Code-Switched Text Synthesis in Unseen Language Pairs** (2023) — I-Hung Hsu, Avik Ray, Shubham Garg, Nanyun Peng, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 11
+  - https://www.semanticscholar.org/paper/0a3eab75098f2ae26406ae9a3f27d38fab515668
+  - arXiv:2305.16724 · doi:10.48550/arXiv.2305.16724
+  - Existing efforts on text synthesis for code-switching mostly require training on code-switched texts in the target language pairs, limiting the deployment of the models to cases lacking code-switched data. In this work, we study the problem of synthesizing code-switched texts for language pairs absent from the training data. We introduce GLOSS, a model built on top of a pre-trained multilingual ma…
+  - via: `query:prefix-to-prefix translation` (round 0)
+- **Breeding Machine Translations: Evolutionary approach to survive and thrive in the world of automated evaluation** (2023) — Josef Jon, Ondrej Bojar — _Annual Meeting of the Association for Computational Linguistics_ — cites: 11
+  - https://www.semanticscholar.org/paper/6b8f95261aab7b3f123233a90fc063d4970e2be7
+  - arXiv:2305.19330 · doi:10.48550/arXiv.2305.19330
+  - We propose a genetic algorithm (GA) based method for modifying n-best lists produced by a machine translation (MT) system. Our method offers an innovative approach to improving MT quality and identifying weaknesses in evaluation metrics. Using common GA operations (mutation and crossover) on a list of hypotheses in combination with a fitness function (an arbitrary MT metric), we obtain novel and d…
+  - via: `cite_of:01508f386eb2ca5181fde7bb6da4920e250d7498` (round 2)
+- **TransFace: Unit-Based Audio-Visual Speech Synthesizer for Talking Head Translation** (2023) — Xize Cheng, Rongjie Huang, Linjun Li, Zehan Wang, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 10
+  - https://www.semanticscholar.org/paper/ef1238a11944e20954554befcd385c8fac282010
+  - arXiv:2312.15197 · doi:10.48550/arXiv.2312.15197
+  - Direct speech-to-speech translation achieves high-quality results through the introduction of discrete units obtained from self-supervised learning. This approach circumvents delays and cascading errors associated with model cascading. However, talking head translation, converting audio-visual speech (i.e., talking head video) from one language into another, still confronts several challenges comp…
+  - via: `query:translation quality speech translation` (round 1)
+- **AV-TranSpeech: Audio-Visual Robust Speech-to-Speech Translation** (2023) — Rongjie Huang, Huadai Liu, Xize Cheng, Yi Ren, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 10
+  - https://www.semanticscholar.org/paper/f341b9c4b866e8c0121678b76f6e68cab0ad1523
+  - arXiv:2305.15403 · doi:10.48550/arXiv.2305.15403
+  - Direct speech-to-speech translation (S2ST) aims to convert speech from one language into another, and has demonstrated significant progress to date. Despite the recent success, current S2ST models still suffer from distinct degradation in noisy environments and fail to translate visual speech (i.e., the movement of lips and teeth). In this work, we present AV-TranSpeech, the first audio-visual spe…
+  - via: `query:available https github speech translation` (round 2)
+- **Text Style Transfer Back-Translation** (2023) — Daimeng Wei, Zhanglin Wu, Hengchao Shang, Zongyao Li, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 9
+  - https://www.semanticscholar.org/paper/0748082ba59d6a65940482313f3e33dca2b63a53
+  - arXiv:2306.01318 · doi:10.48550/arXiv.2306.01318
+  - Back Translation (BT) is widely used in the field of machine translation, as it has been proved effective for enhancing translation quality. However, BT mainly improves the translation of inputs that share a similar style (to be more specific, translation-liked inputs), since the source side of BT data is machine-translated. For natural inputs, BT brings only slight improvements and sometimes even…
+  - via: `query:back-translation simultaneous` (round 0)
+- **Quality-Aware Translation Models: Efficient Generation and Quality Estimation in a Single Model** (2023) — Christian Tomani, David Vilar, Markus Freitag, Colin Cherry, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 9
+  - https://www.semanticscholar.org/paper/aa2ef84419089992f5ad8ad6cb2f3e5bcd2ba9ab
+  - arXiv:2310.06707 · doi:10.18653/v1/2024.acl-long.836
+  - Maximum-a-posteriori (MAP) decoding is the most widely used decoding strategy for neural machine translation (NMT) models. The underlying assumption is that model probability correlates well with human judgment, with better translations getting assigned a higher score by the model. However, research has shown that this assumption does not always hold, and generation quality can be improved by deco…
+  - via: `cite_of:213e471bacff5c0852943988fcb955797f1e591f` (round 2)
+- **Understanding and Improving the Robustness of Terminology Constraints in Neural Machine Translation** (2023) — Huaao Zhang, Qiang Wang, Bo Qin, Zelin Shi, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 9
+  - https://www.semanticscholar.org/paper/181ea4469aec6558ea44bff51d4665e95fcbb843
+  - doi:10.18653/v1/2023.acl-long.332
+  - In this work, we study the robustness of two typical terminology translation methods: Placeholder (PH) and Code-Switch (CS), concerning (1) the number of constraints and (2) the target constraint length. We identify that existing terminology constraint test sets, such as IATE, Wiktionary, and TICO, are blind to this issue due to oversimplified constraint settings. To solve it, we create a new chal…
+  - via: `cite_of:101141b047d119ef9c8fda8dd83d3d9eb3fbfd1f` (round 2)
+- **Simul-LLM: A Framework for Exploring High-Quality Simultaneous Translation with Large Language Models** (2023) — Victor Agostinelli, Max Wild, Matthew Raffel, Kazi Ahmed Asif Fuad, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 8
+  - https://www.semanticscholar.org/paper/327538447d0d9f8eb1fadadd4d3080048a30f585
+  - arXiv:2312.04691 · doi:10.48550/arXiv.2312.04691
+  - Large language models (LLMs) with billions of parameters and pretrained on massive amounts of data are now capable of near or better than state-of-the-art performance in a variety of downstream natural language processing tasks. Neural machine translation (NMT) is one such task that LLMs have been applied to with great success. However, little research has focused on applying LLMs to the more diff…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **An Extensive Exploration of Back-Translation in 60 Languages** (2023) — Paul McNamee, Kevin Duh — _Annual Meeting of the Association for Computational Linguistics_ — cites: 7
+  - https://www.semanticscholar.org/paper/3b1cea929fb0a44886ed654c9ca88a9df959f371
+  - doi:10.18653/v1/2023.findings-acl.518
+  - Back-translation is a data augmentation technique that has been shown to improve model quality through the creation of synthetic training bitext. Early studies showed the promise of the technique and follow on studies have produced additional refinements. We have undertaken a broad investigation using back-translation to train models from 60 languages into English; the majority of these languages…
+  - via: `query:back-translation simultaneous` (round 0)
+- **Dynamic and Efficient Inference for Text Generation via BERT Family** (2023) — Xiaobo Liang, Juntao Li, Lijun Wu, Ziqiang Cao, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 7
+  - https://www.semanticscholar.org/paper/ef2f297648c120e9e7315e1f39816026432abb22
+  - doi:10.18653/v1/2023.acl-long.162
+  - Despite the excellent performance of Pre-trained Language Models on many text generation tasks, they suffer from inefficient inference on computation and memory due to their large-scale parameters and the universal autoregressive decoding paradigm. In this work, we propose a novel fine-tuning method DEER, which can make a single pre-trained model support Dynamic and Efficient infERence and achieve…
+  - via: `cite_of:1e5b826ddf0754f6e93234ba1260bd939c255e7f` (round 1)
+- **When and how to paraphrase for named entity recognition?** (2023) — Saket Sharma, Aviral Joshi, Yiyun Zhao, Namrata Mukhija, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 7
+  - https://www.semanticscholar.org/paper/a12696e2072db458e3b3cae35209b85ade89ea84
+  - doi:10.18653/v1/2023.acl-long.390
+  - While paraphrasing is a promising approach for data augmentation in classification tasks, its effect on named entity recognition (NER) is not investigated systematically due to the difficulty of span-level label preservation. In this paper, we utilize simple strategies to annotate entity spans in generations and compare established and novel methods of paraphrasing in NLP such as back translation,…
+  - via: `cite_of:c6801d553a43530b192309ef4364a43e33e4067f` (round 1)
+- **Pretrained Bidirectional Distillation for Machine Translation** (2023) — Yimeng Zhuang, Mei Tu — _Annual Meeting of the Association for Computational Linguistics_ — cites: 6
+  - https://www.semanticscholar.org/paper/08fd892c63d327e1b6c1299e447db013c6b15875
+  - doi:10.18653/v1/2023.acl-long.63
+  - Knowledge transfer can boost neural machine translation (NMT), for example, by finetuning a pretrained masked language model (LM). However, it may suffer from the forgetting problem and the structural inconsistency between pretrained LMs and NMT models. Knowledge distillation (KD) may be a potential solution to alleviate these issues, but few studies have investigated language knowledge transfer f…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **Counterfactuals of Counterfactuals: a back-translation-inspired approach to analyse counterfactual editors** (2023) — Giorgos Filandrianos, Edmund Dervakos, O. M. Mastromichalakis, Chrysoula Zerva, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 6
+  - https://www.semanticscholar.org/paper/7fc8da1a277ce4a8292f6675a2f7ce2f928a283b
+  - arXiv:2305.17055 · doi:10.48550/arXiv.2305.17055
+  - In the wake of responsible AI, interpretability methods, which attempt to provide an explanation for the predictions of neural models have seen rapid progress. In this work, we are concerned with explanations that are applicable to natural language processing (NLP) models and tasks, and we focus specifically on the analysis of counterfactual, contrastive explanations. We note that while there have…
+  - via: `query:back-translation simultaneous` (round 0)
+- **"A Little is Enough": Few-Shot Quality Estimation based Corpus Filtering improves Machine Translation** (2023) — Akshay Batheja, P. Bhattacharyya — _Annual Meeting of the Association for Computational Linguistics_ — cites: 6
+  - https://www.semanticscholar.org/paper/3af356cbcc07974a529c45656eff379ab9db0058
+  - arXiv:2306.03507 · doi:10.48550/arXiv.2306.03507
+  - Quality Estimation (QE) is the task of evaluating the quality of a translation when reference translation is not available. The goal of QE aligns with the task of corpus filtering, where we assign the quality score to the sentence pairs present in the pseudo-parallel corpus. We propose a Quality Estimation based Filtering approach to extract high-quality parallel data from the pseudo-parallel corp…
+  - via: `query:translation quality machine translation` (round 1)
+- **A Multi-task Learning Framework for Quality Estimation** (2023) — S. Deoghare, Paramveer Choudhary, Diptesh Kanojia, Tharindu Ranasinghe, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 6
+  - https://www.semanticscholar.org/paper/1b876f14e94d5b0fb86d535fe00437ab235a4ef5
+  - doi:10.18653/v1/2023.findings-acl.585
+  - Quality Estimation (QE) is the task of evaluating machine translation output in the absence of reference translation. Conventional approaches to QE involve training separate models at different levels of granularity viz., word-level, sentence-level, and document-level, which sometimes lead to inconsistent predictions for the same input. To overcome this limitation, we focus on jointly training a s…
+  - via: `cite_of:95bcee172f94c7ce7201d3cc3d221ec4a4a9d706` (round 2)
+- **Extract and Attend: Improving Entity Translation in Neural Machine Translation** (2023) — Zixin Zeng, Rui Wang, Yichong Leng, Junliang Guo, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 5
+  - https://www.semanticscholar.org/paper/48d7fd0301059df7d263d7ea56986e346431487a
+  - arXiv:2306.02242 · doi:10.48550/arXiv.2306.02242
+  - While Neural Machine Translation(NMT) has achieved great progress in recent years, it still suffers from inaccurate translation of entities (e.g., person/organization name, location), due to the lack of entity training instances. When we humans encounter an unknown entity during translation, we usually first look up in a dictionary and then organize the entity translation together with the transla…
+  - via: `query:prefix-to-prefix translation` (round 0)
+- **Implicit Memory Transformer for Computationally Efficient Simultaneous Speech Translation** (2023) — Matthew Raffel, Lizhong Chen — _Annual Meeting of the Association for Computational Linguistics_ — cites: 5
+  - https://www.semanticscholar.org/paper/956697da5f282c1bc89b19b4127f7c040aa2268e
+  - arXiv:2307.01381 · doi:10.48550/arXiv.2307.01381
+  - Simultaneous speech translation is an essential communication task difficult for humans whereby a translation is generated concurrently with oncoming speech inputs. For such a streaming task, transformers using block processing to break an input sequence into segments have achieved state-of-the-art performance at a reduced cost. Current methods to allow information to propagate across segments, in…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Improving Translation Quality Estimation with Bias Mitigation** (2023) — Hui Huang, Shuangzhi Wu, Kehai Chen, Hui Di, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 5
+  - https://www.semanticscholar.org/paper/e82812f3b7ba97a29f0c3cf75cae707860ec8b59
+  - doi:10.18653/v1/2023.acl-long.121
+  - State-of-the-art translation Quality Estimation (QE) models are proven to be biased. More specifically, they over-rely on monolingual features while ignoring the bilingual semantic alignment. In this work, we propose a novel method to mitigate the bias of the QE model and improve estimation performance. Our method is based on the contrastive learning between clean and noisy sentence pairs. We firs…
+  - via: `query:translation quality simultaneous translation` (round 1)
+- **Rethinking the Word-level Quality Estimation for Machine Translation from Human Judgement** (2023) — Zhen Yang, Fandong Meng, Yuanmeng Yan, Jie Zhou — _Annual Meeting of the Association for Computational Linguistics_ — cites: 5
+  - https://www.semanticscholar.org/paper/4109370c4d32892daac2c7a7c3b8531dbc4610a6
+  - doi:10.18653/v1/2023.findings-acl.126
+  - ,
+  - via: `query:translation quality machine translation` (round 1)
+- **Robustness of Multi-Source MT to Transcription Errors** (2023) — Dominik Mach'avcek, Peter Pol'ak, Ondrej Bojar, Raj Dabre — _Annual Meeting of the Association for Computational Linguistics_ — cites: 4
+  - https://www.semanticscholar.org/paper/93e0092d3e4bb0c1a1f0df2faab1395fde97dde3
+  - arXiv:2305.16894 · doi:10.48550/arXiv.2305.16894
+  - Automatic speech translation is sensitive to speech recognition errors, but in a multilingual scenario, the same content may be available in various languages via simultaneous interpreting, dubbing or subtitling. In this paper, we hypothesize that leveraging multiple sources will improve translation quality if the sources complement one another in terms of correct information they contain. To this…
+  - via: `query:simultaneous speech translation` (round 0)
+- **MTCue: Learning Zero-Shot Control of Extra-Textual Attributes by Leveraging Unstructured Context in Neural Machine Translation** (2023) — S. Vincent, R. Flynn, Carolina Scarton — _Annual Meeting of the Association for Computational Linguistics_ — cites: 4
+  - https://www.semanticscholar.org/paper/86fef48c65249196d68484e9ed0565484db22271
+  - arXiv:2305.15904 · doi:10.48550/arXiv.2305.15904
+  - Efficient utilisation of both intra- and extra-textual context remains one of the critical gaps between machine and human translation. Existing research has primarily focused on providing individual, well-defined types of context in translation, such as the surrounding text or discrete external variables like the speaker's gender. This work introduces MTCue, a novel neural machine translation (NMT…
+  - via: `query:machine translation nmt machine translation` (round 1)
+- **Improving Language Model Integration for Neural Machine Translation** (2023) — Christian Herold, Yingbo Gao, Mohammad Zeineldeen, H. Ney — _Annual Meeting of the Association for Computational Linguistics_ — cites: 3
+  - https://www.semanticscholar.org/paper/3a72745fddb6200ffeae92fadd699b7dd9f3d633
+  - arXiv:2306.05077 · doi:10.48550/arXiv.2306.05077
+  - The integration of language models for neural machine translation has been extensively studied in the past. It has been shown that an external language model, trained on additional target-side monolingual data, can help improve translation quality. However, there has always been the assumption that the translation model also learns an implicit target-side language model during training, which inte…
+  - via: `query:automatic speech recognition machine translation` (round 2)
+- **Progressive Translation: Improving Domain Robustness of Neural Machine Translation with Intermediate Sequences** (2023) — Chaojun Wang, Y. Liu, Wai Lam — _Annual Meeting of the Association for Computational Linguistics_ — cites: 2
+  - https://www.semanticscholar.org/paper/4e7cf247aa3f346fa5385381e5817c1d5c330d26
+  - arXiv:2305.09154 · doi:10.48550/arXiv.2305.09154
+  - Previous studies show that intermediate supervision signals benefit various Natural Language Processing tasks. However, it is not clear whether there exist intermediate signals that benefit Neural Machine Translation (NMT). Borrowing techniques from Statistical Machine Translation, we propose intermediate signals which are intermediate sequences from the"source-like"structure to the"target-like"st…
+  - via: `query:machine translation nmt machine translation` (round 1)
+- **Leveraging Synthetic Targets for Machine Translation** (2023) — Sarthak Mittal, Oleksii Hrinchuk, Oleksii Kuchaiev — _Annual Meeting of the Association for Computational Linguistics_ — cites: 2
+  - https://www.semanticscholar.org/paper/a026ff41d370292caa13b2c2ce540f1e19bb79fc
+  - arXiv:2305.06155 · doi:10.48550/arXiv.2305.06155
+  - In this work, we provide a recipe for training machine translation models in a limited resource setting by leveraging synthetic target data generated using a large pre-trained model. We show that consistently across different benchmarks in bilingual, multilingual, and speech translation setups, training models on synthetic targets outperforms training on the actual ground-truth data. This performa…
+  - via: `cite_of:12442420adf1c36887fafd108f4b7f4fc822ae60` (round 1)
+- **Disambiguated Lexically Constrained Neural Machine Translation** (2023) — Jinpeng Zhang, Nini Xiao, Ke Wang, C. Dong, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 1
+  - https://www.semanticscholar.org/paper/f869b95523aacbf10d104afd5bdfce8f70803a63
+  - arXiv:2305.17351 · doi:10.48550/arXiv.2305.17351
+  - Lexically constrained neural machine translation (LCNMT), which controls the translation generation with pre-specified constraints, is important in many practical applications. Current approaches to LCNMT typically assume that the pre-specified lexical constraints are contextually appropriate. This assumption limits their application to real-world scenarios where a source lexicon may have multiple…
+  - via: `cite_of:56665fd91f7d05842380fe0f928461d66f10c5de` (round 2)
+- **Multi-VALUE: A Framework for Cross-Dialectal English NLP** (2022) — Caleb Ziems, William B. Held, Jingfeng Yang, Diyi Yang — _Annual Meeting of the Association for Computational Linguistics_ — cites: 64
+  - https://www.semanticscholar.org/paper/0d4eb08b82cb839e8888dcf26fb41c00a76d56ba
+  - arXiv:2212.08011 · doi:10.48550/arXiv.2212.08011
+  - Dialect differences caused by regional, social, and economic factors cause performance discrepancies for many groups of language technology users. Inclusive and equitable language technology must critically be dialect invariant, meaning that performance remains constant over dialectal shifts. Current systems often fall short of this ideal since they are designed and tested on a single dialect: Sta…
+  - via: `cite_of:3ea8767b852253e2636b6e57925be7fcc1d739df` (round 2)
+- **On the Blind Spots of Model-Based Evaluation Metrics for Text Generation** (2022) — Tianxing He, Jingyu (Jack) Zhang, Tianle Wang, Sachin Kumar, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 63
+  - https://www.semanticscholar.org/paper/6e0b6ba5cae954a0643baeb00167965e88458fc3
+  - arXiv:2212.10020 · doi:10.48550/arXiv.2212.10020
+  - In this work, we explore a useful but often neglected methodology for robustness analysis of text generation evaluation metrics: stress tests with synthetic data. Basically, we design and synthesize a wide range of potential errors and check whether they result in a commensurate drop in the metric scores. We examine a range of recently proposed evaluation metrics based on pretrained language model…
+  - via: `cite_of:01508f386eb2ca5181fde7bb6da4920e250d7498` (round 2)
+- **UniTE: Unified Translation Evaluation** (2022) — Yu Wan, Dayiheng Liu, Baosong Yang, Haibo Zhang, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 44
+  - https://www.semanticscholar.org/paper/1ff57e4c588173afeaacea553cd0908cadc3c8c8
+  - arXiv:2204.13346 · doi:10.18653/v1/2022.acl-long.558
+  - Translation quality evaluation plays a crucial role in machine translation. According to the input format, it is mainly separated into three tasks, i.e., reference-only, source-only and source-reference-combined. Recent methods, despite their promising results, are specifically designed and optimized on one of them. This limits the convenience of these methods, and overlooks the commonalities amon…
+  - via: `query:available https github machine translation` (round 2)
+- **Attention as a Guide for Simultaneous Speech Translation** (2022) — Sara Papi, Matteo Negri, Marco Turchi — _Annual Meeting of the Association for Computational Linguistics_ — cites: 42
+  - https://www.semanticscholar.org/paper/28559ef65ee3b563a8b9eafa84d84246ff168a31
+  - arXiv:2212.07850 · doi:10.18653/v1/2023.acl-long.745
+  - In simultaneous speech translation (SimulST), effective policies that determine when to write partial translations are crucial to reach high output quality with low latency. Towards this objective, we propose EDAtt (Encoder-Decoder Attention), an adaptive policy that exploits the attention patterns between audio source and target textual translation to guide an offline-trained ST model during simu…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **Overcoming Catastrophic Forgetting beyond Continual Learning: Balanced Training for Neural Machine Translation** (2022) — Chenze Shao, Yang Feng — _Annual Meeting of the Association for Computational Linguistics_ — cites: 40
+  - https://www.semanticscholar.org/paper/029e9ef47d4a6cfb80fc44c14ef5e858ef28c82d
+  - arXiv:2203.03910 · doi:10.48550/arXiv.2203.03910
+  - Neural networks tend to gradually forget the previously learned knowledge when learning multiple tasks sequentially from dynamic data distributions. This problem is called catastrophic forgetting, which is a fundamental challenge in the continual learning of neural networks. In this work, we observe that catastrophic forgetting not only occurs in continual learning but also affects the traditional…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **Speech-to-Speech Translation For A Real-world Unwritten Language** (2022) — Peng-Jen Chen, Ke M. Tran, Yilin Yang, Jingfei Du, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 39
+  - https://www.semanticscholar.org/paper/7acbaaddf06eeb1cd6f7c28928fe0201b7193047
+  - arXiv:2211.06474 · doi:10.48550/arXiv.2211.06474
+  - We study speech-to-speech translation (S2ST) that translates speech from one language into another language and focuses on building systems to support languages without standard text writing systems. We use English-Taiwanese Hokkien as a case study, and present an end-to-end solution from training data collection, modeling choices to benchmark dataset release. First, we present efforts on creating…
+  - via: `cite_of:f93b523fe44e2ad2deaa1c6dac2da878a17eeeaf` (round 2)
+- **IndicMT Eval: A Dataset to Meta-Evaluate Machine Translation Metrics for Indian Languages** (2022) — Ananya B. Sai, Vignesh Nagarajan, Tanay Dixit, Raj Dabre, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 39
+  - https://www.semanticscholar.org/paper/2c0fe24dd7a620419693a4cd74b2d08339d0233d
+  - arXiv:2212.10180 · doi:10.48550/arXiv.2212.10180
+  - The rapid growth of machine translation (MT) systems necessitates meta-evaluations of evaluation metrics to enable selection of those that best reflect MT quality. Unfortunately, most meta-evaluation studies focus on European languages, the observations for which may not always apply to other languages. Indian languages, having over a billion speakers, are linguistically different from them, and t…
+  - via: `cite_of:01508f386eb2ca5181fde7bb6da4920e250d7498` (round 2)
+- **Sample, Translate, Recombine: Leveraging Audio Alignments for Data Augmentation in End-to-end Speech Translation** (2022) — Tsz Kin Lam, Shigehiko Schamoni, S. Riezler — _Annual Meeting of the Association for Computational Linguistics_ — cites: 36
+  - https://www.semanticscholar.org/paper/7c51f74801f8305052223510822b316e63445aa8
+  - arXiv:2203.08757 · doi:10.18653/v1/2022.acl-short.27
+  - End-to-end speech translation relies on data that pair source-language speech inputs with corresponding translations into a target language. Such data are notoriously scarce, making synthetic data augmentation by back-translation or knowledge distillation a necessary ingredient of end-to-end training. In this paper, we present a novel approach to data augmentation that leverages audio alignments,…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Efficient Cluster-Based k-Nearest-Neighbor Machine Translation** (2022) — Dexin Wang, Kai Fan, Boxing Chen, Deyi Xiong — _Annual Meeting of the Association for Computational Linguistics_ — cites: 35
+  - https://www.semanticscholar.org/paper/9b068f8b7bcfd60f841a8707e9d37ce9bbc2f0d1
+  - arXiv:2204.06175 · doi:10.48550/arXiv.2204.06175
+  - k-Nearest-Neighbor Machine Translation (kNN-MT) has been recently proposed as a non-parametric solution for domain adaptation in neural machine translation (NMT). It aims to alleviate the performance degradation of advanced MT systems in translating out-of-domain sentences by coordinating with an additional token-level feature-based retrieval module constructed from in-domain data. Previous studie…
+  - via: `query:machine translation nmt machine translation` (round 1)
+- **Measuring and Mitigating Name Biases in Neural Machine Translation** (2022) — Jun Wang, Benjamin I. P. Rubinstein, Trevor Cohn — _Annual Meeting of the Association for Computational Linguistics_ — cites: 31
+  - https://www.semanticscholar.org/paper/e0fc811aa01ae11169aae97b58c8334f8ca173d8
+  - doi:10.18653/v1/2022.acl-long.184
+  - Neural Machine Translation (NMT) systems exhibit problematic biases, such as stereotypical gender bias in the translation of occupation terms into languages with grammatical gender. In this paper we describe a new source of bias prevalent in NMT systems, relating to translations of sentences containing person names. To correctly translate such sentences, a NMT system needs to determine the gender…
+  - via: `query:machine translation nmt machine translation` (round 1)
+- **Under the Morphosyntactic Lens: A Multifaceted Evaluation of Gender Bias in Speech Translation** (2022) — Beatrice Savoldi, Marco Gaido, L. Bentivogli, Matteo Negri, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 30
+  - https://www.semanticscholar.org/paper/8d9f0e34cfc659510d6c4ed085c6ef61734732b0
+  - arXiv:2203.09866 · doi:10.48550/arXiv.2203.09866
+  - Gender bias is largely recognized as a problematic phenomenon affecting language technologies, with recent studies underscoring that it might surface differently across languages. However, most of current evaluation practices adopt a word-level focus on a narrow set of occupational nouns under synthetic conditions. Such protocols overlook key features of grammatical gender languages, which are cha…
+  - via: `cite_of:b6222ad8acdf327368b45fb7fa5f4cf374d6da80` (round 1)
+- **Redistributing Low-Frequency Words: Making the Most of Monolingual Data in Non-Autoregressive Translation** (2022) — Liang Ding, Longyue Wang, Shuming Shi, Dacheng Tao, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 30
+  - https://www.semanticscholar.org/paper/68111522d2f74b87849c250145636c0ef5cf2d30
+  - doi:10.18653/v1/2022.acl-long.172
+  - Knowledge distillation (KD) is the preliminary step for training non-autoregressive translation (NAT) models, which eases the training of NAT models at the cost of losing important information for translating low-frequency words. In this work, we provide an appealing alternative for NAT – monolingual KD, which trains NAT student on external monolingual data with AT teacher trained on the original…
+  - via: `cite_of:3f11a2124af139af7c6f17eccab5149d759d7f52` (round 2)
+- **Modeling Dual Read/Write Paths for Simultaneous Machine Translation** (2022) — Shaolei Zhang, Yang Feng — _Annual Meeting of the Association for Computational Linguistics_ — cites: 27
+  - https://www.semanticscholar.org/paper/b29042c20244e45b3e46c46c9f0a004ab60cb703
+  - arXiv:2203.09163 · doi:10.48550/arXiv.2203.09163
+  - Simultaneous machine translation (SiMT) outputs translation while reading source sentence and hence requires a policy to decide whether to wait for the next source word (READ) or generate a target word (WRITE), the actions of which form a read/write path. Although the read/write path is essential to SiMT performance, no direct supervision is given to the path in the existing methods. In this paper…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **BLASER: A Text-Free Speech-to-Speech Translation Evaluation Metric** (2022) — Mingda Chen, Paul-Ambroise Duquenne, Pierre Yves Andrews, Justine T. Kao, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 27
+  - https://www.semanticscholar.org/paper/b618a4a09cad34e75c989cff12a91b535a2bb165
+  - arXiv:2212.08486 · doi:10.48550/arXiv.2212.08486
+  - End-to-End speech-to-speech translation (S2ST) is generally evaluated with text-based metrics. This means that generated speech has to be automatically transcribed, making the evaluation dependent on the availability and quality of automatic speech recognition (ASR) systems.In this paper, we propose a text-free evaluation metric for end-to-end S2ST, named BLASER, to avoid the dependency on ASR sys…
+  - via: `query:translation quality speech translation` (round 1)
+- **Learning Adaptive Segmentation Policy for End-to-End Simultaneous Translation** (2022) — Ruiqing Zhang, Zhongjun He, Hua Wu, Haifeng Wang — _Annual Meeting of the Association for Computational Linguistics_ — cites: 26
+  - https://www.semanticscholar.org/paper/611a1825a568d02829c4ec98e80e5f87b5c1a9f1
+  - doi:10.18653/v1/2022.acl-long.542
+  - End-to-end simultaneous speech-to-text translation aims to directly perform translation from streaming source speech to target text with high translation quality and low latency. A typical simultaneous translation (ST) system consists of a speech translation model and a policy module, which determines when to wait and when to translate. Thus the policy is crucial to balance translation quality and…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **Learning to Generalize to More: Continuous Semantic Augmentation for Neural Machine Translation** (2022) — Xiangpeng Wei, Heng Yu, Yue Hu, Rongxiang Weng, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 26
+  - https://www.semanticscholar.org/paper/a86a303477ee91d66304e87d91a41471af056ec9
+  - arXiv:2204.06812 · doi:10.48550/arXiv.2204.06812
+  - The principal task in supervised neural machine translation (NMT) is to learn to generate target sentences conditioned on the source inputs from a set of parallel sentence pairs, and thus produce a model capable of generalizing to unseen instances. However, it is commonly observed that the generalization performance of the model is highly influenced by the amount of parallel data used in training.…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Extrinsic Evaluation of Machine Translation Metrics** (2022) — Nikita Moghe, Tom Sherborne, Mark Steedman, Alexandra Birch — _Annual Meeting of the Association for Computational Linguistics_ — cites: 24
+  - https://www.semanticscholar.org/paper/32df1618623eeb9d14cc4f67e28b2f714e93f93f
+  - arXiv:2212.10297 · doi:10.48550/arXiv.2212.10297
+  - Automatic machine translation (MT) metrics are widely used to distinguish the quality of machine translation systems across relatively large test sets (system-level evaluation). However, it is unclear if automatic metrics are reliable at distinguishing good translations from bad translations at the sentence level (segment-level evaluation). In this paper, we investigate how useful MT metrics are a…
+  - via: `cite_of:213e471bacff5c0852943988fcb955797f1e591f` (round 2)
+- **Reducing Position Bias in Simultaneous Machine Translation with Length-Aware Framework** (2022) — Shaolei Zhang, Yang Feng — _Annual Meeting of the Association for Computational Linguistics_ — cites: 23
+  - https://www.semanticscholar.org/paper/95b5be40a0d4231df18f6093345bf50d132ad8e8
+  - arXiv:2203.09053 · doi:10.48550/arXiv.2203.09053
+  - Simultaneous machine translation (SiMT) starts translating while receiving the streaming source inputs, and hence the source sentence is always incomplete during translating. Different from the full-sentence MT using the conventional seq-to-seq architecture, SiMT often applies prefix-to-prefix architecture, which forces each target word to only align with a partial source prefix to adapt to the in…
+  - via: `query:prefix-to-prefix translation` (round 0)
+- **Simple and Effective Unsupervised Speech Translation** (2022) — Changhan Wang, H. Inaguma, Peng-Jen Chen, Ilia Kulikov, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 20
+  - https://www.semanticscholar.org/paper/6d0b386d24b24e31b8e64dd158b9e0d1a2b7a579
+  - arXiv:2210.10191 · doi:10.48550/arXiv.2210.10191
+  - The amount of labeled data to train models for speech tasks is limited for most languages, however, the data scarcity is exacerbated for speech translation which requires labeled data covering two different languages. To address this issue, we study a simple and effective approach to build speech translation systems without labeled data by leveraging recent advances in unsupervised speech recognit…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **Confidence Based Bidirectional Global Context Aware Training Framework for Neural Machine Translation** (2022) — Chulun Zhou, Fandong Meng, Jie Zhou, M. Zhang, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 20
+  - https://www.semanticscholar.org/paper/78a981f6946db17a0a5d36c83ed70ae300d6f372
+  - arXiv:2202.13663 · doi:10.18653/v1/2022.acl-long.206
+  - Most dominant neural machine translation (NMT) models are restricted to make predictions only according to the local context of preceding words in a left-to-right manner. Although many previous studies try to incorporate global information into NMT models, there still exist limitations on how to effectively exploit bidirectional global context. In this paper, we propose a Confidence Based Bidirect…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **As Little as Possible, as Much as Necessary: Detecting Over- and Undertranslations with Contrastive Conditioning** (2022) — Jannis Vamvas, Rico Sennrich — _Annual Meeting of the Association for Computational Linguistics_ — cites: 19
+  - https://www.semanticscholar.org/paper/f49ccd4dedaa0ac80a21ca69e8af4a9bb729ccb4
+  - arXiv:2203.01927 · doi:10.48550/arXiv.2203.01927
+  - Omission and addition of content is a typical issue in neural machine translation. We propose a method for detecting such phenomena with off-the-shelf translation models. Using contrastive conditioning, we compare the likelihood of a full sequence under a translation model to the likelihood of its parts, given the corresponding source or target sequence. This allows to pinpoint superfluous words i…
+  - via: `cite_of:95bcee172f94c7ce7201d3cc3d221ec4a4a9d706` (round 2)
+- **CipherDAug: Ciphertext based Data Augmentation for Neural Machine Translation** (2022) — Nishant Kambhatla, Logan Born, Anoop Sarkar — _Annual Meeting of the Association for Computational Linguistics_ — cites: 18
+  - https://www.semanticscholar.org/paper/ae0cee081d474fcc095ca150504f6e7dec7561c3
+  - arXiv:2204.00665 · doi:10.48550/arXiv.2204.00665
+  - We propose a novel data-augmentation technique for neural machine translation based on ROT-k ciphertexts. ROT-k is a simple letter substitution cipher that replaces a letter in the plaintext with the kth letter after it in the alphabet. We first generate multiple ROT-k ciphertexts using different values of k for the plaintext which is the source side of the parallel data. We then leverage this enc…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Bias Mitigation in Machine Translation Quality Estimation** (2022) — Hanna Behnke, M. Fomicheva, Lucia Specia — _Annual Meeting of the Association for Computational Linguistics_ — cites: 16
+  - https://www.semanticscholar.org/paper/7869471766d5d73adaa37398a2f2fbaff9160221
+  - doi:10.18653/v1/2022.acl-long.104
+  - Machine Translation Quality Estimation (QE) aims to build predictive models to assess the quality of machine-generated translations in the absence of reference translations. While state-of-the-art QE models have been shown to achieve good results, they over-rely on features that do not have a causal impact on the quality of a translation. In particular, there appears to be a partial input bias, i.…
+  - via: `query:translation quality machine translation` (round 1)
+- **From Simultaneous to Streaming Machine Translation by Leveraging Streaming History** (2022) — Javier Iranzo-S'anchez, Jorge Civera Saiz, A. Juan — _Annual Meeting of the Association for Computational Linguistics_ — cites: 14
+  - https://www.semanticscholar.org/paper/680d60537322b0f08269c67d9ebde7bc362c3fee
+  - arXiv:2203.02459 · doi:10.48550/arXiv.2203.02459
+  - Simultaneous machine translation has recently gained traction thanks to significant quality improvements and the advent of streaming applications. Simultaneous translation systems need to find a trade-off between translation quality and response time, and with this purpose multiple latency measures have been proposed. However, latency evaluations for simultaneous translation are estimated at the s…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Bridging the Data Gap between Training and Inference for Unsupervised Neural Machine Translation** (2022) — Zhiwei He, Xing Wang, Rui Wang, Shuming Shi, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 14
+  - https://www.semanticscholar.org/paper/2809ec28ca2eaf3f2b420e3f4aeebdca9c8ced30
+  - arXiv:2203.08394 · doi:10.48550/arXiv.2203.08394
+  - Back-translation is a critical component of Unsupervised Neural Machine Translation (UNMT), which generates pseudo parallel data from target monolingual data. A UNMT model is trained on the pseudo parallel data with \text{\bf translated source}, and translates \text{\bf natural source} sentences in inference. The source discrepancy between training and inference hinders the translation performance…
+  - via: `query:self-training simultaneous translation` (round 0)
+- **AutoMoE: Heterogeneous Mixture-of-Experts with Adaptive Computation for Efficient Neural Machine Translation** (2022) — Ganesh Jawahar, Subhabrata Mukherjee, Xiaodong Liu, Young Jin Kim, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 14
+  - https://www.semanticscholar.org/paper/5165de3cd4f8dc9d88e82d55f4798013d57cc0f1
+  - arXiv:2210.07535 · doi:10.18653/v1/2023.findings-acl.580
+  - Mixture-of-Expert (MoE) models have obtained state-of-the-art performance in Neural Machine Translation (NMT) tasks. Existing works in MoE mostly consider a homogeneous design where the same number of experts of the same size are placed uniformly throughout the network. Furthermore, existing MoE works do not consider computational constraints (e.g., FLOPs, latency) to guide their design. To this e…
+  - via: `query:available https github machine translation` (round 2)
+- **Optimal Transport for Unsupervised Hallucination Detection in Neural Machine Translation** (2022) — Nuno M. Guerreiro, Pierre Colombo, P. Piantanida, André Martins — _Annual Meeting of the Association for Computational Linguistics_ — cites: 12
+  - https://www.semanticscholar.org/paper/f08681d14de367ba142f09e90ca1164acc7248dc
+  - arXiv:2212.09631 · doi:10.48550/arXiv.2212.09631
+  - Neural machine translation (NMT) has become the de-facto standard in real-world machine translation applications. However, NMT models can unpredictably produce severely pathological translations, known as hallucinations, that seriously undermine user trust. It becomes thus crucial to implement effective preventive strategies to guarantee their proper functioning. In this paper, we address the prob…
+  - via: `cite_of:143cd4b4717651caf276c7256502dc491454e197` (round 1)
+- **Integrating Vectorized Lexical Constraints for Neural Machine Translation** (2022) — Shuo Wang, Zhixing Tan, Yang Liu — _Annual Meeting of the Association for Computational Linguistics_ — cites: 12
+  - https://www.semanticscholar.org/paper/10b964eba27f9fe8e97fa857e2896c7bb378d303
+  - arXiv:2203.12210 · doi:10.48550/arXiv.2203.12210
+  - Lexically constrained neural machine translation (NMT), which controls the generation of NMT models with pre-specified constraints, is important in many practical scenarios. Due to the representation gap between discrete constraints and continuous vectors in NMT models, most existing works choose to construct synthetic data or modify the decoding algorithm to impose lexical constraints, treating t…
+  - via: `cite_of:101141b047d119ef9c8fda8dd83d3d9eb3fbfd1f` (round 2)
+- **Rethinking Round-Trip Translation for Machine Translation Evaluation** (2022) — Terry Yue Zhuo, Qiongkai Xu, Xuanli He, Trevor Cohn — _Annual Meeting of the Association for Computational Linguistics_ — cites: 10
+  - https://www.semanticscholar.org/paper/7dca64b9fa14b951d8466be47771c892b5587ad3
+  - arXiv:2209.07351 · doi:10.18653/v1/2023.findings-acl.22
+  - Automatic evaluation on low-resource language translation suffers from a deficiency of parallel corpora. Round-trip translation could be served as a clever and straightforward technique to alleviate the requirement of the parallel evaluation corpus. However, there was an observation of obscure correlations between the evaluation scores by forward and round-trip translations in the era of statistic…
+  - via: `cite_of:595306f993993e44e2c2f674367103f44df03d9b` (round 1)
+- **Learning Confidence for Transformer-based Neural Machine Translation** (2022) — Yu Lu, Jiali Zeng, Jiajun Zhang, Shuangzhi Wu, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 9
+  - https://www.semanticscholar.org/paper/ffe9a70445f99516aa3c86651f9121c84b1b78cc
+  - arXiv:2203.11413 · doi:10.48550/arXiv.2203.11413
+  - Confidence estimation aims to quantify the confidence of the model prediction, providing an expectation of success. A well-calibrated confidence estimate enables accurate failure prediction and proper risk measurement when given noisy samples and out-of-distribution data in real-world settings. However, this task remains a severe challenge for neural machine translation (NMT), where probabilities…
+  - via: `cite_of:dae35736329852c83d32cefd66448dc73cd73368` (round 1)
+- **Continual Knowledge Distillation for Neural Machine Translation** (2022) — Yuan Zhang, Peng Li, Maosong Sun, Yang Liu — _Annual Meeting of the Association for Computational Linguistics_ — cites: 7
+  - https://www.semanticscholar.org/paper/7b4b4d6ecc568ee6a42de582f9ca2f97e1eaaa02
+  - arXiv:2212.09097 · doi:10.18653/v1/2023.acl-long.443
+  - While many parallel corpora are not publicly accessible for data copyright, data privacy and competitive differentiation reasons, trained translation models are increasingly available on open platforms. In this work, we propose a method called continual knowledge distillation to take advantage of existing translation models to improve one model of interest. The basic idea is to sequentially transf…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **Joint Speech Transcription and Translation: Pseudo-Labeling with Out-of-Distribution Data** (2022) — Mozhdeh Gheini, Tatiana Likhomanenko, Matthias Sperber, Hendra Setiawan — _Annual Meeting of the Association for Computational Linguistics_ — cites: 7
+  - https://www.semanticscholar.org/paper/91eac6b937eda00f2dafa2d4348d10ffd4f3421a
+  - arXiv:2212.09982 · doi:10.48550/arXiv.2212.09982
+  - Self-training has been shown to be helpful in addressing data scarcity for many domains, including vision, speech, and language. Specifically, self-training, or pseudo-labeling, labels unsupervised data and adds that to the training pool. In this work, we investigate and use pseudo-labeling for a recently proposed novel setup: joint transcription and translation of speech, which suffers from an ab…
+  - via: `query:translation quality speech translation` (round 1)
+- **Online Semantic Parsing for Latency Reduction in Task-Oriented Dialogue** (2022) — Jiawei Zhou, J. Eisner, Michael Newman, Emmanouil Antonios Platanios, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 6
+  - https://www.semanticscholar.org/paper/fdd016dadbe9fa4727869339c32df20fbe31df0a
+  - doi:10.18653/v1/2022.acl-long.110
+  - Standard conversational semantic parsing maps a complete user utterance into an executable program, after which the program is executed to respond to the user. This could be slow when the program contains expensive function calls. We investigate the opportunity to reduce latency by predicting and executing function calls while the user is still speaking. We introduce the task of online semantic pa…
+  - via: `query:prefix-to-prefix translation` (round 0)
+- **Can Synthetic Translations Improve Bitext Quality?** (2022) — Eleftheria Briakou, Marine Carpuat — _Annual Meeting of the Association for Computational Linguistics_ — cites: 6
+  - https://www.semanticscholar.org/paper/c00f7261249f8efed9accd646586219c2e40291c
+  - arXiv:2203.07643 · doi:10.48550/arXiv.2203.07643
+  - Synthetic translations have been used for a wide range of NLP tasks primarily as a means of data augmentation. This work explores, instead, how synthetic translations can be used to revise potentially imperfect reference translations in mined bitext. We find that synthetic samples can improve bitext quality without any additional bilingual supervision when they replace the originals based on a sem…
+  - via: `cite_of:1e5b826ddf0754f6e93234ba1260bd939c255e7f` (round 1)
+- **EIT: Enhanced Interactive Transformer** (2022) — Tong Zheng, Bei Li, Huiwen Bao, Tong Xiao, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 3
+  - https://www.semanticscholar.org/paper/2e742c6ad6d71a2afea9a8f113b9d9c02bcdaf9a
+  - arXiv:2212.10197 · doi:10.48550/arXiv.2212.10197
+  - Two principles: the complementary principle and the consensus principle are widely acknowledged in the literature of multi-view learning. However, the current design of multi-head self-attention, an instance of multi-view learning, prioritizes the complementarity while ignoring the consensus. To address this problem, we propose an enhanced multi-head self-attention (EMHA). First, to satisfy the co…
+  - via: `query:available https github machine translation` (round 2)
+- **DiMS: Distilling Multiple Steps of Iterative Non-Autoregressive Transformers** (2022) — Sajad Norouzi, Rasa Hosseinzadeh, Felipe Pérez, M. Volkovs — _Annual Meeting of the Association for Computational Linguistics_ — cites: 2
+  - https://www.semanticscholar.org/paper/251517f723dbc695df37325f9ba9ddd04c66b3fb
+  - arXiv:2206.02999 · doi:10.48550/arXiv.2206.02999
+  - The computational benefits of iterative non-autoregressive transformers decrease as the number of decoding steps increases. As a remedy, we introduce Distill Multiple Steps (DiMS), a simple yet effective distillation technique to decrease the number of required steps to reach a certain translation quality. The distilled model enjoys the computational benefits of early iterations while preserving t…
+  - via: `cite_of:1e5b826ddf0754f6e93234ba1260bd939c255e7f` (round 1)
+- **Accurate Online Posterior Alignments for Principled Lexically-Constrained Decoding** (2022) — Soumya Chatterjee, S. Sarawagi, P. Jyothi — _Annual Meeting of the Association for Computational Linguistics_ — cites: 1
+  - https://www.semanticscholar.org/paper/e7f5f336d07f40ec3f565f73811addfe627e1fda
+  - arXiv:2204.00871 · doi:10.48550/arXiv.2204.00871
+  - Online alignment in machine translation refers to the task of aligning a target word to a source word when the target sequence has only been partially decoded. Good online alignments facilitate important applications such as lexically constrained translation where user-defined dictionaries are used to inject lexical constraints into the translation model. We propose a novel posterior alignment tec…
+  - via: `cite_of:101141b047d119ef9c8fda8dd83d3d9eb3fbfd1f` (round 2)
+- **Contrastive Learning for Many-to-many Multilingual Neural Machine Translation** (2021) — Xiao Pan, Mingxuan Wang, Liwei Wu, Lei Li — _Annual Meeting of the Association for Computational Linguistics_ — cites: 235
+  - https://www.semanticscholar.org/paper/56665fd91f7d05842380fe0f928461d66f10c5de
+  - arXiv:2105.09501 · doi:10.18653/v1/2021.acl-long.21
+  - Existing multilingual machine translation approaches mainly focus on English-centric directions, while the non-English directions still lag behind. In this work, we aim to build a many-to-many translation system with an emphasis on the quality of non-English language directions. Our intuition is based on the hypothesis that a universal cross-language representation leads to better multilingual tra…
+  - via: `cite_of:1b24b7b4ac2427d20ab60c8451563eb8d99caf9c` (round 1)
+- **Systematic Inequalities in Language Technology Performance across the World’s Languages** (2021) — Damián E. Blasi, Antonios Anastasopoulos, Graham Neubig — _Annual Meeting of the Association for Computational Linguistics_ — cites: 170
+  - https://www.semanticscholar.org/paper/3ea8767b852253e2636b6e57925be7fcc1d739df
+  - arXiv:2110.06733 · doi:10.18653/v1/2022.acl-long.376
+  - Natural language processing (NLP) systems have become a central technology in communication, education, medicine, artificial intelligence, and many other domains of research and development. While the performance of NLP methods has grown enormously over the last decade, this progress has been restricted to a minuscule subset of the world’s \approx6,500 languages. We introduce a framework for estim…
+  - via: `query:https github com speech translation` (round 1)
+- **AVATAR: A Parallel Corpus for Java-Python Program Translation** (2021) — W. Ahmad, Md Golam Rahman Tushar, Saikat Chakraborty, Kai-Wei Chang — _Annual Meeting of the Association for Computational Linguistics_ — cites: 127
+  - https://www.semanticscholar.org/paper/0cf02cb3b3c25aae8336379e29a8257c85558637
+  - arXiv:2108.11590 · doi:10.18653/v1/2023.findings-acl.143
+  - Program translation refers to migrating source code from one programming language to another. It has tremendous practical value in software development, as porting software across languages is time-consuming and costly. Automating program translation is of paramount importance in software migration, and recently researchers explored unsupervised approaches due to the unavailability of parallel cor…
+  - via: `ref_of:2577d053f8aab912d29b424e1f09133d83740fd2` (round 2)
+- **MulDA: A Multilingual Data Augmentation Framework for Low-Resource Cross-Lingual NER** (2021) — Linlin Liu, Bosheng Ding, Lidong Bing, Shafiq R. Joty, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 105
+  - https://www.semanticscholar.org/paper/0df9c19659388e55745c290ace520491c2985d9b
+  - doi:10.18653/v1/2021.acl-long.453
+  - Named Entity Recognition (NER) for low-resource languages is a both practical and challenging research problem. This paper addresses zero-shot transfer for cross-lingual NER, especially when the amount of source-language training data is also limited. The paper first proposes a simple but effective labeled sequence translation method to translate source-language training data to target languages a…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Improving Speech Translation by Understanding and Learning from the Auxiliary Text Translation Task** (2021) — Yun Tang, J. Pino, Xian Li, Changhan Wang, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 96
+  - https://www.semanticscholar.org/paper/95e838c886346c563005bde16af96b3173b0e016
+  - arXiv:2107.05782 · doi:10.18653/v1/2021.acl-long.328
+  - Pretraining and multitask learning are widely used to improve the speech translation performance. In this study, we are interested in training a speech translation model along with an auxiliary text translation task. We conduct a detailed analysis to understand the impact of the auxiliary task on the primary task within the multitask learning framework. Our analysis confirms that multitask learnin…
+  - via: `query:translation quality speech translation` (round 1)
+- **The Paradox of the Compositionality of Natural Language: A Neural Machine Translation Case Study** (2021) — Verna Dankers, Elia Bruni, Dieuwke Hupkes — _Annual Meeting of the Association for Computational Linguistics_ — cites: 87
+  - https://www.semanticscholar.org/paper/b3f644a5ea1fdd8cec1c34ebed69125838a50de3
+  - arXiv:2108.05885 · doi:10.18653/v1/2022.acl-long.286
+  - Obtaining human-like performance in NLP is often argued to require compositional generalisation. Whether neural networks exhibit this ability is usually studied by training models on highly compositional synthetic data. However, compositionality in natural language is much more complex than the rigid, arithmetic-like version such data adheres to, and artificial compositionality tests thus do not a…
+  - via: `query:machine translation nmt machine translation` (round 1)
+- **Stacked Acoustic-and-Textual Encoding: Integrating the Pre-trained Models into Speech Translation Encoders** (2021) — Chen Xu, Bojie Hu, Yanyang Li, Yuhao Zhang, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 86
+  - https://www.semanticscholar.org/paper/2f0aa51f0062061c7db1accdf9dd2be5bccfdd26
+  - arXiv:2105.05752 · doi:10.18653/v1/2021.acl-long.204
+  - Encoder pre-training is promising in end-to-end Speech Translation (ST), given the fact that speech-to-translation data is scarce. But ST encoders are not simple instances of Automatic Speech Recognition (ASR) or Machine Translation (MT) encoders. For example, we find that ASR encoders lack the global context representation, which is necessary for translation, whereas MT encoders are not designed…
+  - via: `query:automatic speech recognition machine translation` (round 2)
+- **Selective Knowledge Distillation for Neural Machine Translation** (2021) — Fusheng Wang, Jianhao Yan, Fandong Meng, Jie Zhou — _Annual Meeting of the Association for Computational Linguistics_ — cites: 70
+  - https://www.semanticscholar.org/paper/926eb6dbb08791dad76e4a0468731b02a85a5bba
+  - arXiv:2105.12967 · doi:10.18653/v1/2021.acl-long.504
+  - Neural Machine Translation (NMT) models achieve state-of-the-art performance on many translation benchmarks. As an active research field in NMT, knowledge distillation is widely applied to enhance the model’s performance by transferring teacher model’s knowledge on each training sample. However, previous work rarely discusses the different impacts and connections among these samples, which serve a…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **Crafting Adversarial Examples for Neural Machine Translation** (2021) — Xinze Zhang, Junzhe Zhang, Zhenhua Chen, Kun He — _Annual Meeting of the Association for Computational Linguistics_ — cites: 70
+  - https://www.semanticscholar.org/paper/e0b753249b8bdd6768f9ece2186e669078071ff6
+  - doi:10.18653/v1/2021.acl-long.153
+  - Effective adversary generation for neural machine translation (NMT) is a crucial prerequisite for building robust machine translation systems. In this work, we investigate veritable evaluations of NMT adversarial attacks, and propose a novel method to craft NMT adversarial examples. We first show the current NMT adversarial attacks may be improperly estimated by the commonly used mono-directional…
+  - via: `query:machine translation nmt machine translation` (round 1)
+- **Discriminative Reranking for Neural Machine Translation** (2021) — Ann Lee, Michael Auli, Marc'Aurelio Ranzato — _Annual Meeting of the Association for Computational Linguistics_ — cites: 60
+  - https://www.semanticscholar.org/paper/c47cac224ff59892abfd6af316b0f9e082f97012
+  - doi:10.18653/v1/2021.acl-long.563
+  - Reranking models enable the integration of rich features to select a better output hypothesis within an n-best list or lattice. These models have a long history in NLP, and we revisit discriminative reranking for modern neural machine translation models by training a large transformer architecture. This takes as input both the source sentence as well as a list of hypotheses to output a ranked list…
+  - via: `cite_of:c7b361427a54b309caea8ef69ed59b50cd54ac67` (round 1)
+- **Rejuvenating Low-Frequency Words: Making the Most of Parallel Data in Non-Autoregressive Translation** (2021) — Liang Ding, Longyue Wang, Xuebo Liu, Derek F. Wong, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 54
+  - https://www.semanticscholar.org/paper/d2197b6b3453d9bcb460588e077853020e2e0cdc
+  - arXiv:2106.00903 · doi:10.18653/v1/2021.acl-long.266
+  - Knowledge distillation (KD) is commonly used to construct synthetic data for training non-autoregressive translation (NAT) models. However, there exists a discrepancy on low-frequency words between the distilled and the original data, leading to more errors on predicting low-frequency words. To alleviate the problem, we directly expose the raw data into NAT by leveraging pretraining. By analyzing…
+  - via: `cite_of:1e5b826ddf0754f6e93234ba1260bd939c255e7f` (round 1)
+- **From Machine Translation to Code-Switching: Generating High-Quality Code-Switched Text** (2021) — Ishan Tarunesh, Syamantak Kumar, P. Jyothi — _Annual Meeting of the Association for Computational Linguistics_ — cites: 52
+  - https://www.semanticscholar.org/paper/a729aca88222c459909942c51cf52b1a1797329a
+  - arXiv:2107.06483 · doi:10.18653/v1/2021.acl-long.245
+  - Generating code-switched text is a problem of growing interest, especially given the scarcity of corpora containing large volumes of real code-switched text. In this work, we adapt a state-of-the-art neural machine translation model to generate Hindi-English code-switched sentences starting from monolingual Hindi sentences. We outline a carefully designed curriculum of pretraining steps, including…
+  - via: `query:translation quality machine translation` (round 1)
+- **Adapting High-resource NMT Models to Translate Low-resource Related Languages without Parallel Data** (2021) — Wei-Jen Ko, Ahmed El-Kishky, Adithya Renduchintala, Vishrav Chaudhary, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 50
+  - https://www.semanticscholar.org/paper/817e8a03162adbb268f08b206a5f04c5bfa97b26
+  - arXiv:2105.15071 · doi:10.18653/v1/2021.acl-long.66
+  - The scarcity of parallel data is a major obstacle for training high-quality machine translation systems for low-resource languages. Fortunately, some low-resource languages are linguistically related or similar to high-resource languages; these related languages may share many lexical or syntactic structures. In this work, we exploit this linguistic overlap to facilitate translating to and from a…
+  - via: `cite_of:595306f993993e44e2c2f674367103f44df03d9b` (round 1)
+- **Self-Training Sampling with Monolingual Data Uncertainty for Neural Machine Translation** (2021) — Wenxiang Jiao, Xing Wang, Zhaopeng Tu, Shuming Shi, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 43
+  - https://www.semanticscholar.org/paper/6b1450a2a68fb8352a7a763409dedc76ae65b254
+  - arXiv:2106.00941 · doi:10.18653/v1/2021.acl-long.221
+  - Self-training has proven effective for improving NMT performance by augmenting model training with synthetic parallel data. The common practice is to construct synthetic data based on a randomly sampled subset of large-scale monolingual data, which we empirically show is sub-optimal. In this work, we propose to improve the sampling procedure by selecting the most informative monolingual sentences…
+  - via: `query:self-training simultaneous translation` (round 0)
+- **Learning When to Translate for Streaming Speech** (2021) — Qianqian Dong, Yaoming Zhu, Mingxuan Wang, Lei Li — _Annual Meeting of the Association for Computational Linguistics_ — cites: 36
+  - https://www.semanticscholar.org/paper/36d5714699cc1cf636746f7d3a0b9e4dd54d0513
+  - arXiv:2109.07368 · doi:10.18653/v1/2022.acl-long.50
+  - How to find proper moments to generate partial sentence translation given a streaming speech input? Existing approaches waiting-and-translating for a fixed duration often break the acoustic units in speech, since the boundaries between acoustic units in speech are not even. In this paper, we propose MoSST, a simple yet effective method for translating streaming speech content. Given a usually long…
+  - via: `query:streaming speech translation` (round 0)
+- **Exploiting Language Relatedness for Low Web-Resource Language Model Adaptation: An Indic Languages Study** (2021) — Yash Khemchandani, Sarvesh Mehtani, Vaidehi Patil, Abhijeet Awasthi, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 34
+  - https://www.semanticscholar.org/paper/dec618c83386fc00b5c730ca688f522985b21b89
+  - arXiv:2106.03958 · doi:10.18653/v1/2021.acl-long.105
+  - Recent research in multilingual language models (LM) has demonstrated their ability to effectively handle multiple languages in a single model. This holds promise for low web-resource languages (LRL) as multilingual models can enable transfer of supervision from high resource languages to LRLs. However, incorporating a new language in an LM still remains a challenge, particularly for languages wit…
+  - via: `cite_of:595306f993993e44e2c2f674367103f44df03d9b` (round 1)
+- **An Exploratory Analysis of Multilingual Word-Level Quality Estimation with Cross-Lingual Transformers** (2021) — Tharindu Ranasinghe, Constantin Orasan, R. Mitkov — _Annual Meeting of the Association for Computational Linguistics_ — cites: 30
+  - https://www.semanticscholar.org/paper/d6218ce8a829c705678884d77ad791753755175e
+  - arXiv:2106.00143 · doi:10.18653/v1/2021.acl-short.55
+  - Most studies on word-level Quality Estimation (QE) of machine translation focus on language-specific models. The obvious disadvantages of these approaches are the need for labelled data for each language pair and the high cost required to maintain several language-specific models. To overcome these problems, we explore different approaches to multilingual, word-level QE. We show that multilingual…
+  - via: `cite_of:95bcee172f94c7ce7201d3cc3d221ec4a4a9d706` (round 2)
+- **Beyond Sentence-Level End-to-End Speech Translation: Context Helps** (2021) — Biao Zhang, Ivan Titov, B. Haddow, Rico Sennrich — _Annual Meeting of the Association for Computational Linguistics_ — cites: 22
+  - https://www.semanticscholar.org/paper/b60e273e336f31f6d061a58d71d5cef7766e8b6f
+  - doi:10.18653/v1/2021.acl-long.200
+  - Document-level contextual information has shown benefits to text-based machine translation, but whether and how context helps end-to-end (E2E) speech translation (ST) is still under-studied. We fill this gap through extensive experiments using a simple concatenation-based context-aware ST model, paired with adaptive feature selection on speech encodings for computational efficiency. We investigate…
+  - via: `query:simultaneous speech translation` (round 0)
+- **IntelliCAT: Intelligent Machine Translation Post-Editing with Quality Estimation and Translation Suggestion** (2021) — Dongjun Lee, Junhyeong Ahn, Heesoo Park, Jaemin Jo — _Annual Meeting of the Association for Computational Linguistics_ — cites: 19
+  - https://www.semanticscholar.org/paper/e94ae0f0640d3ca3e00c359edb5684bf3f54121a
+  - arXiv:2105.12172 · doi:10.18653/v1/2021.acl-demo.2
+  - We present IntelliCAT, an interactive translation interface with neural models that streamline the post-editing process on machine translation output. We leverage two quality estimation (QE) models at different granularities: sentence-level QE, to predict the quality of each machine-translated sentence, and word-level QE, to locate the parts of the machine-translated sentence that need correction.…
+  - via: `query:translation quality machine translation` (round 1)
+- **YANMTT: Yet Another Neural Machine Translation Toolkit** (2021) — Raj Dabre, E. Sumita — _Annual Meeting of the Association for Computational Linguistics_ — cites: 14
+  - https://www.semanticscholar.org/paper/5304392b888f93c4f1730b7d65e66f6a103b3518
+  - arXiv:2108.11126 · doi:10.18653/v1/2023.acl-demo.24
+  - In this paper, we present our open-source neural machine translation (NMT) toolkit called “Yet Another Neural Machine Translation Toolkit” abbreviated as YANMTT - https://github.com/prajdabre/yanmtt, which is built on top of the HuggingFace Transformers library. YANMTT focuses on transfer learning and enables easy pre-training and fine-tuning of sequence-to-sequence models at scale. It can be used…
+  - via: `cite_of:9d3480e46cc506b73d5291387c6452998690fdd3` (round 1)
+- **An Empirical Study on Adversarial Attack on NMT: Languages and Positions Matter** (2021) — Zhiyuan Zeng, Deyi Xiong — _Annual Meeting of the Association for Computational Linguistics_ — cites: 11
+  - https://www.semanticscholar.org/paper/2effdadfa3723abfa39db66e844a3c485203849a
+  - doi:10.18653/v1/2021.acl-short.58
+  - In this paper, we empirically investigate adversarial attack on NMT from two aspects: languages (the source vs. the target language) and positions (front vs. rear). For autoregressive NMT models that generate target words from left to right, we observe that adversarial attack on the source language is more effective than on the target language, and that attacking front positions of target sentence…
+  - via: `cite_of:1e7d3a9846da556bc7b84ae1410d257b89448c30` (round 1)
+- **Cross-language Sentence Selection via Data Augmentation and Rationale Training** (2021) — Yanda Chen, C. Kedzie, Suraj Nair, Petra Galuvsvc'akov'a, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 10
+  - https://www.semanticscholar.org/paper/3df7970d24ac31744b772455307feb71d3d092b0
+  - arXiv:2106.02293 · doi:10.18653/v1/2021.acl-long.300
+  - This paper proposes an approach to cross-language sentence selection in a low-resource setting. It uses data augmentation and negative sampling techniques on noisy parallel sentence data to directly learn a cross-lingual embedding-based query relevance model. Results show that this approach performs as well as or better than multiple state-of-the-art machine translation + monolingual retrieval sys…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **ChrEnTranslate: Cherokee-English Machine Translation Demo with Quality Estimation and Corrective Feedback** (2021) — Shiyue Zhang, B. Frey, Mohit Bansal — _Annual Meeting of the Association for Computational Linguistics_ — cites: 8
+  - https://www.semanticscholar.org/paper/bb53946c7da617a05bbeef47fff74012db27ee78
+  - arXiv:2107.14800 · doi:10.18653/v1/2021.acl-demo.33
+  - We introduce ChrEnTranslate, an online machine translation demonstration system for translation between English and an endangered language Cherokee. It supports both statistical and neural translation models as well as provides quality estimation to inform users of reliability, two user feedback interfaces for experts and common users respectively, example inputs to collect human translations for…
+  - via: `query:translation quality machine translation` (round 1)
+- **Continual Quality Estimation with Online Bayesian Meta-Learning** (2021) — A. Obamuyide, M. Fomicheva, Lucia Specia — _Annual Meeting of the Association for Computational Linguistics_ — cites: 2
+  - https://www.semanticscholar.org/paper/7bf530a2d01cd29b7c09116f2437b799aadd1b05
+  - doi:10.18653/v1/2021.acl-short.25
+  - Most current quality estimation (QE) models for machine translation are trained and evaluated in a static setting where training and test data are assumed to be from a fixed distribution. However, in real-life settings, the test data that a deployed QE model would be exposed to may differ from its training data. In particular, training samples are often labelled by one or a small set of annotators…
+  - via: `cite_of:95bcee172f94c7ce7201d3cc3d221ec4a4a9d706` (round 2)
+- **Improving Massively Multilingual Neural Machine Translation and Zero-Shot Translation** (2020) — Biao Zhang, Philip Williams, Ivan Titov, Rico Sennrich — _Annual Meeting of the Association for Computational Linguistics_ — cites: 446
+  - https://www.semanticscholar.org/paper/4789355a00650afa29682d331d7d9a49a301b43b
+  - arXiv:2004.11867 · doi:10.18653/v1/2020.acl-main.148
+  - Massively multilingual models for neural machine translation (NMT) are theoretically attractive, but often underperform bilingual models and deliver poor zero-shot translations. In this paper, we explore ways to improve them. We argue that multilingual NMT requires stronger modeling capacity to support language pairs with varying typological characteristics, and overcome this bottleneck via langua…
+  - via: `query:machine translation nmt machine translation` (round 1)
+- **HAT: Hardware-Aware Transformers for Efficient Natural Language Processing** (2020) — Hanrui Wang, Zhanghao Wu, Zhijian Liu, Han Cai, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 288
+  - https://www.semanticscholar.org/paper/ef8d788a904ed66bd8e30ffa69bc3ea1fe57dda7
+  - arXiv:2005.14187 · doi:10.18653/v1/2020.acl-main.686
+  - Transformers are ubiquitous in Natural Language Processing (NLP) tasks, but they are difficult to be deployed on hardware due to the intensive computation. To enable low-latency inference on resource-constrained hardware platforms, we propose to design Hardware-Aware Transformers (HAT) with neural architecture search. We first construct a large design space with arbitrary encoder-decoder attention…
+  - via: `ref_of:b7d12aec8a0152ec4921dfa43ab525a63b334385` (round 2)
+- **AdvAug: Robust Adversarial Augmentation for Neural Machine Translation** (2020) — Yong Cheng, Lu Jiang, Wolfgang Macherey, Jacob Eisenstein — _Annual Meeting of the Association for Computational Linguistics_ — cites: 126
+  - https://www.semanticscholar.org/paper/1e7d3a9846da556bc7b84ae1410d257b89448c30
+  - arXiv:2006.11834 · doi:10.18653/v1/2020.acl-main.529
+  - In this paper, we propose a new adversarial augmentation method for Neural Machine Translation (NMT). The main idea is to minimize the vicinal risk over virtual sentences sampled from two vicinity distributions, in which the crucial one is a novel vicinity distribution for adversarial sentences that describes a smooth interpolated embedding space centered around observed training sentence pairs. W…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **SimulSpeech: End-to-End Simultaneous Speech to Text Translation** (2020) — Yi Ren, Jinglin Liu, Xu Tan, Chen Zhang, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 108
+  - https://www.semanticscholar.org/paper/f0dfe7f0528eded4096a741a751aea4b1f707e82
+  - doi:10.18653/v1/2020.acl-main.350
+  - In this work, we develop SimulSpeech, an end-to-end simultaneous speech to text translation system which translates speech in source language to text in target language concurrently. SimulSpeech consists of a speech encoder, a speech segmenter and a text decoder, where 1) the segmenter builds upon the encoder and leverages a connectionist temporal classification (CTC) loss to split the input strea…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **Analyzing the Source and Target Contributions to Predictions in Neural Machine Translation** (2020) — Elena Voita, Rico Sennrich, Ivan Titov — _Annual Meeting of the Association for Computational Linguistics_ — cites: 97
+  - https://www.semanticscholar.org/paper/d9bc8169326d3cca0860ec76247715bc7beaf9c9
+  - arXiv:2010.10907 · doi:10.18653/v1/2021.acl-long.91
+  - In Neural Machine Translation (and, more generally, conditional language modeling), the generation of a target token is influenced by two types of context: the source and the prefix of the target sequence. While many attempts to understand the internal workings of NMT models have been made, none of them explicitly evaluates relative source and target contributions to a generation decision. We argu…
+  - via: `query:prefix-to-prefix translation` (round 0)
+- **Leveraging Monolingual Data with Self-Supervision for Multilingual Neural Machine Translation** (2020) — Aditya Siddhant, Ankur Bapna, Yuan Cao, Orhan Firat, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 88
+  - https://www.semanticscholar.org/paper/5967a76ecb0f15de1da1a2cc869be581656411b1
+  - arXiv:2005.04816 · doi:10.18653/V1/2020.ACL-MAIN.252
+  - Over the last few years two promising research directions in low-resource neural machine translation (NMT) have emerged. The first focuses on utilizing high-resource languages to improve the quality of low-resource languages via multilingual NMT. The second direction employs monolingual data with self-supervision to pre-train translation models, followed by fine-tuning on small amounts of supervis…
+  - via: `ref_of:56665fd91f7d05842380fe0f928461d66f10c5de` (round 2)
+- **Parallel Data Augmentation for Formality Style Transfer** (2020) — Yi Zhang, Tao Ge, Xu Sun — _Annual Meeting of the Association for Computational Linguistics_ — cites: 87
+  - https://www.semanticscholar.org/paper/598fdb78e86415cea390195eeac605db92ac01c6
+  - arXiv:2005.07522 · doi:10.18653/v1/2020.acl-main.294
+  - The main barrier to progress in the task of Formality Style Transfer is the inadequacy of training data. In this paper, we study how to augment parallel data and propose novel and simple data augmentation methods for this task to obtain useful sentence pairs with easily accessible models and systems. Experiments demonstrate that our augmented parallel data largely helps improve formality style tra…
+  - via: `cite_of:0ee468b9b709a2610c4b574d67218e7960350224` (round 1)
+- **Simultaneous Translation Policies: From Fixed to Adaptive** (2020) — Baigong Zheng, Kaibo Liu, Renjie Zheng, Mingbo Ma, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 74
+  - https://www.semanticscholar.org/paper/183a1a62719bd116da23db4cbf5b2bd2576e4ee8
+  - arXiv:2004.13169 · doi:10.18653/v1/2020.acl-main.254
+  - Adaptive policies are better than fixed policies for simultaneous translation, since they can flexibly balance the tradeoff between translation quality and latency based on the current context information. But previous methods on obtaining adaptive policies either rely on complicated training process, or underperform simple fixed policies. We design an algorithm to achieve adaptive policies via a…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **A Study of Non-autoregressive Model for Sequence Generation** (2020) — Yi Ren, Jinglin Liu, Xu Tan, Sheng Zhao, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 69
+  - https://www.semanticscholar.org/paper/bed87e8fb3e7e9bc87e1c2ee459ae405a35d3267
+  - arXiv:2004.10454 · doi:10.18653/v1/2020.acl-main.15
+  - Non-autoregressive (NAR) models generate all the tokens of a sequence in parallel, resulting in faster generation speed compared to their autoregressive (AR) counterparts but at the cost of lower accuracy. Different techniques including knowledge distillation and source-target alignment have been proposed to bridge the gap between AR and NAR models in various tasks such as neural machine translati…
+  - via: `query:machine translation nmt speech translation` (round 1)
+- **ENGINE: Energy-Based Inference Networks for Non-Autoregressive Machine Translation** (2020) — Lifu Tu, Richard Yuanzhe Pang, Sam Wiseman, Kevin Gimpel — _Annual Meeting of the Association for Computational Linguistics_ — cites: 58
+  - https://www.semanticscholar.org/paper/f2c0b478a30e653157dcdfe879b3082c6bbb0913
+  - arXiv:2005.00850 · doi:10.18653/v1/2020.acl-main.251
+  - We propose to train a non-autoregressive machine translation model to minimize the energy defined by a pretrained autoregressive model. In particular, we view our non-autoregressive translation system as an inference network (Tu and Gimpel, 2018) trained to minimize the autoregressive teacher energy. This contrasts with the popular approach of training a non-autoregressive model on a distilled cor…
+  - via: `cite_of:1e5b826ddf0754f6e93234ba1260bd939c255e7f` (round 1)
+- **Tagged Back-translation Revisited: Why Does It Really Work?** (2020) — Benjamin Marie, Raphaël Rubino, Atsushi Fujita — _Annual Meeting of the Association for Computational Linguistics_ — cites: 57
+  - https://www.semanticscholar.org/paper/d141914b07dee69d8ae0e87da25b4e3bb2b80029
+  - doi:10.18653/v1/2020.acl-main.532
+  - In this paper, we show that neural machine translation (NMT) systems trained on large back-translated data overfit some of the characteristics of machine-translated texts. Such NMT systems better translate human-produced translations, i.e., translationese, but may largely worsen the translation quality of original texts. Our analysis reveals that adding a simple tag to back-translations prevents t…
+  - via: `query:back-translation simultaneous` (round 0)
+- **Knowledge Distillation for Multilingual Unsupervised Neural Machine Translation** (2020) — Haipeng Sun, Rui Wang, Kehai Chen, M. Utiyama, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 52
+  - https://www.semanticscholar.org/paper/1b856b7dd486d0db7565031720db4e051420ec3b
+  - arXiv:2004.10171 · doi:10.18653/v1/2020.acl-main.324
+  - Unsupervised neural machine translation (UNMT) has recently achieved remarkable results for several language pairs. However, it can only translate between a single language pair and cannot produce translation results for multiple language pairs at the same time. That is, research on multilingual UNMT has been limited. In this paper, we empirically introduce a simple method to translate between thi…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **Weight Distillation: Transferring the Knowledge in Neural Network Parameters** (2020) — Ye Lin, Yanyang Li, Ziyang Wang, Bei Li, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 31
+  - https://www.semanticscholar.org/paper/e8bfc2a1d895b4915d9e32458ea62b51bc727a57
+  - arXiv:2009.09152 · doi:10.18653/v1/2021.acl-long.162
+  - Knowledge distillation has been proven to be effective in model acceleration and compression. It transfers knowledge from a large neural network to a small one by using the large neural network predictions as targets of the small neural network. But this way ignores the knowledge inside the large neural networks, e.g., parameters. Our preliminary study as well as the recent success in pre-training…
+  - via: `query:bleu points machine translation` (round 2)
+- **It’s Easier to Translate out of English than into it: Measuring Neural Translation Difficulty by Cross-Mutual Information** (2020) — Emanuele Bugliarello, Sabrina J. Mielke, Antonios Anastasopoulos, Ryan Cotterell, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 30
+  - https://www.semanticscholar.org/paper/fd9e0fc8753f5b2c7af5f5ce03d819e48332925c
+  - arXiv:2005.02354 · doi:10.18653/v1/2020.acl-main.149
+  - The performance of neural machine translation systems is commonly evaluated in terms of BLEU. However, due to its reliance on target language properties and generation, the BLEU metric does not allow an assessment of which translation directions are more difficult to model. In this paper, we propose cross-mutual information (XMI): an asymmetric information-theoretic metric of machine translation d…
+  - via: `query:available https github machine translation` (round 2)
+- **Are we Estimating or Guesstimating Translation Quality?** (2020) — Shuo Sun, Francisco (Paco) Guzmán, Lucia Specia — _Annual Meeting of the Association for Computational Linguistics_ — cites: 29
+  - https://www.semanticscholar.org/paper/29aceafb7d5a593bd08ce4d7628a0cc8aa9ace3a
+  - doi:10.18653/v1/2020.acl-main.558
+  - Recent advances in pre-trained multilingual language models lead to state-of-the-art results on the task of quality estimation (QE) for machine translation. A carefully engineered ensemble of such models won the QE shared task at WMT19. Our in-depth analysis, however, shows that the success of using pre-trained language models for QE is over-estimated due to three issues we observed in current QE…
+  - via: `cite_of:95bcee172f94c7ce7201d3cc3d221ec4a4a9d706` (round 2)
+- **Improving Non-autoregressive Neural Machine Translation with Monolingual Data** (2020) — Jiawei Zhou, Phillip Keung — _Annual Meeting of the Association for Computational Linguistics_ — cites: 28
+  - https://www.semanticscholar.org/paper/699b29745ec527e4d3b08ea38adf34888a85469f
+  - arXiv:2005.00932 · doi:10.18653/v1/2020.acl-main.171
+  - Non-autoregressive (NAR) neural machine translation is usually done via knowledge distillation from an autoregressive (AR) model. Under this framework, we leverage large monolingual corpora to improve the NAR model’s performance, with the goal of transferring the AR model’s generalization ability while preventing overfitting. On top of a strong NAR baseline, our experimental results on the WMT14 E…
+  - via: `ref_of:ac6535d096fc79dde2d9ce0329e0626b79ede7f0` (round 2)
+- **Opportunistic Decoding with Timely Correction for Simultaneous Translation** (2020) — Renjie Zheng, Mingbo Ma, Baigong Zheng, Kaibo Liu, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 19
+  - https://www.semanticscholar.org/paper/931514d517731f9d925511e60f0594e5b61cd47b
+  - arXiv:2005.00675 · doi:10.18653/v1/2020.acl-main.42
+  - Simultaneous translation has many important application scenarios and attracts much attention from both academia and industry recently. Most existing frameworks, however, have difficulties in balancing between the translation quality and latency, i.e., the decoding policy is usually either too aggressive or too conservative. We propose an opportunistic decoding technique with timely correction abi…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **CLIReval: Evaluating Machine Translation as a Cross-Lingual Information Retrieval Task** (2020) — Shuo Sun, Suzanna Sia, Kevin Duh — _Annual Meeting of the Association for Computational Linguistics_ — cites: 12
+  - https://www.semanticscholar.org/paper/4e8bb0c169afb85cbcc748b78850862d49e36b21
+  - doi:10.18653/v1/2020.acl-demos.18
+  - We present CLIReval, an easy-to-use toolkit for evaluating machine translation (MT) with the proxy task of cross-lingual information retrieval (CLIR). Contrary to what the project name might suggest, CLIReval does not actually require any annotated CLIR dataset. Instead, it automatically transforms translations and references used in MT evaluations into a synthetic CLIR dataset; it then sets up a…
+  - via: `query:available https github machine translation` (round 2)
+- **Data Augmentation with Unsupervised Machine Translation Improves the Structural Similarity of Cross-lingual Word Embeddings** (2020) — Sosuke Nishikawa, Ryokan Ri, Yoshimasa Tsuruoka — _Annual Meeting of the Association for Computational Linguistics_ — cites: 4
+  - https://www.semanticscholar.org/paper/0f296ee7d1e0a786f1224aeea09daedabcbc69d5
+  - arXiv:2006.00262 · doi:10.18653/v1/2021.acl-srw.17
+  - Unsupervised cross-lingual word embedding(CLWE) methods learn a linear transformation matrix that maps two monolingual embedding spaces that are separately trained with monolingual corpora. This method relies on the assumption that the two embedding spaces are structurally similar, which does not necessarily hold true in general. In this paper, we argue that using a pseudo-parallel corpus generate…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Checkpoint Reranking: An Approach to Select Better Hypothesis for Neural Machine Translation Systems** (2020) — Vinay Pandramish, D. Sharma — _Annual Meeting of the Association for Computational Linguistics_ — cites: 4
+  - https://www.semanticscholar.org/paper/19c0d8304844894f6f2eeebc9c3317cc6e65b891
+  - doi:10.18653/v1/2020.acl-srw.38
+  - In this paper, we propose a method of re-ranking the outputs of Neural Machine Translation (NMT) systems. After the decoding process, we select a few last iteration outputs in the training process as the N-best list. After training a Neural Machine Translation (NMT) baseline system, it has been observed that these iteration outputs have an oracle score higher than baseline up to 1.01 BLEU points c…
+  - via: `query:bleu points machine translation` (round 2)
+- **Multimodal Quality Estimation for Machine Translation** (2020) — Shu Okabe, F. Blain, Lucia Specia — _Annual Meeting of the Association for Computational Linguistics_ — cites: 1
+  - https://www.semanticscholar.org/paper/b43ad46c0731ac2f5334bc47eff9f012091f3c07
+  - doi:10.18653/v1/2020.acl-main.114
+  - We propose approaches to Quality Estimation (QE) for Machine Translation that explore both text and visual modalities for Multimodal QE. We compare various multimodality integration and fusion strategies. For both sentence-level and document-level predictions, we show that state-of-the-art neural and feature-based QE frameworks obtain better results when using the additional modality.
+  - via: `cite_of:95bcee172f94c7ce7201d3cc3d221ec4a4a9d706` (round 2)
+- **BART: Denoising Sequence-to-Sequence Pre-training for Natural Language Generation, Translation, and Comprehension** (2019) — M. Lewis, Yinhan Liu, Naman Goyal, Marjan Ghazvininejad, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 12655
+  - https://www.semanticscholar.org/paper/395de0bd3837fdf4b4b5e5f04835bcc69c279481
+  - arXiv:1910.13461 · doi:10.18653/v1/2020.acl-main.703
+  - We present BART, a denoising autoencoder for pretraining sequence-to-sequence models. BART is trained by (1) corrupting text with an arbitrary noising function, and (2) learning a model to reconstruct the original text. It uses a standard Tranformer-based neural machine translation architecture which, despite its simplicity, can be seen as generalizing BERT (due to the bidirectional encoder), GPT…
+  - via: `ref_of:7ba0dc20800195c6350995695c8bf86be6227c49` (round 1)
+- **Monotonic Infinite Lookback Attention for Simultaneous Machine Translation** (2019) — N. Arivazhagan, Colin Cherry, Wolfgang Macherey, Chung-Cheng Chiu, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 212
+  - https://www.semanticscholar.org/paper/05b3a6acc8be299cc2a2678e5d81712b71c748e5
+  - arXiv:1906.05218 · doi:10.18653/v1/P19-1126
+  - Simultaneous machine translation begins to translate each source sentence before the source speaker is finished speaking, with applications to live and streaming scenarios. Simultaneous systems must carefully schedule their reading of the source sentence to balance quality against latency. We present the first simultaneous translation system to learn an adaptive schedule jointly with a neural mach…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **An Effective Approach to Unsupervised Machine Translation** (2019) — Mikel Artetxe, Gorka Labaka, Eneko Agirre — _Annual Meeting of the Association for Computational Linguistics_ — cites: 158
+  - https://www.semanticscholar.org/paper/aecddd82840323e5bd43f9c73a32fed88ee93c8c
+  - arXiv:1902.01313 · doi:10.18653/v1/P19-1019
+  - While machine translation has traditionally relied on large amounts of parallel corpora, a recent research line has managed to train both Neural Machine Translation (NMT) and Statistical Machine Translation (SMT) systems using monolingual corpora only. In this paper, we identify and address several deficiencies of existing unsupervised SMT approaches by exploiting subword information, developing a…
+  - via: `query:bleu points machine translation` (round 2)
+- **OpenKiwi: An Open Source Framework for Quality Estimation** (2019) — F. Kepler, Jonay Trénous, Marcos Vinícius Treviso, M. Vera, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 140
+  - https://www.semanticscholar.org/paper/95bcee172f94c7ce7201d3cc3d221ec4a4a9d706
+  - arXiv:1902.08646 · doi:10.18653/v1/P19-3020
+  - We introduce OpenKiwi, a Pytorch-based open source framework for translation quality estimation. OpenKiwi supports training and testing of word-level and sentence-level quality estimation systems, implementing the winning systems of the WMT 2015–18 quality estimation campaigns. We benchmark OpenKiwi on two datasets from WMT 2018 (English-German SMT and NMT), yielding state-of-the-art performance o…
+  - via: `ref_of:dae35736329852c83d32cefd66448dc73cd73368` (round 1)
+- **Distilling Knowledge Learned in BERT for Text Generation** (2019) — Yen-Chun Chen, Zhe Gan, Yu Cheng, Jingzhou Liu, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 139
+  - https://www.semanticscholar.org/paper/75352cc69a29bd5fc411e0e79737cb96b6309161
+  - doi:10.18653/v1/2020.acl-main.705
+  - Large-scale pre-trained language model such as BERT has achieved great success in language understanding tasks. However, it remains an open question how to utilize BERT for language generation. In this paper, we present a novel approach, Conditional Masked Language Modeling (C-MLM), to enable the finetuning of BERT on target generation tasks. The finetuned BERT (teacher) is exploited as extra supe…
+  - via: `cite_of:1b24b7b4ac2427d20ab60c8451563eb8d99caf9c` (round 1)
+- **Soft Contextual Data Augmentation for Neural Machine Translation** (2019) — Jinhua Zhu, Fei Gao, Lijun Wu, Yingce Xia, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 135
+  - https://www.semanticscholar.org/paper/258e92bd6ceaeb78e7384eeea57b4c7a2c356cfa
+  - arXiv:1905.10523 · doi:10.18653/v1/P19-1555
+  - While data augmentation is an important trick to boost the accuracy of deep learning methods in computer vision tasks, its study in natural language tasks is still very limited. In this paper, we present a novel data augmentation method for neural machine translation.Different from previous augmentation methods that randomly drop, swap or replace words with other words in a sentence, we softly aug…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Generalized Data Augmentation for Low-Resource Translation** (2019) — Mengzhou Xia, X. Kong, Antonios Anastasopoulos, Graham Neubig — _Annual Meeting of the Association for Computational Linguistics_ — cites: 128
+  - https://www.semanticscholar.org/paper/595306f993993e44e2c2f674367103f44df03d9b
+  - arXiv:1906.03785 · doi:10.18653/v1/P19-1579
+  - Low-resource language pairs with a paucity of parallel data pose challenges for machine translation in terms of both adequacy and fluency. Data augmentation utilizing a large amount of monolingual data is regarded as an effective way to alleviate the problem. In this paper, we propose a general framework of data augmentation for low-resource machine translation not only using target-side monolingu…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Improved Zero-shot Neural Machine Translation via Ignoring Spurious Correlations** (2019) — Jiatao Gu, Yong Wang, Kyunghyun Cho, V. Li — _Annual Meeting of the Association for Computational Linguistics_ — cites: 110
+  - https://www.semanticscholar.org/paper/b3e3a2ec4e411e07a31972745e2eea537b9eb20c
+  - arXiv:1906.01181 · doi:10.18653/v1/P19-1121
+  - Zero-shot translation, translating between language pairs on which a Neural Machine Translation (NMT) system has never been trained, is an emergent property when training the system in multilingual settings. However, naive training for zero-shot NMT easily fails, and is sensitive to hyper-parameter setting. The performance typically lags far behind the more conventional pivot-based approach which…
+  - via: `query:bleu points machine translation` (round 2)
+- **On The Evaluation of Machine Translation SystemsTrained With Back-Translation** (2019) — Sergey Edunov, Myle Ott, Marc'Aurelio Ranzato, Michael Auli — _Annual Meeting of the Association for Computational Linguistics_ — cites: 104
+  - https://www.semanticscholar.org/paper/8b5b8bd0942d5f39d01c1f4b89d174fb3fde99cc
+  - arXiv:1908.05204 · doi:10.18653/v1/2020.acl-main.253
+  - Back-translation is a widely used data augmentation technique which leverages target monolingual data. However, its effectiveness has been challenged since automatic metrics such as BLEU only show significant improvements for test examples where the source itself is a translation, or translationese. This is believed to be due to translationese inputs better matching the back-translated training da…
+  - via: `query:back-translation simultaneous` (round 0)
+- **Imitation Learning for Non-Autoregressive Neural Machine Translation** (2019) — Bingzhen Wei, Mingxuan Wang, Hao Zhou, Junyang Lin, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 99
+  - https://www.semanticscholar.org/paper/df9e4fbe7f7a8d3a1d4804b2065308a24b8490ae
+  - arXiv:1906.02041 · doi:10.18653/v1/P19-1125
+  - Non-autoregressive translation models (NAT) have achieved impressive inference speedup. A potential issue of the existing NAT algorithms, however, is that the decoding is conducted in parallel, without directly considering previous context. In this paper, we propose an imitation learning framework for non-autoregressive machine translation, which still enjoys the fast translation speed but gives c…
+  - via: `ref_of:1e5b826ddf0754f6e93234ba1260bd939c255e7f` (round 1)
+- **Effective Cross-lingual Transfer of Neural Machine Translation Models without Shared Vocabularies** (2019) — Yunsu Kim, Yingbo Gao, H. Ney — _Annual Meeting of the Association for Computational Linguistics_ — cites: 91
+  - https://www.semanticscholar.org/paper/7c2ce260d160c94aeeb4d711cf6757aadfde5d90
+  - arXiv:1905.05475 · doi:10.18653/v1/P19-1120
+  - Transfer learning or multilingual model is essential for low-resource neural machine translation (NMT), but the applicability is limited to cognate languages by sharing their vocabularies. This paper shows effective techniques to transfer a pretrained NMT model to a new, unrelated language without shared vocabularies. We relieve the vocabulary mismatch by using cross-lingual word embedding, train…
+  - via: `ref_of:56665fd91f7d05842380fe0f928461d66f10c5de` (round 2)
+- **Simultaneous Translation with Flexible Policy via Restricted Imitation Learning** (2019) — Baigong Zheng, Renjie Zheng, Mingbo Ma, Liang Huang — _Annual Meeting of the Association for Computational Linguistics_ — cites: 64
+  - https://www.semanticscholar.org/paper/310050f7bf5bd5d630e7971114fbccbd6198a393
+  - arXiv:1906.01135 · doi:10.18653/v1/P19-1582
+  - Simultaneous translation is widely useful but remains one of the most difficult tasks in NLP. Previous work either uses fixed-latency policies, or train a complicated two-staged model using reinforcement learning. We propose a much simpler single model that adds a “delay” token to the target vocabulary, and design a restricted dynamic oracle to greatly simplify training. Experiments on Chinese <->…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Target Conditioned Sampling: Optimizing Data Selection for Multilingual Neural Machine Translation** (2019) — Xinyi Wang, Graham Neubig — _Annual Meeting of the Association for Computational Linguistics_ — cites: 28
+  - https://www.semanticscholar.org/paper/a0cbaf59f563580f68523ab6839a436e38b6db18
+  - arXiv:1905.08212 · doi:10.18653/v1/P19-1583
+  - To improve low-resource Neural Machine Translation (NMT) with multilingual corpus, training on the most related high-resource language only is generally more effective than us- ing all data available (Neubig and Hu, 2018). However, it remains a question whether a smart data selection strategy can further improve low-resource NMT with data from other auxiliary languages. In this paper, we seek to c…
+  - via: `cite_of:0ee468b9b709a2610c4b574d67218e7960350224` (round 1)
+- **Style Transfer Through Back-Translation** (2018) — Shrimai Prabhumoye, Yulia Tsvetkov, R. Salakhutdinov, A. Black — _Annual Meeting of the Association for Computational Linguistics_ — cites: 404
+  - https://www.semanticscholar.org/paper/bface38422b7e53287134c4d01a39fa58edd4469
+  - arXiv:1804.09000 · doi:10.18653/v1/P18-1080
+  - Style transfer is the task of rephrasing the text to contain specific stylistic properties without changing the intent or affect within the context. This paper introduces a new method for automatic style transfer. We first learn a latent representation of the input sentence which is grounded in a language translation model in order to better preserve the meaning of the sentence while reducing styl…
+  - via: `ref_of:c8c76626db4246c944642e86d19665025fa7deb4` (round 1)
+- **STACL: Simultaneous Translation with Implicit Anticipation and Controllable Latency using Prefix-to-Prefix Framework** (2018) — Mingbo Ma, Liang Huang, Hao Xiong, Renjie Zheng, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 309
+  - https://www.semanticscholar.org/paper/9d3480e46cc506b73d5291387c6452998690fdd3
+  - doi:10.18653/v1/P19-1289
+  - Simultaneous translation, which translates sentences before they are finished, is use- ful in many scenarios but is notoriously dif- ficult due to word-order differences. While the conventional seq-to-seq framework is only suitable for full-sentence translation, we pro- pose a novel prefix-to-prefix framework for si- multaneous translation that implicitly learns to anticipate in a single translati…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **Triangular Architecture for Rare Language Translation** (2018) — Shuo Ren, Wenhu Chen, Shujie Liu, Mu Li, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 34
+  - https://www.semanticscholar.org/paper/e8b02e05d44c7b1ec9dac3e211eef62a3cd2d9f3
+  - arXiv:1805.04813 · doi:10.18653/v1/P18-1006
+  - Neural Machine Translation (NMT) performs poor on the low-resource language pair (X,Z), especially when Z is a rare language. By introducing another rich language Y, we propose a novel triangular training architecture (TA-NMT) to leverage bilingual data (Y,Z) (may be small) and (X,Y) (can be rich) to improve the translation performance of low-resource pairs. In this triangular architecture, Z is t…
+  - via: `ref_of:dae35736329852c83d32cefd66448dc73cd73368` (round 1)
+- **Automatic Estimation of Simultaneous Interpreter Performance** (2018) — Craig Alan Stewart, Nikolai Vogler, Junjie Hu, J. Boyd-Graber, et al. — _Annual Meeting of the Association for Computational Linguistics_ — cites: 18
+  - https://www.semanticscholar.org/paper/34cb1f081c1d1d6b3dc16a9278940a9ee85fb2e0
+  - arXiv:1805.04016 · doi:10.18653/v1/p18-2105
+  - Simultaneous interpretation, translation of the spoken word in real-time, is both highly challenging and physically demanding. Methods to predict interpreter confidence and the adequacy of the interpreted message have a number of potential applications, such as in computer-assisted interpretation interfaces or pedagogical tools. We propose the task of predicting simultaneous interpreter performanc…
+  - via: `query:translation quality simultaneous translation` (round 1)
+
+## EMNLP (184)
+
+- **Scaling Low-Resource MT via Synthetic Data Generation with LLMs** (2025) — Ona de Gibert, Joseph Attieh, Teemu Vahtola, Mikko Aulamo, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 8
+  - https://www.semanticscholar.org/paper/4233ce7a5f374e423e348b13736b2dc759dd4393
+  - arXiv:2505.14423 · doi:10.48550/arXiv.2505.14423
+  - We investigate the potential of LLM-generated synthetic data for improving low-resource Machine Translation (MT). Focusing on seven diverse target languages, we construct a document-level synthetic corpus from English Europarl, and extend it via pivoting to 147 additional language pairs. Automatic and human evaluation confirm its overall high quality. We study its practical application by (i) iden…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **PRIM: Towards Practical In-Image Multilingual Machine Translation** (2025) — Yanzhi Tian, Zeming Liu, Zhengyang Liu, Chong Feng, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 4
+  - https://www.semanticscholar.org/paper/e28de223ffc5712c9e5b5b02a1bb85dc5e8d4a57
+  - arXiv:2509.05146 · doi:10.48550/arXiv.2509.05146
+  - In-Image Machine Translation (IIMT) aims to translate images containing texts from one language to another. Current research of end-to-end IIMT mainly conducts on synthetic data, with simple background, single font, fixed text position, and bilingual translation, which can not fully reflect real world, causing a significant gap between the research and practical conditions. To facilitate research…
+  - via: `query:translation quality machine translation` (round 1)
+- **Evaluating Large Language Models for Cross-Lingual Retrieval** (2025) — Longfei Zuo, Pingjun Hong, Oliver Kraus, Barbara Plank, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 4
+  - https://www.semanticscholar.org/paper/6812f7683ad9bcae657dfb341bb29d57f9d78470
+  - arXiv:2509.14749 · doi:10.48550/arXiv.2509.14749
+  - Multi-stage information retrieval (IR) has become a widely-adopted paradigm in search. While Large Language Models (LLMs) have been extensively evaluated as second-stage reranking models for monolingual IR, a systematic large-scale comparison is still lacking for cross-lingual IR (CLIR). Moreover, while prior work shows that LLM-based rerankers improve CLIR performance, their evaluation setup reli…
+  - via: `query:large language llms simultaneous translation` (round 1)
+- **Remedy: Learning Machine Translation Evaluation from Human Preferences with Reward Modeling** (2025) — Shaomu Tan, C. Monz — _Conference on Empirical Methods in Natural Language Processing_ — cites: 3
+  - https://www.semanticscholar.org/paper/544ec51b8e94c025cdee53ce406c7862d918d1ea
+  - arXiv:2504.13630 · doi:10.48550/arXiv.2504.13630
+  - A key challenge in MT evaluation is the inherent noise and inconsistency of human ratings. Regression-based neural metrics struggle with this noise, while prompting LLMs shows promise at system-level evaluation but performs poorly at segment level. In this work, we propose ReMedy, a novel MT metric framework that reformulates translation evaluation as a reward modeling task. Instead of regressing…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **EnAnchored-X2X: English-Anchored Optimization for Many-to-Many Translation** (2025) — Sen Yang, Yu Bao, Yu Lu, Jiajun Chen, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 3
+  - https://www.semanticscholar.org/paper/81a580291165fcd42f0fa1c6b942c147adf81068
+  - arXiv:2509.19770 · doi:10.48550/arXiv.2509.19770
+  - Large language models (LLMs) have demonstrated strong machine translation capabilities for English-centric language pairs but underperform in direct non-English (x2x) translation. This work addresses this limitation through a synthetic data generation framework that leverages models'established English-to-x (en2x) capabilities. By extending English parallel corpora into omnidirectional datasets an…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **Efficient Compositional Multi-tasking for On-device Large Language Models** (2025) — Ondrej Bohdal, Mete Ozay, J. Moon, Kyeng-Hun Lee, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 3
+  - https://www.semanticscholar.org/paper/707e2070b7553f6196910d5b14d2a9698c48f123
+  - arXiv:2507.16083 · doi:10.48550/arXiv.2507.16083
+  - Adapter parameters provide a mechanism to modify the behavior of machine learning models and have gained significant popularity in the context of large language models (LLMs) and generative AI. These parameters can be merged to support multiple tasks via a process known as task merging. However, prior work on merging in LLMs, particularly in natural language processing, has been limited to scenari…
+  - via: `query:large language simultaneous translation` (round 1)
+- **DrFrattn: Directly Learn Adaptive Policy from Attention for Simultaneous Machine Translation** (2025) — Libo Zhao, Jing Li, Ziqian Zeng — _Conference on Empirical Methods in Natural Language Processing_ — cites: 2
+  - https://www.semanticscholar.org/paper/6142df1278ad53d97e6898b081f4f5e5b69ebc34
+  - doi:10.18653/v1/2025.emnlp-main.1767
+  - ,
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **MultiMed-ST: Large-scale Many-to-many Multilingual Medical Speech Translation** (2025) — Khai Le-Duc, Tuyen Tran, Bach Phan Tat, Nguyen Kim Hai Bui, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 2
+  - https://www.semanticscholar.org/paper/d3e6ae1a390b97f678c906cb6b964e065e20e815
+  - arXiv:2504.03546 · doi:10.48550/arXiv.2504.03546
+  - Multilingual speech translation (ST) and machine translation (MT) in the medical domain enhances patient care by enabling efficient communication across language barriers, alleviating specialized workforce shortages, and facilitating improved diagnosis and treatment, particularly during pandemics. In this work, we present the first systematic study on medical ST, to our best knowledge, by releasin…
+  - via: `query:streaming speech translation` (round 0)
+- **CYCLE-INSTRUCT: Fully Seed-Free Instruction Tuning via Dual Self-Training and Cycle Consistency** (2025) — Zhanming Shen, Hao Chen, Yu-Chien Tang, Shaolin Zhu, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 2
+  - https://www.semanticscholar.org/paper/86869e2efacc2cbef59303e8ebb893ff6861922d
+  - arXiv:2508.16100 · doi:10.48550/arXiv.2508.16100
+  - Instruction tuning is vital for aligning large language models (LLMs) with human intent, but current methods typically rely on costly human-annotated seed data or powerful external teacher models. While instruction back-translation techniques reduce this dependency, they remain fundamentally tethered to an initial seed set, which limits full automation, introduces biases, and can lead to inefficie…
+  - via: `query:self-training simultaneous translation` (round 0)
+- **From Tens of Hours to Tens of Thousands: Scaling Back-Translation for Speech Recognition** (2025) — Tianduo Wang, Lu Xu, Wei Lu, Shanbo Cheng — _Conference on Empirical Methods in Natural Language Processing_ — cites: 2
+  - https://www.semanticscholar.org/paper/b8f76b11b6efc0dac5373b306d8ac0486f9dbc01
+  - arXiv:2505.16972 · doi:10.48550/arXiv.2505.16972
+  - Recent advances in Automatic Speech Recognition (ASR) have been largely fueled by massive speech corpora. However, extending coverage to diverse languages with limited resources remains a formidable challenge. This paper introduces Speech Back-Translation, a scalable pipeline that improves multilingual ASR models by converting large-scale text corpora into synthetic speech via off-the-shelf text-t…
+  - via: `query:back-translation simultaneous` (round 0)
+- **TopXGen: Topic-Diverse Parallel Data Generation for Low-Resource Machine Translation** (2025) — A. Zebaze, Benoît Sagot, Rachel Bawden — _Conference on Empirical Methods in Natural Language Processing_ — cites: 1
+  - https://www.semanticscholar.org/paper/e549950da3f9645bc016fd61431aaa95ab8a168d
+  - arXiv:2508.08680 · doi:10.48550/arXiv.2508.08680
+  - LLMs have been shown to perform well in machine translation (MT) with the use of in-context learning (ICL), rivaling supervised models when translating into high-resource languages (HRLs). However, they lag behind when translating into low-resource language (LRLs). Example selection via similarity search and supervised fine-tuning help. However the improvements they give are limited by the size, q…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **Unsupervised Word-level Quality Estimation for Machine Translation Through the Lens of Annotators (Dis)agreement** (2025) — Gabriele Sarti, Vilém Zouhar, Malvina Nissim, Arianna Bisazza — _Conference on Empirical Methods in Natural Language Processing_ — cites: 1
+  - https://www.semanticscholar.org/paper/533b4bcbbfa05c205b8ecf95aae51d044c33d87d
+  - arXiv:2505.23183 · doi:10.18653/v1/2025.emnlp-main.924
+  - Word-level quality estimation (WQE) aims to automatically identify fine-grained error spans in machine-translated outputs and has found many uses, including assisting translators during post-editing. Modern WQE techniques are often expensive, involving prompting of large language models or ad-hoc training on large amounts of human-labeled data. In this work, we investigate efficient alternatives e…
+  - via: `query:translation quality machine translation` (round 1)
+- **The Green KNIGHT: Green Machine Translation with Knowledge-Distilled, Narrow, Inexpensive, Greedy, Hybrid Transformers** (2025) — Andreas Guta, Frithjof Petrick, Peter Polák — _Conference on Empirical Methods in Natural Language Processing_ — cites: 1
+  - https://www.semanticscholar.org/paper/3a6a04a3410c2ae52309d8c58b2c4a7e15503703
+  - doi:10.18653/v1/2025.findings-emnlp.316
+  - State-of-the-art neural machine translation (NMT) models deliver high-quality translations at the expense of high inference latency and energy consumption, requiring vast GPU fleets and contributing significantly to carbon emissions. To democratize and “green” NMT, we introduce the Green KNIGHT, a hardware-agnostic collection of recipes to optimize translation speed and energy consumption, with on…
+  - via: `query:translation quality machine translation` (round 1)
+- **RIVAL: Reinforcement Learning with Iterative and Adversarial Optimization for Machine Translation** (2025) — Tianjiao Li, Mengran Yu, Chenyu Shi, Yanjun Zhao, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 1
+  - https://www.semanticscholar.org/paper/2a471f03cb31cab24def7419d5a70b85c1a791a6
+  - arXiv:2506.05070 · doi:10.48550/arXiv.2506.05070
+  - Large language models (LLMs) possess strong multilingual capabilities, and combining Reinforcement Learning from Human Feedback (RLHF) with translation tasks has shown great potential. However, we observe that this paradigm performs unexpectedly poorly when applied to colloquial subtitle translation tasks. In this work, we investigate this issue and find that the offline reward model (RM) graduall…
+  - via: `query:translation quality machine translation` (round 1)
+- **On-device System of Compositional Multi-tasking in Large Language Models** (2025) — Ondrej Bohdal, Konstantinos Theodosiadis, Asterios Mpatziakas, Dimitris Filippidis, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 1
+  - https://www.semanticscholar.org/paper/f7ab9db5ef52288d2076b059be52bb812e3e5d8c
+  - arXiv:2510.13848 · doi:10.18653/v1/2025.emnlp-industry.27
+  - Large language models (LLMs) are commonly adapted for diverse downstream tasks via parameter-efficient fine-tuning techniques such as Low-Rank Adapters (LoRA). While adapters can be combined to handle multiple tasks separately, standard approaches struggle when targeting the simultaneous execution of complex tasks, such as generating a translated summary from a long conversation. To address this c…
+  - via: `query:large language simultaneous translation` (round 1)
+- **MedCOD: Enhancing English-to-Spanish Medical Translation of Large Language Models Using Enriched Chain-of-Dictionary Framework** (2025) — Md Shahidul Salim, Lian Fu, Arav Adikesh Ramakrishnan, Zonghai Yao, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 1
+  - https://www.semanticscholar.org/paper/41b0544a9ba06919a747693654ec6e2447a3077c
+  - arXiv:2509.00934 · doi:10.48550/arXiv.2509.00934
+  - We present MedCOD (Medical Chain-of-Dictionary), a hybrid framework designed to improve English-to-Spanish medical translation by integrating domain-specific structured knowledge into large language models (LLMs). MedCOD integrates domain-specific knowledge from both the Unified Medical Language System (UMLS) and the LLM-as-Knowledge-Base (LLM-KB) paradigm to enhance structured prompting and fine-…
+  - via: `query:large language simultaneous translation` (round 1)
+- **Case-Based Decision-Theoretic Decoding with Quality Memories** (2025) — Hiroyuki Deguchi, Masaaki Nagata — _Conference on Empirical Methods in Natural Language Processing_ — cites: 1
+  - https://www.semanticscholar.org/paper/9b1104558c4d63b1e2ded5857f0629ffcdedfe94
+  - arXiv:2509.12677 · doi:10.48550/arXiv.2509.12677
+  - Minimum Bayes risk (MBR) decoding is a decision rule of text generation, which selects the hypothesis that maximizes the expected utility and robustly generates higher-quality texts than maximum a posteriori (MAP) decoding. However, it depends on sample texts drawn from the text generation model; thus, it is difficult to find a hypothesis that correctly captures the knowledge or information of out…
+  - via: `cite_of:c7b361427a54b309caea8ef69ed59b50cd54ac67` (round 1)
+- **Paired by the Teacher: Turning Unpaired Data into High-Fidelity Pairs for Low-Resource Text Generation** (2025) — Yen-Ju Lu, Thomas Thebaud, L. Moro-Velázquez, N. Dehak, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 1
+  - https://www.semanticscholar.org/paper/21de4aacd38dfdb1eec7311b34b8292ec987d108
+  - arXiv:2509.25144 · doi:10.48550/arXiv.2509.25144
+  - We present Paired by the Teacher (PbT), a two-stage teacher-student pipeline that synthesizes accurate input-output pairs without human labels or parallel data. In many low-resource natural language generation (NLG) scenarios, practitioners may have only raw outputs, like highlights, recaps, or questions, or only raw inputs, such as articles, dialogues, or paragraphs, but seldom both. This mismatc…
+  - via: `cite_of:48925fef94500cf19ee220ed74217816f1ab5e60` (round 2)
+- **Transplant Then Regenerate: A New Paradigm for Text Data Augmentation** (2025) — Guangzhan Wang, Hongyu Zhang, Beijun Shen, Xiaodong Gu — _Conference on Empirical Methods in Natural Language Processing_ — cites: 0
+  - https://www.semanticscholar.org/paper/d1ca922f7f3d3c50ba0ac40605a3551596285c2c
+  - arXiv:2508.14723 · doi:10.48550/arXiv.2508.14723
+  - Data augmentation is a critical technique in deep learning. Traditional methods like Back-translation typically focus on lexical-level rephrasing, which primarily produces variations with the same semantics. While large language models (LLMs) have enhanced text augmentation by their"knowledge emergence"capability, controlling the style and structure of these outputs remains challenging and require…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Data Augmentation for Maltese NLP using Transliterated and Machine Translated Arabic Data** (2025) — Kurt Micallef, Nizar Habash, Claudia Borg — _Conference on Empirical Methods in Natural Language Processing_ — cites: 0
+  - https://www.semanticscholar.org/paper/656f6c15c6dbdb7f6b11992e0587857f636a2313
+  - arXiv:2509.12853 · doi:10.18653/v1/2025.findings-emnlp.1177
+  - Maltese is a unique Semitic language that has evolved under extensive influence from Romance and Germanic languages, particularly Italian and English. Despite its Semitic roots, its orthography is based on the Latin script, creating a gap between it and its closest linguistic relatives in Arabic. In this paper, we explore whether Arabic-language resources can support Maltese natural language proce…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **SHIFT: Selected Helpful Informative Frame for Video-guided Machine Translation** (2025) — Boyu Guan, Chuang Han, Yining Zhang, Yupu Liang, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 0
+  - https://www.semanticscholar.org/paper/4583bbd2e2ad438c66de89350666bc10e8adaa36
+  - doi:10.18653/v1/2025.emnlp-main.161
+  - Video-guided Machine Translation (VMT) aims to improve translation quality by integrating contextual information from paired short video clips. Mainstream VMT approaches typically incorporate multimodal information by uniformly sampling frames from the input videos. However, this paradigm frequently incurs significant computational overhead and introduces redundant multimodal content, which degrad…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **Dub-S2ST: Textless Speech-to-Speech Translation for Seamless Dubbing** (2025) — Jeongsoo Choi, Jaehun Kim, Joon Son Chung — _Conference on Empirical Methods in Natural Language Processing_ — cites: 0
+  - https://www.semanticscholar.org/paper/dd1111ae3ccf9165b69f669ffccc7875fd9f426d
+  - arXiv:2505.20899 · doi:10.48550/arXiv.2505.20899
+  - This paper introduces a cross-lingual dubbing system that translates speech from one language to another while preserving key characteristics such as duration, speaker identity, and speaking speed. Despite the strong translation quality of existing speech translation approaches, they often overlook the transfer of speech patterns, leading to mismatches with source speech and limiting their suitabi…
+  - via: `query:translation quality speech translation` (round 1)
+- **POSESTITCH-SLT: Linguistically Inspired Pose-Stitching for End-to-End Sign Language Translation** (2025) — Abhinav Joshi, Vaibhav Sharma, Sanjeet Singh, Ashutosh Modi — _Conference on Empirical Methods in Natural Language Processing_ — cites: 0
+  - https://www.semanticscholar.org/paper/eb7ea015570e832aeb2ef00b90a687bce4c07495
+  - arXiv:2511.00270 · doi:10.18653/v1/2025.emnlp-main.698
+  - Sign language translation remains a challenging task due to the scarcity of large-scale, sentence-aligned datasets. Prior arts have focused on various feature extraction and architectural changes to support neural machine translation for sign languages. We propose POSESTITCH-SLT, a novel pre-training scheme that is inspired by linguistic-templates-based sentence generation technique. With translat…
+  - via: `query:language pairs simultaneous translation` (round 1)
+- **LLaMAX: Scaling Linguistic Horizons of LLM by Enhancing Translation Capabilities Beyond 100 Languages** (2024) — Yinquan Lu, Wenhao Zhu, Lei Li, Yu Qiao, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 64
+  - https://www.semanticscholar.org/paper/d3ad0931e5c6e0e7152485eb103a7301836b57cf
+  - arXiv:2407.05975 · doi:10.48550/arXiv.2407.05975
+  - Large Language Models (LLMs) demonstrate remarkable translation capabilities in high-resource language tasks, yet their performance in low-resource languages is hindered by insufficient multilingual data during pre-training. To address this, we conduct extensive multilingual continual pre-training on the LLaMA series models, enabling translation support across more than 100 languages. Through a co…
+  - via: `cite_of:56665fd91f7d05842380fe0f928461d66f10c5de` (round 2)
+- **TransLLaMa: LLM-based Simultaneous Translation System** (2024) — Roman Koshkin, Katsuhito Sudoh, Satoshi Nakamura — _Conference on Empirical Methods in Natural Language Processing_ — cites: 45
+  - https://www.semanticscholar.org/paper/95166d7b62c864dd5f10eda5f1ad0a32fa12f004
+  - arXiv:2402.04636 · doi:10.48550/arXiv.2402.04636
+  - Decoder-only large language models (LLMs) have recently demonstrated impressive capabilities in text generation and reasoning. Nonetheless, they have limited applications in simultaneous machine translation (SiMT), currently dominated by encoder-decoder transformers. This study demonstrates that, after fine-tuning on a small dataset comprising causally aligned source and target sentence pairs, a p…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **Fine-Tuning Large Language Models to Translate: Will a Touch of Noisy Data in Misaligned Languages Suffice?** (2024) — D. Zhu, Pinzhen Chen, Miaoran Zhang, B. Haddow, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 22
+  - https://www.semanticscholar.org/paper/a992a1ff27c1bd04a964bf7ed82c6db19fd7f671
+  - arXiv:2404.14122 · doi:10.48550/arXiv.2404.14122
+  - Traditionally, success in multilingual machine translation can be attributed to three key factors in training data: large volume, diverse translation directions, and high quality. In the current practice of fine-tuning large language models (LLMs) for translation, we revisit the importance of these factors. We find that LLMs display strong translation capability after being fine-tuned on as few as…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **Ladder: A Model-Agnostic Framework Boosting LLM-based Machine Translation to the Next Level** (2024) — Zhaopeng Feng, Ruizhe Chen, Yan Zhang, Zijie Meng, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 20
+  - https://www.semanticscholar.org/paper/8450f3b0d77c4657a6827530fb094054b7060e75
+  - arXiv:2406.15741 · doi:10.48550/arXiv.2406.15741
+  - General-purpose Large Language Models (LLMs) like GPT-4 have achieved remarkable advancements in machine translation (MT) by leveraging extensive web content. On the other hand, translation-specific LLMs are built by pre-training on domain-specific monolingual corpora and fine-tuning with human-annotated translation data. Despite the superior performance, these methods either demand an unprecedent…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **Word Alignment as Preference for Machine Translation** (2024) — Qiyu Wu, Masaaki Nagata, Zhongtao Miao, Yoshimasa Tsuruoka — _Conference on Empirical Methods in Natural Language Processing_ — cites: 18
+  - https://www.semanticscholar.org/paper/5f39f57b175a27930dfe26aafc224dab8f34f8fc
+  - arXiv:2405.09223 · doi:10.48550/arXiv.2405.09223
+  - The problem of hallucination and omission, a long-standing problem in machine translation (MT), is more pronounced when a large language model (LLM) is used in MT because an LLM itself is susceptible to these phenomena. In this work, we mitigate the problem in an LLM-based MT model by guiding it to better word alignment. We first study the correlation between word alignment and the phenomena of ha…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **Better Alignment with Instruction Back-and-Forth Translation** (2024) — Thao Nguyen, Jeffrey Li, Sewoong Oh, Ludwig Schmidt, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 15
+  - https://www.semanticscholar.org/paper/78b502c3f6f404d623ead6cd12759b839d80c320
+  - arXiv:2408.04614 · doi:10.48550/arXiv.2408.04614
+  - We propose a new method, instruction back-and-forth translation, to construct high-quality synthetic data grounded in world knowledge for aligning large language models (LLMs). Given documents from a web corpus, we generate and curate synthetic instructions using the backtranslation approach proposed by Li et al.(2023a), and rewrite the responses to improve their quality further based on the initi…
+  - via: `query:back-translation simultaneous` (round 0)
+- **BLASER 2.0: a metric for evaluation and quality estimation of massively multilingual speech and text translation** (2024) — David Dale, M. Costa-jussà — _Conference on Empirical Methods in Natural Language Processing_ — cites: 15
+  - https://www.semanticscholar.org/paper/52420f18e63ed04b8d7ee31f12293c0edc2b4f11
+  - doi:10.18653/v1/2024.findings-emnlp.943
+  - We present B LASER 2.0, an automatic metric of machine translation quality which supports both speech and text modalities. Compared to its predecessor B LASER (Chen et al., 2023), B LASER 2.0 is based on better underlying text and speech representations that cover 202 text languages and 57 speech onesand extends the training data. B LASER 2.0 comes in two varieties: a reference-based and a referen…
+  - via: `query:translation quality speech translation` (round 1)
+- **Towards Online Continuous Sign Language Recognition and Translation** (2024) — Ronglai Zuo, Fangyun Wei, Brian Mak — _Conference on Empirical Methods in Natural Language Processing_ — cites: 15
+  - https://www.semanticscholar.org/paper/8a515cec1559414759aa3c732fa5f4ceb8972267
+  - arXiv:2401.05336 · doi:10.18653/v1/2024.emnlp-main.619
+  - Research on continuous sign language recognition (CSLR) is essential to bridge the communication gap between deaf and hearing individuals. Numerous previous studies have trained their models using the connectionist temporal classification (CTC) loss. During inference, these CTC-based models generally require the entire sign video as input to make predictions, a process known as offline recognition…
+  - via: `cite_of:9d3480e46cc506b73d5291387c6452998690fdd3` (round 1)
+- **Simultaneous Masking, Not Prompting Optimization: A Paradigm Shift in Fine-tuning LLMs for Simultaneous Translation** (2024) — Matthew Raffel, Victor Agostinelli, Lizhong Chen — _Conference on Empirical Methods in Natural Language Processing_ — cites: 10
+  - https://www.semanticscholar.org/paper/af4328bc1eb2d80e4fc035b143cecba5580d39ef
+  - arXiv:2405.10443 · doi:10.48550/arXiv.2405.10443
+  - Large language models (LLMs) have achieved state-of-the-art performance in various language processing tasks, motivating their adoption in simultaneous translation. Current fine-tuning methods to adapt LLMs for simultaneous translation focus on prompting optimization strategies using either data augmentation or prompt structure modifications. However, these methods suffer from several issues, such…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **LLMs Are Zero-Shot Context-Aware Simultaneous Translators** (2024) — Roman Koshkin, Katsuhito Sudoh, Satoshi Nakamura — _Conference on Empirical Methods in Natural Language Processing_ — cites: 9
+  - https://www.semanticscholar.org/paper/30c8f876c03e48d4536dc56534c2a35454f3391d
+  - arXiv:2406.13476 · doi:10.48550/arXiv.2406.13476
+  - The advent of transformers has fueled progress in machine translation. More recently large language models (LLMs) have come to the spotlight thanks to their generality and strong performance in a wide range of language tasks, including translation. Here we show that open-source LLMs perform on par with or better than some state-of-the-art baselines in simultaneous machine translation (SiMT) tasks,…
+  - via: `query:large language simultaneous translation` (round 1)
+- **Aligning Translation-Specific Understanding to General Understanding in Large Language Models** (2024) — Yi-Chong Huang, Xiaocheng Feng, Baohang Li, Chengpeng Fu, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 8
+  - https://www.semanticscholar.org/paper/a23a89855e3af2e6cec7fd4a01e12cacdf6c727f
+  - arXiv:2401.05072 · doi:10.48550/arXiv.2401.05072
+  - Large Language models (LLMs) have exhibited remarkable abilities in understanding complex texts, offering a promising path towards human-like translation performance. However, this study reveals the misalignment between the translation-specific understanding and the general understanding inside LLMs. This understanding misalignment leads to LLMs mistakenly or literally translating some complicated…
+  - via: `query:large language simultaneous translation` (round 1)
+- **SpeechQE: Estimating the Quality of Direct Speech Translation** (2024) — HyoJung Han, Kevin Duh, Marine Carpuat — _Conference on Empirical Methods in Natural Language Processing_ — cites: 7
+  - https://www.semanticscholar.org/paper/a06e6f5eb23e3449aa87ec92fe51924ec82841a0
+  - arXiv:2410.21485 · doi:10.18653/v1/2024.emnlp-main.1218
+  - Recent advances in automatic quality estimation for machine translation have exclusively focused on written language, leaving the speech modality underexplored. In this work, we formulate the task of quality estimation for speech translation (SpeechQE), construct a benchmark, and evaluate a family of systems based on cascaded and end-to-end architectures. In this process, we introduce a novel end-…
+  - via: `query:streaming speech translation` (round 0)
+- **Gloss2Text: Sign Language Gloss translation using LLMs and Semantically Aware Label Smoothing** (2024) — Pooya Fayyazsanavi, Antonios Anastasopoulos, Jana Kosecka — _Conference on Empirical Methods in Natural Language Processing_ — cites: 7
+  - https://www.semanticscholar.org/paper/d48f3d288e9642ab4d206a0b2f8386dd7b62d321
+  - arXiv:2407.01394 · doi:10.48550/arXiv.2407.01394
+  - Sign language translation from video to spoken text presents unique challenges owing to the distinct grammar, expression nuances, and high variation of visual appearance across different speakers and contexts. The intermediate gloss annotations of videos aim to guide the translation process. In our work, we focus on {\em Gloss2Text} translation stage and propose several advances by leveraging pre-…
+  - via: `query:large language llms simultaneous translation` (round 1)
+- **LAMBDA: Large Language Model-Based Data Augmentation for Multi-Modal Machine Translation** (2024) — Yusong Wang, Dongyuan Li, Jialun Shen, Yicheng Xu, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 6
+  - https://www.semanticscholar.org/paper/5ca0818a6fa9902495e91417f0a14df3ad1f006c
+  - doi:10.18653/v1/2024.findings-emnlp.893
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Simultaneous Interpretation Corpus Construction by Large Language Models in Distant Language Pair** (2024) — Yusuke Sakai, Mana Makinae, Hidetaka Kamigaito, Taro Watanabe — _Conference on Empirical Methods in Natural Language Processing_ — cites: 6
+  - https://www.semanticscholar.org/paper/1be2056a2fb91c84e5429bce41636a78e76e7c99
+  - arXiv:2404.12299 · doi:10.48550/arXiv.2404.12299
+  - In Simultaneous Machine Translation (SiMT), training with a simultaneous interpretation (SI) corpus is an effective method for achieving high-quality yet low-latency. However, constructing such a corpus is challenging due to high costs, and limitations in annotator capabilities, and as a result, existing SI corpora are limited. Therefore, we propose a method to convert existing speech translation…
+  - via: `query:simultaneous speech translation` (round 0)
+- **PsFuture: A Pseudo-Future-based Zero-Shot Adaptive Policy for Simultaneous Machine Translation** (2024) — Libo Zhao, Jing Li, Ziqian Zeng — _Conference on Empirical Methods in Natural Language Processing_ — cites: 5
+  - https://www.semanticscholar.org/paper/16c790cccf95f3bdab15f380423a95ccafaff5d4
+  - arXiv:2410.04075 · doi:10.48550/arXiv.2410.04075
+  - Simultaneous Machine Translation (SiMT) requires target tokens to be generated in real-time as streaming source tokens are consumed. Traditional approaches to SiMT typically require sophisticated architectures and extensive parameter configurations for training adaptive read/write policies, which in turn demand considerable computational power and memory. We propose PsFuture, the first zero-shot a…
+  - via: `query:prefix-to-prefix translation` (round 0)
+- **Simul-MuST-C: Simultaneous Multilingual Speech Translation Corpus Using Large Language Model** (2024) — Mana Makinae, Yusuke Sakai, Hidetaka Kamigaito, Taro Watanabe — _Conference on Empirical Methods in Natural Language Processing_ — cites: 5
+  - https://www.semanticscholar.org/paper/df336e608c451a3a85668cbb0f60ae778f5c23db
+  - doi:10.18653/v1/2024.emnlp-main.1238
+  - Simultaneous Speech Translation (SiST) begins translating before the entire source input is received, making it crucial to balance quality and latency. In real interpreting situations, interpreters manage this simultaneity by breaking sentences into smaller segments and translating them while maintaining the source order as much as possible. SiST could benefit from this approach to balance quality…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Building Resources for Emakhuwa: Machine Translation and News Classification Benchmarks** (2024) — F. D. M. Ali, Henrique Lopes Cardoso, R. Sousa-Silva — _Conference on Empirical Methods in Natural Language Processing_ — cites: 5
+  - https://www.semanticscholar.org/paper/ef721e478e0314b4a800dd44dfcd6b4a7a49b5f8
+  - doi:10.18653/v1/2024.emnlp-main.824
+  - This paper introduces a comprehensive collection of NLP resources for Emakhuwa, Mozambique’s most widely spoken language. The resources include the first manually translated news bitext corpus between Portuguese and Emakhuwa, news topic classification datasets, and monolingual data. We detail the process and challenges of acquiring this data and present benchmark results for machine translation an…
+  - via: `query:available https github machine translation` (round 2)
+- **LexMatcher: Dictionary-centric Data Collection for LLM-based Machine Translation** (2024) — Yongjing Yin, Jiali Zeng, Yafu Li, Fandong Meng, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 4
+  - https://www.semanticscholar.org/paper/b5c70c2f9ae398b2458e1cf79cbf75d6131cfe6c
+  - arXiv:2406.01441 · doi:10.48550/arXiv.2406.01441
+  - The fine-tuning of open-source large language models (LLMs) for machine translation has recently received considerable attention, marking a shift towards data-centric research from traditional neural machine translation. However, the area of data collection for instruction fine-tuning in machine translation remains relatively underexplored. In this paper, we present LexMatcher, a simple yet effect…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Error Analysis of Multilingual Language Models in Machine Translation: A Case Study of English-Amharic Translation** (2024) — Hizkiel Mitiku Alemayehu, Hamada M. Zahera, Axel-Cyrille Ngonga Ngomo — _Conference on Empirical Methods in Natural Language Processing_ — cites: 4
+  - https://www.semanticscholar.org/paper/319948eb2954c474bb1eb4ba040ac13df395fb43
+  - doi:10.18653/v1/2024.emnlp-main.1102
+  - Multilingual large language models (mLLMs) have significantly advanced machine translation, yet challenges remain for low-resource languages like Amharic. This study evaluates the performance of state-of-the-art mLLMs, specifically NLLB-200 (NLLB3.3, NLLB1.3 Distilled1.3, NLB600) and M2M (M2M1.2B, M2M418), in English-Amharic bidirectional translation using the Lesan AI dataset. We employed both au…
+  - via: `query:translation quality machine translation` (round 1)
+- **SCOI: Syntax-augmented Coverage-based In-context Example Selection for Machine Translation** (2024) — Chenming Tang, Zhixiang Wang, Yunfang Wu — _Conference on Empirical Methods in Natural Language Processing_ — cites: 4
+  - https://www.semanticscholar.org/paper/7533a8aecce8c31b740c81471df7f5a4332c32d3
+  - arXiv:2408.04872 · doi:10.48550/arXiv.2408.04872
+  - In-context learning (ICL) greatly improves the performance of large language models (LLMs) on various down-stream tasks, where the improvement highly depends on the quality of demonstrations. In this work, we introduce syntactic knowledge to select better in-context examples for machine translation (MT). We propose a new strategy, namely Syntax-augmented COverage-based In-context example selection…
+  - via: `query:available https github machine translation` (round 2)
+- **Curriculum Consistency Learning for Conditional Sentence Generation** (2024) — Liangxin Liu, Xuebo Liu, Lian Lian, Shengjun Cheng, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 3
+  - https://www.semanticscholar.org/paper/4ff11536cbe5918eecf28265165f4ed9e9e5ed1b
+  - doi:10.18653/v1/2024.emnlp-main.768
+  - Consistency learning (CL) has proven to be a valuable technique for improving the robustness of models in conditional sentence generation (CSG) tasks by ensuring stable predictions across various input data forms. However, models augmented with CL often face challenges in optimizing consistency features, which can detract from their efficiency and effectiveness. To address these challenges, we int…
+  - via: `query:available https github speech translation` (round 2)
+- **PyMarian: Fast Neural Machine Translation and Evaluation in Python** (2024) — Thamme Gowda, Roman Grundkiewicz, Elijah Matthew Rippeth, Matt Post, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 2
+  - https://www.semanticscholar.org/paper/39700068621e26db011ef8c607f2b05461a42f43
+  - arXiv:2408.11853 · doi:10.48550/arXiv.2408.11853
+  - The deep learning language of choice these days is Python; measured by factors such as available libraries and technical support, it is hard to beat. At the same time, software written in lower-level programming languages like C++ retain advantages in speed. We describe a Python interface to Marian NMT, a C++-based training and inference toolkit for sequence-to-sequence models, focusing on machine…
+  - via: `query:machine translation nmt machine translation` (round 1)
+- **Contrastive Token Learning with Similarity Decay for Repetition Suppression in Machine Translation** (2024) — Huangyu Dai, Ben Chen, Kaidi Chen, Ying Han, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 1
+  - https://www.semanticscholar.org/paper/d365d5637073f87acfa7df8255b44d4ab35be4f4
+  - arXiv:2409.19877 · doi:10.48550/arXiv.2409.19877
+  - For crosslingual conversation and trade, Neural Machine Translation (NMT) is pivotal yet faces persistent challenges with monotony and repetition in generated content. Traditional solutions that rely on penalizing text redundancy or token reoccurrence have shown limited efficacy, particularly for lengthy article and e-commerce descriptions with inherent redundancy, even with the advent of Large La…
+  - via: `query:machine translation nmt machine translation` (round 1)
+- **INSTRUCTSCORE: Towards Explainable Text Generation Evaluation with Automatic Feedback** (2023) — Wenda Xu, Danqing Wang, Liangming Pan, Zhenqiao Song, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 131
+  - https://www.semanticscholar.org/paper/460609e217fd59eaa34f5e11a820661f8ec8d7b6
+  - doi:10.48550/arXiv.2305.14282
+  - The field of automatic evaluation of text generation made tremendous progress in the last few years. In particular, since the advent of neural metrics, like COMET, BLEURT and SEScore2, the newest generation of metrics show a high correlation with human judgment. Unfortunately, quality scores generated with neural metrics are not interpretable and it is unclear which part of the generation output i…
+  - via: `cite_of:01508f386eb2ca5181fde7bb6da4920e250d7498` (round 2)
+- **Epsilon Sampling Rocks: Investigating Sampling Strategies for Minimum Bayes Risk Decoding for Machine Translation** (2023) — Markus Freitag, B. Ghorbani, Patrick Fernandes — _Conference on Empirical Methods in Natural Language Processing_ — cites: 61
+  - https://www.semanticscholar.org/paper/d6a9a720943ab4e8c92f874980df34ada45c6be3
+  - arXiv:2305.09860 · doi:10.48550/arXiv.2305.09860
+  - Recent advances in machine translation (MT) have shown that Minimum Bayes Risk (MBR) decoding can be a powerful alternative to beam search decoding, especially when combined with neural-based utility functions. However, the performance of MBR decoding depends heavily on how and how many candidates are sampled from the model. In this paper, we explore how different sampling approaches for generatin…
+  - via: `cite_of:213e471bacff5c0852943988fcb955797f1e591f` (round 2)
+- **Cross-modality Data Augmentation for End-to-End Sign Language Translation** (2023) — Jinhui Ye, Wenxiang Jiao, Xing Wang, Zhaopeng Tu, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 30
+  - https://www.semanticscholar.org/paper/b32c4a0a5e401cb565d12d5b30485b21aeb38570
+  - arXiv:2305.11096 · doi:10.48550/arXiv.2305.11096
+  - End-to-end sign language translation (SLT) aims to convert sign language videos into spoken language texts directly without intermediate representations. It has been a challenging task due to the modality gap between sign videos and texts and the data scarcity of labeled data. Due to these challenges, the input and output distributions of end-to-end sign language translation (i.e., video-to-text)…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Physician Detection of Clinical Harm in Machine Translation: Quality Estimation Aids in Reliance and Backtranslation Identifies Critical Errors** (2023) — Nikita Mehandru, Sweta Agrawal, Yimin Xiao, Elaine C. Khoong, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 23
+  - https://www.semanticscholar.org/paper/6f105dd60f0b90dbc61b34aadaaaef67b5a530f0
+  - arXiv:2310.16924 · doi:10.48550/arXiv.2310.16924
+  - A major challenge in the practical use of Machine Translation (MT) is that users lack guidance to make informed decisions about when to rely on outputs. Progress in quality estimation research provides techniques to automatically assess MT quality, but these techniques have primarily been evaluated in vitro by comparison against human judgments outside of a specific context of use. This paper eval…
+  - via: `query:translation quality simultaneous translation` (round 1)
+- **STEER: Unified Style Transfer with Expert Reinforcement** (2023) — Skyler Hallinan, Faeze Brahman, Ximing Lu, Jaehun Jung, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 18
+  - https://www.semanticscholar.org/paper/896a584885febb21fb4d287fe78984640cee1eb3
+  - arXiv:2311.07167 · doi:10.48550/arXiv.2311.07167
+  - While text style transfer has many applications across natural language processing, the core premise of transferring from a single source style is unrealistic in a real-world setting. In this work, we focus on arbitrary style transfer: rewriting a text from an arbitrary, unknown style to a target style. We propose STEER: Unified Style Transfer with Expert Reinforcement, a unified frame-work develo…
+  - via: `cite_of:bface38422b7e53287134c4d01a39fa58edd4469` (round 2)
+- **Non-autoregressive Streaming Transformer for Simultaneous Translation** (2023) — Zhengrui Ma, Shaolei Zhang, Shoutao Guo, Chenze Shao, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 16
+  - https://www.semanticscholar.org/paper/db89afe2ccd11581465dc4ca8b1a85188184a309
+  - arXiv:2310.14883 · doi:10.48550/arXiv.2310.14883
+  - Simultaneous machine translation (SiMT) models are trained to strike a balance between latency and translation quality. However, training these models to achieve high quality while maintaining low latency often leads to a tendency for aggressive anticipation. We argue that such issue stems from the autoregressive architecture upon which most existing SiMT models are built. To address those issues,…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Data Augmentation for Code Translation with Comparable Corpora and Multiple References** (2023) — Yiqing Xie, Atharva Naik, Daniel Fried, Carolyn P. Rosé — _Conference on Empirical Methods in Natural Language Processing_ — cites: 16
+  - https://www.semanticscholar.org/paper/9db9b7d22cfc37650808eb6855318f510dc639c4
+  - arXiv:2311.00317 · doi:10.48550/arXiv.2311.00317
+  - One major challenge of translating code between programming languages is that parallel training data is often limited. To overcome this challenge, we present two data augmentation techniques, one that builds comparable corpora (i.e., code pairs with similar functionality), and another that augments existing parallel data with multiple reference translations. Specifically, we build and analyze mult…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **An Empirical Study of Translation Hypothesis Ensembling with Large Language Models** (2023) — António Farinhas, José G. C. de Souza, Andr'e F. T. Martins — _Conference on Empirical Methods in Natural Language Processing_ — cites: 16
+  - https://www.semanticscholar.org/paper/4b98dd7341f6907107951dfa8be168c15b36f520
+  - arXiv:2310.11430 · doi:10.48550/arXiv.2310.11430
+  - Large language models (LLMs) are becoming a one-fits-many solution, but they sometimes hallucinate or produce unreliable output. In this paper, we investigate how hypothesis ensembling can improve the quality of the generated text for the specific problem of LLM-based machine translation. We experiment with several techniques for ensembling hypotheses produced by LLMs such as ChatGPT, LLaMA, and A…
+  - via: `query:large language simultaneous translation` (round 1)
+- **Program Translation via Code Distillation** (2023) — Yufan Huang, Mengnan Qi, Yongqiang Yao, Maoquan Wang, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 15
+  - https://www.semanticscholar.org/paper/b1c999046d189f13863a4e59867bedf8c993bf4a
+  - arXiv:2310.11476 · doi:10.48550/arXiv.2310.11476
+  - Software version migration and program translation are an important and costly part of the lifecycle of large codebases. Traditional machine translation relies on parallel corpora for supervised translation, which is not feasible for program translation due to a dearth of aligned data. Recent unsupervised neural machine translation techniques have overcome data limitations by included techniques s…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **End-to-End Evaluation for Low-Latency Simultaneous Speech Translation** (2023) — Christian Huber, Tu Anh Dinh, Carlos Mullov, Ngoc-Quan Pham, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 13
+  - https://www.semanticscholar.org/paper/f524f119afc13cc07ca15998c10b9509e9e9b0b5
+  - arXiv:2308.03415 · doi:10.48550/arXiv.2308.03415
+  - The challenge of low-latency speech translation has recently draw significant interest in the research community as shown by several publications and shared tasks. Therefore, it is essential to evaluate these different approaches in realistic scenarios. However, currently only specific aspects of the systems are evaluated and often it is not possible to compare different approaches. In this work,…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Continual Learning for Multilingual Neural Machine Translation via Dual Importance-based Model Division** (2023) — Junpeng Liu, Kaiyu Huang, Hao Yu, Jiuyi Li, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 13
+  - https://www.semanticscholar.org/paper/9782cdf9838991c96018b01d5184c40dc1b06068
+  - doi:10.18653/v1/2023.emnlp-main.736
+  - A persistent goal of multilingual neural machine translation (MNMT) is to continually adapt the model to support new language pairs or improve some current language pairs without accessing the previous training data. To achieve this, the existing methods primarily focus on preventing catastrophic forgetting by making compromises between the original and new language pairs, leading to sub-optimal p…
+  - via: `query:multilingual machine translation simultaneous translation` (round 3)
+- **Simultaneous Machine Translation with Tailored Reference** (2023) — Shoutao Guo, Shaolei Zhang, Yang Feng — _Conference on Empirical Methods in Natural Language Processing_ — cites: 12
+  - https://www.semanticscholar.org/paper/941a34453a2e650ee0058c112b2779ce75c42cc8
+  - arXiv:2310.13588 · doi:10.48550/arXiv.2310.13588
+  - Simultaneous machine translation (SiMT) generates translation while reading the whole source sentence. However, existing SiMT models are typically trained using the same reference disregarding the varying amounts of available source information at different latency. Training the model with ground-truth at low latency may introduce forced anticipations, whereas utilizing reference consistent with t…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Adaptive Policy with Wait-$k$ Model for Simultaneous Translation** (2023) — Libo Zhao, Kai Fan, Wei Luo, Jing Wu, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 11
+  - https://www.semanticscholar.org/paper/1a80d32e1800de71ed8c2f1aa4b63b4ce3f8efeb
+  - arXiv:2310.14853 · doi:10.48550/arXiv.2310.14853
+  - Simultaneous machine translation (SiMT) requires a robust read/write policy in conjunction with a high-quality translation model. Traditional methods rely on either a fixed wait-$k$ policy coupled with a standalone wait-$k$ translation model, or an adaptive policy jointly trained with the translation model. In this study, we propose a more flexible approach by decoupling the adaptive policy model…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **Adapting Offline Speech Translation Models for Streaming with Future-Aware Distillation and Inference** (2023) — Biao Fu, Kai Fan, Minpeng Liao, Zhongqiang Huang, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 8
+  - https://www.semanticscholar.org/paper/19ae248171fff8d42eda2db7676d7d012c758dbc
+  - arXiv:2303.07914 · doi:10.48550/arXiv.2303.07914
+  - A popular approach to streaming speech translation is to employ a single offline model with a wait-k policy to support different latency requirements, which is simpler than training multiple online models with different latency constraints. However, there is a mismatch problem in using a model trained with complete utterances for streaming inference with partial input. We demonstrate that speech r…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **Condensing Multilingual Knowledge with Lightweight Language-Specific Modules** (2023) — Haoran Xu, Weiting Tan, Shuyue Stella Li, Yunmo Chen, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 8
+  - https://www.semanticscholar.org/paper/cf99558d35891d35ba5429cfce5ca2e2ae383b71
+  - arXiv:2305.13993 · doi:10.48550/arXiv.2305.13993
+  - Incorporating language-specific (LS) modules is a proven method to boost performance in multilingual machine translation. This approach bears similarity to Mixture-of-Experts (MoE) because it does not inflate FLOPs. However, the scalability of this approach to hundreds of languages (experts) tends to be unmanageable due to the prohibitive number of parameters introduced by full-rank matrices in fu…
+  - via: `query:bleu points machine translation` (round 2)
+- **Mitigating Data Imbalance and Representation Degeneration in Multilingual Machine Translation** (2023) — Wen Lai, Alexandra Chronopoulou, Alexander M. Fraser — _Conference on Empirical Methods in Natural Language Processing_ — cites: 8
+  - https://www.semanticscholar.org/paper/04c82465e3838458817bbccaa489d46f978872c9
+  - arXiv:2305.12786 · doi:10.48550/arXiv.2305.12786
+  - Despite advances in multilingual neural machine translation (MNMT), we argue that there are still two major challenges in this area: data imbalance and representation degeneration. The data imbalance problem refers to the imbalance in the amount of parallel corpora for all language pairs, especially for long-tail languages (i.e., very low-resource languages). The representation degeneration proble…
+  - via: `cite_of:48925fef94500cf19ee220ed74217816f1ab5e60` (round 2)
+- **Training Simultaneous Speech Translation with Robust and Random Wait-k-Tokens Strategy** (2023) — Linlin Zhang, Kai Fan, Jiajun Bu, Zhongqiang Huang — _Conference on Empirical Methods in Natural Language Processing_ — cites: 5
+  - https://www.semanticscholar.org/paper/2ae4c485a97bd22f455f56a22b99cc725bb8f5ae
+  - doi:10.18653/v1/2023.emnlp-main.484
+  - Simultaneous Speech Translation (SimulST) is a task focused on ensuring high-quality translation of speech in low-latency situations. Despite this, the modality gap ( e.g. , unknown word boundaries) between audio and text presents a challenge. This gap hinders the effective application of policies from simultaneous text translation (SimulMT) and compromises the performance of offline speech transl…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **Data Augmentation Techniques for Machine Translation of Code-Switched Texts: A Comparative Study** (2023) — Injy Hamed, Nizar Habash, Ngoc Thang Vu — _Conference on Empirical Methods in Natural Language Processing_ — cites: 4
+  - https://www.semanticscholar.org/paper/8255c2dda2903eb911cfaf7f141013558a94d094
+  - arXiv:2310.15262 · doi:10.48550/arXiv.2310.15262
+  - Code-switching (CSW) text generation has been receiving increasing attention as a solution to address data scarcity. In light of this growing interest, we need more comprehensive studies comparing different augmentation approaches. In this work, we compare three popular approaches: lexical replacements, linguistic theories, and back-translation (BT), in the context of Egyptian Arabic-English CSW.…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Code-Switching with Word Senses for Pretraining in Neural Machine Translation** (2023) — Vivek Iyer, Edoardo Barba, Alexandra Birch, Jeff Z. Pan, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 4
+  - https://www.semanticscholar.org/paper/4d0e2c45cc5c084522881ef843386b5101011fcc
+  - arXiv:2310.14050 · doi:10.48550/arXiv.2310.14050
+  - Lexical ambiguity is a significant and pervasive challenge in Neural Machine Translation (NMT), with many state-of-the-art (SOTA) NMT systems struggling to handle polysemous words (Campolungo et al., 2022). The same holds for the NMT pretraining paradigm of denoising synthetic"code-switched"text (Pan et al., 2021; Iyer et al., 2023), where word senses are ignored in the noising stage -- leading to…
+  - via: `query:machine translation nmt machine translation` (round 1)
+- **Textless Speech-to-Speech Translation With Limited Parallel Data** (2023) — Anuj Diwan, A. Srinivasan, David Harwath, Eunsol Choi — _Conference on Empirical Methods in Natural Language Processing_ — cites: 4
+  - https://www.semanticscholar.org/paper/e733cf338aceefa4585c981f468995f5a4348454
+  - arXiv:2305.15405 · doi:10.18653/v1/2024.findings-emnlp.951
+  - Existing speech-to-speech translation (S2ST) models fall into two camps: they either leverage text as an intermediate step or require hundreds of hours of parallel speech data. Both approaches are incompatible with textless languages or language pairs with limited parallel data. We present PFB, a framework for training textless S2ST models that require just dozens of hours of parallel speech data.…
+  - via: `query:bleu points speech translation` (round 2)
+- **Enhanced Simultaneous Machine Translation with Word-level Policies** (2023) — Kangil Kim, Hankyu Cho — _Conference on Empirical Methods in Natural Language Processing_ — cites: 3
+  - https://www.semanticscholar.org/paper/75f2a587cec986738290e32071ccb5775e35862a
+  - arXiv:2310.16417 · doi:10.48550/arXiv.2310.16417
+  - Recent years have seen remarkable advances in the field of Simultaneous Machine Translation (SiMT) due to the introduction of innovative policies that dictate whether to READ or WRITE at each step of the translation process. However, a common assumption in many existing studies is that operations are carried out at the subword level, even though the standard unit for input and output in most pract…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Exploring All-In-One Knowledge Distillation Framework for Neural Machine Translation** (2023) — Zhongjian Miao, Wen Zhang, Jinsong Su, Xiang Li, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 2
+  - https://www.semanticscholar.org/paper/7f7c482630abeee274777219b205f889999eab80
+  - doi:10.18653/v1/2023.emnlp-main.178
+  - Conventional knowledge distillation (KD) approaches are commonly employed to compress neural machine translation (NMT) models. However, they only obtain one lightweight student each time. Consequently, we have to conduct KD multiple times when different students are required at the same time, which could be resource-intensive. Additionally, these students are individually optimized, and thus lack…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **Quick Back-Translation for Unsupervised Machine Translation** (2023) — Benjamin J. Brimacombe, Jiawei Zhou — _Conference on Empirical Methods in Natural Language Processing_ — cites: 2
+  - https://www.semanticscholar.org/paper/b742f7f465b60e4d1556bcc9d5ddfd2eace07e5f
+  - arXiv:2312.00912 · doi:10.48550/arXiv.2312.00912
+  - The field of unsupervised machine translation has seen significant advancement from the marriage of the Transformer and the back-translation algorithm. The Transformer is a powerful generative model, and back-translation leverages Transformer's high-quality translations for iterative self-improvement. However, the Transformer is encumbered by the run-time of autoregressive inference during back-tr…
+  - via: `query:back-translation simultaneous` (round 0)
+- **Improved Pseudo Data for Machine Translation Quality Estimation with Constrained Beam Search** (2023) — Xiang Geng, Yu Zhang, Zhejian Lai, Shuaijie She, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 2
+  - https://www.semanticscholar.org/paper/ee947cd0f25a99bc718a3339c2b3dfbfccf95e91
+  - doi:10.18653/v1/2023.emnlp-main.764
+  - Machine translation (MT) quality estimation (QE) is a crucial task to estimate the quality of MT outputs when reference translations are unavailable. Many studies focus on generating pseudo data using large parallel corpus and achieve remarkable success in the supervised setting. However, pseudo data solutions are less satisfying in unsupervised scenarios because the pseudo labels are inaccurate o…
+  - via: `query:translation quality machine translation` (round 1)
+- **Decomposed Prompting for Machine Translation Between Related Languages using Large Language Models** (2023) — Ratish Puduppully, Raj Dabre, A. Aw, Nancy F. Chen — _Conference on Empirical Methods in Natural Language Processing_ — cites: 1
+  - https://www.semanticscholar.org/paper/b6e5855b6a4e425ba251a93516f2bccffe5ba403
+  - arXiv:2305.13085 · doi:10.48550/arXiv.2305.13085
+  - This study investigates machine translation between related languages i.e., languages within the same family that share linguistic characteristics such as word order and lexical similarity. Machine translation through few-shot prompting leverages a small set of translation pair examples to generate translations for test sentences. This procedure requires the model to learn how to generate translat…
+  - via: `query:large language simultaneous translation` (round 1)
+- **Consistency is Key: On Data-Efficient Modality Transfer in Speech Translation** (2023) — Hojin Lee, Changmin Lee, Seung-won Hwang — _Conference on Empirical Methods in Natural Language Processing_ — cites: 1
+  - https://www.semanticscholar.org/paper/8d93b1628a863135b7034e90fd417dab2a211fcc
+  - doi:10.18653/v1/2023.findings-emnlp.905
+  - End-to-end approaches have shown promising results for speech translation (ST), but they suffer from its data scarcity compared to machine translation (MT). To address this, progressive training has become a common practice, of using external MT data during the fine-tuning phase. Despite of its prevalence and computational overhead, its validity is not extensively corroborated yet. This paper cond…
+  - via: `query:https github com speech translation` (round 1)
+- **Reference Free Domain Adaptation for Translation of Noisy Questions with Question Specific Rewards** (2023) — Baban Gain, Ramakrishna Appicharla, Soumya Chennabasavaraj, Nikesh Garera, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 0
+  - https://www.semanticscholar.org/paper/01aba4063e7326df599336d57ce67c6c1b65d63e
+  - arXiv:2310.15259 · doi:10.48550/arXiv.2310.15259
+  - Community Question-Answering (CQA) portals serve as a valuable tool for helping users within an organization. However, making them accessible to non-English-speaking users continues to be a challenge. Translating questions can broaden the community's reach, benefiting individuals with similar inquiries in various languages. Translating questions using Neural Machine Translation (NMT) poses more ch…
+  - via: `cite_of:d9bc8169326d3cca0860ec76247715bc7beaf9c9` (round 1)
+- **Is Robustness Transferable across Languages in Multilingual Neural Machine Translation?** (2023) — Leiyu Pan, Supryadi, Deyi Xiong — _Conference on Empirical Methods in Natural Language Processing_ — cites: 0
+  - https://www.semanticscholar.org/paper/2bdc5c124ab4d7c21f9ef6f3637f02155de52dc8
+  - arXiv:2310.20162 · doi:10.48550/arXiv.2310.20162
+  - Robustness, the ability of models to maintain performance in the face of perturbations, is critical for developing reliable NLP systems. Recent studies have shown promising results in improving the robustness of models through adversarial training and data augmentation. However, in machine translation, most of these studies have focused on bilingual machine translation with a single translation di…
+  - via: `cite_of:4789355a00650afa29682d331d7d9a49a301b43b` (round 2)
+- **Speculative Decoding: Exploiting Speculative Execution for Accelerating Seq2seq Generation** (2022) — Heming Xia, Tao Ge, Peiyi Wang, Si-Qing Chen, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 171
+  - https://www.semanticscholar.org/paper/218c5c69f3cf0c158e9b6af239a2cc62a688c6de
+  - arXiv:2203.16487 · doi:10.18653/v1/2023.findings-emnlp.257
+  - We propose Speculative Decoding (SpecDec), for the first time ever, to formally study exploiting the idea of speculative execution to accelerate autoregressive (AR) decoding. Speculative Decoding has two innovations: Spec-Drafter -- an independent model specially optimized for efficient and accurate drafting -- and Spec-Verification -- a reliable method for verifying the drafted tokens efficiently…
+  - via: `cite_of:7472f26ffa0f056a70e461d6918ae5ffecda2c92` (round 1)
+- **Natural Language to Code Translation with Execution** (2022) — Freda Shi, Daniel Fried, Marjan Ghazvininejad, Luke Zettlemoyer, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 169
+  - https://www.semanticscholar.org/paper/47e15941c8b157873c8264e4bf50318d1ba5cd18
+  - arXiv:2204.11454 · doi:10.48550/arXiv.2204.11454
+  - Generative models of code, pretrained on large corpora of programs, have shown great success in translating natural language to code (Chen et al., 2021; Austin et al., 2021; Li et al., 2022, inter alia). While these models do not explicitly incorporate program semantics (i.e., execution results) during training, they are able to generate correct solutions for many problems. However, choosing a sin…
+  - via: `ref_of:2577d053f8aab912d29b424e1f09133d83740fd2` (round 2)
+- **On the Limitations of Reference-Free Evaluations of Generated Text** (2022) — Daniel Deutsch, Rotem Dror, Dan Roth — _Conference on Empirical Methods in Natural Language Processing_ — cites: 72
+  - https://www.semanticscholar.org/paper/b7bf8fb8de6359b3b3273502f62f49d8df42911e
+  - arXiv:2210.12563 · doi:10.48550/arXiv.2210.12563
+  - There is significant interest in developing evaluation metrics which accurately estimate the quality of generated text without the aid of a human-written reference text, which can be time consuming and expensive to collect or entirely unavailable in online applications. However, in this work, we demonstrate that these reference-free metrics are inherently biased and limited in their ability to eva…
+  - via: `cite_of:01508f386eb2ca5181fde7bb6da4920e250d7498` (round 2)
+- **Information-Transport-based Policy for Simultaneous Translation** (2022) — Shaolei Zhang, Yang Feng — _Conference on Empirical Methods in Natural Language Processing_ — cites: 56
+  - https://www.semanticscholar.org/paper/7dc02a2ecbcd2c5f22595b736e2c7a1b35ac9267
+  - arXiv:2210.12357 · doi:10.48550/arXiv.2210.12357
+  - Simultaneous translation (ST) outputs translation while receiving the source inputs, and hence requires a policy to determine whether to translate a target token or wait for the next source token. The major challenge of ST is that each target token can only be translated based on the current received source tokens, where the received source information will directly affect the translation quality.…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **DEMETR: Diagnosing Evaluation Metrics for Translation** (2022) — Marzena Karpinska, N. Raj, Katherine Thai, Yixiao Song, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 48
+  - https://www.semanticscholar.org/paper/9443a623d6e0d423adb9c61b5d225f0077f38767
+  - arXiv:2210.13746 · doi:10.48550/arXiv.2210.13746
+  - While machine translation evaluation metrics based on string overlap (e.g., BLEU) have their limitations, their computations are transparent: the BLEU score assigned to a particular candidate translation can be traced back to the presence or absence of certain words. The operations of newer learned metrics (e.g., BLEURT, COMET), which leverage pretrained language models to achieve higher correlati…
+  - via: `cite_of:01508f386eb2ca5181fde7bb6da4920e250d7498` (round 2)
+- **CROP: Zero-shot Cross-lingual Named Entity Recognition with Multilingual Labeled Sequence Translation** (2022) — Jian Yang, Jian Yang, Shaohan Huang, Shuming Ma, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 29
+  - https://www.semanticscholar.org/paper/3e7d2160f58088297a8347a8273642ee484c7967
+  - arXiv:2210.07022 · doi:10.48550/arXiv.2210.07022
+  - Named entity recognition (NER) suffers from the scarcity of annotated training data, especially for low-resource languages without labeled data. Cross-lingual NER has been proposed to alleviate this issue by transferring knowledge from high-resource languages to low-resource languages via aligned cross-lingual representations or machine translation results. However, the performance of cross-lingua…
+  - via: `cite_of:0df9c19659388e55745c290ace520491c2985d9b` (round 1)
+- **Does Simultaneous Speech Translation need Simultaneous Models?** (2022) — Sara Papi, Marco Gaido, Matteo Negri, Marco Turchi — _Conference on Empirical Methods in Natural Language Processing_ — cites: 28
+  - https://www.semanticscholar.org/paper/2b05dc1f5a7a37c27e637e362a195370d141a23d
+  - arXiv:2204.03783 · doi:10.18653/v1/2022.findings-emnlp.11
+  - In simultaneous speech translation (SimulST), finding the best trade-off between high translation quality and low latency is a challenging task. To meet the latency constraints posed by the different application scenarios, multiple dedicated SimulST models are usually trained and maintained, generating high computational costs. In this paper, motivated by the increased social and environmental imp…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Distill The Image to Nowhere: Inversion Knowledge Distillation for Multimodal Machine Translation** (2022) — Ru Peng, Yawen Zeng, J. Zhao — _Conference on Empirical Methods in Natural Language Processing_ — cites: 27
+  - https://www.semanticscholar.org/paper/d5fd95467722501a939c140506ab133b0dab1a2d
+  - arXiv:2210.04468 · doi:10.48550/arXiv.2210.04468
+  - Past works on multimodal machine translation (MMT) elevate bilingual setup by incorporating additional aligned vision information.However, an image-must requirement of the multimodal dataset largely hinders MMT’s development — namely that it demands an aligned form of [image, source text, target text].This limitation is generally troublesome during the inference phase especially when the aligned i…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **SMaLL-100: Introducing Shallow Multilingual Machine Translation Model for Low-Resource Languages** (2022) — Alireza Mohammadshahi, Vassilina Nikoulina, Alexandre Berard, C. Brun, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 26
+  - https://www.semanticscholar.org/paper/83608aadb17443beba22c4087030c8704ccd7c64
+  - arXiv:2210.11621 · doi:10.48550/arXiv.2210.11621
+  - In recent years, multilingual machine translation models have achieved promising performance on low-resource language pairs by sharing information between similar languages, thus enabling zero-shot translation. To overcome the “curse of multilinguality”, these models often opt for scaling up the number of parameters, which makes their use in resource-constrained environments challenging. We introd…
+  - via: `cite_of:ac6535d096fc79dde2d9ce0329e0626b79ede7f0` (round 2)
+- **Wait-info Policy: Balancing Source and Target at Information Level for Simultaneous Machine Translation** (2022) — Shaolei Zhang, Shoutao Guo, Yang Feng — _Conference on Empirical Methods in Natural Language Processing_ — cites: 25
+  - https://www.semanticscholar.org/paper/902f4adc08bf44bfafb58cf69ce41deb8a061809
+  - arXiv:2210.11220 · doi:10.48550/arXiv.2210.11220
+  - Simultaneous machine translation (SiMT) outputs the translation while receiving the source inputs, and hence needs to balance the received source information and translated target information to make a reasonable decision between waiting for inputs or outputting translation. Previous methods always balance source and target information at the token level, either directly waiting for a fixed number…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **Not All Errors are Equal: Learning Text Generation Metrics using Stratified Error Synthesis** (2022) — Wenda Xu, Yi-Lin Tuan, Yujie Lu, Michael Stephen Saxon, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 24
+  - https://www.semanticscholar.org/paper/8eac7b9318e186cc2708845d669a7a759565c452
+  - arXiv:2210.05035 · doi:10.48550/arXiv.2210.05035
+  - Is it possible to build a general and automatic natural language generation (NLG) evaluation metric? Existing learned metrics either perform unsatisfactorily or are restricted to tasks where large human rating data is already available. We introduce SESCORE, a model-based metric that is highly correlated with human judgements without requiring human annotation, by utilizing a novel, iterative erro…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **ConNER: Consistency Training for Cross-lingual Named Entity Recognition** (2022) — Ran Zhou, Xin Li, Lidong Bing, E. Cambria, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 21
+  - https://www.semanticscholar.org/paper/91e24327e4502a95a2ed7f2ac4c36cf0139284cb
+  - arXiv:2211.09394 · doi:10.48550/arXiv.2211.09394
+  - Cross-lingual named entity recognition (NER) suffers from data scarcity in the target languages, especially under zero-shot settings. Existing translate-train or knowledge distillation methods attempt to bridge the language gap, but often introduce a high level of noise. To solve this problem, consistency training methods regularize the model to be robust towards perturbations on data or hidden st…
+  - via: `cite_of:0df9c19659388e55745c290ace520491c2985d9b` (round 1)
+- **Data Selection Curriculum for Neural Machine Translation** (2022) — Tasnim Mohiuddin, Philipp Koehn, Vishrav Chaudhary, James Cross, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 18
+  - https://www.semanticscholar.org/paper/d6c4b31958fe9e4ff4f83e049ed5c6881653eb03
+  - arXiv:2203.13867 · doi:10.48550/arXiv.2203.13867
+  - Neural Machine Translation (NMT) models are typically trained on heterogeneous data that are concatenated and randomly shuffled. However, not all of the training data are equally useful to the model. Curriculum training aims to present the data to the NMT models in a meaningful order. In this work, we introduce a two-stage curriculum training framework for NMT where we fine-tune a base NMT model o…
+  - via: `query:machine translation nmt machine translation` (round 1)
+- **Non-Parametric Domain Adaptation for End-to-End Speech Translation** (2022) — Yichao Du, Weizhi Wang, Zhirui Zhang, Boxing Chen, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 18
+  - https://www.semanticscholar.org/paper/e03fbb4c3ef5203ad12dc659707423fd95b78f16
+  - arXiv:2205.11211 · doi:10.48550/arXiv.2205.11211
+  - The end-to-end speech translation (E2E-ST) has received increasing attention due to the potential of its less error propagation, lower latency and fewer parameters. However, the effectiveness of neural-based approaches to this task is severely limited by the available training corpus, especially for domain adaptation where in-domain triplet data is scarce or nonexistent. In this paper, we propose…
+  - via: `cite_of:e4d99f390901df5caac0b587ff685f9cde100342` (round 2)
+- **Turning Fixed to Adaptive: Integrating Post-Evaluation into Simultaneous Machine Translation** (2022) — Shoutao Guo, Shaolei Zhang, Yang Feng — _Conference on Empirical Methods in Natural Language Processing_ — cites: 17
+  - https://www.semanticscholar.org/paper/4afef2ea406e6c789de1609100d2350bcd71c586
+  - arXiv:2210.11900 · doi:10.48550/arXiv.2210.11900
+  - Simultaneous machine translation (SiMT) starts its translation before reading the whole source sentence and employs either fixed or adaptive policy to generate the target sentence. Compared to the fixed policy, the adaptive policy achieves better latency-quality tradeoffs by adopting a flexible translation policy. If the policy can evaluate rationality before taking action, the probability of inco…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **ConsistTL: Modeling Consistency in Transfer Learning for Low-Resource Neural Machine Translation** (2022) — Zhao Li, Xuebo Liu, Derek F. Wong, Lidia S. Chao, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 16
+  - https://www.semanticscholar.org/paper/0fd94b38505a2541cef118a1263db0b411615675
+  - arXiv:2212.04262 · doi:10.48550/arXiv.2212.04262
+  - Transfer learning is a simple and powerful method that can be used to boost model performance of low-resource neural machine translation (NMT). Existing transfer learning methods for NMT are static, which simply transfer knowledge from a parent model to a child model once via parameter initialization. In this paper, we propose a novel transfer learning method for NMT, namely ConsistTL, which can c…
+  - via: `cite_of:2115a9127cb7ea4dfd5c3a08bfc41bab3b279266` (round 2)
+- **COMET-QE and Active Learning for Low-Resource Machine Translation** (2022) — E. Chimoto, Bruce A. Bassett — _Conference on Empirical Methods in Natural Language Processing_ — cites: 14
+  - https://www.semanticscholar.org/paper/40b2b5ea3fb43874fff960723000f43c2174eb7d
+  - arXiv:2210.15696 · doi:10.48550/arXiv.2210.15696
+  - Active learning aims to deliver maximum benefit when resources are scarce. We use COMET-QE, a reference-free evaluation metric, to select sentences for low-resource neural machine translation. Using Swahili, Kinyarwanda and Spanish for our experiments, we show that COMET-QE significantly outperforms two variants of Round Trip Translation Likelihood (RTTL) and random sentence selection by up to 5 B…
+  - via: `query:bleu points machine translation` (round 2)
+- **Breaking the Representation Bottleneck of Chinese Characters: Neural Machine Translation with Stroke Sequence Modeling** (2022) — Zhijun Wang, Xuebo Liu, Min Zhang — _Conference on Empirical Methods in Natural Language Processing_ — cites: 13
+  - https://www.semanticscholar.org/paper/7abfcf54eeac3a5c298717a4f0fe8a5daceeaa42
+  - arXiv:2211.12781 · doi:10.48550/arXiv.2211.12781
+  - Existing research generally treats Chinese character as a minimum unit for representation. However, such Chinese character representation will suffer two bottlenecks: 1) Learning bottleneck, the learning cannot benefit from its rich internal features (e.g., radicals and strokes); and 2) Parameter bottleneck, each individual character has to be represented by a unique vector. In this paper, we intr…
+  - via: `cite_of:1e7d3a9846da556bc7b84ae1410d257b89448c30` (round 1)
+- **PreQuEL: Quality Estimation of Machine Translation Outputs in Advance** (2022) — Shachar Don-Yehiya, Leshem Choshen, Omri Abend — _Conference on Empirical Methods in Natural Language Processing_ — cites: 12
+  - https://www.semanticscholar.org/paper/88d24b4f19ee59da3b6932a2bd0eb794f9d40bf7
+  - arXiv:2205.09178 · doi:10.48550/arXiv.2205.09178
+  - We present the task of PreQuEL, Pre-(Quality-Estimation) Learning. A PreQuEL system predicts how well a given sentence will be translated, without recourse to the actual translation, thus eschewing unnecessary resource allocation when translation quality is bound to be low. PreQuEL can be defined relative to a given MT system (e.g., some industry service) or generally relative to the state-of-the-…
+  - via: `query:translation quality machine translation` (round 1)
+- **Disentangling Uncertainty in Machine Translation Evaluation** (2022) — Chrysoula Zerva, T. Glushkova, Ricardo Rei, André Martins — _Conference on Empirical Methods in Natural Language Processing_ — cites: 10
+  - https://www.semanticscholar.org/paper/ccd51e04c62b357e8c908d94176e394f356147b8
+  - arXiv:2204.06546 · doi:10.18653/v1/2022.emnlp-main.591
+  - Trainable evaluation metrics for machine translation (MT) exhibit strong correlation with human judgements, but they are often hard to interpret and might produce unreliable scores under noisy or out-of-domain data. Recent work has attempted to mitigate this with simple uncertainty quantification techniques (Monte Carlo dropout and deep ensembles), however these techniques (as we show) are limited…
+  - via: `cite_of:01508f386eb2ca5181fde7bb6da4920e250d7498` (round 2)
+- **Multi-Granularity Optimization for Non-Autoregressive Translation** (2022) — Yafu Li, Leyang Cui, Yongjing Yin, Yue Zhang — _Conference on Empirical Methods in Natural Language Processing_ — cites: 8
+  - https://www.semanticscholar.org/paper/71bb0d7b5faa7c6cbcad4de8ebc4af215329f2b3
+  - arXiv:2210.11017 · doi:10.48550/arXiv.2210.11017
+  - Despite low latency, non-autoregressive machine translation (NAT) suffers severe performance deterioration due to the naive independence assumption. This assumption is further strengthened by cross-entropy loss, which encourages a strict match between the hypothesis and the reference token by token. To alleviate this issue, we propose multi-granularity optimization for NAT, which collects model be…
+  - via: `cite_of:1e5b826ddf0754f6e93234ba1260bd939c255e7f` (round 1)
+- **Unifying the Convergences in Multilingual Neural Machine Translation** (2022) — Yi-Chong Huang, Xiaocheng Feng, Xinwei Geng, Bing Qin — _Conference on Empirical Methods in Natural Language Processing_ — cites: 7
+  - https://www.semanticscholar.org/paper/1f32937d02f8e2665af37f7939bf6a556c7ca07b
+  - arXiv:2205.01620 · doi:10.18653/v1/2022.emnlp-main.458
+  - Although all-in-one-model multilingual neural machine translation (MNMT) has achieved remarkable progress, the convergence inconsistency in the joint training is ignored, i.e., different language pairs reaching convergence in different epochs. This leads to the trained MNMT model over-fitting low-resource language translations while under-fitting high-resource ones. In this paper, we propose a nov…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **Entropy-Based Vocabulary Substitution for Incremental Learning in Multilingual Neural Machine Translation** (2022) — Kaiyu Huang, Peng Li, Jingjing Ma, Yang Liu — _Conference on Empirical Methods in Natural Language Processing_ — cites: 7
+  - https://www.semanticscholar.org/paper/b6f4877861be9a40711763394d8f5f0377ad1a8f
+  - doi:10.18653/v1/2022.emnlp-main.720
+  - In a practical real-world scenario, the longstanding goal is that a universal multilingual translation model can be incrementally updated when new language pairs arrive. Specifically, the initial vocabulary only covers some of the words in new languages, which hurts the translation quality for incremental learning. Although existing approaches attempt to address this issue by replacing the origina…
+  - via: `cite_of:3198d56ff8998070e9b2fd663d8257b5b697e0e9` (round 2)
+- **SegAugment: Maximizing the Utility of Speech Translation Data with Segmentation-based Augmentations** (2022) — Yiannis (Ioannis) Tsiamas, José A. R. Fonollosa, M. Costa-jussà — _Conference on Empirical Methods in Natural Language Processing_ — cites: 6
+  - https://www.semanticscholar.org/paper/681be744075ef0c703f0f65485fd25149ae0ccb7
+  - arXiv:2212.09699 · doi:10.48550/arXiv.2212.09699
+  - End-to-end Speech Translation is hindered by a lack of available data resources. While most of them are based on documents, a sentence-level version is available, which is however single and static, potentially impeding the usefulness of the data. We propose a new data augmentation strategy, SegAugment, to address this issue by generating multiple alternative sentence-level versions of a dataset.…
+  - via: `cite_of:b6222ad8acdf327368b45fb7fa5f4cf374d6da80` (round 1)
+- **Twist Decoding: Diverse Generators Guide Each Other** (2022) — Jungo Kasai, Keisuke Sakaguchi, Ronan Le Bras, Hao Peng, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 5
+  - https://www.semanticscholar.org/paper/ded0cd920c145ca0ae68acf306d54926cad5388c
+  - arXiv:2205.09273 · doi:10.48550/arXiv.2205.09273
+  - Many language generation models are now available for a wide range of generation tasks, including machine translation and summarization. Combining such diverse models may lead to further progress, but ensembling generation models is challenging during inference: conventional ensembling methods (e.g., shallow fusion) require that the models share vocabulary/tokenization schemes. We introduce Twist…
+  - via: `cite_of:213e471bacff5c0852943988fcb955797f1e591f` (round 2)
+- **A Template-based Method for Constrained Neural Machine Translation** (2022) — Shuo Wang, Peng Li, Zhixing Tan, Zhaopeng Tu, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 4
+  - https://www.semanticscholar.org/paper/558f8e4eabee92f2ac6c928c2f31759ce1c839b7
+  - arXiv:2205.11255 · doi:10.48550/arXiv.2205.11255
+  - Machine translation systems are expected to cope with various types of constraints in many practical scenarios. While neural machine translation (NMT) has achieved strong performance in unconstrained cases, it is non-trivial to impose pre-specified constraints into the translation process of NMT models. Although many approaches have been proposed to address this issue, most existing methods can no…
+  - via: `cite_of:101141b047d119ef9c8fda8dd83d3d9eb3fbfd1f` (round 2)
+- **Competency-Aware Neural Machine Translation: Can Machine Translation Know its Own Translation Quality?** (2022) — Pei Zhang, Baosong Yang, Hao-Ran Wei, Dayiheng Liu, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 3
+  - https://www.semanticscholar.org/paper/b078fb61a0b0f0c394b950b9ba7e7c987dc728ac
+  - arXiv:2211.13865 · doi:10.48550/arXiv.2211.13865
+  - Neural machine translation (NMT) is often criticized for failures that happenwithout awareness. The lack of competency awareness makes NMT untrustworthy. This is in sharp contrast to human translators who give feedback or conduct further investigations whenever they are in doubt about predictions. To fill this gap, we propose a novel competency-aware NMT by extending conventional NMT with a self-e…
+  - via: `query:translation quality machine translation` (round 1)
+- **Machine Translation Robustness to Natural Asemantic Variation** (2022) — Jacob Bremerman, Xiang Ren, Jonathan May — _Conference on Empirical Methods in Natural Language Processing_ — cites: 2
+  - https://www.semanticscholar.org/paper/ce5d11ad6985d77ec82810cb2e064847f0c61f29
+  - arXiv:2205.12514 · doi:10.48550/arXiv.2205.12514
+  - Current Machine Translation (MT) models still struggle with more challenging input, such as noisy data and tail-end words and phrases. Several works have addressed this robustness issue by identifying specific categories of noise and variation then tuning models to perform better on them. An important yet under-studied category involves minor variations in nuance (non-typos) that preserve meaning…
+  - via: `cite_of:0ee468b9b709a2610c4b574d67218e7960350224` (round 1)
+- **Beyond Distillation: Task-level Mixture-of-Experts for Efficient Inference** (2021) — Sneha Kudugunta, Yanping Huang, Ankur Bapna, M. Krikun, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 134
+  - https://www.semanticscholar.org/paper/8ae292cbd9144acbf4b42b7ead82b079faf33192
+  - arXiv:2110.03742 · doi:10.18653/v1/2021.findings-emnlp.304
+  - Sparse Mixture-of-Experts (MoE) has been a successful approach for scaling multilingual translation models to billions of parameters without a proportional increase in training computation. However, MoE models are prohibitively large and practitioners often resort to methods such as distillation for serving. In this work, we investigate routing strategies at different granularity (token, sentence,…
+  - via: `cite_of:1b24b7b4ac2427d20ab60c8451563eb8d99caf9c` (round 1)
+- **Learning Compact Metrics for MT** (2021) — Amy Pu, Hyung Won Chung, Ankur P. Parikh, Sebastian Gehrmann, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 115
+  - https://www.semanticscholar.org/paper/dfd104dd0ff28b1bde2fbd4c4d6d3ccb4761f639
+  - arXiv:2110.06341 · doi:10.18653/v1/2021.emnlp-main.58
+  - Recent developments in machine translation and multilingual text generation have led researchers to adopt trained metrics such as COMET or BLEURT, which treat evaluation as a regression problem and use representations from multilingual pre-trained models such as XLM-RoBERTa or mBERT. Yet studies on related tasks suggest that these models are most efficient when they are large, which is costly and…
+  - via: `cite_of:01508f386eb2ca5181fde7bb6da4920e250d7498` (round 2)
+- **BERT, mBERT, or BiBERT? A Study on Contextualized Embeddings for Neural Machine Translation** (2021) — Haoran Xu, Benjamin Van Durme, Kenton Murray — _Conference on Empirical Methods in Natural Language Processing_ — cites: 75
+  - https://www.semanticscholar.org/paper/2607dce6dcb9043ca9cae67e25e6a24411f08c0b
+  - arXiv:2109.04588 · doi:10.18653/v1/2021.emnlp-main.534
+  - The success of bidirectional encoders using masked language models, such as BERT, on numerous natural language processing tasks has prompted researchers to attempt to incorporate these pre-trained models into neural machine translation (NMT) systems. However, proposed methods for incorporating pre-trained models are non-trivial and mainly focus on BERT, which lacks a comparison of the impact that…
+  - via: `query:machine translation nmt machine translation` (round 1)
+- **Cross Attention Augmented Transducer Networks for Simultaneous Translation** (2021) — Dan Liu, Mengge Du, Xiaoxi Li, Ya Li, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 60
+  - https://www.semanticscholar.org/paper/df4f0c97d4ee2e28bb8a88fcc9a1c865a861fc69
+  - doi:10.18653/v1/2021.emnlp-main.4
+  - This paper proposes a novel architecture, Cross Attention Augmented Transducer (CAAT), for simultaneous translation. The framework aims to jointly optimize the policy and translation models. To effectively consider all possible READ-WRITE simultaneous translation action paths, we adapt the online automatic speech recognition (ASR) model, RNN-T, but remove the strong monotonic constraint, which is…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Uncertainty-Aware Machine Translation Evaluation** (2021) — T. Glushkova, Chrysoula Zerva, Ricardo Rei, André Martins — _Conference on Empirical Methods in Natural Language Processing_ — cites: 51
+  - https://www.semanticscholar.org/paper/2a8ec34500e2f90c5070fa34317b50939ac8f6f9
+  - arXiv:2109.06352 · doi:10.18653/v1/2021.findings-emnlp.330
+  - Several neural-based metrics have been recently proposed to evaluate machine translation quality. However, all of them resort to point estimates, which provide limited information at segment level. This is made worse as they are trained on noisy, biased and scarce human judgements, often resulting in unreliable quality predictions. In this paper, we introduce uncertainty-aware MT evaluation and an…
+  - via: `cite_of:dae35736329852c83d32cefd66448dc73cd73368` (round 1)
+- **AligNART: Non-autoregressive Neural Machine Translation by Jointly Learning to Estimate Alignment and Translate** (2021) — Jongyoon Song, Sungwon Kim, Sungroh Yoon — _Conference on Empirical Methods in Natural Language Processing_ — cites: 45
+  - https://www.semanticscholar.org/paper/a8f9c041691db73eaa17ecc3fe93c4aac4e352b6
+  - arXiv:2109.06481 · doi:10.18653/v1/2021.emnlp-main.1
+  - Non-autoregressive neural machine translation (NART) models suffer from the multi-modality problem which causes translation inconsistency such as token repetition. Most recent approaches have attempted to solve this problem by implicitly modeling dependencies between outputs. In this paper, we introduce AligNART, which leverages full alignment information to explicitly reduce the modality of the t…
+  - via: `cite_of:1e5b826ddf0754f6e93234ba1260bd939c255e7f` (round 1)
+- **Universal Simultaneous Machine Translation with Mixture-of-Experts Wait-k Policy** (2021) — Shaolei Zhang, Yang Feng — _Conference on Empirical Methods in Natural Language Processing_ — cites: 43
+  - https://www.semanticscholar.org/paper/5d6c242b3477c2315676277fd2d3f17f0a4f8875
+  - arXiv:2109.05238 · doi:10.18653/v1/2021.emnlp-main.581
+  - Simultaneous machine translation (SiMT) generates translation before reading the entire source sentence and hence it has to trade off between translation quality and latency. To fulfill the requirements of different translation quality and latency in practical applications, the previous methods usually need to train multiple SiMT models for different latency levels, resulting in large computationa…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **Improving Neural Machine Translation by Bidirectional Training** (2021) — Liang Ding, Di Wu, D. Tao — _Conference on Empirical Methods in Natural Language Processing_ — cites: 38
+  - https://www.semanticscholar.org/paper/4f71fd26be06f479099b17af95d408c7ab272830
+  - arXiv:2109.07780 · doi:10.18653/v1/2021.emnlp-main.263
+  - We present a simple and effective pretraining strategy – bidirectional training (BiT) for neural machine translation. Specifically, we bidirectionally update the model parameters at the early stage and then tune the model normally. To achieve bidirectional updating, we simply reconstruct the training samples from “src\rightarrowtgt” to “src+tgt\rightarrowtgt+src” without any complicated model modi…
+  - via: `cite_of:48925fef94500cf19ee220ed74217816f1ab5e60` (round 2)
+- **Rethinking Data Augmentation for Low-Resource Neural Machine Translation: A Multi-Task Learning Approach** (2021) — V'ictor M. S'anchez-Cartagena, M. Esplà-Gomis, Juan Antonio P'erez-Ortiz, Felipe S'anchez-Mart'inez — _Conference on Empirical Methods in Natural Language Processing_ — cites: 30
+  - https://www.semanticscholar.org/paper/d539b8ce8e94025200468a49099802491396a9d4
+  - arXiv:2109.03645 · doi:10.18653/v1/2021.emnlp-main.669
+  - In the context of neural machine translation, data augmentation (DA) techniques may be used for generating additional training samples when the available parallel data are scarce. Many DA approaches aim at expanding the support of the empirical data distribution by generating new sentence pairs that contain infrequent words, thus making it closer to the true data distribution of parallel sentences…
+  - via: `query:prefix-to-prefix translation` (round 0)
+- **A Generative Framework for Simultaneous Machine Translation** (2021) — Yishu Miao, Phil Blunsom, Lucia Specia — _Conference on Empirical Methods in Natural Language Processing_ — cites: 29
+  - https://www.semanticscholar.org/paper/b05386241ac7cce9abc154f580d0a6376a77ecc8
+  - doi:10.18653/v1/2021.emnlp-main.536
+  - We propose a generative framework for simultaneous machine translation. Conventional approaches use a fixed number of source words to translate or learn dynamic policies for the number of source words by reinforcement learning. Here we formulate simultaneous translation as a structural sequence-to-sequence learning problem. A latent variable is introduced to model read or translate actions at ever…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **On the Complementarity between Pre-Training and Back-Translation for Neural Machine Translation** (2021) — Xuebo Liu, Longyue Wang, Derek F. Wong, Liang Ding, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 29
+  - https://www.semanticscholar.org/paper/beda4bea4c0bee9d942f7db8b4991712cc707f68
+  - arXiv:2110.01811 · doi:10.18653/v1/2021.findings-emnlp.247
+  - Pre-training (PT) and back-translation (BT) are two simple and powerful methods to utilize monolingual data for improving the model performance of neural machine translation (NMT). This paper takes the first step to investigate the complementarity between PT and BT. We introduce two probing tasks for PT and BT respectively and find that PT mainly contributes to the encoder module while BT brings m…
+  - via: `query:back-translation simultaneous` (round 0)
+- **Mutual-Learning Improves End-to-End Speech Translation** (2021) — Jiawei Zhao, Wei Luo, Boxing Chen, A. Gilman — _Conference on Empirical Methods in Natural Language Processing_ — cites: 29
+  - https://www.semanticscholar.org/paper/c5eb527195354a6ee690c13d95df6a9bb8bb3647
+  - doi:10.18653/v1/2021.emnlp-main.325
+  - A currently popular research area in end-to-end speech translation is the use of knowledge distillation from a machine translation (MT) task to improve the speech translation (ST) task. However, such scenario obviously only allows one way transfer, which is limited by the performance of the teacher model. Therefore, We hypothesis that the knowledge distillation-based approaches are sub-optimal. In…
+  - via: `cite_of:e4d99f390901df5caac0b587ff685f9cde100342` (round 2)
+- **Language-agnostic Representation from Multilingual Sentence Encoders for Cross-lingual Similarity Estimation** (2021) — Nattapong Tiyajamorn, Tomoyuki Kajiwara, Yuki Arase, Makoto Onizuka — _Conference on Empirical Methods in Natural Language Processing_ — cites: 27
+  - https://www.semanticscholar.org/paper/c0a54963b0689fa7d76fda1063b65003c769d9b7
+  - doi:10.18653/v1/2021.emnlp-main.612
+  - We propose a method to distill a language-agnostic meaning embedding from a multilingual sentence encoder. By removing language-specific information from the original embedding, we retrieve an embedding that fully represents the sentence’s meaning. The proposed method relies only on parallel corpora without any human annotations. Our meaning embedding allows efficient cross-lingual sentence simila…
+  - via: `cite_of:01508f386eb2ca5181fde7bb6da4920e250d7498` (round 2)
+- **Contrastive Conditioning for Assessing Disambiguation in MT: A Case Study of Distilled Bias** (2021) — Jannis Vamvas, Rico Sennrich — _Conference on Empirical Methods in Natural Language Processing_ — cites: 25
+  - https://www.semanticscholar.org/paper/1fe457167f898eb6edb9ada7ccd4249e19237ba0
+  - doi:10.18653/v1/2021.emnlp-main.803
+  - Lexical disambiguation is a major challenge for machine translation systems, especially if some senses of a word are trained less often than others. Identifying patterns of overgeneralization requires evaluation methods that are both reliable and scalable. We propose contrastive conditioning as a reference-free black-box method for detecting disambiguation errors. Specifically, we score the qualit…
+  - via: `cite_of:1e5b826ddf0754f6e93234ba1260bd939c255e7f` (round 1)
+- **Speechformer: Reducing Information Loss in Direct Speech Translation** (2021) — Sara Papi, Marco Gaido, Matteo Negri, Marco Turchi — _Conference on Empirical Methods in Natural Language Processing_ — cites: 25
+  - https://www.semanticscholar.org/paper/a8e61923b1404eb7ae286e4ec407a3e3f925f788
+  - arXiv:2109.04574 · doi:10.18653/v1/2021.emnlp-main.127
+  - Transformer-based models have gained increasing popularity achieving state-of-the-art performance in many research fields including speech translation. However, Transformer’s quadratic complexity with respect to the input sequence length prevents its adoption as is with audio signals, which are typically represented by long sequences. Current solutions resort to an initial sub-optimal compression…
+  - via: `query:bleu points speech translation` (round 2)
+- **GFST: Gender-Filtered Self-Training for More Accurate Gender in Translation** (2021) — P. Choubey, Anna Currey, Prashant Mathur, Georgiana Dinu — _Conference on Empirical Methods in Natural Language Processing_ — cites: 21
+  - https://www.semanticscholar.org/paper/f01ee20ea9f5bb25a843a8f51834d1aa29b532d2
+  - doi:10.18653/v1/2021.emnlp-main.123
+  - Targeted evaluations have found that machine translation systems often output incorrect gender in translations, even when the gender is clear from context. Furthermore, these incorrectly gendered translations have the potential to reflect or amplify social biases. We propose gender-filtered self-training (GFST) to improve gender translation accuracy on unambiguously gendered inputs. Our GFST appro…
+  - via: `query:self-training simultaneous translation` (round 0)
+- **Stream-level Latency Evaluation for Simultaneous Machine Translation** (2021) — Javier Iranzo-Sánchez, Jorge Civera Saiz, Alfons Juan-Císcar — _Conference on Empirical Methods in Natural Language Processing_ — cites: 18
+  - https://www.semanticscholar.org/paper/3de6daeb811b2565a1c657c1cbbd3a5517c0ec6e
+  - arXiv:2104.08817 · doi:10.18653/v1/2021.findings-emnlp.58
+  - Simultaneous machine translation has recently gained traction thanks to significant quality improvements and the advent of streaming applications. Simultaneous translation systems need to find a trade-off between translation quality and response time, and with this purpose multiple latency measures have been proposed. However, latency evaluations for simultaneous translation are estimated at the s…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **Generic resources are what you need: Style transfer tasks without task-specific parallel training data** (2021) — Huiyuan Lai, Antonio Toral, M. Nissim — _Conference on Empirical Methods in Natural Language Processing_ — cites: 18
+  - https://www.semanticscholar.org/paper/dd17b1de8f230f6717188dc8d063b027c5a025c2
+  - arXiv:2109.04543 · doi:10.18653/v1/2021.emnlp-main.349
+  - Style transfer aims to rewrite a source text in a different target style while preserving its content. We propose a novel approach to this task that leverages generic resources, and without using any task-specific parallel (source–target) data outperforms existing unsupervised approaches on the two most popular style transfer tasks: formality transfer and polarity swap. In practice, we adopt a mul…
+  - via: `cite_of:bface38422b7e53287134c4d01a39fa58edd4469` (round 2)
+- **Competence-based Curriculum Learning for Multilingual Machine Translation** (2021) — Mingliang Zhang, Fandong Meng, Y. Tong, Jie Zhou — _Conference on Empirical Methods in Natural Language Processing_ — cites: 18
+  - https://www.semanticscholar.org/paper/e3990c75d70e9ce024a0f17df0903b7291313547
+  - arXiv:2109.04002 · doi:10.18653/v1/2021.findings-emnlp.212
+  - Currently, multilingual machine translation is receiving more and more attention since it brings better performance for low resource languages (LRLs) and saves more space. However, existing multilingual machine translation models face a severe challenge: imbalance. As a result, the translation performance of different languages in multilingual translation models are quite different. We argue that…
+  - via: `query:multilingual machine translation simultaneous translation` (round 3)
+- **Self-Supervised Quality Estimation for Machine Translation** (2021) — Yuanhang Zheng, Zhixing Tan, Meng Zhang, M. Maimaiti, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 15
+  - https://www.semanticscholar.org/paper/e00f5ee7155a09fec7b769ab315d6870a3db79da
+  - doi:10.18653/v1/2021.emnlp-main.267
+  - Quality estimation (QE) of machine translation (MT) aims to evaluate the quality of machine-translated sentences without references and is important in practical applications of MT. Training QE models require massive parallel data with hand-crafted quality annotations, which are time-consuming and labor-intensive to obtain. To address the issue of the absence of annotated training data, previous s…
+  - via: `query:self-training simultaneous translation` (round 0)
+- **It Is Not As Good As You Think! Evaluating Simultaneous Machine Translation on Interpretation Data** (2021) — Jinming Zhao, Philip Arthur, Gholamreza Haffari, Trevor Cohn, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 14
+  - https://www.semanticscholar.org/paper/2ee442b040a59ee4db34851f262be1a5f0685605
+  - arXiv:2110.05213 · doi:10.18653/v1/2021.emnlp-main.537
+  - Most existing simultaneous machine translation (SiMT) systems are trained and evaluated on offline translation corpora. We argue that SiMT systems should be trained and tested on real interpretation data. To illustrate this argument, we propose an interpretation test set and conduct a realistic evaluation of SiMT trained on offline translations. Our results, on our test set along with 3 existing s…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Translation-based Supervision for Policy Generation in Simultaneous Neural Machine Translation** (2021) — Ashkan Alinejad, Hassan S. Shavarani, Anoop Sarkar — _Conference on Empirical Methods in Natural Language Processing_ — cites: 12
+  - https://www.semanticscholar.org/paper/6df3e69cd4cda0a48fa8819196fed9061855ce79
+  - doi:10.18653/v1/2021.emnlp-main.130
+  - In simultaneous machine translation, finding an agent with the optimal action sequence of reads and writes that maintain a high level of translation quality while minimizing the average lag in producing target tokens remains an extremely challenging problem. We propose a novel supervised learning approach for training an agent that can detect the minimum number of reads required for generating eac…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **WeTS: A Benchmark for Translation Suggestion** (2021) — Zhen Yang, Yingxue Zhang, Ernan Li, Fandong Meng, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 11
+  - https://www.semanticscholar.org/paper/e88243bbf0494313556410e7f03058c95f2ddbe2
+  - arXiv:2110.05151 · doi:10.18653/v1/2022.emnlp-main.353
+  - Translation suggestion (TS), which provides alternatives for specific words or phrases given the entire documents generated by machine translation (MT), has been proven to play a significant role in post-editing (PE). There are two main pitfalls for existing researches in this line. First, most conventional works only focus on the overall performance of PE but ignore the exact performance of TS, w…
+  - via: `cite_of:3360768fcb265a8b7c1ee5ba7cfe03de0e2fad62` (round 2)
+- **HintedBT: Augmenting Back-Translation with Quality and Transliteration Hints** (2021) — Sahana Ramnath, Melvin Johnson, Abhirut Gupta, Aravindan Raghuveer — _Conference on Empirical Methods in Natural Language Processing_ — cites: 10
+  - https://www.semanticscholar.org/paper/0f968312b389bf47b41b3514686823d2b7239b3f
+  - arXiv:2109.04443 · doi:10.18653/v1/2021.emnlp-main.129
+  - Back-translation (BT) of target monolingual corpora is a widely used data augmentation strategy for neural machine translation (NMT), especially for low-resource language pairs. To improve effectiveness of the available BT data, we introduce HintedBT—a family of techniques which provides hints (through tags) to the encoder and decoder. First, we propose a novel method of using both high and low qu…
+  - via: `query:back-translation simultaneous` (round 0)
+- **Exploiting Curriculum Learning in Unsupervised Neural Machine Translation** (2021) — Jinliang Lu, Jiajun Zhang — _Conference on Empirical Methods in Natural Language Processing_ — cites: 10
+  - https://www.semanticscholar.org/paper/7fb364a70a185c7e32bdd8844b7d789b09958464
+  - arXiv:2109.11177 · doi:10.18653/v1/2021.findings-emnlp.79
+  - Back-translation (BT) has become one of the de facto components in unsupervised neural machine translation (UNMT), and it explicitly makes UNMT have translation ability. However, all the pseudo bi-texts generated by BT are treated equally as clean data during optimization without considering the quality diversity, leading to slow convergence and limited translation performance. To address this pro…
+  - via: `cite_of:dae35736329852c83d32cefd66448dc73cd73368` (round 1)
+- **Multilingual Neural Machine Translation: Can Linguistic Hierarchies Help?** (2021) — Fahimeh Saleh, Wray L. Buntine, Gholamreza Haffari, Lan Du — _Conference on Empirical Methods in Natural Language Processing_ — cites: 9
+  - https://www.semanticscholar.org/paper/d4d076eb456840c098d6b52feadba131f02adb47
+  - arXiv:2110.07816 · doi:10.18653/v1/2021.findings-emnlp.114
+  - Multilingual Neural Machine Translation (MNMT) trains a single NMT model that supports translation between multiple languages, rather than training separate models for different languages. Learning a single model can enhance the low-resource translation by leveraging data from multiple languages. However, the performance of an MNMT model is highly dependent on the type of languages used in trainin…
+  - via: `cite_of:1b24b7b4ac2427d20ab60c8451563eb8d99caf9c` (round 1)
+- **Beyond Glass-Box Features: Uncertainty Quantification Enhanced Quality Estimation for Neural Machine Translation** (2021) — Ke Min Wang, Yangbin Shi, Jiayi Wang, Yuqi Zhang, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 8
+  - https://www.semanticscholar.org/paper/014ffd86ffdbfe84df070aa76e33ccca2c80bf48
+  - arXiv:2109.07141 · doi:10.18653/v1/2021.findings-emnlp.401
+  - Quality Estimation (QE) plays an essential role in applications of Machine Translation (MT). Traditionally, a QE system accepts the original source text and translation from a black-box MT system as input. Recently, a few studies indicate that as a by-product of translation, QE benefits from the model and training data's information of the MT system where the translations come from, and it is call…
+  - via: `query:translation quality machine translation` (round 1)
+- **Levenshtein Training for Word-level Quality Estimation** (2021) — Shuoyang Ding, Marcin Junczys-Dowmunt, Matt Post, Philipp Koehn — _Conference on Empirical Methods in Natural Language Processing_ — cites: 8
+  - https://www.semanticscholar.org/paper/e68e29ea60c3803c5b425bb959a42e2376819bd4
+  - arXiv:2109.05611 · doi:10.18653/v1/2021.emnlp-main.539
+  - We propose a novel scheme to use the Levenshtein Transformer to perform the task of word-level quality estimation. A Levenshtein Transformer is a natural fit for this task: trained to perform decoding in an iterative manner, a Levenshtein Transformer can learn to post-edit without explicit supervision. To further minimize the mismatch between the translation task and the word-level QE task, we pro…
+  - via: `cite_of:01508f386eb2ca5181fde7bb6da4920e250d7498` (round 2)
+- **Preventing Author Profiling through Zero-Shot Multilingual Back-Translation** (2021) — David Ifeoluwa Adelani, Miaoran Zhang, Xiaoyu Shen, A. Davody, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 7
+  - https://www.semanticscholar.org/paper/1a92c78f09c55498d2377b4d6ccebafc36b38a4c
+  - arXiv:2109.09133 · doi:10.18653/v1/2021.emnlp-main.684
+  - Documents as short as a single sentence may inadvertently reveal sensitive information about their authors, including e.g. their gender or ethnicity. Style transfer is an effective way of transforming texts in order to remove any information that enables author profiling. However, for a number of current state-of-the-art approaches the improved privacy is accompanied by an undesirable drop in the…
+  - via: `query:back-translation simultaneous` (round 0)
+- **MiSS: An Assistant for Multi-Style Simultaneous Translation** (2021) — Zuchao Li, Kevin Parnow, M. Utiyama, E. Sumita, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 6
+  - https://www.semanticscholar.org/paper/c7f7df7a059356f1e0db402e673ca1680130dc46
+  - doi:10.18653/v1/2021.emnlp-demo.1
+  - In this paper, we present MiSS, an assistant for multi-style simultaneous translation. Our proposed translation system has five key features: highly accurate translation, simultaneous translation, translation for multiple text styles, back-translation for translation quality evaluation, and grammatical error correction. With this system, we aim to provide a complete translation experience for mach…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **MeetDot: Videoconferencing with Live Translation Captions** (2021) — Arkady Arkhangorodsky, Christopher Chu, Scot Fang, Yiqi Huang, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 6
+  - https://www.semanticscholar.org/paper/0c915fa4f80ddece05b798d586d732862a3b48a2
+  - arXiv:2109.09577 · doi:10.18653/v1/2021.emnlp-demo.23
+  - We present MeetDot, a videoconferencing system with live translation captions overlaid on screen. The system aims to facilitate conversation between people who speak different languages, thereby reducing communication barriers between multilingual participants. Currently, our system supports speech and captions in 4 languages and combines automatic speech recognition (ASR) and machine translation…
+  - via: `cite_of:9d3480e46cc506b73d5291387c6452998690fdd3` (round 1)
+- **Token-wise Curriculum Learning for Neural Machine Translation** (2021) — Chen Liang, Haoming Jiang, Xiaodong Liu, Pengcheng He, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 5
+  - https://www.semanticscholar.org/paper/59006ac5a85a898f28710cbfbd80d04991c0560e
+  - arXiv:2103.11088 · doi:10.18653/v1/2021.findings-emnlp.310
+  - Existing curriculum learning approaches to Neural Machine Translation (NMT) require sampling sufficient amounts of"easy"samples from training data at the early training stage. This is not always achievable for low-resource languages where the amount of training data is limited. To address such limitation, we propose a novel token-wise curriculum learning approach that creates sufficient amounts of…
+  - via: `cite_of:2115a9127cb7ea4dfd5c3a08bfc41bab3b279266` (round 2)
+- **Investigating the Helpfulness of Word-Level Quality Estimation for Post-Editing Machine Translation Output** (2021) — R. Shenoy, Nico Herbig, A. Krüger, Josef van Genabith — _Conference on Empirical Methods in Natural Language Processing_ — cites: 4
+  - https://www.semanticscholar.org/paper/833fe195669c4fcb89f1d5d11c268757df76501d
+  - doi:10.18653/v1/2021.emnlp-main.799
+  - Compared to fully manual translation, post-editing (PE) machine translation (MT) output can save time and reduce errors. Automatic word-level quality estimation (QE) aims to predict the correctness of words in MT output and holds great promise to aid PE by flagging problematic output. Quality of QE is crucial, as incorrect QE might lead to translators missing errors or wasting time on already corr…
+  - via: `query:translation quality machine translation` (round 1)
+- **Multi-Sentence Resampling: A Simple Approach to Alleviate Dataset Length Bias and Beam-Search Degradation** (2021) — Ivan Provilkov, A. Malinin — _Conference on Empirical Methods in Natural Language Processing_ — cites: 4
+  - https://www.semanticscholar.org/paper/0f79d7c74ccb483c79cb28dfdc8811646efe6aa9
+  - arXiv:2109.06253 · doi:10.18653/v1/2021.emnlp-main.677
+  - Neural Machine Translation (NMT) is known to suffer from a beam-search problem: after a certain point, increasing beam size causes an overall drop in translation quality. This effect is especially pronounced for long sentences. While much work was done analyzing this phenomenon, primarily for autoregressive NMT models, there is still no consensus on its underlying cause. In this work, we analyze e…
+  - via: `query:machine translation nmt speech translation` (round 1)
+- **Improving Scheduled Sampling with Elastic Weight Consolidation for Neural Machine Translation** (2021) — Michalis Korakakis, Andreas Vlachos — _Conference on Empirical Methods in Natural Language Processing_ — cites: 3
+  - https://www.semanticscholar.org/paper/6c2ef65cb0c3d204ca557d83c78b8d17657bdeca
+  - arXiv:2109.06308 · doi:10.18653/v1/2022.findings-emnlp.536
+  - Despite strong performance in many sequence-to-sequence tasks, autoregressive models trained with maximum likelihood estimation suffer from exposure bias, i.e. the discrepancy between the ground-truth prefixes used during training and the model-generated prefixes used at inference time. Scheduled sampling is a simple and empirically successful approach which addresses this issue by incorporating m…
+  - via: `query:prefix-to-prefix translation` (round 0)
+- **COMET: A Neural Framework for MT Evaluation** (2020) — Ricardo Rei, Craig Alan Stewart, Ana C. Farinha, A. Lavie — _Conference on Empirical Methods in Natural Language Processing_ — cites: 1520
+  - https://www.semanticscholar.org/paper/9e67b9758520e49016ab66bafb974d2e1ed762d1
+  - arXiv:2009.09025 · doi:10.18653/v1/2020.emnlp-main.213
+  - We present COMET, a neural framework for training multilingual machine translation evaluation models which obtains new state-of-the-art levels of correlation with human judgements. Our framework leverages recent breakthroughs in cross-lingual pretrained language modeling resulting in highly multilingual and adaptable MT evaluation models that exploit information from both the source input and a ta…
+  - via: `ref_of:218c5c69f3cf0c158e9b6af239a2cc62a688c6de` (round 2)
+- **Automatic Machine Translation Evaluation in Many Languages via Zero-Shot Paraphrasing** (2020) — Brian Thompson, Matt Post — _Conference on Empirical Methods in Natural Language Processing_ — cites: 204
+  - https://www.semanticscholar.org/paper/01508f386eb2ca5181fde7bb6da4920e250d7498
+  - arXiv:2004.14564 · doi:10.18653/v1/2020.emnlp-main.8
+  - We propose the use of a sequence-to-sequence paraphraser for automatic machine translation evaluation. The paraphraser takes a human reference as input and then force-decodes and scores an MT system output. We propose training the aforementioned paraphraser as a multilingual NMT system, treating paraphrasing as a zero-shot "language pair" (e.g., Russian to Russian). We denote our paraphraser "unbi…
+  - via: `cite_of:8b5b8bd0942d5f39d01c1f4b89d174fb3fde99cc` (round 1)
+- **BLEU Might Be Guilty but References Are Not Innocent** (2020) — Markus Freitag, David Grangier, Isaac Caswell — _Conference on Empirical Methods in Natural Language Processing_ — cites: 162
+  - https://www.semanticscholar.org/paper/213e471bacff5c0852943988fcb955797f1e591f
+  - arXiv:2004.06063 · doi:10.18653/v1/2020.emnlp-main.5
+  - The quality of automatic metrics for machine translation has been increasingly called into question, especially for high-quality systems. This paper demonstrates that, while choice of metric is important, the nature of the references is also critical. We study different methods to collect references and compare their value in automated evaluation by reporting correlation with human evaluation for…
+  - via: `cite_of:8b5b8bd0942d5f39d01c1f4b89d174fb3fde99cc` (round 1)
+- **SIMULEVAL: An Evaluation Toolkit for Simultaneous Translation** (2020) — Xutai Ma, M. Dousti, Changhan Wang, Jiatao Gu, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 124
+  - https://www.semanticscholar.org/paper/dfb8aabf2bc6f5fea3c0de0af85996cc8ba29db7
+  - arXiv:2007.16193 · doi:10.18653/v1/2020.emnlp-demos.19
+  - Simultaneous translation on both text and speech focuses on a real-time and low-latency scenario where the model starts translating before reading the complete source input. Evaluating simultaneous translation models is more complex than offline models because the latency is another factor to consider in addition to translation quality. The research community, despite its growing focus on novel mo…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Sequence-level Mixed Sample Data Augmentation** (2020) — Demi Guo, Yoon Kim, Alexander M. Rush — _Conference on Empirical Methods in Natural Language Processing_ — cites: 106
+  - https://www.semanticscholar.org/paper/106fb432d2b62f3824a9d6f4a1b30e1f8b6ea9d7
+  - arXiv:2011.09039 · doi:10.18653/v1/2020.emnlp-main.447
+  - Despite their empirical success, neural networks still have difficulty capturing compositional aspects of natural language. This work proposes a simple data augmentation approach to encourage compositional behavior in neural models for sequence-to-sequence problems. Our approach, SeqMix, creates new synthetic examples by softly combining input/output sequences from the training set. We connect thi…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Autoregressive Knowledge Distillation through Imitation Learning** (2020) — Alexander Lin, Jeremy Wohlwend, Howard Chen, Tao Lei — _Conference on Empirical Methods in Natural Language Processing_ — cites: 65
+  - https://www.semanticscholar.org/paper/bffbf4931170d3fcb47b8b1aae6df1066302e825
+  - arXiv:2009.07253 · doi:10.18653/v1/2020.emnlp-main.494
+  - The performance of autoregressive models on natural language generation tasks has dramatically improved due to the adoption of deep, self-attentive architectures. However, these gains have come at the cost of hindering inference speed, making state-of-the-art models cumbersome to deploy in real-world, time-sensitive settings. We develop a compression technique for autoregressive models that is dri…
+  - via: `cite_of:1b24b7b4ac2427d20ab60c8451563eb8d99caf9c` (round 1)
+- **Language Model Prior for Low-Resource Neural Machine Translation** (2020) — Christos Baziotis, B. Haddow, Alexandra Birch — _Conference on Empirical Methods in Natural Language Processing_ — cites: 63
+  - https://www.semanticscholar.org/paper/e7246557d6cc04bebdfbba473c130d323e415ccd
+  - arXiv:2004.14928 · doi:10.18653/v1/2020.emnlp-main.615
+  - The scarcity of large parallel corpora is an important obstacle for neural machine translation. A common solution is to exploit the knowledge of language models (LM) trained on abundant monolingual data. In this work, we propose a novel approach to incorporate a LM as prior in a neural translation model (TM). Specifically, we add a regularization term, which pushes the output distributions of the…
+  - via: `cite_of:1e5b826ddf0754f6e93234ba1260bd939c255e7f` (round 1)
+- **Learning Adaptive Segmentation Policy for Simultaneous Translation** (2020) — Ruiqing Zhang, Chuanqiang Zhang, Zhongjun He, Hua Wu, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 52
+  - https://www.semanticscholar.org/paper/1c0660a4ab3d22cc159574f9322f380cd84ab5aa
+  - doi:10.18653/v1/2020.emnlp-main.178
+  - Balancing accuracy and latency is a great challenge for simultaneous translation. To achieve high accuracy, the model usually needs to wait for more streaming text before translation, which results in increased latency. However, keeping low latency would probably hurt accuracy. Therefore, it is essential to segment the ASR output into appropriate units for translation. Inspired by human interprete…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **Dynamic Data Selection and Weighting for Iterative Back-Translation** (2020) — Zi-Yi Dou, Antonios Anastasopoulos, Graham Neubig — _Conference on Empirical Methods in Natural Language Processing_ — cites: 51
+  - https://www.semanticscholar.org/paper/1bd43c91ecbf46098ef2b521c5367e849819960e
+  - arXiv:2004.03672 · doi:10.18653/v1/2020.emnlp-main.475
+  - Back-translation has proven to be an effective method to utilize monolingual data in neural machine translation (NMT), and iteratively conducting back-translation can further improve the model performance. Selecting which monolingual data to back-translate is crucial, as we require that the resulting synthetic data are of high quality \textit{and} reflect the target domain. To achieve these two go…
+  - via: `query:back-translation simultaneous` (round 0)
+- **Simulated Multiple Reference Training Improves Low-Resource Machine Translation** (2020) — Huda Khayrallah, Brian Thompson, Matt Post, Philipp Koehn — _Conference on Empirical Methods in Natural Language Processing_ — cites: 40
+  - https://www.semanticscholar.org/paper/7dfbd4a728a78aaefc6415a7baf59694278bb942
+  - arXiv:2004.14524 · doi:10.18653/v1/2020.emnlp-main.7
+  - Many valid translations exist for a given sentence, and yet machine translation (MT) is trained with a single reference translation, exacerbating data sparsity in low-resource settings. We introduce a novel MT training method that approximates the full space of possible translations by: sampling a paraphrase of the reference sentence from a paraphraser and training the MT model to predict the para…
+  - via: `cite_of:0ee468b9b709a2610c4b574d67218e7960350224` (round 1)
+- **Why Skip If You Can Combine: A Simple Knowledge Distillation Technique for Intermediate Layers** (2020) — Yimeng Wu, Peyman Passban, Mehdi Rezagholizade, Qun Liu — _Conference on Empirical Methods in Natural Language Processing_ — cites: 38
+  - https://www.semanticscholar.org/paper/0d5a3fd61911590e887927c39e3cedd36c9c3c8c
+  - arXiv:2010.03034 · doi:10.18653/V1/2020.EMNLP-MAIN.74
+  - With the growth of computing power neural machine translation (NMT) models also grow accordingly and become better. However, they also become harder to deploy on edge devices due to memory constraints. To cope with this problem, a common practice is to distill knowledge from a large and accurately-trained teacher network (T) into a compact student network (S). Although knowledge distillation (KD)…
+  - via: `cite_of:1b24b7b4ac2427d20ab60c8451563eb8d99caf9c` (round 1)
+- **Simultaneous Machine Translation with Visual Context** (2020) — Ozan Caglayan, Julia Ive, Veneta Haralampieva, P. Madhyastha, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 31
+  - https://www.semanticscholar.org/paper/85c972b7f2e1f9ae61d681ed8b125cf7620d446e
+  - arXiv:2009.07310 · doi:10.18653/v1/2020.emnlp-main.184
+  - Simultaneous machine translation (SiMT) aims to translate a continuous input text stream into another language with the lowest latency and highest quality possible. The translation thus has to start with an incomplete source text, which is read progressively, creating the need for anticipation. In this paper, we seek to understand whether the addition of visual information can compensate for the m…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Improving Simultaneous Translation by Incorporating Pseudo-References with Fewer Reorderings** (2020) — Junkun Chen, Renjie Zheng, Atsuhito Kita, Mingbo Ma, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 29
+  - https://www.semanticscholar.org/paper/27902aaa105053b15b66ad2b3384b91734878edf
+  - arXiv:2010.11247 · doi:10.18653/v1/2021.emnlp-main.473
+  - Simultaneous translation is vastly different from full-sentence translation, in the sense that it starts translation before the source sentence ends, with only a few words delay. However, due to the lack of large-scale, high-quality simultaneous translation datasets, most such systems are still trained on conventional full-sentence bitexts. This is far from ideal for the simultaneous scenario due…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Distilling Multiple Domains for Neural Machine Translation** (2020) — Anna Currey, Prashant Mathur, Georgiana Dinu — _Conference on Empirical Methods in Natural Language Processing_ — cites: 27
+  - https://www.semanticscholar.org/paper/32be03e29c49c979c13faf922ecb851c50637773
+  - doi:10.18653/V1/2020.EMNLP-MAIN.364
+  - Neural machine translation achieves impressive results in high-resource conditions, but performance often suffers when the input domain is low-resource. The standard practice of adapting a separate model for each domain of interest does not scale well in practice from both a quality perspective (brittleness under domain shift) as well as a cost perspective (added maintenance and inference complexi…
+  - via: `cite_of:1b24b7b4ac2427d20ab60c8451563eb8d99caf9c` (round 1)
+- **Data Rejuvenation: Exploiting Inactive Training Examples for Neural Machine Translation** (2020) — Wenxiang Jiao, Xing Wang, Shilin He, Irwin King, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 26
+  - https://www.semanticscholar.org/paper/8bb84249b548e58494ed66efba86621449d49dc1
+  - arXiv:2010.02552 · doi:10.18653/v1/2020.emnlp-main.176
+  - Large-scale training datasets lie at the core of the recent success of neural machine translation (NMT) models. However, the complex patterns and potential noises in the large-scale data make training NMT models difficult. In this work, we explore to identify the inactive training examples which contribute less to the model performance, and show that the existence of inactive examples depends on t…
+  - via: `cite_of:1e5b826ddf0754f6e93234ba1260bd939c255e7f` (round 1)
+- **Unsupervised Data Augmentation with Naive Augmentation and without Unlabeled Data** (2020) — David Lowell, Brian Howard, Zachary Chase Lipton, Byron C. Wallace — _Conference on Empirical Methods in Natural Language Processing_ — cites: 25
+  - https://www.semanticscholar.org/paper/80b747af8d86541cf53198519c8fa51109eed4f9
+  - arXiv:2010.11966 · doi:10.18653/v1/2021.emnlp-main.408
+  - Unsupervised Data Augmentation (UDA) is a semisupervised technique that applies a consistency loss to penalize differences between a model’s predictions on (a) observed (unlabeled) examples; and (b) corresponding ‘noised’ examples produced via data augmentation. While UDA has gained popularity for text classification, open questions linger over which design decisions are necessary and how to exten…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Direct Segmentation Models for Streaming Speech Translation** (2020) — Javier Iranzo-Sánchez, Adrià Giménez-Pastor, J. Silvestre-Cerdà, Pau Baquero-Arnal, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 22
+  - https://www.semanticscholar.org/paper/38394a6dabf474eb5eff911ba8657658932c5af6
+  - doi:10.18653/v1/2020.emnlp-main.206
+  - The cascade approach to Speech Translation (ST) is based on a pipeline that concatenates an Automatic Speech Recognition (ASR) system followed by a Machine Translation (MT) system. These systems are usually connected by a segmenter that splits the ASR output into hopefully, semantically self-contained chunks to be fed into the MT system. This is specially challenging in the case of streaming ST, w…
+  - via: `query:streaming speech translation` (round 0)
+- **Self-Induced Curriculum Learning in Self-Supervised Neural Machine Translation** (2020) — Dana Ruiter, Josef van Genabith, C. España-Bonet — _Conference on Empirical Methods in Natural Language Processing_ — cites: 14
+  - https://www.semanticscholar.org/paper/57fcc63b95a0b4036e57d89f8f5289b086539bd6
+  - doi:10.18653/v1/2020.emnlp-main.202
+  - Self-supervised neural machine translation (SSNMT) jointly learns to identify and select suitable training data from comparable (rather than parallel) corpora and to translate, in a way that the two tasks support each other in a virtuous circle. In this study, we provide an in-depth analysis of the sampling choices the SSNMT model makes during training. We show how, without it having been told to…
+  - via: `query:self-training simultaneous translation` (round 0)
+- **Generating Diverse Translation from Model Distribution with Dropout** (2020) — Xuanfu Wu, Yang Feng, Chenze Shao — _Conference on Empirical Methods in Natural Language Processing_ — cites: 14
+  - https://www.semanticscholar.org/paper/99959092c6eadcf359ed8f74de2168244bbe402e
+  - arXiv:2010.08178 · doi:10.18653/v1/2020.emnlp-main.82
+  - Despite the improvement of translation quality, neural machine translation (NMT) often suffers from the lack of diversity in its generation. In this paper, we propose to generate diverse translations by deriving a large number of possible models with Bayesian modelling and sampling models from them for inference. The possible models are obtained by applying concrete dropout to the NMT model and ea…
+  - via: `cite_of:3360768fcb265a8b7c1ee5ba7cfe03de0e2fad62` (round 2)
+- **Ensemble Distillation for Structured Prediction: Calibrated, Accurate, Fast—Choose Three** (2020) — Steven Reich, David Mueller, Nicholas Andrews — _Conference on Empirical Methods in Natural Language Processing_ — cites: 13
+  - https://www.semanticscholar.org/paper/038e28a5e121ee3c7508dee329b3af9ba79fa818
+  - arXiv:2010.06721 · doi:10.18653/v1/2020.emnlp-main.450
+  - Modern neural networks do not always produce well-calibrated predictions, even when trained with a proper scoring function such as cross-entropy. In classification settings, simple methods such as isotonic regression or temperature scaling may be used in conjunction with a held-out dataset to calibrate model outputs. However, extending these methods to structured prediction is not always straightf…
+  - via: `cite_of:58d34a4fb936ffe95917d8fb4016ff5e3520429a` (round 2)
+- **Simultaneous Translation** (2020) — Liang Huang, Colin Cherry, Mingbo Ma, N. Arivazhagan, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 5
+  - https://www.semanticscholar.org/paper/00cad0201287c7ff08c6bcf1a9be2425321c645c
+  - doi:10.18653/v1/2020.emnlp-tutorials.6
+  - Simultaneous translation, which performs translation concurrently with the source speech, is widely useful in many scenarios such as international conferences, negotiations, press releases, legal proceedings, and medicine. This problem has long been considered one of the hardest problems in AI and one of its holy grails. Recently, with rapid improvements in machine translation, speech recognition,…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **A Streaming Approach for Efficient Batched Beam Search** (2020) — Kevin Yang, Violet Z. Yao, John DeNero, D. Klein — _Conference on Empirical Methods in Natural Language Processing_ — cites: 1
+  - https://www.semanticscholar.org/paper/64f853a54611cf1e58f335d1a793999be4faefca
+  - arXiv:2010.02164 · doi:10.18653/v1/2020.emnlp-main.366
+  - We propose an efficient batching strategy for variable-length decoding on GPU architectures. During decoding, when candidates terminate or are pruned according to heuristics, our streaming approach periodically "refills" the batch before proceeding with a selected subset of candidates. We apply our method to variable-width beam search on a state-of-the-art machine translation model. Our method dec…
+  - via: `cite_of:c7b361427a54b309caea8ef69ed59b50cd54ac67` (round 1)
+- **Training on Synthetic Noise Improves Robustness to Natural Noise in Machine Translation** (2019) — Vladimir Karpukhin, Omer Levy, Jacob Eisenstein, Marjan Ghazvininejad — _Conference on Empirical Methods in Natural Language Processing_ — cites: 130
+  - https://www.semanticscholar.org/paper/0b9ac1035918823ffca1c6f55ec316b42d4e033f
+  - arXiv:1902.01509 · doi:10.18653/v1/D19-5506
+  - Contemporary machine translation systems achieve greater coverage by applying subword models such as BPE and character-level CNNs, but these methods are highly sensitive to orthographical variations such as spelling mistakes. We show how training on a mild amount of random synthetic noise can dramatically improve robustness to these variations, without diminishing performance on clean text. We foc…
+  - via: `ref_of:1e7d3a9846da556bc7b84ae1410d257b89448c30` (round 1)
+- **Multilingual Neural Machine Translation with Language Clustering** (2019) — Xu Tan, Jiale Chen, Di He, Yingce Xia, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 123
+  - https://www.semanticscholar.org/paper/3198d56ff8998070e9b2fd663d8257b5b697e0e9
+  - arXiv:1908.09324 · doi:10.18653/v1/D19-1089
+  - Multilingual neural machine translation (NMT), which translates multiple languages using a single model, is of great practical importance due to its advantages in simplifying the training process, reducing online maintenance costs, and enhancing low-resource and zero-shot translation. Given there are thousands of languages in the world and some of them are very different, it is extremely burdensom…
+  - via: `cite_of:1b24b7b4ac2427d20ab60c8451563eb8d99caf9c` (round 1)
+- **Data augmentation using back-translation for context-aware neural machine translation** (2019) — Amane Sugiyama, N. Yoshinaga — _Conference on Empirical Methods in Natural Language Processing_ — cites: 103
+  - https://www.semanticscholar.org/paper/c6801d553a43530b192309ef4364a43e33e4067f
+  - doi:10.18653/v1/D19-6504
+  - A single sentence does not always convey information that is enough to translate it into other languages. Some target languages need to add or specialize words that are omitted or ambiguous in the source languages (e.g, zero pronouns in translating Japanese to English or epicene pronouns in translating English to French). To translate such ambiguous sentences, we need contexts beyond a single sent…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Improving Back-Translation with Uncertainty-based Confidence Estimation** (2019) — Shuo Wang, Yang Liu, Chao Wang, Huanbo Luan, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 84
+  - https://www.semanticscholar.org/paper/dae35736329852c83d32cefd66448dc73cd73368
+  - arXiv:1909.00157 · doi:10.18653/v1/D19-1073
+  - While back-translation is simple and effective in exploiting abundant monolingual corpora to improve low-resource neural machine translation (NMT), the synthetic bilingual corpora generated by NMT models trained on limited authentic bilingual data are inevitably noisy. In this work, we propose to quantify the confidence of NMT model predictions based on model uncertainty. With word- and sentence-l…
+  - via: `query:back-translation simultaneous` (round 0)
+- **Simple and Effective Noisy Channel Modeling for Neural Machine Translation** (2019) — Kyra Yee, Nathan Ng, Yann Dauphin, Michael Auli — _Conference on Empirical Methods in Natural Language Processing_ — cites: 83
+  - https://www.semanticscholar.org/paper/c7b361427a54b309caea8ef69ed59b50cd54ac67
+  - arXiv:1908.05731 · doi:10.18653/v1/D19-1571
+  - Previous work on neural noisy channel modeling relied on latent variable models that incrementally process the source and target sentence. This makes decoding decisions based on partial source prefixes even though the full source is available. We pursue an alternative approach based on standard sequence to sequence models which utilize the entire source. These models perform remarkably well as cha…
+  - via: `query:prefix-to-prefix translation` (round 0)
+- **Simpler and Faster Learning of Adaptive Policies for Simultaneous Translation** (2019) — Baigong Zheng, Renjie Zheng, Mingbo Ma, Liang Huang — _Conference on Empirical Methods in Natural Language Processing_ — cites: 80
+  - https://www.semanticscholar.org/paper/fe65988d07e87e32333c237b04a6c42826c2f6dc
+  - arXiv:1909.01559 · doi:10.18653/v1/D19-1137
+  - Simultaneous translation is widely useful but remains challenging. Previous work falls into two main categories: (a) fixed-latency policies such as Ma et al. (2019) and (b) adaptive policies such as Gu et al. (2017). The former are simple and effective, but have to aggressively predict future content due to diverging source-target word order; the latter do not anticipate, but suffer from unstable…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Hint-Based Training for Non-Autoregressive Machine Translation** (2019) — Zhuohan Li, Zi Lin, Di He, Fei Tian, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 77
+  - https://www.semanticscholar.org/paper/5b446648504afeecf7c73028aa02c2da16db6224
+  - arXiv:1909.06708 · doi:10.18653/v1/D19-1573
+  - Due to the unparallelizable nature of the autoregressive factorization, AutoRegressive Translation (ART) models have to generate tokens sequentially during decoding and thus suffer from high inference latency. Non-AutoRegressive Translation (NART) models were proposed to reduce the inference time, but could only achieve inferior translation accuracy. In this paper, we proposed a novel approach to…
+  - via: `ref_of:b7d12aec8a0152ec4921dfa43ab525a63b334385` (round 2)
+- **An Exploration of Data Augmentation and Sampling Techniques for Domain-Agnostic Question Answering** (2019) — S. Longpre, Yi Lu, Zhucheng Tu, Christopher DuBois — _Conference on Empirical Methods in Natural Language Processing_ — cites: 73
+  - https://www.semanticscholar.org/paper/22e510c1f0fffed225c49dc5e5f57a9d80f0d61f
+  - arXiv:1912.02145 · doi:10.18653/v1/D19-5829
+  - To produce a domain-agnostic question answering model for the Machine Reading Question Answering (MRQA) 2019 Shared Task, we investigate the relative benefits of large pre-trained language models, various data sampling strategies, as well as query and context paraphrases generated by back-translation. We find a simple negative sampling technique to be particularly effective, even though it is typi…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **From Research to Production and Back: Ludicrously Fast Neural Machine Translation** (2019) — Young Jin Kim, Marcin Junczys-Dowmunt, Hany Hassan, Kenneth Heafield, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 73
+  - https://www.semanticscholar.org/paper/ba08784bb30de51f72f88d5d64a64310d030db10
+  - doi:10.18653/v1/D19-5632
+  - This paper describes the submissions of the “Marian” team to the WNGT 2019 efficiency shared task. Taking our dominating submissions to the previous edition of the shared task as a starting point, we develop improved teacher-student training via multi-agent dual-learning and noisy backward-forward translation for Transformer-based student models. For efficient CPU-based decoding, we propose pre-pa…
+  - via: `ref_of:0df9c19659388e55745c290ace520491c2985d9b` (round 1)
+- **Grammatical Error Correction in Low-Resource Scenarios** (2019) — Jakub Náplava, Milan Straka — _Conference on Empirical Methods in Natural Language Processing_ — cites: 66
+  - https://www.semanticscholar.org/paper/9ad2f58f1e7f3b3d825d5c6b174fb38f601c6df0
+  - arXiv:1910.00353 · doi:10.18653/v1/D19-5545
+  - Grammatical error correction in English is a long studied problem with many existing systems and datasets. However, there has been only a limited research on error correction of other languages. In this paper, we present a new dataset AKCES-GEC on grammatical error correction for Czech. We then make experiments on Czech, German and Russian and show that when utilizing synthetic parallel corpus, Tr…
+  - via: `query:available https github machine translation` (round 2)
+- **Improving Neural Machine Translation Robustness via Data Augmentation: Beyond Back-Translation** (2019) — Zhenhao Li, Lucia Specia — _Conference on Empirical Methods in Natural Language Processing_ — cites: 45
+  - https://www.semanticscholar.org/paper/0d1f3f5a6bf3393c517f07f3fb2107e4ad5a7e85
+  - arXiv:1910.03009 · doi:10.18653/v1/D19-5543
+  - Neural Machine Translation (NMT) models have been proved strong when translating clean texts, but they are very sensitive to noise in the input. Improving NMT models robustness can be seen as a form of “domain” adaption to noise. The recently created Machine Translation on Noisy Text task corpus provides noisy-clean parallel data for a few language pairs, but this data is very limited in size and…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Iterative Dual Domain Adaptation for Neural Machine Translation** (2019) — Jiali Zeng, Yang Liu, Jinsong Su, Yubin Ge, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 36
+  - https://www.semanticscholar.org/paper/894c7a5fd756ca31bf92561f8e12c824637bef57
+  - arXiv:1912.07239 · doi:10.18653/v1/D19-1078
+  - Previous studies on the domain adaptation for neural machine translation (NMT) mainly focus on the one-pass transferring out-of-domain translation knowledge to in-domain NMT model. In this paper, we argue that such a strategy fails to fully extract the domain-shared translation knowledge, and repeatedly utilizing corpora of different domains can lead to better distillation of domain-shared transla…
+  - via: `cite_of:1b24b7b4ac2427d20ab60c8451563eb8d99caf9c` (round 1)
+- **Machine Translation of Restaurant Reviews: New Corpus for Domain Adaptation and Robustness** (2019) — Alexandre Berard, Ioan Calapodescu, Marc Dymetman, Claude Roux, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 30
+  - https://www.semanticscholar.org/paper/aaa3437de6b4014bfa25216c20dee8d086f6e816
+  - arXiv:1910.14589 · doi:10.18653/v1/D19-5617
+  - We share a French-English parallel corpus of Foursquare restaurant reviews, and define a new task to encourage research on Neural Machine Translation robustness and domain adaptation, in a real-world scenario where better-quality MT would be greatly beneficial. We discuss the challenges of such user-generated content, and train good baseline models that build upon the latest techniques for MT robu…
+  - via: `cite_of:0b9ac1035918823ffca1c6f55ec316b42d4e033f` (round 2)
+- **Facebook AI’s WAT19 Myanmar-English Translation Task Submission** (2019) — Peng-Jen Chen, Jiajun Shen, Matt Le, Vishrav Chaudhary, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 29
+  - https://www.semanticscholar.org/paper/062d8a57731ecc99575af7c4e4c8a708c80c6328
+  - arXiv:1910.06848 · doi:10.18653/v1/D19-5213
+  - This paper describes Facebook AI’s submission to the WAT 2019 Myanmar-English translation task. Our baseline systems are BPE-based transformer models. We explore methods to leverage monolingual data to improve generalization, including self-training, back-translation and their combination. We further improve results by using noisy channel re-ranking and ensembling. We demonstrate that these techni…
+  - via: `cite_of:c7b361427a54b309caea8ef69ed59b50cd54ac67` (round 1)
+- **Understanding Data Augmentation in Neural Machine Translation: Two Perspectives towards Generalization** (2019) — Guanlin Li, Lemao Liu, Guoping Huang, Conghui Zhu, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 25
+  - https://www.semanticscholar.org/paper/4d13a1bd81e8a09fbcfc2390387e298c635b1f9e
+  - doi:10.18653/v1/D19-1570
+  - Many Data Augmentation (DA) methods have been proposed for neural machine translation. Existing works measure the superiority of DA methods in terms of their performance on a specific test set, but we find that some DA methods do not exhibit consistent improvements across translation tasks. Based on the observation, this paper makes an initial attempt to answer a fundamental question: what benefit…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Speculative Beam Search for Simultaneous Translation** (2019) — Renjie Zheng, Mingbo Ma, Baigong Zheng, Liang Huang — _Conference on Empirical Methods in Natural Language Processing_ — cites: 24
+  - https://www.semanticscholar.org/paper/c6a1d71e569df933559c8d1b810b5a6433fb9439
+  - arXiv:1909.05421 · doi:10.18653/v1/D19-1144
+  - Beam search is universally used in (full-sentence) machine translation but its application to simultaneous translation remains highly non-trivial, where output words are committed on the fly. In particular, the recently proposed wait-k policy (Ma et al., 2018) is a simple and effective method that (after an initial wait) commits one output word on receiving each input word, making beam search seem…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **Benefits of Data Augmentation for NMT-based Text Normalization of User-Generated Content** (2019) — C. Veliz, Orphée De Clercq, Veronique Hoste — _Conference on Empirical Methods in Natural Language Processing_ — cites: 11
+  - https://www.semanticscholar.org/paper/7c1580277c56ad43956761fa3b3cf75af1fcf3d3
+  - doi:10.18653/v1/D19-5536
+  - One of the most persistent characteristics of written user-generated content (UGC) is the use of non-standard words. This characteristic contributes to an increased difficulty to automatically process and analyze UGC. Text normalization is the task of transforming lexical variants to their canonical forms and is often used as a pre-processing step for conventional NLP tasks in order to overcome th…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **English-Myanmar Supervised and Unsupervised NMT: NICT’s Machine Translation Systems at WAT-2019** (2019) — Rui Wang, Haipeng Sun, Kehai Chen, Chenchen Ding, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 4
+  - https://www.semanticscholar.org/paper/0ee7daf8133c869cb2da7abdaed4544692938df0
+  - doi:10.18653/v1/D19-5209
+  - This paper presents the NICT’s participation (team ID: NICT) in the 6th Workshop on Asian Translation (WAT-2019) shared translation task, specifically Myanmar (Burmese) - English task in both translation directions. We built neural machine translation (NMT) systems for these tasks. Our NMT systems were trained with language model pretraining. Back-translation technology is adopted to NMT. Our NMT…
+  - via: `query:machine translation nmt machine translation` (round 1)
+- **Supervised neural machine translation based on data augmentation and improved training & inference process** (2019) — Yixuan Tong, Liang Liang, Boyan Liu, Shanshan Jiang, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 3
+  - https://www.semanticscholar.org/paper/863337886651d22a33f4e93e2dfe1e8a8ccb521e
+  - doi:10.18653/v1/D19-5218
+  - This is the second time for SRCB to participate in WAT. This paper describes the neural machine translation systems for the shared translation tasks of WAT 2019. We participated in ASPEC tasks and submitted results on English-Japanese, Japanese-English, Chinese-Japanese, and Japanese-Chinese four language pairs. We employed the Transformer model as the baseline and experimented relative position r…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Long Warm-up and Self-Training: Training Strategies of NICT-2 NMT System at WAT-2019** (2019) — K. Imamura, E. Sumita — _Conference on Empirical Methods in Natural Language Processing_ — cites: 1
+  - https://www.semanticscholar.org/paper/57f2ae33132f9a12eeb4fc42a588ebc1de26dfd4
+  - doi:10.18653/v1/D19-5217
+  - This paper describes the NICT-2 neural machine translation system at the 6th Workshop on Asian Translation. This system employs the standard Transformer model but features the following two characteristics. One is the long warm-up strategy, which performs a longer warm-up of the learning rate at the start of the training than conventional approaches. Another is that the system introduces self-trai…
+  - via: `query:self-training simultaneous translation` (round 0)
+- **Phrase-Based & Neural Unsupervised Machine Translation** (2018) — Guillaume Lample, Myle Ott, Alexis Conneau, Ludovic Denoyer, et al. — _Conference on Empirical Methods in Natural Language Processing_ — cites: 712
+  - https://www.semanticscholar.org/paper/48925fef94500cf19ee220ed74217816f1ab5e60
+  - arXiv:1804.07755 · doi:10.18653/v1/D18-1549
+  - Machine translation systems achieve near human-level performance on some languages, yet their effectiveness strongly relies on the availability of large amounts of parallel sentences, which hinders their applicability to the majority of language pairs. This work investigates how to learn to translate when having access to only large monolingual corpora in each language. We propose two model varian…
+  - via: `ref_of:12442420adf1c36887fafd108f4b7f4fc822ae60` (round 1)
+- **SwitchOut: an Efficient Data Augmentation Algorithm for Neural Machine Translation** (2018) — Xinyi Wang, Hieu Pham, Zihang Dai, Graham Neubig — _Conference on Empirical Methods in Natural Language Processing_ — cites: 208
+  - https://www.semanticscholar.org/paper/0ee468b9b709a2610c4b574d67218e7960350224
+  - arXiv:1808.07512 · doi:10.18653/v1/D18-1100
+  - In this work, we examine methods for data augmentation for text-based tasks such as neural machine translation (NMT). We formulate the design of a data augmentation policy with desirable properties as an optimization problem, and derive a generic analytic solution. This solution not only subsumes some existing augmentation schemes, but also leads to an extremely simple data augmentation strategy f…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Back-Translation Sampling by Targeting Difficult Words in Neural Machine Translation** (2018) — Marzieh Fadaee, C. Monz — _Conference on Empirical Methods in Natural Language Processing_ — cites: 110
+  - https://www.semanticscholar.org/paper/08170cde0cdeef674a78bdff5680adeb365844d4
+  - arXiv:1808.09006 · doi:10.18653/v1/D18-1040
+  - Neural Machine Translation has achieved state-of-the-art performance for several language pairs using a combination of parallel and synthetic data. Synthetic data is often generated by back-translating sentences randomly sampled from monolingual data using a reverse translation model. While back-translation has been shown to be very effective in many cases, it is not entirely clear why. In this wo…
+  - via: `ref_of:dae35736329852c83d32cefd66448dc73cd73368` (round 1)
+- **Prediction Improves Simultaneous Neural Machine Translation** (2018) — Ashkan Alinejad, Maryam Siahbani, Anoop Sarkar — _Conference on Empirical Methods in Natural Language Processing_ — cites: 59
+  - https://www.semanticscholar.org/paper/8205e94bcc4fc5f28d65a5358bf190f8afd9b4fc
+  - doi:10.18653/v1/D18-1337
+  - Simultaneous speech translation aims to maintain translation quality while minimizing the delay between reading input and incrementally producing the output. We propose a new general-purpose prediction action which predicts future words in the input to improve quality and minimize delay in simultaneous translation. We train this agent using reinforcement learning with a novel reward function. Our…
+  - via: `query:simultaneous speech translation` (round 0)
+
+## NAACL (53)
+
+- **Mitigating Hallucinated Translations in Large Language Models with Hallucination-focused Preference Optimization** (2025) — Zilu Tang, Rajen Chatterjee, Sarthak Garg — _North American Chapter of the Association for Computational Linguistics_ — cites: 9
+  - https://www.semanticscholar.org/paper/1d1af14aa70f86b013e616cfd07fa8a164652d84
+  - arXiv:2501.17295 · doi:10.48550/arXiv.2501.17295
+  - Machine Translation (MT) is undergoing a paradigm shift, with systems based on fine-tuned large language models (LLM) becoming increasingly competitive with traditional encoder-decoder models trained specifically for translation tasks. However, LLM-based systems are at a higher risk of generating hallucinations, which can severely undermine user's trust and safety. Most prior research on hallucina…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **Automatic Input Rewriting Improves Translation with Large Language Models** (2025) — Dayeon Ki, Marine Carpuat — _North American Chapter of the Association for Computational Linguistics_ — cites: 4
+  - https://www.semanticscholar.org/paper/07e6723fe95764fdbd9221d78a814984ae9738b0
+  - arXiv:2502.16682 · doi:10.48550/arXiv.2502.16682
+  - Can we improve machine translation (MT) with LLMs by rewriting their inputs automatically? Users commonly rely on the intuition that well-written text is easier to translate when using off-the-shelf MT systems. LLMs can rewrite text in many ways but in the context of MT, these capabilities have been primarily exploited to rewrite outputs via post-editing. We present an empirical study of 21 input…
+  - via: `query:large language simultaneous translation` (round 1)
+- **Prepending or Cross-Attention for Speech-to-Text? An Empirical Comparison** (2025) — Tsz Kin Lam, Marco Gaido, Sara Papi, L. Bentivogli, et al. — _North American Chapter of the Association for Computational Linguistics_ — cites: 4
+  - https://www.semanticscholar.org/paper/2c3c325334f34e066096e5398afc8c0ea0bcc9cd
+  - arXiv:2501.02370 · doi:10.48550/arXiv.2501.02370
+  - Following the remarkable success of Large Language Models (LLMs) in NLP tasks, there is increasing interest in extending their capabilities to speech -- the most common form of communication. The most widespread approach to integrating speech into LLMs is dense feature prepending (DFP), which prepends the projected speech representations to the textual representations, allowing end-to-end training…
+  - via: `query:large language llms speech translation` (round 1)
+- **Low-resource Machine Translation for Code-switched Kazakh-Russian Language Pair** (2025) — Maksim Borisov, Zhanibek Kozhirbayev, V. Malykh — _North American Chapter of the Association for Computational Linguistics_ — cites: 4
+  - https://www.semanticscholar.org/paper/95a57fda3e078fe649b3fe65cf724b5f1aaa59e7
+  - arXiv:2503.20007 · doi:10.48550/arXiv.2503.20007
+  - Machine translation for low resource language pairs is a challenging task. This task could become extremely difficult once a speaker uses code switching. We propose a method to build a machine translation model for code-switched Kazakh-Russian language pair with no labeled data. Our method is basing on generation of synthetic data. Additionally, we present the first codeswitching Kazakh-Russian pa…
+  - via: `query:language pairs simultaneous translation` (round 1)
+- **Beyond the Mode: Sequence-Level Distillation of Multilingual Translation Models for Low-Resource Language Pairs** (2025) — Aarón Galiano Jiménez, J. A. Pérez-Ortiz, F. Sánchez-Martínez, V. M. Sánchez-Cartagena — _North American Chapter of the Association for Computational Linguistics_ — cites: 3
+  - https://www.semanticscholar.org/paper/5851bafad37bcf53f49c93ee8291cbd420dd674e
+  - doi:10.18653/v1/2025.findings-naacl.372
+  - This paper delves into sequence-level knowledge distillation (KD) of multilingual pre-trained translation models. We posit that, beyond the approximated mode obtained via beam search, the whole output distribution of the teacher contains valuable insights for students. We explore the potential of n -best lists from beam search to guide student’s learning and then investigate alternative decoding m…
+  - via: `query:language pairs simultaneous translation` (round 1)
+- **Investigating Hallucinations in Simultaneous Machine Translation: Knowledge Distillation Solution and Components Analysis** (2025) — Donglei Yu, Xiaomian Kang, Yuchen Liu, Feifei Zhai, et al. — _North American Chapter of the Association for Computational Linguistics_ — cites: 1
+  - https://www.semanticscholar.org/paper/e2ee9c415657f480e9df0490b1396a169e56531c
+  - doi:10.18653/v1/2025.naacl-long.364
+  - .
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Self-Vocabularizing Training for Neural Machine Translation** (2025) — Pin-Jie Lin, Ernie Chang — _North American Chapter of the Association for Computational Linguistics_ — cites: 0
+  - https://www.semanticscholar.org/paper/11bb2b2c9b8cfda0c80e0da05223a3701d76a905
+  - arXiv:2503.13837 · doi:10.48550/arXiv.2503.13837
+  - Past vocabulary learning techniques identify relevant vocabulary before training, relying on statistical and entropy-based assumptions that largely neglect the role of model training. Empirically, we observe that trained translation models are induced to use a byte-pair encoding (BPE) vocabulary subset distinct from the original BPE vocabulary, leading to performance improvements when retrained wi…
+  - via: `query:self-training simultaneous translation` (round 0)
+- **Improving Machine Translation with Human Feedback: An Exploration of Quality Estimation as a Reward Model** (2024) — Zhiwei He, Xing Wang, Wenxiang Jiao, Zhuosheng Zhang, et al. — _North American Chapter of the Association for Computational Linguistics_ — cites: 39
+  - https://www.semanticscholar.org/paper/5b9fad3e2b2cc5dd23b01e0089bb7b6f6865cb82
+  - arXiv:2401.12873 · doi:10.48550/arXiv.2401.12873
+  - Insufficient modeling of human preferences within the reward model is a major obstacle for leveraging human feedback to improve translation quality. Fortunately, quality estimation (QE), which predicts the quality of a given translation without reference, has achieved impressive alignment with human evaluations in the last two years. In this work, we investigate the potential of employing the QE m…
+  - via: `query:translation quality machine translation` (round 1)
+- **MSc-SQL: Multi-Sample Critiquing Small Language Models For Text-To-SQL Translation** (2024) — S. Gorti, Ilan Gofman, Zhaoyan Liu, Jiapeng Wu, et al. — _North American Chapter of the Association for Computational Linguistics_ — cites: 26
+  - https://www.semanticscholar.org/paper/606c29f7cb5dd740afe2e5182611040b04d3699d
+  - arXiv:2410.12916 · doi:10.48550/arXiv.2410.12916
+  - Text-to-SQL generation enables non-experts to interact with databases via natural language. Recent advances rely on large closed-source models like GPT-4 that present challenges in accessibility, privacy, and latency. To address these issues, we focus on developing small, efficient, and open-source text-to-SQL models. We demonstrate the benefits of sampling multiple candidate SQL generations and p…
+  - via: `query:language pairs simultaneous translation` (round 1)
+- **AI-Assisted Human Evaluation of Machine Translation** (2024) — Vilém Zouhar, Tom Kocmi, Mrinmaya Sachan — _North American Chapter of the Association for Computational Linguistics_ — cites: 19
+  - https://www.semanticscholar.org/paper/7e59fe96d896f66abafb6a772b0822a29d2b0568
+  - arXiv:2406.12419 · doi:10.48550/arXiv.2406.12419
+  - Annually, research teams spend large amounts of money to evaluate the quality of machine translation systems (WMT, inter alia). This is expensive because it requires a lot of expert human labor. In the recently adopted annotation protocol, Error Span Annotation (ESA), annotators mark erroneous parts of the translation and then assign a final score. A lot of the annotator time is spent on scanning…
+  - via: `query:translation quality machine translation` (round 1)
+- **Grammar-based Data Augmentation for Low-Resource Languages: The Case of Guarani-Spanish Neural Machine Translation** (2024) — Agustín Lucas, Alexis Baladón, Victoria Pardiñas, Marvin Agüero-Torales, et al. — _North American Chapter of the Association for Computational Linguistics_ — cites: 12
+  - https://www.semanticscholar.org/paper/1dc706bd7b93879e8d7b816bce5e10ae27526580
+  - doi:10.18653/v1/2024.naacl-long.354
+  - One of the main problems low-resource languages face in NLP can be pictured as a vicious circle: data is needed to build and test tools, but the available text is scarce and there are not powerful tools to collect it.In order to break this circle for Guarani, we explore if text automatically generated from a grammar can work as a Data Augmentation technique to boost the performance of Guarani-Span…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **MT-PATCHER: Selective and Extendable Knowledge Distillation from Large Language Models for Machine Translation** (2024) — Jiahuan Li, Shanbo Cheng, Shujian Huang, Jiajun Chen — _North American Chapter of the Association for Computational Linguistics_ — cites: 11
+  - https://www.semanticscholar.org/paper/38270d319b74916ab0022cb740e3e1dd68fe6459
+  - arXiv:2403.09522 · doi:10.48550/arXiv.2403.09522
+  - Large Language Models (LLM) have demonstrated their strong ability in the field of machine translation, yet they suffer from high computational cost and latency. Therefore, transferring translation knowledge from giant LLMs to medium-sized machine translation models is a promising research direction. However, traditional knowledge distillation methods ignore the capability of student and teacher m…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **A Bayesian Optimization Approach to Machine Translation Reranking** (2024) — Julius Cheng, Maike Zufle, Vilém Zouhar, Andreas Vlachos — _North American Chapter of the Association for Computational Linguistics_ — cites: 2
+  - https://www.semanticscholar.org/paper/ed58524b793a4ef21acd5f6421acc45077aa492f
+  - arXiv:2411.09694 · doi:10.48550/arXiv.2411.09694
+  - Reranking a list of candidates from a machine translation system with an external scoring model and returning the highest-scoring candidate remains a simple and effective method for improving the overall output quality. Translation scoring models continue to grow in size, with the best models being comparable to generation models. Thus, reranking can add substantial computational cost to the trans…
+  - via: `cite_of:c7b361427a54b309caea8ef69ed59b50cd54ac67` (round 1)
+- **CA*: Addressing Evaluation Pitfalls in Computation-Aware Latency for Simultaneous Speech Translation** (2024) — Xi Xu, Wenda Xu, Siqi Ouyang, Lei Li — _North American Chapter of the Association for Computational Linguistics_ — cites: 1
+  - https://www.semanticscholar.org/paper/834a63a343c904db3e3052a3ff7b3e3739e81bec
+  - arXiv:2410.16011 · doi:10.48550/arXiv.2410.16011
+  - Simultaneous speech translation (SimulST) systems must balance translation quality with response time, making latency measurement crucial for evaluating their real-world performance. However, there has been a longstanding belief that current metrics yield unrealistically high latency measurements in unsegmented streaming settings. In this paper, we investigate this phenomenon, revealing its root c…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Anticipating Future with Large Language Model for Simultaneous Machine Translation** (2024) — Siqi Ouyang, Oleksii Hrinchuk, Zhehuai Chen, Vitaly Lavrukhin, et al. — _North American Chapter of the Association for Computational Linguistics_ — cites: 0
+  - https://www.semanticscholar.org/paper/c948b5c490defea04dabaf60ad6311c96689a36f
+  - arXiv:2410.22499 · doi:10.48550/arXiv.2410.22499
+  - Simultaneous machine translation (SMT) takes streaming input utterances and incrementally produces target text. Existing SMT methods mainly use the partial utterance that has already arrived at the input and the generated hypothesis. Motivated by human interpreters' technique to forecast future words before hearing them, we propose $\textbf{T}$ranslation by $\textbf{A}$nticipating $\textbf{F}$utur…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Reinforcement Learning for Edit-Based Non-Autoregressive Neural Machine Translation** (2024) — Hao Wang, Tetsuro Morimura, Ukyo Honda, Daisuke Kawahara — _North American Chapter of the Association for Computational Linguistics_ — cites: 0
+  - https://www.semanticscholar.org/paper/4eb05087428cb4204b434dfe2a956fe278bc7edb
+  - arXiv:2405.01280 · doi:10.48550/arXiv.2405.01280
+  - Non-autoregressive (NAR) language models are known for their low latency in neural machine translation (NMT). However, a performance gap exists between NAR and autoregressive models due to the large decoding space and difficulty in capturing dependency between target words accurately. Compounding this, preparing appropriate training data for NAR models is a non-trivial task, often exacerbating exp…
+  - via: `query:machine translation nmt machine translation` (round 1)
+- **Efficient Sample-Specific Encoder Perturbations** (2024) — Yassir Fathullah, M. Gales — _North American Chapter of the Association for Computational Linguistics_ — cites: 0
+  - https://www.semanticscholar.org/paper/c8b397c3388079268cf1b7c7568488a06057c68f
+  - arXiv:2405.01601 · doi:10.48550/arXiv.2405.01601
+  - Encoder-decoder foundation models have displayed state-of-the-art performance on a range of autoregressive sequence tasks. This paper proposes a simple and lightweight modification to such systems to control the behaviour according to a specific attribute of interest. This paper proposes a novel inference-efficient approach to modifying the behaviour of an encoder-decoder system according to a spe…
+  - via: `cite_of:4789355a00650afa29682d331d7d9a49a301b43b` (round 2)
+- **Direct Preference Optimization for Neural Machine Translation with Minimum Bayes Risk Decoding** (2023) — Guangyu Yang, Jinghong Chen, Weizhe Lin, Bill Byrne — _North American Chapter of the Association for Computational Linguistics_ — cites: 40
+  - https://www.semanticscholar.org/paper/6c6d2ac4f7c94b30ceef79ba3e72840d0f4ba1d0
+  - arXiv:2311.08380 · doi:10.48550/arXiv.2311.08380
+  - Minimum Bayes Risk (MBR) decoding can significantly improve translation performance of Multilingual Large Language Models (MLLMs). However, MBR decoding is computationally expensive. We show how the recently developed Reinforcement Learning technique, Direct Preference Optimization (DPO), can fine-tune MLLMs to get the gains of MBR without any additional computation in inference. Our method uses o…
+  - via: `query:machine translation nmt machine translation` (round 1)
+- **On Synthetic Data for Back Translation** (2023) — Jiahao Xu, Yubin Ruan, Wei Bi, Guoping Huang, et al. — _North American Chapter of the Association for Computational Linguistics_ — cites: 14
+  - https://www.semanticscholar.org/paper/f46140d6992d983cfa1607b9fb1762d43defffcf
+  - arXiv:2310.13675 · doi:10.18653/v1/2022.naacl-main.32
+  - Back translation (BT) is one of the most significant technologies in NMT research fields. Existing attempts on BT share a common characteristic: they employ either beam search or random sampling to generate synthetic data with a backward model but seldom work studies the role of synthetic data in the performance of BT. This motivates us to ask a fundamental question: what kind of synthetic data co…
+  - via: `query:back-translation simultaneous` (round 0)
+- **Accurate Knowledge Distillation via n-best Reranking** (2023) — Hendra Setiawan — _North American Chapter of the Association for Computational Linguistics_ — cites: 4
+  - https://www.semanticscholar.org/paper/a04628d231295627708074b36c45217e9d9eebcf
+  - arXiv:2305.12057 · doi:10.48550/arXiv.2305.12057
+  - We propose utilizing n-best reranking to enhance Sequence-Level Knowledge Distillation (Kim and Rush, 2016) where we extract pseudo-labels for student model’s training data from top n-best hypotheses and leverage a diverse set of models with different inductive biases, objective functions or architectures, including some publicly-available large language models, to pick the highest-quality hypothe…
+  - via: `cite_of:c7b361427a54b309caea8ef69ed59b50cd54ac67` (round 1)
+- **Quality-Aware Decoding for Neural Machine Translation** (2022) — Patrick Fernandes, António Farinhas, Ricardo Rei, José G. C. de Souza, et al. — _North American Chapter of the Association for Computational Linguistics_ — cites: 63
+  - https://www.semanticscholar.org/paper/0cceebb6b796c210b55ebf6b98032b5c631db0e1
+  - arXiv:2205.00978 · doi:10.48550/arXiv.2205.00978
+  - Despite the progress in machine translation quality estimation and evaluation in the last years, decoding in neural machine translation (NMT) is mostly oblivious to this and centers around finding the most probable translation according to the model (MAP decoding), approximated with beam search. In this paper, we bring together these two lines of research and propose quality-aware decoding for NMT…
+  - via: `query:translation quality machine translation` (round 1)
+- **One Reference Is Not Enough: Diverse Distillation with Reference Selection for Non-Autoregressive Translation** (2022) — Chenze Shao, Xuanfu Wu, Yang Feng — _North American Chapter of the Association for Computational Linguistics_ — cites: 27
+  - https://www.semanticscholar.org/paper/97831c39481de706da510d5b0b938d46da316cf1
+  - arXiv:2205.14333 · doi:10.48550/arXiv.2205.14333
+  - Non-autoregressive neural machine translation (NAT) suffers from the multi-modality problem: the source sentence may have multiple correct translations, but the loss function is calculated only according to the reference sentence. Sequence-level knowledge distillation makes the target more deterministic by replacing the target with the output from an autoregressive model. However, the multi-modali…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **TreeMix: Compositional Constituency-based Data Augmentation for Natural Language Understanding** (2022) — Le Zhang, Zichao Yang, Diyi Yang — _North American Chapter of the Association for Computational Linguistics_ — cites: 26
+  - https://www.semanticscholar.org/paper/e184d1113060bbeec171b2faf0db0a4022515859
+  - arXiv:2205.06153 · doi:10.48550/arXiv.2205.06153
+  - Data augmentation is an effective approach to tackle over-fitting. Many previous works have proposed different data augmentations strategies for NLP, such as noise injection, word replacement, back-translation etc. Though effective, they missed one important characteristic of language–compositionality, meaning of a complex expression is built from its sub-parts. Motivated by this, we propose a com…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Improving Classification of Infrequent Cognitive Distortions: Domain-Specific Model vs. Data Augmentation** (2022) — Xiruo Ding, Kevin Lybarger, J. Tauscher, T. Cohen — _North American Chapter of the Association for Computational Linguistics_ — cites: 18
+  - https://www.semanticscholar.org/paper/c2c82202584b390ce970709b958d09d871ec11dc
+  - doi:10.18653/v1/2022.naacl-srw.9
+  - Cognitive distortions are counterproductive patterns of thinking that are one of the targets of cognitive behavioral therapy (CBT). These can be challenging for clinicians to detect, especially those without extensive CBT training or supervision. Text classification methods can approximate expert clinician judgment in the detection of frequently occurring cognitive distortions in text-based therap…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Teaching BERT to Wait: Balancing Accuracy and Latency for Streaming Disfluency Detection** (2022) — Angelica Chen, V. Zayats, D. D. Walker, D. Padfield — _North American Chapter of the Association for Computational Linguistics_ — cites: 17
+  - https://www.semanticscholar.org/paper/30a9b6da70349f1825ea53dd03d52a465b6d44b7
+  - arXiv:2205.00620 · doi:10.48550/arXiv.2205.00620
+  - In modern interactive speech-based systems, speech is consumed and transcribed incrementally prior to having disfluencies removed. While this post-processing step is crucial for producing clean transcripts and high performance on downstream tasks (e.g. machine translation), most current state-of-the-art NLP models such as the Transformer operate non-incrementally, potentially causing unacceptable…
+  - via: `query:streaming speech translation` (round 0)
+- **Bi-SimCut: A Simple Strategy for Boosting Neural Machine Translation** (2022) — Pengzhi Gao, Zhongjun He, Hua Wu, Haifeng Wang — _North American Chapter of the Association for Computational Linguistics_ — cites: 15
+  - https://www.semanticscholar.org/paper/b2bfad95134d8eb2896dd6e0f6e2ea9e963ab002
+  - arXiv:2206.02368 · doi:10.48550/arXiv.2206.02368
+  - We introduce Bi-SimCut: a simple but effective training strategy to boost neural machine translation (NMT) performance. It consists of two procedures: bidirectional pretraining and unidirectional finetuning. Both procedures utilize SimCut, a simple regularization method that forces the consistency between the output distributions of the original and the cutoff sentence pairs. Without leveraging ex…
+  - via: `query:machine translation nmt machine translation` (round 1)
+- **ExtraPhrase: Efficient Data Augmentation for Abstractive Summarization** (2022) — Mengsay Loem, Sho Takase, Masahiro Kaneko, Naoaki Okazaki — _North American Chapter of the Association for Computational Linguistics_ — cites: 14
+  - https://www.semanticscholar.org/paper/0f4d05fa955ddae7857179e8a219f7371187fcab
+  - arXiv:2201.05313 · doi:10.18653/v1/2022.naacl-srw.3
+  - Neural models trained with large amount of parallel data have achieved impressive performance in abstractive summarization tasks. However, large-scale parallel corpora are expensive and challenging to construct. In this work, we introduce a low-cost and effective strategy, ExtraPhrase, to augment training data for abstractive summarization tasks. ExtraPhrase constructs pseudo training data in two…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Nearest Neighbor Knowledge Distillation for Neural Machine Translation** (2022) — Zhixian Yang, Renliang Sun, Xiaojun Wan — _North American Chapter of the Association for Computational Linguistics_ — cites: 13
+  - https://www.semanticscholar.org/paper/a555c9b700e72d7e43528c0af8ed683ef816c002
+  - arXiv:2205.00479 · doi:10.48550/arXiv.2205.00479
+  - k-nearest-neighbor machine translation (kNN-MT), proposed by Khandelwal et al. (2021), has achieved many state-of-the-art results in machine translation tasks. Although effective, kNN-MT requires conducting kNN searches through the large datastore for each decoding step during inference, prohibitively increasing the decoding cost and thus leading to the difficulty for the deployment in real-world…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **Language Model Augmented Monotonic Attention for Simultaneous Translation** (2022) — S. Indurthi, Mohd Abbas Zaidi, Beomseok Lee, Nikhil Kumar Lakumarapu, et al. — _North American Chapter of the Association for Computational Linguistics_ — cites: 10
+  - https://www.semanticscholar.org/paper/0723d75f58b0c0f705f875a7d0f9148c6a3a5ae9
+  - doi:10.18653/v1/2022.naacl-main.3
+  - The state-of-the-art adaptive policies for Simultaneous Neural Machine Translation (SNMT) use monotonic attention to perform read/write decisions based on the partial source and target sequences. The lack of sufficient information might cause the monotonic attention to take poor read/write decisions, which in turn negatively affects the performance of the SNMT model. On the other hand, human trans…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **A Study of Syntactic Multi-Modality in Non-Autoregressive Machine Translation** (2022) — Kexun Zhang, Rui Wang, Xu Tan, Junliang Guo, et al. — _North American Chapter of the Association for Computational Linguistics_ — cites: 10
+  - https://www.semanticscholar.org/paper/47d9c5492834c1e3275c6f265fcfb3004cc622cd
+  - arXiv:2207.04206 · doi:10.48550/arXiv.2207.04206
+  - It is difficult for non-autoregressive translation (NAT) models to capture the multi-modal distribution of target translations due to their conditional independence assumption, which is known as the “multi-modality problem”, including the lexical multi-modality and the syntactic multi-modality. While the first one has been well studied, the syntactic multi-modality brings severe challenges to the…
+  - via: `cite_of:1e5b826ddf0754f6e93234ba1260bd939c255e7f` (round 1)
+- **Non-Autoregressive Neural Machine Translation with Consistency Regularization Optimized Variational Framework** (2022) — Minghao Zhu, Junli Wang, Chungang Yan — _North American Chapter of the Association for Computational Linguistics_ — cites: 8
+  - https://www.semanticscholar.org/paper/d09bda2c66588328be349ad1e538d2aa2752a94b
+  - doi:10.18653/v1/2022.naacl-main.45
+  - Variational Autoencoder (VAE) is an effective framework to model the interdependency for non-autoregressive neural machine translation (NAT). One of the prominent VAE-based NAT frameworks, LaNMT, achieves great improvements to vanilla models, but still suffers from two main issues which lower down the translation quality: (1) mismatch between training and inference circumstances and (2) inadequacy…
+  - via: `query:bleu points machine translation` (round 2)
+- **Diffusion Glancing Transformer for Parallel Sequence-to-Sequence Learning** (2022) — Lihua Qian, Mingxuan Wang, Yang Liu, Hao Zhou — _North American Chapter of the Association for Computational Linguistics_ — cites: 7
+  - https://www.semanticscholar.org/paper/63b5f504d108223f6a7b5e8769c07f3fe4ce412b
+  - arXiv:2212.10240 · doi:10.18653/v1/2024.naacl-long.271
+  - Previously, non-autoregressive models were widely recognized as being superior in generation efficiency but inferior in generation quality due to the challenges of modeling multiple target modalities.To enhance the multi-modality modeling ability, we propose the diffusion glancing transformer, which employs a modality diffusion process and residual glancing sampling.The modality diffusion process…
+  - via: `cite_of:1e5b826ddf0754f6e93234ba1260bd939c255e7f` (round 1)
+- **Neighbors Are Not Strangers: Improving Non-Autoregressive Translation under Low-Frequency Lexical Constraints** (2022) — Chun Zeng, Jiangjie Chen, Tianyi Zhuang, Rui Xu, et al. — _North American Chapter of the Association for Computational Linguistics_ — cites: 7
+  - https://www.semanticscholar.org/paper/a4b9466175991ca0219970d50438bd4a938476ce
+  - arXiv:2204.13355 · doi:10.18653/v1/2022.naacl-main.424
+  - Lexically constrained neural machine translation (NMT) draws much industrial attention for its practical usage in specific domains.However, current autoregressive approaches suffer from high latency.In this paper, we focus on non-autoregressive translation (NAT) for this problem for its efficiency advantage.We identify that current constrained NAT models, which are based on iterative editing, do n…
+  - via: `cite_of:1e5b826ddf0754f6e93234ba1260bd939c255e7f` (round 1)
+- **The Devil is in the Details: On the Pitfalls of Vocabulary Selection in Neural Machine Translation** (2022) — Tobias Domhan, E. Hasler, Ke M. Tran, Sony Trenous, et al. — _North American Chapter of the Association for Computational Linguistics_ — cites: 6
+  - https://www.semanticscholar.org/paper/f075c37f0dad765334402e751ad6ec60023fc02d
+  - arXiv:2205.06618 · doi:10.48550/arXiv.2205.06618
+  - Vocabulary selection, or lexical shortlisting, is a well-known technique to improve latency of Neural Machine Translation models by constraining the set of allowed output words during inference. The chosen set is typically determined by separately trained alignment model parameters, independent of the source-sentence context at inference time. While vocabulary selection appears competitive with re…
+  - via: `cite_of:ac6535d096fc79dde2d9ce0329e0626b79ede7f0` (round 2)
+- **The Curious Case of Hallucinations in Neural Machine Translation** (2021) — Vikas Raunak, Arul Menezes, Marcin Junczys-Dowmunt — _North American Chapter of the Association for Computational Linguistics_ — cites: 234
+  - https://www.semanticscholar.org/paper/143cd4b4717651caf276c7256502dc491454e197
+  - arXiv:2104.06683 · doi:10.18653/V1/2021.NAACL-MAIN.92
+  - In this work, we study hallucinations in Neural Machine Translation (NMT), which lie at an extreme end on the spectrum of NMT pathologies. Firstly, we connect the phenomenon of hallucinations under source perturbation to the Long-Tail theory of Feldman, and present an empirically validated hypothesis that explains hallucinations under source perturbation. Secondly, we consider hallucinations under…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **NeuroLogic A*esque Decoding: Constrained Text Generation with Lookahead Heuristics** (2021) — Ximing Lu, S. Welleck, Peter West, Liwei Jiang, et al. — _North American Chapter of the Association for Computational Linguistics_ — cites: 189
+  - https://www.semanticscholar.org/paper/304cf21da84961469ac9f43405df187441832b61
+  - arXiv:2112.08726 · doi:10.18653/v1/2022.naacl-main.57
+  - The dominant paradigm for neural text generation is left-to-right decoding from autoregressive language models. Constrained or controllable generation under complex lexical constraints, however, requires foresight to plan ahead feasible future paths. Drawing inspiration from the A^* search algorithm, we propose NeuroLogic A*esque, a decoding algorithm that incorporates heuristic estimates of futur…
+  - via: `cite_of:101141b047d119ef9c8fda8dd83d3d9eb3fbfd1f` (round 2)
+- **Source and Target Bidirectional Knowledge Distillation for End-to-end Speech Translation** (2021) — H. Inaguma, T. Kawahara, Shinji Watanabe — _North American Chapter of the Association for Computational Linguistics_ — cites: 47
+  - https://www.semanticscholar.org/paper/89a8edbc0fe2ea8b9ee703ca37e5d5d6d34c571a
+  - arXiv:2104.06457 · doi:10.18653/V1/2021.NAACL-MAIN.150
+  - A conventional approach to improving the performance of end-to-end speech translation (E2E-ST) models is to leverage the source transcription via pre-training and joint training with automatic speech recognition (ASR) and neural machine translation (NMT) tasks. However, since the input modalities are different, it is difficult to leverage source language text successfully. In this work, we focus o…
+  - via: `query:machine translation nmt speech translation` (round 1)
+- **Counterfactual Data Augmentation for Neural Machine Translation** (2021) — Qi Liu, Matt J. Kusner, Phil Blunsom — _North American Chapter of the Association for Computational Linguistics_ — cites: 37
+  - https://www.semanticscholar.org/paper/2660fcbec300315e349d1bff65c8802e4c7c4df4
+  - doi:10.18653/V1/2021.NAACL-MAIN.18
+  - We propose a data augmentation method for neural machine translation. It works by interpreting language models and phrasal alignment causally. Specifically, it creates augmented parallel translation corpora by generating (path-specific) counterfactual aligned phrases. We generate these by sampling new source phrases from a masked language model, then sampling an aligned counterfactual target phras…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Training Data Augmentation for Code-Mixed Translation** (2021) — Abhirut Gupta, Aditya Vavre, S. Sarawagi — _North American Chapter of the Association for Computational Linguistics_ — cites: 32
+  - https://www.semanticscholar.org/paper/fcf24ec00524fd4b74ad1b5615eeab53377a43c9
+  - doi:10.18653/V1/2021.NAACL-MAIN.459
+  - Machine translation of user-generated code-mixed inputs to English is of crucial importance in applications like web search and targeted advertising. We address the scarcity of parallel training data for training such models by designing a strategy of converting existing non-code-mixed parallel data sources to code-mixed parallel data. We present an m-BERT based procedure whose core learnable comp…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Sentence Concatenation Approach to Data Augmentation for Neural Machine Translation** (2021) — Seiichiro Kondo, Kengo Hotate, Masahiro Kaneko, Mamoru Komachi — _North American Chapter of the Association for Computational Linguistics_ — cites: 18
+  - https://www.semanticscholar.org/paper/2c1736f11602088d8a1a0199d03f70d630091a3c
+  - arXiv:2104.08478 · doi:10.18653/v1/2021.naacl-srw.18
+  - Recently, neural machine translation is widely used for its high translation accuracy, but it is also known to show poor performance at long sentence translation. Besides, this tendency appears prominently for low resource languages. We assume that these problems are caused by long sentences being few in the train data. Therefore, we propose a data augmentation method for handling long sentences.…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Comparison of Grammatical Error Correction Using Back-Translation Models** (2021) — Aomi Koyama, Kengo Hotate, Masahiro Kaneko, Mamoru Komachi — _North American Chapter of the Association for Computational Linguistics_ — cites: 12
+  - https://www.semanticscholar.org/paper/3f2bb1e7ed87b06ac82b08bd42e75896c2628ac1
+  - arXiv:2104.07848 · doi:10.18653/v1/2021.naacl-srw.16
+  - Grammatical error correction (GEC) suffers from a lack of sufficient parallel data. Studies on GEC have proposed several methods to generate pseudo data, which comprise pairs of grammatical and artificially produced ungrammatical sentences. Currently, a mainstream approach to generate pseudo data is back-translation (BT). Most previous studies using BT have employed the same architecture for both…
+  - via: `query:back-translation simultaneous` (round 0)
+- **Smart-Start Decoding for Neural Machine Translation** (2021) — Jian Yang, Jian Yang, Shuming Ma, Dongdong Zhang, et al. — _North American Chapter of the Association for Computational Linguistics_ — cites: 5
+  - https://www.semanticscholar.org/paper/f4b20bd6a7ec7c57f8afc2228bcfd00a7346197c
+  - doi:10.18653/V1/2021.NAACL-MAIN.312
+  - Most current neural machine translation models adopt a monotonic decoding order of either left-to-right or right-to-left. In this work, we propose a novel method that breaks up the limitation of these decoding orders, called Smart-Start decoding. More specifically, our method first predicts a median word. It starts to decode the words on the right side of the median word and then generates words o…
+  - via: `cite_of:58d34a4fb936ffe95917d8fb4016ff5e3520429a` (round 2)
+- **Sampling and Filtering of Neural Machine Translation Distillation Data** (2021) — Vilém Zouhar — _North American Chapter of the Association for Computational Linguistics_ — cites: 3
+  - https://www.semanticscholar.org/paper/9db4e74bd70af5f4bfe9d51c138eee92e3b60642
+  - arXiv:2104.00664 · doi:10.18653/v1/2021.naacl-srw.1
+  - In most of neural machine translation distillation or stealing scenarios, the highest-scoring hypothesis of the target model (teacher) is used to train a new model (student). If reference translations are also available, then better hypotheses (with respect to the references) can be oversampled and poor hypotheses either removed or undersampled. This paper explores the sampling method landscape (p…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **Grouping Words with Semantic Diversity** (2021) — Karine Chubarian, A. Khan, Anastasios Sidiropoulos, Jia Xu — _North American Chapter of the Association for Computational Linguistics_ — cites: 3
+  - https://www.semanticscholar.org/paper/e2916c30f0654a25e6177be4db9c6786e9325d75
+  - doi:10.18653/V1/2021.NAACL-MAIN.257
+  - Deep Learning-based NLP systems can be sensitive to unseen tokens and hard to learn with high-dimensional inputs, which critically hinder learning generalization. We introduce an approach by grouping input words based on their semantic diversity to simplify input language representation with low ambiguity. Since the semantically diverse words reside in different contexts, we are able to substitute…
+  - via: `cite_of:0ee468b9b709a2610c4b574d67218e7960350224` (round 1)
+- **Improving Zero and Few-Shot Abstractive Summarization with Intermediate Fine-tuning and Data Augmentation** (2020) — A. R. Fabbri, Simeng Han, Haoyuan Li, Haoran Li, et al. — _North American Chapter of the Association for Computational Linguistics_ — cites: 102
+  - https://www.semanticscholar.org/paper/7ba0dc20800195c6350995695c8bf86be6227c49
+  - arXiv:2010.12836 · doi:10.18653/V1/2021.NAACL-MAIN.57
+  - Models pretrained with self-supervised objectives on large text corpora achieve state-of-the-art performance on English text summarization tasks. However, these models are typically fine-tuned on hundreds of thousands of data points, an infeasible requirement when applying summarization to new, niche domains. In this work, we introduce a novel and generalizable method, called WikiTransfer, for fin…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Self-Training for Unsupervised Neural Machine Translation in Unbalanced Training Data Scenarios** (2020) — Haipeng Sun, Rui Wang, Kehai Chen, M. Utiyama, et al. — _North American Chapter of the Association for Computational Linguistics_ — cites: 14
+  - https://www.semanticscholar.org/paper/3277e13821617580534fb25dd2d041bf75f0bceb
+  - arXiv:2004.04507 · doi:10.18653/V1/2021.NAACL-MAIN.311
+  - Unsupervised neural machine translation (UNMT) that relies solely on massive monolingual corpora has achieved remarkable results in several translation tasks. However, in real-world scenarios, massive monolingual corpora do not exist for some extremely low-resource languages such as Estonian, and UNMT systems usually perform poorly when there is not adequate training corpus for one language. In th…
+  - via: `query:self-training simultaneous translation` (round 0)
+- **Learning to Navigate Unseen Environments: Back Translation with Environmental Dropout** (2019) — Hao Tan, Licheng Yu, Mohit Bansal — _North American Chapter of the Association for Computational Linguistics_ — cites: 391
+  - https://www.semanticscholar.org/paper/c8c76626db4246c944642e86d19665025fa7deb4
+  - arXiv:1904.04195 · doi:10.18653/v1/N19-1268
+  - A grand goal in AI is to build a robot that can accurately navigate based on natural language instructions, which requires the agent to perceive the scene, understand and ground language, and act in the real-world environment. One key challenge here is to learn to navigate in new environments that are unseen during training. Most of the existing approaches perform dramatically worse in unseen envi…
+  - via: `query:back-translation simultaneous` (round 0)
+- **Improved Lexically Constrained Decoding for Translation and Monolingual Rewriting** (2019) — J. Hu, Huda Khayrallah, Ryan Culkin, Patrick Xia, et al. — _North American Chapter of the Association for Computational Linguistics_ — cites: 148
+  - https://www.semanticscholar.org/paper/101141b047d119ef9c8fda8dd83d3d9eb3fbfd1f
+  - doi:10.18653/v1/N19-1090
+  - Lexically-constrained sequence decoding allows for explicit positive or negative phrase-based constraints to be placed on target output strings in generation tasks such as machine translation or monolingual text rewriting. We describe vectorized dynamic beam allocation, which extends work in lexically-constrained decoding to work with batching, leading to a five-fold improvement in throughput when…
+  - via: `cite_of:0ee468b9b709a2610c4b574d67218e7960350224` (round 1)
+- **Improving Robustness of Machine Translation with Synthetic Noise** (2019) — Vaibhav, Sumeet Singh, Craig Stewart, Graham Neubig — _North American Chapter of the Association for Computational Linguistics_ — cites: 88
+  - https://www.semanticscholar.org/paper/bdbf635476477eec5be5a292b494e20b8902cc35
+  - arXiv:1902.09508 · doi:10.18653/v1/N19-1190
+  - Modern Machine Translation (MT) systems perform remarkably well on clean, in-domain text. However most of the human generated text, particularly in the realm of social media, is full of typos, slang, dialect, idiolect and other noise which can have a disastrous impact on the accuracy of MT. In this paper we propose methods to enhance the robustness of MT systems by emulating naturally occurring no…
+  - via: `ref_of:0b9ac1035918823ffca1c6f55ec316b42d4e033f` (round 2)
+- **SEQˆ3: Differentiable Sequence-to-Sequence-to-Sequence Autoencoder for Unsupervised Abstractive Sentence Compression** (2019) — Christos Baziotis, Ion Androutsopoulos, Ioannis Konstas, A. Potamianos — _North American Chapter of the Association for Computational Linguistics_ — cites: 85
+  - https://www.semanticscholar.org/paper/8274799029bfac4402685e1efd995a8aeb9e7426
+  - arXiv:1904.03651 · doi:10.18653/v1/N19-1071
+  - Neural sequence-to-sequence models are currently the dominant approach in several natural language processing tasks, but require large parallel corpora. We present a sequence-to-sequence-to-sequence autoencoder (SEQˆ3), consisting of two chained encoder-decoder pairs, with words used as a sequence of discrete latent variables. We apply the proposed model to unsupervised abstractive sentence compre…
+  - via: `ref_of:7ba0dc20800195c6350995695c8bf86be6227c49` (round 1)
+- **Lost in Interpretation: Predicting Untranslated Terminology in Simultaneous Interpretation** (2019) — Nikolai Vogler, Craig Alan Stewart, Graham Neubig — _North American Chapter of the Association for Computational Linguistics_ — cites: 15
+  - https://www.semanticscholar.org/paper/b990517fbbf4499861d7aa00407b0422874ab990
+  - arXiv:1904.00930 · doi:10.18653/v1/N19-1010
+  - Simultaneous interpretation, the translation of speech from one language to another in real-time, is an inherently difficult and strenuous task. One of the greatest challenges faced by interpreters is the accurate translation of difficult terminology like proper names, numbers, or other entities. Intelligent computer-assisted interpreting (CAI) tools that could analyze the spoken word and detect t…
+  - via: `query:simultaneous speech translation` (round 0)
+- **Universal Neural Machine Translation for Extremely Low Resource Languages** (2018) — Jiatao Gu, Hany Hassan, Jacob Devlin, V. Li — _North American Chapter of the Association for Computational Linguistics_ — cites: 297
+  - https://www.semanticscholar.org/paper/2115a9127cb7ea4dfd5c3a08bfc41bab3b279266
+  - arXiv:1802.05368 · doi:10.18653/v1/N18-1032
+  - In this paper, we propose a new universal machine translation approach focusing on languages with a limited amount of parallel data. Our proposed approach utilizes a transfer-learning approach to share lexical and sentence level representations across multiple source languages into one target language. The lexical part is shared through a Universal Lexical Representation to support multi-lingual w…
+  - via: `ref_of:1b24b7b4ac2427d20ab60c8451563eb8d99caf9c` (round 1)
+- **Incremental Decoding and Training Methods for Simultaneous Translation in Neural Machine Translation** (2018) — Fahim Dalvi, Nadir Durrani, Hassan Sajjad, S. Vogel — _North American Chapter of the Association for Computational Linguistics_ — cites: 102
+  - https://www.semanticscholar.org/paper/246805dc95ab2a51f3acfe1c3ae016994645aa3a
+  - arXiv:1806.03661 · doi:10.18653/v1/N18-2079
+  - We address the problem of simultaneous translation by modifying the Neural MT decoder to operate with dynamically built encoder and attention. We propose a tunable agent which decides the best segmentation strategy for a user-defined BLEU loss and Average Proportion (AP) constraint. Our agent outperforms previously proposed Wait-if-diff and Wait-if-worse agents (Cho and Esipova, 2016) on BLEU with…
+  - via: `query:wait-k simultaneous translation` (round 0)
+
+## ICLR (28)
+
+- **SimulPL: Aligning Human Preferences in Simultaneous Machine Translation** (2025) — Donglei Yu, Yang Zhao, Jie Zhu, Yangyifan Xu, et al. — _International Conference on Learning Representations_ — cites: 9
+  - https://www.semanticscholar.org/paper/a2e6614d8e896864e8a1512c7fd3236803c1d054
+  - arXiv:2502.00634 · doi:10.48550/arXiv.2502.00634
+  - Simultaneous Machine Translation (SiMT) generates translations while receiving streaming source inputs. This requires the SiMT model to learn a read/write policy, deciding when to translate and when to wait for more source input. Numerous linguistic studies indicate that audiences in SiMT scenarios have distinct preferences, such as accurate translations, simpler syntax, and no unnecessary latency…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **X-ALMA: Plug & Play Modules and Adaptive Rejection for Quality Translation at Scale** (2024) — Haoran Xu, Kenton Murray, Philipp Koehn, Hieu D. Hoang, et al. — _International Conference on Learning Representations_ — cites: 38
+  - https://www.semanticscholar.org/paper/a7227e49728bedc38a95190da45d33221b5fbb2c
+  - arXiv:2410.03115 · doi:10.48550/arXiv.2410.03115
+  - Large language models (LLMs) have achieved remarkable success across various NLP tasks with a focus on English due to English-centric pre-training and limited multilingual data. In this work, we focus on the problem of translation, and while some multilingual LLMs claim to support for hundreds of languages, models often fail to provide high-quality responses for mid- and low-resource languages, le…
+  - via: `cite_of:166d1e5361465f8e235747d14641249cbb3b6fd2` (round 1)
+- **DelTA: An Online Document-Level Translation Agent Based on Multi-Level Memory** (2024) — Yutong Wang, Jiali Zeng, Xuebo Liu, Derek F. Wong, et al. — _International Conference on Learning Representations_ — cites: 23
+  - https://www.semanticscholar.org/paper/615d80aeae843ec23155ae67ce873452d1244cb9
+  - arXiv:2410.08143 · doi:10.48550/arXiv.2410.08143
+  - Large language models (LLMs) have achieved reasonable quality improvements in machine translation (MT). However, most current research on MT-LLMs still faces significant challenges in maintaining translation consistency and accuracy when processing entire documents. In this paper, we introduce DelTA, a Document-levEL Translation Agent designed to overcome these limitations. DelTA features a multi-…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **MT-Ranker: Reference-free machine translation evaluation by inter-system ranking** (2024) — Ibraheem Muhammad Moosa, Rui Zhang, Wenpeng Yin — _International Conference on Learning Representations_ — cites: 13
+  - https://www.semanticscholar.org/paper/326922d615c39e91a672582f7171aec4d1d57442
+  - arXiv:2401.17099 · doi:10.48550/arXiv.2401.17099
+  - Traditionally, Machine Translation (MT) Evaluation has been treated as a regression problem -- producing an absolute translation-quality score. This approach has two limitations: i) the scores lack interpretability, and human annotators struggle with giving consistent scores; ii) most scoring methods are based on (reference, translation) pairs, limiting their applicability in real-world scenarios…
+  - via: `query:translation quality machine translation` (round 1)
+- **Mufu: Multilingual Fused Learning for Low-Resource Translation with LLM** (2024) — Zheng Wei Lim, Nitish Gupta, Honglin Yu, Trevor Cohn — _International Conference on Learning Representations_ — cites: 4
+  - https://www.semanticscholar.org/paper/b884ad6d84bb0332edabe65cff155aa8f28b4d77
+  - arXiv:2409.13949 · doi:10.48550/arXiv.2409.13949
+  - Multilingual large language models (LLMs) are great translators, but this is largely limited to high-resource languages. For many LLMs, translating in and out of low-resource languages remains a challenging task. To maximize data efficiency in this low-resource setting, we introduce Mufu, which includes a selection of automatically generated multilingual candidates and an instruction to correct in…
+  - via: `cite_of:166d1e5361465f8e235747d14641249cbb3b6fd2` (round 1)
+- **A Paradigm Shift in Machine Translation: Boosting Translation Performance of Large Language Models** (2023) — Haoran Xu, Young Jin Kim, Amr Sharaf, H. Awadalla — _International Conference on Learning Representations_ — cites: 120
+  - https://www.semanticscholar.org/paper/166d1e5361465f8e235747d14641249cbb3b6fd2
+  - arXiv:2309.11674 · doi:10.48550/arXiv.2309.11674
+  - Generative Large Language Models (LLMs) have achieved remarkable advancements in various NLP tasks. However, these advances have not been reflected in the translation task, especially those with moderate model sizes (i.e., 7B or 13B parameters), which still lag behind conventional supervised encoder-decoder translation models. Previous studies have attempted to improve the translation capabilities…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **Hidden Markov Transformer for Simultaneous Machine Translation** (2023) — Shaolei Zhang, Yang Feng — _International Conference on Learning Representations_ — cites: 31
+  - https://www.semanticscholar.org/paper/9ce604efe716d9f85bb3af198bf63d9ceacf1deb
+  - arXiv:2303.00257 · doi:10.48550/arXiv.2303.00257
+  - Simultaneous machine translation (SiMT) outputs the target sequence while receiving the source sequence, and hence learning when to start translating each target token is the core challenge for SiMT task. However, it is non-trivial to learn the optimal moment among many possible moments of starting translating, as the moments of starting translating always hide inside the model and can only be sup…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **PolyVoice: Language Models for Speech to Speech Translation** (2023) — Qianqian Dong, Zhiying Huang, Chen Xu, Yunlong Zhao, et al. — _International Conference on Learning Representations_ — cites: 31
+  - https://www.semanticscholar.org/paper/1f4c497a2b2c7f01dac882e70ebbf02bae7b2fa0
+  - arXiv:2306.02982 · doi:10.48550/arXiv.2306.02982
+  - We propose PolyVoice, a language model-based framework for speech-to-speech translation (S2ST) system. Our framework consists of two language models: a translation language model and a speech synthesis language model. We use discretized speech units, which are generated in a fully unsupervised way, and thus our framework can be used for unwritten languages. For the speech synthesis part, we adopt…
+  - via: `query:translation quality speech translation` (round 1)
+- **Simple and Scalable Nearest Neighbor Machine Translation** (2023) — Yu-Hsiu Dai, Zhirui Zhang, Qiuzhi Liu, Qu Cui, et al. — _International Conference on Learning Representations_ — cites: 20
+  - https://www.semanticscholar.org/paper/161956dc055a680cfe1a0bbdc22fabd9822cadc8
+  - arXiv:2302.12188 · doi:10.48550/arXiv.2302.12188
+  - $k$NN-MT is a straightforward yet powerful approach for fast domain adaptation, which directly plugs pre-trained neural machine translation (NMT) models with domain-specific token-level $k$-nearest-neighbor ($k$NN) retrieval to achieve domain adaptation without retraining. Despite being conceptually attractive, $k$NN-MT is burdened with massive storage requirements and high computational complexit…
+  - via: `query:machine translation nmt machine translation` (round 1)
+- **Fuzzy Alignments in Directed Acyclic Graph for Non-Autoregressive Machine Translation** (2023) — Zhengrui Ma, Chenze Shao, Shangtong Gui, M. Zhang, et al. — _International Conference on Learning Representations_ — cites: 18
+  - https://www.semanticscholar.org/paper/e47d5a56ffbe7615a910f5bfcb77237fed30cc5c
+  - arXiv:2303.06662 · doi:10.48550/arXiv.2303.06662
+  - Non-autoregressive translation (NAT) reduces the decoding latency but suffers from performance degradation due to the multi-modality problem. Recently, the structure of directed acyclic graph has achieved great success in NAT, which tackles the multi-modality problem by introducing dependency between vertices. However, training it with negative log-likelihood loss implicitly requires a strict alig…
+  - via: `cite_of:1e5b826ddf0754f6e93234ba1260bd939c255e7f` (round 1)
+- **Pseudo-Label Training and Model Inertia in Neural Machine Translation** (2023) — B. Hsu, Anna Currey, Xing Niu, Maria Nuadejde, et al. — _International Conference on Learning Representations_ — cites: 3
+  - https://www.semanticscholar.org/paper/8627ce5fa45057477a78b1ae9dae3e3bf0a4d0a5
+  - arXiv:2305.11808 · doi:10.48550/arXiv.2305.11808
+  - Like many other machine learning applications, neural machine translation (NMT) benefits from over-parameterized deep neural models. However, these models have been observed to be brittle: NMT model predictions are sensitive to small input changes and can show significant variation across re-training or incremental model updates. This work studies a frequently used method in NMT, pseudo-label trai…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **Multi-lingual Evaluation of Code Generation Models** (2022) — Ben Athiwaratkun, Sanjay Krishna Gouda, Zijian Wang, Xiaopeng Li, et al. — _International Conference on Learning Representations_ — cites: 231
+  - https://www.semanticscholar.org/paper/2577d053f8aab912d29b424e1f09133d83740fd2
+  - arXiv:2210.14868 · doi:10.48550/arXiv.2210.14868
+  - We present new benchmarks on evaluation code generation models: MBXP and Multilingual HumanEval, and MathQA-X. These datasets cover over 10 programming languages and are generated using a scalable conversion framework that transpiles prompts and test cases from the original Python datasets into the corresponding data in the target language. Using these benchmarks, we are able to assess the perform…
+  - via: `cite_of:c6801d553a43530b192309ef4364a43e33e4067f` (round 1)
+- **Improving Non-Autoregressive Translation Models Without Distillation** (2022) — X. Huang, Felipe Pérez, M. Volkovs — _International Conference on Learning Representations_ — cites: 60
+  - https://www.semanticscholar.org/paper/1967b9127084aa696f32e20f42f0f8d7be583be5
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **TranSpeech: Speech-to-Speech Translation With Bilateral Perturbation** (2022) — Rongjie Huang, Zhou Zhao, Jinglin Liu, Huadai Liu, et al. — _International Conference on Learning Representations_ — cites: 55
+  - https://www.semanticscholar.org/paper/6b86667bae101cc045f39d3d77a1eaf21a43c12c
+  - arXiv:2205.12523 · doi:10.48550/arXiv.2205.12523
+  - Direct speech-to-speech translation (S2ST) with discrete units leverages recent progress in speech representation learning. Specifically, a sequence of discrete representations derived in a self-supervised manner are predicted from the model and passed to a vocoder for speech reconstruction, while still facing the following challenges: 1) Acoustic multimodality: the discrete units derived from spe…
+  - via: `query:available https github speech translation` (round 2)
+- **Unified Discrete Diffusion for Simultaneous Vision-Language Generation** (2022) — Minghui Hu, Chuanxia Zheng, Heliang Zheng, Tat-Jen Cham, et al. — _International Conference on Learning Representations_ — cites: 41
+  - https://www.semanticscholar.org/paper/0b59a2680806fe518429957a7a19a9b0e4f24e3e
+  - arXiv:2211.14842 · doi:10.48550/arXiv.2211.14842
+  - The recently developed discrete diffusion models perform extraordinarily well in the text-to-image task, showing significant promise for handling the multi-modality signals. In this work, we harness these traits and present a unified multimodal generation model that can conduct both the"modality translation"and"multi-modality generation"tasks using a single model, performing text-based, image-base…
+  - via: `query:language pairs simultaneous translation` (round 1)
+- **Learning Multimodal Data Augmentation in Feature Space** (2022) — Zichang Liu, Zhiqiang Tang, Xingjian Shi, Aston Zhang, et al. — _International Conference on Learning Representations_ — cites: 30
+  - https://www.semanticscholar.org/paper/7a63b216572f21a3d7e05007a1b27329d9e0ef46
+  - arXiv:2212.14453 · doi:10.48550/arXiv.2212.14453
+  - The ability to jointly learn from multiple modalities, such as text, audio, and visual data, is a defining feature of intelligent systems. While there have been promising advances in designing neural networks to harness multimodal data, the enormous success of data augmentation currently remains limited to single-modality tasks like image classification. Indeed, it is particularly difficult to aug…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Enabling arbitrary translation objectives with Adaptive Tree Search** (2022) — Wang Ling, Wojciech Stokowiec, Domenic Donato, Laurent Sartran, et al. — _International Conference on Learning Representations_ — cites: 0
+  - https://www.semanticscholar.org/paper/4bd990e865aea7de457e917d3b0f8412567bdb5d
+  - arXiv:2202.11444
+  - We introduce an adaptive tree search algorithm, that can find high-scoring outputs under translation models that make no assumptions about the form or structure of the search objective. This algorithm -- a deterministic variant of Monte Carlo tree search -- enables the exploration of new kinds of models that are unencumbered by constraints imposed to make decoding tractable, such as autoregressivi…
+  - via: `cite_of:c7b361427a54b309caea8ef69ed59b50cd54ac67` (round 1)
+- **Leveraging Automated Unit Tests for Unsupervised Code Translation** (2021) — Baptiste Rozière, J Zhang, François Charton, M. Harman, et al. — _International Conference on Learning Representations_ — cites: 160
+  - https://www.semanticscholar.org/paper/1aed58bd07026492194672adec494dc37c894a28
+  - arXiv:2110.06773
+  - With little to no parallel data available for programming languages, unsupervised methods are well-suited to source code translation. However, the majority of unsupervised machine translation approaches rely on back-translation, a method developed in the context of natural language translation and one that inherently involves training on noisy inputs. Unfortunately, source code is highly sensitive…
+  - via: `cite_of:48925fef94500cf19ee220ed74217816f1ab5e60` (round 2)
+- **Is Label Smoothing Truly Incompatible with Knowledge Distillation: An Empirical Study** (2021) — Zhiqiang Shen, Zechun Liu, Dejia Xu, Zitian Chen, et al. — _International Conference on Learning Representations_ — cites: 83
+  - https://www.semanticscholar.org/paper/1c38fb9ee7a86755c184a37bcb654786150038c5
+  - arXiv:2104.00676
+  - This work aims to empirically clarify a recently discovered perspective that label smoothing is incompatible with knowledge distillation. We begin by introducing the motivation behind on how this incompatibility is raised, i.e., label smoothing erases relative information between teacher logits. We provide a novel connection on how label smoothing affects distributions of semantically similar and…
+  - via: `cite_of:1b24b7b4ac2427d20ab60c8451563eb8d99caf9c` (round 1)
+- **Meta Back-translation** (2021) — Hieu Pham, Xinyi Wang, Yiming Yang, Graham Neubig — _International Conference on Learning Representations_ — cites: 26
+  - https://www.semanticscholar.org/paper/fcdac45272543b4f8b8eaa59d66044d1b7018494
+  - arXiv:2102.07847
+  - Back-translation is an effective strategy to improve the performance of Neural Machine Translation~(NMT) by generating pseudo-parallel data. However, several recent works have found that better translation quality of the pseudo-parallel data does not necessarily lead to better final translation models, while lower-quality but more diverse data often yields stronger results. In this paper, we propo…
+  - via: `query:back-translation simultaneous` (round 0)
+- **Deep Encoder, Shallow Decoder: Reevaluating Non-autoregressive Machine Translation** (2020) — Jungo Kasai, Nikolaos Pappas, Hao Peng, James Cross, et al. — _International Conference on Learning Representations_ — cites: 154
+  - https://www.semanticscholar.org/paper/ac6535d096fc79dde2d9ce0329e0626b79ede7f0
+  - arXiv:2006.10369
+  - Much recent effort has been invested in non-autoregressive neural machine translation, which appears to be an efficient alternative to state-of-the-art autoregressive machine translation on modern GPUs. In contrast to the latter, where generation is sequential, the former allows generation to be parallelized across target token positions. Some of the latest non-autoregressive models have achieved…
+  - via: `cite_of:1e5b826ddf0754f6e93234ba1260bd939c255e7f` (round 1)
+- **Understanding and Improving Lexical Choice in Non-Autoregressive Translation** (2020) — Liang Ding, Longyue Wang, Xuebo Liu, Derek F. Wong, et al. — _International Conference on Learning Representations_ — cites: 90
+  - https://www.semanticscholar.org/paper/24a1767f6731abaeb21f8fa745b7e02fd4bbf39f
+  - arXiv:2012.14583
+  - Knowledge distillation (KD) is essential for training non-autoregressive translation (NAT) models by reducing the complexity of the raw data with an autoregressive teacher model. In this study, we empirically show that as a side effect of this training, the lexical choice errors on low-frequency words are propagated to the NAT model from the teacher model. To alleviate this problem, we propose to…
+  - via: `cite_of:1e5b826ddf0754f6e93234ba1260bd939c255e7f` (round 1)
+- **Reducing Transformer Depth on Demand with Structured Dropout** (2019) — Angela Fan, Edouard Grave, Armand Joulin — _International Conference on Learning Representations_ — cites: 692
+  - https://www.semanticscholar.org/paper/f4a8480cffa491020bdbb8c4c4e7a7e923b1c2c1
+  - arXiv:1909.11556
+  - Overparameterized transformer networks have obtained state of the art results in various natural language processing tasks, such as machine translation, language modeling, and question answering. These models contain hundreds of millions of parameters, necessitating a large amount of computation and making them prone to overfitting. In this work, we explore LayerDrop, a form of structured dropout,…
+  - via: `ref_of:b7d12aec8a0152ec4921dfa43ab525a63b334385` (round 2)
+- **Revisiting Self-Training for Neural Sequence Generation** (2019) — Junxian He, Jiatao Gu, Jiajun Shen, Marc'Aurelio Ranzato — _International Conference on Learning Representations_ — cites: 294
+  - https://www.semanticscholar.org/paper/12442420adf1c36887fafd108f4b7f4fc822ae60
+  - arXiv:1909.13788
+  - Self-training is one of the earliest and simplest semi-supervised methods. The key idea is to augment the original labeled dataset with unlabeled data paired with the model's prediction (i.e. the pseudo-parallel data). While self-training has been extensively studied on classification problems, in complex sequence generation tasks (e.g. machine translation) it is still unclear how self-training wo…
+  - via: `query:self-training simultaneous translation` (round 0)
+- **Multilingual Neural Machine Translation with Knowledge Distillation** (2019) — Xu Tan, Yi Ren, Di He, Tao Qin, et al. — _International Conference on Learning Representations_ — cites: 264
+  - https://www.semanticscholar.org/paper/1b24b7b4ac2427d20ab60c8451563eb8d99caf9c
+  - arXiv:1902.10461
+  - Multilingual machine translation, which translates multiple languages with a single model, has attracted much attention due to its efficiency of offline training and online serving. However, traditional multilingual translation usually yields inferior accuracy compared with the counterpart using individual models for each language pair, due to language diversity and model capacity limitations. In…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **Understanding Knowledge Distillation in Non-autoregressive Machine Translation** (2019) — Chunting Zhou, Graham Neubig, Jiatao Gu — _International Conference on Learning Representations_ — cites: 235
+  - https://www.semanticscholar.org/paper/1e5b826ddf0754f6e93234ba1260bd939c255e7f
+  - arXiv:1911.02727
+  - Non-autoregressive machine translation (NAT) systems predict a sequence of output tokens in parallel, achieving substantial improvements in generation speed compared to autoregressive models. Existing NAT models usually rely on the technique of knowledge distillation, which creates the training data from a pretrained autoregressive model for better performance. Knowledge distillation is empiricall…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **Monotonic Multihead Attention** (2019) — Xutai Ma, J. Pino, James Cross, Liezl Puzon, et al. — _International Conference on Learning Representations_ — cites: 148
+  - https://www.semanticscholar.org/paper/ee3c825e6bd1cd5bc3a8bb62a3dbab13ff1c5b73
+  - arXiv:1909.12406
+  - Simultaneous machine translation models start generating a target sequence before they have encoded or read the source sequence. Recent approaches for this task either apply a fixed policy on a state-of-the art Transformer model, or a learnable monotonic attention on a weaker recurrent neural network-based structure. In this paper, we propose a new attention mechanism, Monotonic Multihead Attentio…
+  - via: `query:translation quality simultaneous translation` (round 1)
+- **Leveraging Grammar and Reinforcement Learning for Neural Program Synthesis** (2018) — Rudy Bunel, Matthew J. Hausknecht, Jacob Devlin, Rishabh Singh, et al. — _International Conference on Learning Representations_ — cites: 228
+  - https://www.semanticscholar.org/paper/dea6aeb514b1969ab879c793d46a0d2eceaa2cbf
+  - arXiv:1805.04276
+  - Program synthesis is the task of automatically generating a program consistent with a specification. Recent years have seen proposal of a number of neural approaches for program synthesis, many of which adopt a sequence generation paradigm similar to neural machine translation, in which sequence-to-sequence models are trained to maximize the likelihood of known reference programs. While achieving…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+
+## ICML (23)
+
+- **OptMATH: A Scalable Bidirectional Data Synthesis Framework for Optimization Modeling** (2025) — Hongliang Lu, Zhonglin Xie, Yaoyu Wu, Can Ren, et al. — _International Conference on Machine Learning_ — cites: 27
+  - https://www.semanticscholar.org/paper/ed0caf27d3dcee024b81323a04c4f2185da011c2
+  - arXiv:2502.11102 · doi:10.48550/arXiv.2502.11102
+  - Despite the rapid development of large language models (LLMs), a fundamental challenge persists: the lack of high-quality optimization modeling datasets hampers LLMs' robust modeling of practical optimization problems from natural language descriptions (NL). This data scarcity also contributes to the generalization difficulties experienced by learning-based methods. To address these challenges, we…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **High-Fidelity Simultaneous Speech-To-Speech Translation** (2025) — Tom Labiausse, Laurent Mazar'e, Edouard Grave, Patrick P'erez, et al. — _International Conference on Machine Learning_ — cites: 21
+  - https://www.semanticscholar.org/paper/d45d18b9ad0ff50c3104c65594d3d7fba3898d9c
+  - arXiv:2502.03382 · doi:10.48550/arXiv.2502.03382
+  - We introduce Hibiki, a decoder-only model for simultaneous speech translation. Hibiki leverages a multistream language model to synchronously process source and target speech, and jointly produces text and audio tokens to perform speech-to-text and speech-to-speech translation. We furthermore address the fundamental challenge of simultaneous interpretation, which unlike its consecutive counterpart…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Categorical Schrödinger Bridge Matching** (2025) — Grigoriy Ksenofontov, A. Korotin — _International Conference on Machine Learning_ — cites: 2
+  - https://www.semanticscholar.org/paper/264d133525527216c6cb2811d1506192b0b6d535
+  - arXiv:2502.01416 · doi:10.48550/arXiv.2502.01416
+  - The Schr\"odinger Bridge (SB) is a powerful framework for solving generative modeling tasks such as unpaired domain translation. Most SB-related research focuses on continuous data space $\mathbb{R}^{D}$ and leaves open theoretical and algorithmic questions about applying SB methods to discrete data, e.g, on finite spaces $\mathbb{S}^{D}$. Notable examples of such sets $\mathbb{S}$ are codebooks o…
+  - via: `cite_of:bface38422b7e53287134c4d01a39fa58edd4469` (round 2)
+- **Real-Time Machine Translation Model for Online Literature: A Transformer Approach Integrating Visual Context and Text** (2025) — Jing Chen, Chensha Li — _2025 6th International Conference on Machine Learning and Computer Application (ICMLCA)_ — cites: 0
+  - https://www.semanticscholar.org/paper/1dfb28d7437edd43a88151bef2371cb5994f2fd3
+  - doi:10.1109/ICMLCA66850.2025.11336720
+  - With the increasingly frequent global dissemination of online literature, achieving high-quality and low-latency multimodal machine real-time translation is of great significance for promoting cross-cultural communication. Addressing the shortcomings of traditional machine translation models in handling the cultural-loaded words, implicit semantics, and multimodal context specific to online litera…
+  - via: `cite_of:7472f26ffa0f056a70e461d6918ae5ffecda2c92` (round 1)
+- **Overcoming Non-monotonicity in Transducer-based Streaming Generation** (2024) — Zhengrui Ma, Yang Feng, Min Zhang — _International Conference on Machine Learning_ — cites: 4
+  - https://www.semanticscholar.org/paper/db6ce3ade53dc73de88bbbac84edd8e96a351eae
+  - arXiv:2411.17170
+  - Streaming generation models are utilized across fields, with the Transducer architecture being popular in industrial applications. However, its input-synchronous decoding mechanism presents challenges in tasks requiring non-monotonic alignments, such as simultaneous translation. In this research, we address this issue by integrating Transducer's decoding with the history of input stream via a lear…
+  - via: `cite_of:9d3480e46cc506b73d5291387c6452998690fdd3` (round 1)
+- **LeaPformer: Enabling Linear Transformers for Autoregressive and Simultaneous Tasks via Learned Proportions** (2024) — Victor Agostinelli, Sanghyun Hong, Lizhong Chen — _International Conference on Machine Learning_ — cites: 3
+  - https://www.semanticscholar.org/paper/fdf9545ed4c9970a003d9a856101b606ba01fce2
+  - arXiv:2405.13046 · doi:10.48550/arXiv.2405.13046
+  - A promising approach to preserving model performance in linearized transformers is to employ position-based re-weighting functions. However, state-of-the-art re-weighting functions rely heavily on target sequence lengths, making it difficult or impossible to apply them to autoregressive and simultaneous tasks, where the target and sometimes even the input sequence length are unknown. To address th…
+  - via: `cite_of:9d3480e46cc506b73d5291387c6452998690fdd3` (round 1)
+- **Using Transformers for Emotion Recognition in Bangla Text: A Comparative Study of MultiBERT and BanglaBERT with Data Augmentation** (2024) — Nabarun Halder, T. Proma, J. H. Setu, Arafat Noor, et al. — _International Conference on Machine Learning and Applications_ — cites: 1
+  - https://www.semanticscholar.org/paper/8e5ba96f912202b2eefb311d34df9649566ca9d6
+  - doi:10.1109/ICMLA61862.2024.00256
+  - Emotion recognition is an exacting task due to the complexity and diversity of human emotions, as well as their tendency to be open to multiple interpretations. Despite these challenges, emotion recognition from textual data has achieved promising results in recent years for the English language. Numerous studies have been conducted on this topic, leading to significant advancements in various fie…
+  - via: `cite_of:c6801d553a43530b192309ef4364a43e33e4067f` (round 1)
+- **Shiftable Context: Addressing Training-Inference Context Mismatch in Simultaneous Speech Translation** (2023) — Matthew Raffel, Drew Penney, Lizhong Chen — _International Conference on Machine Learning_ — cites: 4
+  - https://www.semanticscholar.org/paper/76e8dd7acb3a9e4ae65189817bfa7e1adedf805a
+  - arXiv:2307.01377 · doi:10.48550/arXiv.2307.01377
+  - Transformer models using segment-based processing have been an effective architecture for simultaneous speech translation. However, such models create a context mismatch between training and inference environments, hindering potential translation accuracy. We solve this issue by proposing Shiftable Context, a simple yet effective scheme to ensure that consistent segment and context sizes are maint…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **EM-Network: Oracle Guided Self-distillation for Sequence Learning** (2023) — J. Yoon, Sunghwan Ahn, Hyeon Seung Lee, Minchan Kim, et al. — _International Conference on Machine Learning_ — cites: 3
+  - https://www.semanticscholar.org/paper/37432dbb873ba7727286cc3662a5c6b8563f89ea
+  - arXiv:2306.10058 · doi:10.48550/arXiv.2306.10058
+  - We introduce EM-Network, a novel self-distillation approach that effectively leverages target information for supervised sequence-to-sequence (seq2seq) learning. In contrast to conventional methods, it is trained with oracle guidance, which is derived from the target sequence. Since the oracle guidance compactly represents the target-side context that can assist the sequence model in solving the t…
+  - via: `cite_of:3f11a2124af139af7c6f17eccab5149d759d7f52` (round 2)
+- **Directed Acyclic Transformer for Non-Autoregressive Machine Translation** (2022) — Fei Huang, Hao Zhou, Yang Liu, Hanguang Li, et al. — _International Conference on Machine Learning_ — cites: 82
+  - https://www.semanticscholar.org/paper/7472f26ffa0f056a70e461d6918ae5ffecda2c92
+  - arXiv:2205.07459 · doi:10.48550/arXiv.2205.07459
+  - Non-autoregressive Transformers (NATs) significantly reduce the decoding latency by generating all tokens in parallel. However, such independent predictions prevent NATs from capturing the dependencies between the tokens for generating multiple possible translations. In this paper, we propose Directed Acyclic Transfomer (DA-Transformer), which represents the hidden states in a Directed Acyclic Gra…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **Data Scaling Laws in NMT: The Effect of Noise and Architecture** (2022) — Yamini Bansal, B. Ghorbani, Ankush Garg, Biao Zhang, et al. — _International Conference on Machine Learning_ — cites: 62
+  - https://www.semanticscholar.org/paper/37ddb9305c8c9120c21a2fae5a851ce8e4384a9c
+  - arXiv:2202.01994
+  - In this work, we study the effect of varying the architecture and training data quality on the data scaling properties of Neural Machine Translation (NMT). First, we establish that the test loss of encoder-decoder transformer models scales as a power law in the number of training samples, with a dependence on the model size. Then, we systematically vary aspects of the training setup to understand…
+  - via: `cite_of:213e471bacff5c0852943988fcb955797f1e591f` (round 2)
+- **Arithmetic Sampling: Parallel Diverse Decoding for Large Language Models** (2022) — L. Vilnis, Yury Zemlyanskiy, Patrick Murray, Alexandre Passos, et al. — _International Conference on Machine Learning_ — cites: 17
+  - https://www.semanticscholar.org/paper/c505b1abb840c8477b35a4503834e04241ffa7b5
+  - arXiv:2210.15458 · doi:10.48550/arXiv.2210.15458
+  - Decoding methods for large language models often trade-off between diversity of outputs and parallelism of computation. Methods such as beam search and Gumbel top-k sampling can guarantee a different output for each element of the beam, but are not easy to parallelize. Alternatively, methods such as temperature sampling and its modifications (top-k sampling, nucleus sampling, typical decoding, and…
+  - via: `cite_of:b462bd9e3c4c991722b77fe696fda0a0372bf6dd` (round 2)
+- **Translatotron 2: High-quality direct speech-to-speech translation with voice preservation** (2021) — Ye Jia, Michelle Tadmor Ramanovich, Tal Remez, Roi Pomerantz — _International Conference on Machine Learning_ — cites: 107
+  - https://www.semanticscholar.org/paper/67bf3f035a062f8b0a6a409f30bb858e859a8645
+  - arXiv:2107.08661
+  - We present Translatotron 2, a neural direct speech-to-speech translation model that can be trained end-to-end. Translatotron 2 consists of a speech encoder, a linguistic decoder, an acoustic synthesizer, and a single attention module that connects them together. Experimental results on three datasets consistently show that Translatotron 2 outperforms the original Translatotron by a large margin on…
+  - via: `query:translation quality speech translation` (round 1)
+- **Mixed Cross Entropy Loss for Neural Machine Translation** (2021) — Haoran Li, Wei Lu — _International Conference on Machine Learning_ — cites: 21
+  - https://www.semanticscholar.org/paper/e8c7a43c7505d4990f4596b1ecc35f01e365a59e
+  - arXiv:2106.15880
+  - In neural machine translation, cross entropy (CE) is the standard loss function in two training methods of auto-regressive models, i.e., teacher forcing and scheduled sampling. In this paper, we propose mixed cross entropy loss (mixed CE) as a substitute for CE in both training approaches. In teacher forcing, the model trained with CE regards the translation problem as a one-to-one mapping process…
+  - via: `cite_of:3360768fcb265a8b7c1ee5ba7cfe03de0e2fad62` (round 2)
+- **Self-supervised and Supervised Joint Training for Resource-rich Machine Translation** (2021) — Yong Cheng, Wei Wang, Lu Jiang, Wolfgang Macherey — _International Conference on Machine Learning_ — cites: 19
+  - https://www.semanticscholar.org/paper/095277b3963c6d8d1b2475ff818f52f27f9e4946
+  - arXiv:2106.04060
+  - Self-supervised pre-training of text representations has been successfully applied to low-resource Neural Machine Translation (NMT). However, it usually fails to achieve notable gains on resource-rich NMT. In this paper, we propose a joint training approach, $F_2$-XEnDec, to combine self-supervised and supervised learning to optimize NMT models. To exploit complementary self-supervised signals for…
+  - via: `query:self-training simultaneous translation` (round 0)
+- **Aligned Cross Entropy for Non-Autoregressive Machine Translation** (2020) — Marjan Ghazvininejad, Vladimir Karpukhin, Luke Zettlemoyer, Omer Levy — _International Conference on Machine Learning_ — cites: 121
+  - https://www.semanticscholar.org/paper/3f11a2124af139af7c6f17eccab5149d759d7f52
+  - arXiv:2004.01655
+  - Non-autoregressive machine translation models significantly speed up decoding by allowing for parallel prediction of the entire target sequence. However, modeling word order is more challenging due to the lack of autoregressive factors in the model. This difficultly is compounded during training with cross entropy loss, which can highly penalize small shifts in word order. In this paper, we propos…
+  - via: `cite_of:1e5b826ddf0754f6e93234ba1260bd939c255e7f` (round 1)
+- **An EM Approach to Non-autoregressive Conditional Sequence Generation** (2020) — Zhiqing Sun, Yiming Yang — _International Conference on Machine Learning_ — cites: 43
+  - https://www.semanticscholar.org/paper/3dd6ceabc36725fa8f8debdaa4a87ec4e35e8c22
+  - arXiv:2006.16378
+  - Autoregressive (AR) models have been the dominating approach to conditional sequence generation, but are suffering from the issue of high inference latency. Non-autoregressive (NAR) models have been recently proposed to reduce the latency by generating all output tokens in parallel but could only achieve inferior accuracy compared to their autoregressive counterparts, primarily due to a difficulty…
+  - via: `cite_of:1e5b826ddf0754f6e93234ba1260bd939c255e7f` (round 1)
+- **Parallel Machine Translation with Disentangled Context Transformer** (2020) — Jungo Kasai, James Cross, Marjan Ghazvininejad, Jiatao Gu — _International Conference on Machine Learning_ — cites: 36
+  - https://www.semanticscholar.org/paper/024731a02ab455ae202dab12f404e0a4350f1dec
+  - arXiv:2001.05136
+  - State-of-the-art neural machine translation models generate a translation from left to right and every step is conditioned on the previously generated tokens. The sequential nature of this generation process causes fundamental latency in inference since we cannot generate multiple tokens in each sentence in parallel. We propose an attention-masking based model, called Disentangled Context (DisCo)…
+  - via: `cite_of:1e5b826ddf0754f6e93234ba1260bd939c255e7f` (round 1)
+- **Cross-model Back-translated Distillation for Unsupervised Machine Translation** (2020) — Xuan-Phi Nguyen, Shafiq R. Joty, Wu Kui, A. Aw — _International Conference on Machine Learning_ — cites: 16
+  - https://www.semanticscholar.org/paper/1a19afe0daeab7ae70dff119f0fed4304c95a815
+  - arXiv:2006.02163
+  - Recent unsupervised machine translation (UMT) systems usually employ three main principles: initialization, language modeling and iterative back-translation, though they may apply them differently. Crucially, iterative back-translation and denoising auto-encoding for language modeling provide data diversity to train the UMT systems. However, the gains from these diversification processes has seeme…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **Temporally Correlated Task Scheduling for Sequence Learning** (2020) — Xueqing Wu, Lewen Wang, Yingce Xia, Weiqing Liu, et al. — _International Conference on Machine Learning_ — cites: 11
+  - https://www.semanticscholar.org/paper/a70a860d76ce108eedf7fc86a8bdc5a2d2f1e1d4
+  - arXiv:2007.05290
+  - Sequence learning has attracted much research attention from the machine learning community in recent years. In many applications, a sequence learning task is usually associated with multiple temporally correlated auxiliary tasks, which are different in terms of how much input information to use or which future step to predict. For example, (i) in simultaneous machine translation, one can conduct…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **Stochastic Beams and Where to Find Them: The Gumbel-Top-k Trick for Sampling Sequences Without Replacement** (2019) — W. Kool, H. V. Hoof, M. Welling — _International Conference on Machine Learning_ — cites: 299
+  - https://www.semanticscholar.org/paper/b462bd9e3c4c991722b77fe696fda0a0372bf6dd
+  - arXiv:1903.06059
+  - The well-known Gumbel-Max trick for sampling from a categorical distribution can be extended to sample $k$ elements without replacement. We show how to implicitly apply this 'Gumbel-Top-$k$' trick on a factorized distribution over sequences, allowing to draw exact samples without replacement using a Stochastic Beam Search. Even for exponentially large domains, the number of model evaluations grows…
+  - via: `ref_of:0feea94f89d395436bf41bd10c797447eecbc128` (round 1)
+- **Insertion Transformer: Flexible Sequence Generation via Insertion Operations** (2019) — Mitchell Stern, William Chan, J. Kiros, Jakob Uszkoreit — _International Conference on Machine Learning_ — cites: 272
+  - https://www.semanticscholar.org/paper/58d34a4fb936ffe95917d8fb4016ff5e3520429a
+  - arXiv:1902.03249
+  - We present the Insertion Transformer, an iterative, partially autoregressive model for sequence generation based on insertion operations. Unlike typical autoregressive models which rely on a fixed, often left-to-right ordering of the output, our approach accommodates arbitrary orderings by allowing for tokens to be inserted anywhere in the sequence during decoding. This flexibility confers a numbe…
+  - via: `ref_of:1e5b826ddf0754f6e93234ba1260bd939c255e7f` (round 1)
+- **Mixture Models for Diverse Machine Translation: Tricks of the Trade** (2019) — T. Shen, Myle Ott, Michael Auli, Marc'Aurelio Ranzato — _International Conference on Machine Learning_ — cites: 167
+  - https://www.semanticscholar.org/paper/3360768fcb265a8b7c1ee5ba7cfe03de0e2fad62
+  - arXiv:1902.07816
+  - Mixture models trained via EM are among the simplest, most widely used and well understood latent variable models in the machine learning literature. Surprisingly, these models have been hardly explored in text generation applications such as machine translation. In principle, they provide a latent variable to control generation and produce a diverse set of hypotheses. In practice, however, mixtur…
+  - via: `ref_of:0feea94f89d395436bf41bd10c797447eecbc128` (round 1)
+
+## NeurIPS (15)
+
+- **QUEST: Quality-Aware Metropolis-Hastings Sampling for Machine Translation** (2024) — Gonçalo Faria, Sweta Agrawal, António Farinhas, Ricardo Rei, et al. — _Neural Information Processing Systems_ — cites: 14
+  - https://www.semanticscholar.org/paper/45562e42830e2f5e2b4a5de6e64c9a3bfb1847d5
+  - arXiv:2406.00049 · doi:10.48550/arXiv.2406.00049
+  - An important challenge in machine translation (MT) is to generate high-quality and diverse translations. Prior work has shown that the estimated likelihood from the MT model correlates poorly with translation quality. In contrast, quality evaluation metrics (such as COMET or BLEURT) exhibit high correlations with human judgments, which has motivated their use as rerankers (such as quality-aware an…
+  - via: `query:translation quality machine translation` (round 1)
+- **Efficient Minimum Bayes Risk Decoding using Low-Rank Matrix Completion Algorithms** (2024) — Firas Trabelsi, David Vilar, Mara Finkelstein, Markus Freitag — _Neural Information Processing Systems_ — cites: 13
+  - https://www.semanticscholar.org/paper/0b3f5408d571aa8687d16b9d8ec36d067334bb7f
+  - arXiv:2406.02832 · doi:10.48550/arXiv.2406.02832
+  - Minimum Bayes Risk (MBR) decoding is a powerful decoding strategy widely used for text generation tasks, but its quadratic computational complexity limits its practical application. This paper presents a novel approach for approximating MBR decoding using matrix completion techniques, focusing on the task of machine translation. We formulate MBR decoding as a matrix completion problem, where the u…
+  - via: `cite_of:213e471bacff5c0852943988fcb955797f1e591f` (round 2)
+- **Speculative Decoding with Big Little Decoder** (2023) — Sehoon Kim, K. Mangalam, Suhong Moon, J. Malik, et al. — _Neural Information Processing Systems_ — cites: 180
+  - https://www.semanticscholar.org/paper/b7d12aec8a0152ec4921dfa43ab525a63b334385
+  - arXiv:2302.07863 · doi:10.52202/075280-1705
+  - The recent emergence of Large Language Models based on the Transformer architecture has enabled dramatic advancements in the field of Natural Language Processing. However, these models have long inference latency, which limits their deployment and makes them prohibitively expensive for various real-time applications. The inference latency is further exacerbated by autoregressive generative tasks,…
+  - via: `cite_of:1e5b826ddf0754f6e93234ba1260bd939c255e7f` (round 1)
+- **DASpeech: Directed Acyclic Transformer for Fast and High-quality Speech-to-Speech Translation** (2023) — Qingkai Fang, Yan Zhou, Yangzhou Feng — _Neural Information Processing Systems_ — cites: 17
+  - https://www.semanticscholar.org/paper/bea4d7de96a9699d4b3ae4d4ac5b50516dd01259
+  - arXiv:2310.07403 · doi:10.48550/arXiv.2310.07403
+  - Direct speech-to-speech translation (S2ST) translates speech from one language into another using a single model. However, due to the presence of linguistic and acoustic diversity, the target speech follows a complex multimodal distribution, posing challenges to achieving both high-quality translations and fast decoding speeds for S2ST models. In this paper, we propose DASpeech, a non-autoregressi…
+  - via: `query:translation quality speech translation` (round 1)
+- **Unified Segment-to-Segment Framework for Simultaneous Sequence Generation** (2023) — Shaolei Zhang, Yang Feng — _Neural Information Processing Systems_ — cites: 9
+  - https://www.semanticscholar.org/paper/6dd1bb6d84c48a9f0066d9a3937fa55153cf6acc
+  - arXiv:2310.17940 · doi:10.48550/arXiv.2310.17940
+  - Simultaneous sequence generation is a pivotal task for real-time scenarios, such as streaming speech recognition, simultaneous machine translation and simultaneous speech translation, where the target sequence is generated while receiving the source sequence. The crux of achieving high-quality generation with low latency lies in identifying the optimal moments for generating, accomplished by learn…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **On the Pareto Front of Multilingual Neural Machine Translation** (2023) — Liang Chen, Shuming Ma, Dongdong Zhang, Furu Wei, et al. — _Neural Information Processing Systems_ — cites: 8
+  - https://www.semanticscholar.org/paper/a05e67039798a9b7280a929c17a8600d1b456ac0
+  - arXiv:2304.03216 · doi:10.48550/arXiv.2304.03216
+  - In this work, we study how the performance of a given direction changes with its sampling ratio in Multilingual Neural Machine Translation (MNMT). By training over 200 multilingual models with various model sizes, data sizes, and language directions, we find it interesting that the performance of certain translation direction does not always improve with the increase of its weight in the multi-tas…
+  - via: `cite_of:4789355a00650afa29682d331d7d9a49a301b43b` (round 2)
+- **Plug-and-Play Stability for Intracortical Brain-Computer Interfaces: A One-Year Demonstration of Seamless Brain-to-Text Communication** (2023) — Chaofei Fan, Nick V. Hahn, Foram B. Kamdar, Donald T. Avansino, et al. — _Neural Information Processing Systems_ — cites: 1
+  - https://www.semanticscholar.org/paper/53284b6b3bb01bf33a5a969bb1d197604a86f1c3
+  - doi:10.52202/075280-1831
+  - Intracortical brain-computer interfaces (iBCIs) have shown promise for restoring rapid communication to people with neurological disorders such as amyotrophic lateral sclerosis (ALS). However, to maintain high performance over time, iBCIs typically need frequent recalibration to combat changes in the neural recordings that accrue over days. This requires iBCI users to stop using the iBCI and engag…
+  - via: `cite_of:12442420adf1c36887fafd108f4b7f4fc822ae60` (round 1)
+- **Non-Monotonic Latent Alignments for CTC-Based Non-Autoregressive Machine Translation** (2022) — Chenze Shao, Yang Feng — _Neural Information Processing Systems_ — cites: 25
+  - https://www.semanticscholar.org/paper/9990750f433eee9fe12b2a134fab7ddd6b05ecbe
+  - arXiv:2210.03953 · doi:10.48550/arXiv.2210.03953
+  - Non-autoregressive translation (NAT) models are typically trained with the cross-entropy loss, which forces the model outputs to be aligned verbatim with the target sentence and will highly penalize small shifts in word positions. Latent alignment models relax the explicit alignment by marginalizing out all monotonic latent alignments with the CTC loss. However, they cannot handle non-monotonic al…
+  - via: `ref_of:218c5c69f3cf0c158e9b6af239a2cc62a688c6de` (round 2)
+- **FastCorrect: Fast Error Correction with Edit Alignment for Automatic Speech Recognition** (2021) — Yichong Leng, Xu Tan, Linchen Zhu, Jin Xu, et al. — _Neural Information Processing Systems_ — cites: 78
+  - https://www.semanticscholar.org/paper/4d43b8809f78ee9f661cc986961e631cbb2accd7
+  - arXiv:2105.03842
+  - Error correction techniques have been used to refine the output sentences from automatic speech recognition (ASR) models and achieve a lower word error rate (WER) than original ASR outputs. Previous works usually use a sequence-to-sequence model to correct an ASR output sentence autoregressively, which causes large latency and cannot be deployed in online ASR services. A straightforward solution t…
+  - via: `query:automatic speech recognition machine translation` (round 2)
+- **Incorporating BERT into Parallel Sequence Decoding with Adapters** (2020) — Junliang Guo, Zhirui Zhang, Linli Xu, Hao-Ran Wei, et al. — _Neural Information Processing Systems_ — cites: 70
+  - https://www.semanticscholar.org/paper/af27f9ada598a86435b778f136bec07d1294a69e
+  - arXiv:2010.06138
+  - While large scale pre-trained language models such as BERT have achieved great success on various natural language understanding tasks, how to efficiently and effectively incorporate them into sequence-to-sequence models and the corresponding text generation tasks remains a non-trivial problem. In this paper, we propose to address this problem by taking two different BERT models as the encoder and…
+  - via: `cite_of:58d34a4fb936ffe95917d8fb4016ff5e3520429a` (round 2)
+- **Variational Interaction Information Maximization for Cross-domain Disentanglement** (2020) — HyeongJoo Hwang, Geon-hyeong Kim, Seunghoon Hong, Kee-Eung Kim — _Neural Information Processing Systems_ — cites: 57
+  - https://www.semanticscholar.org/paper/c4007cc8f5b7404499227c684df171ef2dac9d19
+  - arXiv:2012.04251
+  - Cross-domain disentanglement is the problem of learning representations partitioned into domain-invariant and domain-specific representations, which is a key to successful domain transfer or measuring semantic distance between two domains. Grounded in information theory, we cast the simultaneous learning of domain-invariant and domain-specific representations as a joint objective of multiple infor…
+  - via: `query:translation tasks simultaneous translation` (round 2)
+- **Unsupervised Data Augmentation for Consistency Training** (2019) — Qizhe Xie, Zihang Dai, E. Hovy, Minh-Thang Luong, et al. — _Neural Information Processing Systems_ — cites: 2635
+  - https://www.semanticscholar.org/paper/0feea94f89d395436bf41bd10c797447eecbc128
+  - arXiv:1904.12848
+  - Semi-supervised learning lately has shown much promise in improving deep learning models when labeled data is scarce. Common among recent approaches is the use of consistency training on a large amount of unlabeled data to constrain model predictions to be invariant to input noise. In this work, we present a new perspective on how to effectively noise unlabeled examples and argue that the quality…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **SPoC: Search-based Pseudocode to Code** (2019) — Sumith Kulal, Panupong Pasupat, Kartik Chandra, Mina Lee, et al. — _Neural Information Processing Systems_ — cites: 318
+  - https://www.semanticscholar.org/paper/1906e3a2fda12641a42739e3fb6a8f8b1accc8dd
+  - arXiv:1906.04908
+  - We consider the task of mapping pseudocode to long programs that are functionally correct. Given test cases as a mechanism to validate programs, we search over the space of possible translations of the pseudocode to find a program that passes the validation. However, without proper credit assignment to localize the sources of program failures, it is difficult to guide search toward more promising…
+  - via: `ref_of:2577d053f8aab912d29b424e1f09133d83740fd2` (round 2)
+- **Implicit Semantic Data Augmentation for Deep Networks** (2019) — Yulin Wang, Xuran Pan, Shiji Song, Hong Zhang, et al. — _Neural Information Processing Systems_ — cites: 235
+  - https://www.semanticscholar.org/paper/11babff42b5bf9841ebb87781bfc21f74acb3d28
+  - arXiv:1909.12220
+  - In this paper, we propose a novel implicit semantic data augmentation (ISDA) approach to complement traditional augmentation techniques like flipping, translation or rotation. Our work is motivated by the intriguing property that deep networks are surprisingly good at linearizing features, such that certain directions in the deep feature space correspond to meaningful semantic transformations, e.g…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Fast Structured Decoding for Sequence Models** (2019) — Zhiqing Sun, Zhuohan Li, Haoqing Wang, Zi Lin, et al. — _Neural Information Processing Systems_ — cites: 132
+  - https://www.semanticscholar.org/paper/fe2f254923c72958fb65e025adf38ec6403dd6f8
+  - arXiv:1910.11555
+  - Autoregressive sequence models achieve state-of-the-art performance in domains like machine translation. However, due to the autoregressive factorization nature, these models suffer from heavy latency during inference. Recently, non-autoregressive sequence models were proposed to reduce the inference time. However, these models assume that the decoding process of each token is conditionally indepe…
+  - via: `ref_of:7472f26ffa0f056a70e461d6918ae5ffecda2c92` (round 1)
+
+## ICASSP (64)
+
+- **Chunk-wise Attention Transducers for Fast and Accurate Streaming Speech-to-Text** (2026) — Hainan Xu, Vladimir Bataev, Travis M. Bartley, J. Balam — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 0
+  - https://www.semanticscholar.org/paper/d0c53dfab969742a85df4ddbfec08e147ffed239
+  - arXiv:2602.24245 · doi:10.48550/arXiv.2602.24245
+  - We propose Chunk-wise Attention Transducer (CHAT), a novel extension to RNN-T models that processes audio in fixed-size chunks while employing cross-attention within each chunk. This hybrid approach maintains RNN-T's streaming capability while introducing controlled flexibility for local alignment modeling. CHAT significantly reduces the temporal dimension that RNN-T must handle, yielding substant…
+  - via: `query:streaming speech translation` (round 0)
+- **Enhancing Document-Level Machine Translation via Filtered Synthetic Corpora and Two-Stage LLM Adaptation** (2026) — Ireh Kim, Tesia Sker, Chanwoo Kim — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 0
+  - https://www.semanticscholar.org/paper/f0598429afbe7cf382cdffff24967e462e78f882
+  - arXiv:2603.22186 · doi:10.1109/icassp55912.2026.11461046
+  - In Machine Translation, Large Language Models (LLMs) have generally underperformed compared to conventional encoder-decoder systems and thus see limited adoption. However, LLMs excel at modeling contextual information, making them a natural fit for document-level translation tasks where coherence across sentences is crucial. Despite this potential, document-level MT with LLMs faces two key challen…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **MTAD: A Three-Stage Framework for Machine Translation Agents Distillation** (2026) — Xuanbo Guo, Yanjie Liang, Jianxiang Zhou, Baqun Sun, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 0
+  - https://www.semanticscholar.org/paper/f6a4bd19ecd0321879860ba5dfc99633f020fc3b
+  - doi:10.1109/icassp55912.2026.11462599
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **PROST-LLM: Progressively Enhancing the Speech-to-Speech Translation Capability in LLMs** (2026) — Jing Xu, Jiaqi Wang, Daxin Tan, Xiao Chen — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 0
+  - https://www.semanticscholar.org/paper/b3691734002256b1c4ca5e6efbf0af4eece19c83
+  - arXiv:2601.16618 · doi:10.48550/arXiv.2601.16618
+  - Although Large Language Models (LLMs) excel in many tasks, their application to Speech-to-Speech Translation (S2ST) is underexplored and hindered by data scarcity. To bridge this gap, we propose PROST-LLM (PROgressive Speech-to-speech Translation) to enhance the S2ST capabilities in LLMs progressively. First, we fine-tune the LLMs with the CVSS corpus, employing designed tri-task learning and chai…
+  - via: `query:large language llms speech translation` (round 1)
+- **Speaker Attributed Automatic Speech Recognition Using Speech Aware Llms** (2026) — Hagai Aronowitz, Zvi Kons, Avihu Dekel, G. Saon, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 0
+  - https://www.semanticscholar.org/paper/a865cfc4e91bf5c478e2dc62ae4b33c0d0c480fa
+  - arXiv:2604.11269 · doi:10.1109/icassp55912.2026.11464609
+  - Speaker-Attributed Automatic Speech Recognition (SAA) enhances traditional ASR systems by incorporating relative speaker identity tags directly into the transcript (e.g., [Speaker 1]:, [Speaker 2]:). In this work, we extend the capabilities of Granite-speech, a state-of-the-art speech-aware Large Language Model (LLM) originally trained for transcription and translation. We demonstrate that it can…
+  - via: `query:large language llms speech translation` (round 1)
+- **Knowledge Distillation for Image Restoration : Simultaneous Learning from Degraded and Clean Images** (2025) — Yongheng Zhang, Danfeng Yan — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 4
+  - https://www.semanticscholar.org/paper/20c39d5e21d7eb2e8209a83f26cfd3280684d0d4
+  - arXiv:2501.09268 · doi:10.1109/ICASSP49660.2025.10889105
+  - Model compression through knowledge distillation has seen extensive application in classification and segmentation tasks. However, its potential in image-to-image translation, particularly in image restoration, remains underexplored. To address this gap, we propose a Simultaneous Learning Knowledge Distillation (SLKD) framework tailored for model compression in image restoration tasks. SLKD employ…
+  - via: `query:simultaneous speech translation` (round 0)
+- **PHRASED: Phrase Dictionary Biasing for Speech Translation** (2025) — Peidong Wang, Jian Xue, Rui Zhao, Junkun Chen, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 1
+  - https://www.semanticscholar.org/paper/ce75d52eba5d0211267dab3f7d76b03e9c604732
+  - arXiv:2506.09175 · doi:10.48550/arXiv.2506.09175
+  - Phrases are essential to understand the core concepts in conversations. However, due to their rare occurrence in training data, correct translation of phrases is challenging in speech translation tasks. In this paper, we propose a phrase dictionary biasing method to leverage pairs of phrases mapping from the source language to the target language. We apply the phrase dictionary biasing method to t…
+  - via: `query:streaming speech translation` (round 0)
+- **Semi-Supervised Knowledge Distillation Framework towards Lightweight Large Language Model for Spoken Language Translation** (2025) — Tonmoy Rajkhowa, Amartya Roy Chowdhury, A. Tripathi, Sanjeev Sharma, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 1
+  - https://www.semanticscholar.org/paper/0e2a18811fe27a15798ff1f13c6d733187aae919
+  - doi:10.1109/ICASSP49660.2025.10888265
+  - Even though large language models (LLMs) have demonstrated remarkable performance across various natural language processing tasks, their application in speech-related tasks has largely remained underexplored. This work addresses this gap by incorporating acoustic features into an LLM which can be fine-tuned for downstream direct speech-to-text translation and automatic speech recognition tasks. T…
+  - via: `query:large language llms simultaneous translation` (round 1)
+- **LESS: Large Language Model Enhanced Semi-Supervised Learning for Speech Foundational Models** (2025) — Wen Ding, Fan Qian — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 1
+  - https://www.semanticscholar.org/paper/9c324e100eace0d3f8db227d5a962c5e3266c31d
+  - arXiv:2506.04586 · doi:10.48550/arXiv.2506.04586
+  - Although state-of-the-art Speech Foundational Models can produce high-quality text pseudo-labels, applying Semi-Supervised Learning (SSL) for in-the-wild real-world data remains challenging due to its richer and more complex acoustics compared to curated datasets. To address the challenges, we introduce LESS (Large Language Model Enhanced Semi-supervised Learning), a versatile framework that uses…
+  - via: `query:large language llms speech translation` (round 1)
+- **Large Language Models Are Efficient Learners as Zero-Shot Speech Translators** (2025) — Chenxuan Liu, Liping Chen, Peiwang Tang, Weitai Zhang, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 1
+  - https://www.semanticscholar.org/paper/9aac31bd3553759bfae8b3e2d710e6c2774c8a7d
+  - doi:10.1109/ICASSP49660.2025.10889325
+  - Significant progress has recently been made in combining Speech Foundation Models (SFMs) and Large Language Models (LLMs) into a unified model to tackle Speech-to-Text Translation (ST) tasks. However, fine-tuning LLMs to adapt to specific downstream tasks requires substantial resources, which is often infeasible. Therefore, this study proposes using Chain-of-Thought (CoT)-based LLMs to perform err…
+  - via: `query:large language llms speech translation` (round 1)
+- **Revisiting Direct Speech-to-Text Translation with Speech LLMs: Better Scaling than CoT Prompting?** (2025) — Oriol Pareras, Gerard I. Gállego, Federico Costa, Cristina España-Bonet, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 1
+  - https://www.semanticscholar.org/paper/c0d7dd9ac1494effa1f0585b4482fbd5f88d0bf4
+  - arXiv:2510.03093 · doi:10.1109/ICASSP55912.2026.11464161
+  - Recent work on Speech-to-Text Translation (S2TT) has focused on LLM-based models, introducing the increasingly adopted Chain-of-Thought (CoT) prompting, where the model is guided to first transcribe the speech and then translate it. CoT typically outperforms direct prompting primarily because it can exploit abundant Automatic Speech Recognition (ASR) and Text-to-Text Translation (T2TT) datasets to…
+  - via: `query:speech recognition asr simultaneous translation` (round 2)
+- **Direct Simultaneous Translation Activation for Large Audio-Language Models** (2025) — Pei Zhang, Yiming Wang, Jialong Tang, Baosong Yang, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 0
+  - https://www.semanticscholar.org/paper/7f5ed8e225cd2f90249f004dad29d33a3572abfd
+  - arXiv:2509.15692 · doi:10.48550/arXiv.2509.15692
+  - Simultaneous speech-to-text translation (Simul-S2TT) aims to translate speech into target text in real time, outputting translations while receiving source speech input, rather than waiting for the entire utterance to be spoken. Simul-S2TT research often modifies model architectures to implement read-write strategies. However, with the rise of large audio-language models (LALMs), a key challenge i…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **SimulSense: Sense-Driven Interpreting for Efficient Simultaneous Speech Translation** (2025) — Haotian Tan, Hiroki Ouchi, S. Sakti — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 0
+  - https://www.semanticscholar.org/paper/cf5a396afb4f17d436b388baf83c0a2cd315b3cd
+  - arXiv:2509.21932 · doi:10.48550/arXiv.2509.21932
+  - How to make human-interpreter-like read/write decisions for simultaneous speech translation (SimulST) systems? Current state-of-the-art systems formulate SimulST as a multi-turn dialogue task, requiring specialized interleaved training data and relying on computationally expensive large language model (LLM) inference for decision-making. In this paper, we propose SimulSense, a novel framework for…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **A Domain-Specific Multilingual Speech Translation Corpus via Simultaneous Interpretation** (2025) — Seunghee Han, Gary Geunbae Lee, Hung Soon Kim, Sunhee Kim, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 0
+  - https://www.semanticscholar.org/paper/a297aad97df342a4672d6e6791fd5f3e69b32f6a
+  - doi:10.1109/ICASSP49660.2025.10887990
+  - This paper presents a novel multilingual speech translation corpus for complex, domain-specific content in Korean, English, Spanish, and Japanese. The corpus contains 4,000 hours of parallel speech, including 1,000 hours of Korean audio with simultaneous sight interpretations in the other three languages by 294 professionals (242 interpreters and 52 Korean voice actors). It also includes transcrip…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Transcribing and Translating, Fast and Slow: Joint Speech Translation and Recognition** (2025) — Niko Moritz, Ruiming Xie, Yashesh Gaur, Ke Li, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 0
+  - https://www.semanticscholar.org/paper/395b2530a4ce777d2624be95d7a2319d524f5185
+  - doi:10.1109/ICASSP49660.2025.10890381
+  - We propose the joint speech translation and recognition (JSTAR) model that leverages the fast-slow cascaded encoder architecture for simultaneous end-to-end automatic speech recognition (ASR) and speech translation (ST). The model is transducer-based and uses a multi-objective training strategy that optimizes both ASR and ST objectives simultaneously. This allows JSTAR to produce high-quality stre…
+  - via: `query:streaming speech translation` (round 0)
+- **Faithful Self-Refinement in Mathematical Reasoning via Progressive Back-Translation** (2025) — Haoran Liao, Zhihao Zhu, Shaohua Hu, Hao He, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 0
+  - https://www.semanticscholar.org/paper/dea9e4835652ef2e4a0f56008b9edc19b59ed423
+  - doi:10.1109/ICASSP49660.2025.10890054
+  - Large language models (LLMs) can achieve superior results through iterative refinement based on internal or external signals, compared to the unstable outputs from a single pass. However, the reliability of existing internal signals is questionable due to their susceptibility to intrinsic hallucinations, while external signals are only useful in limited scenarios. In this paper, we introduce a nov…
+  - via: `query:back-translation simultaneous` (round 0)
+- **SLAM-AAC: Enhancing Audio Captioning with Paraphrasing Augmentation and CLAP-Refine through LLMs** (2024) — Wenxi Chen, Ziyang Ma, Xiquan Li, Xuenan Xu, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 19
+  - https://www.semanticscholar.org/paper/5d209a14c92ff5aaa934e65b0f6ebf665da40fca
+  - arXiv:2410.09503 · doi:10.1109/ICASSP49660.2025.10889071
+  - Automated Audio Captioning (AAC) aims to generate natural textual descriptions for input audio signals. Recent progress in audio pre-trained models and large language models (LLMs) has significantly enhanced audio understanding and textual reasoning capabilities, making improvements in AAC possible. In this paper, we propose SLAM-AAC to further enhance AAC with paraphrasing augmentation and CLAP-R…
+  - via: `query:large language llms speech translation` (round 1)
+- **Train Long and Test Long:Leveraging Full Document Contexts in Speech Processing** (2024) — William Chen, Takatomo Kano, A. Ogawa, Marc Delcroix, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 14
+  - https://www.semanticscholar.org/paper/b27c03837cf3565b21b710bed1162eefba048d23
+  - doi:10.1109/ICASSP48485.2024.10446727
+  - The quadratic memory complexity of self-attention has generally restricted Transformer-based models to utterance-based speech processing, preventing models from leveraging long-form contexts. A common solution has been to formulate long-form speech processing into a streaming problem, only using limited prior context. We propose a new and simple paradigm, encoding entire documents at once, which h…
+  - via: `query:streaming speech translation` (round 0)
+- **Anim-400K: A Large-Scale Dataset for Automated End to End Dubbing of Video** (2024) — Kevin Cai, Chong Liu, David M. Chan — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 9
+  - https://www.semanticscholar.org/paper/c44705e285b48e4a0634c78ff51d11152c422896
+  - arXiv:2401.05314 · doi:10.1109/ICASSP48485.2024.10447911
+  - The Internet’s wealth of content, with up to 60% published in English, starkly contrasts the global population, where only 18.8% are English speakers, and just 5.1% consider it their native language, leading to disparities in online information access. Unfortunately, automated processes for dubbing of video – replacing the audio track of a video with a translated alternative – remain a complex and…
+  - via: `query:simultaneous speech translation` (round 0)
+- **Textless Streaming Speech-to-Speech Translation using Semantic Speech Tokens** (2024) — Jinzheng Zhao, Niko Moritz, Egor Lakomkin, Ruiming Xie, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 6
+  - https://www.semanticscholar.org/paper/a6aec06e0270b41cd5a1a06745378401b88155d0
+  - arXiv:2410.03298 · doi:10.1109/ICASSP49660.2025.10889740
+  - Cascaded speech-to-speech translation systems often suffer from the error accumulation problem and high latency, which is a result of cascaded modules whose inference delays accumulate. In this paper, we propose a transducer-based speech translation model that outputs discrete speech tokens in a low-latency streaming fashion. This approach eliminates the need for generating text output first, foll…
+  - via: `query:streaming speech translation` (round 0)
+- **EMMeTT: Efficient Multimodal Machine Translation Training** (2024) — Piotr Żelasko, Zhehuai Chen, Mengru Wang, Daniel Galvez, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 6
+  - https://www.semanticscholar.org/paper/ba7212afad7143f8a3159feb1841e5fad00515d5
+  - arXiv:2409.13523 · doi:10.1109/ICASSP49660.2025.10890312
+  - A rising interest in the modality extension of foundation language models warrants discussion on the most effective, and efficient, multimodal training approach. This work focuses on neural machine translation (NMT) and proposes a joint multimodal training regime of Speech-LLM to include automatic speech translation (AST). We investigate two different foundation model architectures, decoder-only G…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **Quantifying The Effect Of Simulator-Based Data Augmentation For Speech Recognition On Augmented Reality Glasses** (2024) — Riku Arakawa, Mathieu Parvaix, Chiong Lai, Hakan Erdogan, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 5
+  - https://www.semanticscholar.org/paper/6af9da9519a027aa2029a6d3b106517d94e13e4e
+  - doi:10.1109/ICASSP48485.2024.10446544
+  - Augmented reality (AR) glasses have an immense potential for enhancing conversations by leveraging speech recognition to display real-time transcription or translation, for example, to assist people with hearing impairments or for people conversing in a non-native language. For deployment in real environments, such systems, however, need to be able to separate the speech of interest from noise and…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **End-to-End Speech Translation with Mutual Knowledge Distillation** (2024) — Hao Wang, Zhengshan Xue, Yikun Lei, Deyi Xiong — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 4
+  - https://www.semanticscholar.org/paper/99aed8ca648202a343cd741dbaf2e4c8b7899667
+  - doi:10.1109/ICASSP48485.2024.10445811
+  - Multi-task learning (MTL) is widely used to improve end-to-end speech translation (ST), which implicitly transfer knowledge from auxiliary automatic speech recognition (ASR) and/or machine translation (MT) to ST through shared modules. In this study, we find that triple-task MTL (ST+MT+ASR) suffers from a knowledge transfer limitation that leads to performance stagnation compared with dual-task MT…
+  - via: `query:streaming speech translation` (round 0)
+- **A Cross Search Method for Data Augmentation in Neural Machine Translation** (2024) — Mengchao Zhang, Mei Tu, Fan Zhang, Song Liu — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 3
+  - https://www.semanticscholar.org/paper/6fbde862d84f1430baa57fbfd26329b47696d98e
+  - doi:10.1109/ICASSP48485.2024.10447171
+  - Large language models (LLMs) have shown excellent performance on general machine translation. However, LLMs suffer from high deployment cost and unsatisfying quality on low-resource domains. To this end, we explore to build base translation models with LLM-enhanced data augmentation. For data augmentation, we propose a cross search method to obtain qualified parallel in-domain corpus. This method…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Semi-Decoupled 6D Pose Estimation via Multi-Modal Feature Fusion** (2024) — Zhenhu Zhang, Xin Cao, Li Jin, Xueying Qin, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 3
+  - https://www.semanticscholar.org/paper/8b605cec23369278cc0fe8d3e9cfd4d4894dba48
+  - doi:10.1109/ICASSP48485.2024.10447649
+  - The existing methods for 6D pose estimation based on RGB-D employ RGB images and observed point cloud derived from depth maps as input, then concurrently predicting both rotation and translation. However, rotation and translation possess distinct characteristics and scale ranges, and their simultaneous prediction can lead to mutual influence in the network parameter space. Additionally, the observ…
+  - via: `query:simultaneous speech translation` (round 0)
+- **A Modular-based Strategy for Mitigating Gradient Conflicts in Simultaneous Speech Translation** (2024) — Xiaoqian Liu, Yangfan Du, Jianjin Wang, Yuan Ge, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 2
+  - https://www.semanticscholar.org/paper/6811a92597b93152e9a0d52638593e33c26d851a
+  - arXiv:2409.15911 · doi:10.1109/ICASSP49660.2025.10887794
+  - Simultaneous Speech Translation (SimulST) involves generating target language text while continuously processing streaming speech input, presenting significant real-time challenges. Multi-task learning is often employed to enhance SimulST performance but introduces optimization conflicts between primary and auxiliary tasks, potentially compromising overall efficiency. The existing model-level conf…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **SimulTron: On-Device Simultaneous Speech to Speech Translation** (2024) — A. Agranovich, Eliya Nachmani, O. Rybakov, Yifan Ding, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 0
+  - https://www.semanticscholar.org/paper/cc504679eccd9371ca4338023511e577e78b259a
+  - arXiv:2406.02133 · doi:10.1109/ICASSP49660.2025.10889296
+  - Simultaneous speech-to-speech translation (S2ST) holds the promise of breaking down communication barriers and enabling fluid conversations across languages. However, achieving accurate, real-time translation through mobile devices remains a major challenge. We introduce SimulTron, a novel S2ST architecture designed to tackle this task. SimulTron is a lightweight direct S2ST model that uses the st…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Towards Universal Speech Discrete Tokens: A Case Study for ASR and TTS** (2023) — Yifan Yang, Feiyu Shen, Chenpeng Du, Ziyang Ma, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 46
+  - https://www.semanticscholar.org/paper/fe3f5c5209557cd93a98de61afeb325db545740e
+  - arXiv:2309.07377 · doi:10.1109/ICASSP48485.2024.10447751
+  - Self-supervised learning (SSL) proficiency in speech-related tasks has driven research into utilizing discrete tokens for speech tasks like recognition and translation, which offer lower storage requirements and great potential to employ natural language processing techniques. However, these studies, mainly single-task focused, faced challenges like overfitting and performance degradation in speec…
+  - via: `query:available https github speech translation` (round 2)
+- **SSVMR: Saliency-Based Self-Training for Video-Music Retrieval** (2023) — Xuxin Cheng, Zhihong Zhu, Hongxiang Li, Yaowei Li, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 30
+  - https://www.semanticscholar.org/paper/2e5928ab18b444582286f3345e8bdfe6de5fe436
+  - arXiv:2302.09328 · doi:10.1109/ICASSP49357.2023.10096514
+  - With the rise of short videos, the demand for selecting appropriate background music (BGM) for a video has increased significantly, video-music retrieval (VMR) task gradually draws much attention by research community. As other cross-modal learning tasks, existing VMR approaches usually attempt to measure the similarity between the video and music in the feature space. However, they (1) neglect th…
+  - via: `query:self-training simultaneous translation` (round 0)
+- **Translatotron 3: Speech to Speech Translation with Monolingual Data** (2023) — Eliya Nachmani, Alon Levkovitch, Yi-Yang Ding, Chulayutsh Asawaroengchai, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 28
+  - https://www.semanticscholar.org/paper/0d5469be6d35fb5819471bdfe231cb075971a8c3
+  - arXiv:2305.17547 · doi:10.1109/ICASSP48485.2024.10448426
+  - This paper presents Translatotron 3, a novel approach to unsupervised direct speech-to-speech translation from monolingual speech-text datasets by combining masked autoencoder, unsupervised embedding mapping, and back-translation. Experimental results in speech-to-speech translation tasks between Spanish and English show that Translatotron 3 outperforms a baseline cascade system, reporting 18.14 B…
+  - via: `cite_of:b6222ad8acdf327368b45fb7fa5f4cf374d6da80` (round 1)
+- **Glancing Future for Simultaneous Machine Translation** (2023) — Shoutao Guo, Shaolei Zhang, Yang Feng — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 11
+  - https://www.semanticscholar.org/paper/556ec6eb0b748bce7dbb13473bfb8b69d80351cc
+  - arXiv:2309.06179 · doi:10.1109/ICASSP48485.2024.10446517
+  - Simultaneous machine translation (SiMT) outputs translation while reading the source sentence. Unlike conventional sequence-to-sequence (seq2seq) training, existing SiMT methods adopt the prefix-to-prefix (prefix2prefix) training, where the model predicts target tokens based on partial source tokens. However, the prefix2prefix training diminishes the ability of the model to capture global informat…
+  - via: `query:prefix-to-prefix translation` (round 0)
+- **Enhancing Speech-To-Speech Translation with Multiple TTS Targets** (2023) — Jiatong Shi, Yun Tang, Ann Lee, H. Inaguma, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 11
+  - https://www.semanticscholar.org/paper/8402d64fde12cafaf8a1daa60de0acd1abedbffb
+  - arXiv:2304.04618 · doi:10.1109/ICASSP49357.2023.10095973
+  - It has been known that direct speech-to-speech translation (S2ST) models usually suffer from the data scarcity issue because of the limited existing parallel materials for both source and target speech. Therefore to train a direct S2ST system, previous works usually utilize text-to-speech (TTS) systems to generate samples in the target language by augmenting the data from speech-to-text translatio…
+  - via: `query:bleu points speech translation` (round 2)
+- **ST-MVDNet++: Improve Vehicle Detection with Lidar-Radar Geometrical Augmentation via Self-Training** (2023) — Yu-Jhe Li, Matthew O'Toole, Kris Kitani — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 10
+  - https://www.semanticscholar.org/paper/b4ab96f16fa56db97bcfeae6c1c2fbec1b48a6e9
+  - doi:10.1109/ICASSP49357.2023.10096041
+  - We aim to improve the performance of the vehicle detection model with Lidar-Radar fusion and data augmentation. The recent works for Lidar-Radar fusion such as MVDNet or ST-MVDNet, have been proposed to have effective performance in detecting vehicles, and address the issue regarding missing modality. However, there are few works applying some global data augmentations such as rotation, translatio…
+  - via: `query:self-training simultaneous translation` (round 0)
+- **Diarist: Streaming Speech Translation with Speaker Diarization** (2023) — Muqiao Yang, Naoyuki Kanda, Xiaofei Wang, Junkun Chen, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 8
+  - https://www.semanticscholar.org/paper/aaddee14d77b84ed8be95218b7b5b5e738d71717
+  - arXiv:2309.08007 · doi:10.1109/ICASSP48485.2024.10446050
+  - End-to-end speech translation (ST) for conversation recordings involves several under-explored challenges such as speaker diarization (SD) without accurate word time stamps and handling of overlapping speech in a streaming fashion. In this work, we propose DiariST, the first streaming ST and SD solution. It is built upon a neural transducer-based streaming ST system and integrates tokenlevel seria…
+  - via: `query:streaming speech translation` (round 0)
+- **Decoupled Non-Parametric Knowledge Distillation for end-to-End Speech Translation** (2023) — Hao Zhang, Nianwen Si, Yaqi Chen, Wenlin Zhang, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 6
+  - https://www.semanticscholar.org/paper/349c57479e5e28e61904fe4381c1128486fb1c0c
+  - arXiv:2304.10295 · doi:10.1109/ICASSP49357.2023.10096899
+  - Existing techniques often attempt to make knowledge transfer from a powerful machine translation (MT) to speech translation (ST) model with some elaborate techniques, which often requires transcription as extra input during training. However, transcriptions are not always available, and how to improve the ST model performance without transcription, i.e., data efficiency, has rarely been studied in…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **LEAPT: Learning Adaptive Prefix-to-Prefix Translation For Simultaneous Machine Translation** (2023) — Lei Lin, Shuangtao Li, Xiaodon Shi — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 5
+  - https://www.semanticscholar.org/paper/348bdd33f49abe891ca60531ea4632f7f1bad06f
+  - arXiv:2303.11750 · doi:10.1109/ICASSP49357.2023.10096545
+  - Simultaneous machine translation, which aims at a realtime translation, is useful in many live scenarios but very challenging due to the trade-off between accuracy and latency. To achieve the balance for both, the model needs to wait for appropriate streaming text (READ policy) and then generates its translation (WRITE policy). However, WRITE policies of previous work either are specific to the me…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **Leveraging Timestamp Information for Serialized Joint Streaming Recognition and Translation** (2023) — Sara Papi, Peidong Wang, Junkun Chen, Jian Xue, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 4
+  - https://www.semanticscholar.org/paper/f4f9aa35c6088fb870ad472328425518ec08527f
+  - arXiv:2310.14806 · doi:10.1109/ICASSP48485.2024.10447565
+  - The growing need for instant spoken language transcription and translation is driven by increased global communication and cross-lingual interactions. This has made offering translations in multiple languages essential for user applications. Traditional approaches to automatic speech recognition (ASR) and speech translation (ST) have often relied on separate systems, leading to inefficiencies in c…
+  - via: `query:streaming speech translation` (round 0)
+- **Language Model is a Branch Predictor for Simultaneous Machine Translation** (2023) — Aoxiong Yin, Tianyun Zhong, Haoyuan Li, Siliang Tang, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 2
+  - https://www.semanticscholar.org/paper/1ac3987626a282c165085c4d26cee22576938999
+  - arXiv:2312.14488 · doi:10.1109/ICASSP48485.2024.10447486
+  - The primary objective of simultaneous machine translation (SiMT) is to minimize latency while preserving the quality of the final translation. Drawing inspiration from CPU branch prediction techniques, we propose incorporating branch prediction techniques in SiMT tasks to reduce translation latency. Specifically, we utilize a language model as a branch predictor to predict potential branch directi…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Zephyr: Zero-Shot Punctuation Restoration** (2023) — Minghan Wang, Yinglu Li, Jiaxin Guo, Xiaosong Qiao, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 2
+  - https://www.semanticscholar.org/paper/29a7ab3b9d63e075099aad443a08c8fa0772f6ba
+  - doi:10.1109/icassp49357.2023.10095799
+  - Punctuation restoration can be crucial for the cascade speech translation system. Traditional approaches typically treat it as a sequential tagging problem, predicting which punctuation mark should follow a given word. However, this often requires significant computational and storage resources for full-stage training or fine-tuning. Our argument is that pre-trained language models (PLMs) can dire…
+  - via: `query:streaming speech translation` (round 0)
+- **Joint Training and Decoding for Multilingual End-to-End Simultaneous Speech Translation** (2023) — Wuwei Huang, Renren Jin, Wen Zhang, Jian Luan, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 1
+  - https://www.semanticscholar.org/paper/38bea301c1e64ba6036d52e31c2970e0f812aaaa
+  - arXiv:2503.11080 · doi:10.1109/ICASSP49357.2023.10095811
+  - Recent studies on end-to-end speech translation(ST) have facilitated the exploration of multilingual end-to-end ST and end-to-end simultaneous ST. In this paper, we investigate end-to-end simultaneous speech translation in a one-to-many multilingual setting which is closer to applications in real scenarios. We explore a separate decoder architecture and a unified architecture for joint synchronous…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Cooperative Five Degrees Of Freedom Motion Estimation For A Swarm Of Autonomous Vehicles** (2023) — Nikos Piperigkos, Aris S. Lalos, K. Berberidis, C. Anagnostopoulos — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 1
+  - https://www.semanticscholar.org/paper/947e607de9009620c01e9e3137893b642f8185dd
+  - doi:10.1109/ICASSP49357.2023.10096821
+  - In this paper, we propose a novel cooperative-based system that facilitates each autonomous vehicle of the swarm to be fully aware of its 5 degrees of freedom (DOF) motion, i.e., 3D translation and 2D rotation, a very important task for autonomous navigation, known also as simultaneous localization and mapping (SLAM). The novelty is that the interconnected vehicles of the swarm share a common coll…
+  - via: `query:simultaneous speech translation` (round 0)
+- **Rethinking the Reasonability of the Test Set for Simultaneous Machine Translation** (2023) — Meng Liu, Wen Zhang, Xiang Li, Jian Luan, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 0
+  - https://www.semanticscholar.org/paper/5ebc7a15e41167b4015b3f46507fbba07da95d17
+  - arXiv:2303.00969 · doi:10.1109/ICASSP49357.2023.10095739
+  - Simultaneous machine translation (SimulMT) models start translation before the end of the source sentence, making the translation monotonically aligned with the source sentence. However, the general full-sentence translation test set is acquired by offline translation of the entire source sentence, which is not designed for SimulMT evaluation, making us rethink whether this will underestimate the…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Textless Direct Speech-to-Speech Translation with Discrete Speech Representation** (2022) — Xinjian Li, Ye Jia, Chung-Cheng Chiu — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 35
+  - https://www.semanticscholar.org/paper/f37f0f69515d827b006f78e53d8331fd0a4a18b9
+  - arXiv:2211.00115 · doi:10.1109/ICASSP49357.2023.10096797
+  - Research on speech-to-speech translation (S2ST) has progressed rapidly in recent years. Many end-to-end systems have been proposed and show advantages over conventional cascade systems, which are often composed of recognition, translation and synthesis sub-systems. However, most of end-to-end systems still rely on intermediate textual supervision during training, which makes it infeasible to work…
+  - via: `query:translation quality speech translation` (round 1)
+- **Make More of Your Data: Minimal Effort Data Augmentation for Automatic Speech Recognition and Translation** (2022) — Tsz Kin Lam, Shigehiko Schamoni, S. Riezler — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 12
+  - https://www.semanticscholar.org/paper/2ea55d04b084d599306a748a6a01563cddad2ff8
+  - arXiv:2210.15398 · doi:10.1109/ICASSP49357.2023.10094564
+  - Data augmentation is a technique to generate new training data based on existing data. We evaluate the simple and cost-effective method of concatenating the original data examples to build new training instances. Continued training with such augmented data is able to improve off-the-shelf Transformer and Conformer models that were optimized on the original data only. We demonstrate considerable im…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Improving Speech-to-Speech Translation Through Unlabeled Text** (2022) — Xuan-Phi Nguyen, Sravya Popuri, Changhan Wang, Yun Tang, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 9
+  - https://www.semanticscholar.org/paper/fbdf0176e214e50cd87939a7a5a61ecbab9e7173
+  - arXiv:2210.14514 · doi:10.1109/ICASSP49357.2023.10095578
+  - Direct speech-to-speech translation (S2ST) is among the most challenging problems in the translation paradigm due to the significant scarcity of S2ST data. While effort has been made to increase the data size from unlabeled speech by cascading pretrained speech recognition (ASR), machine translation (MT) and text-to-speech (TTS) models; unlabeled text has remained relatively under-utilized to impr…
+  - via: `cite_of:b6222ad8acdf327368b45fb7fa5f4cf374d6da80` (round 1)
+- **Tackling Data Scarcity in Speech Translation Using Zero-Shot Multilingual Machine Translation Techniques** (2022) — Tu Anh Dinh, Danni Liu, J. Niehues — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 7
+  - https://www.semanticscholar.org/paper/79911c4d6a195b020c22a9b43f35d4bdfe407b2a
+  - arXiv:2201.11172 · doi:10.1109/ICASSP43922.2022.9746815
+  - Recently, end-to-end speech translation (ST) has gained significant attention as it avoids error propagation. However, the approach suffers from data scarcity. It heavily depends on direct ST data and is less efficient in making use of speech transcription and text translation data, which is often more easily available. In the related field of multilingual text translation, several techniques have…
+  - via: `query:machine translation nmt speech translation` (round 1)
+- **Efficient Speech Translation with Dynamic Latent Perceivers** (2022) — Yiannis (Ioannis) Tsiamas, Gerard I. Gállego, José A. R. Fonollosa, Marta R. Costa-juss'a — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 4
+  - https://www.semanticscholar.org/paper/315f0f5d971f7e04c3ef168df48a52a4a4278829
+  - arXiv:2210.16264 · doi:10.1109/ICASSP49357.2023.10095276
+  - Transformers have been the dominant architecture for Speech Translation in recent years, achieving significant improvements in translation quality. Since speech signals are longer than their textual counterparts, and due to the quadratic complexity of the Transformer, a down-sampling step is essential for its adoption in Speech Translation. Instead, in this research, we propose to ease the complex…
+  - via: `query:translation quality speech translation` (round 1)
+- **Align, Write, Re-Order: Explainable End-to-End Speech Translation via Operation Sequence Generation** (2022) — Motoi Omachi, Brian Yan, Siddharth Dalmia, Yuya Fujita, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 4
+  - https://www.semanticscholar.org/paper/d89299f0f0c5edef073c0f86dcb4e99316738446
+  - arXiv:2211.05967 · doi:10.1109/ICASSP49357.2023.10095896
+  - The black-box nature of end-to-end speech-to-text translation (E2E ST) makes it difficult to understand how source language inputs are being mapped to the target language. To solve this problem, we propose to simultaneously generate automatic speech recognition (ASR) and ST predictions such that each source language word is explicitly mapped to a target language word. A major challenge arises from…
+  - via: `cite_of:9d3480e46cc506b73d5291387c6452998690fdd3` (round 1)
+- **Machine Translation Verbosity Control for Automatic Dubbing** (2021) — Surafel Melaku Lakew, Marcello Federico, Yue Wang — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 27
+  - https://www.semanticscholar.org/paper/aa6b6a91881cac61ec7e53d922b527713924f922
+  - arXiv:2110.03847 · doi:10.1109/ICASSP39728.2021.9414411
+  - Automatic dubbing aims at seamlessly replacing the speech in a video document with synthetic speech in a different language. The task implies many challenges, one of which is generating translations that not only convey the original content, but also match the duration of the corresponding utterances. In this paper, we focus on the problem of controlling the verbosity of machine translation out-pu…
+  - via: `query:automatic speech machine translation` (round 2)
+- **An Empirical Study of End-To-End Simultaneous Speech Translation Decoding Strategies** (2021) — H. Nguyen, Y. Estève, L. Besacier — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 20
+  - https://www.semanticscholar.org/paper/c275d1d5569bf993effcbc3190e86bced184151f
+  - arXiv:2103.03233 · doi:10.1109/ICASSP39728.2021.9414276
+  - This paper proposes a decoding strategy for end-to-end simultaneous speech translation. We leverage end-to-end models trained in offline mode and conduct an empirical study for two language pairs (English-to-German and English-to-Portuguese). We also investigate different output token granularities including characters and Byte Pair Encoding (BPE) units. The results show that the proposed decoding…
+  - via: `query:simultaneous speech translation` (round 0)
+- **Improving Neural Text Normalization with Partial Parameter Generator and Pointer-Generator Network** (2021) — Weiwei Jiang, Junjie Li, Minchuan Chen, Jun Ma, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 11
+  - https://www.semanticscholar.org/paper/aade90ca8968f7cfce1b0c09b04f94cc2745f0de
+  - doi:10.1109/ICASSP39728.2021.9415113
+  - Text Normalization (TN) is an essential part in conversational systems like text-to-speech synthesis (TTS) and automatic speech recognition (ASR). It is a process of transforming non-standard words (NSW) into a representation of how the words are to be spoken. Existing approaches to TN are mainly rule-based or hybrid systems, which require abundant hand-crafted rules. In this paper, we treat TN as…
+  - via: `query:automatic speech recognition machine translation` (round 2)
+- **Convolutional Dropout and Wordpiece Augmentation for End-to-End Speech Recognition** (2021) — Hainan Xu, Yinghui Huang, Yun Zhu, Kartik Audhkhasi, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 4
+  - https://www.semanticscholar.org/paper/035236e2b0a5c792e5d3e120341e49f5a306617b
+  - doi:10.1109/ICASSP39728.2021.9415004
+  - Regularization and data augmentation are crucial to training end-to-end automatic speech recognition systems. Dropout is a popular regularization technique, which operates on each neuron independently by multiplying it with a Bernoulli random variable. We propose a generalization of dropout, called "convolutional dropout", where each neuron’s activation is replaced with a randomly-weighted linear…
+  - via: `query:automatic speech recognition machine translation` (round 2)
+- **An Empirical Study on Task-Oriented Dialogue Translation** (2021) — Siyou Liu — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 0
+  - https://www.semanticscholar.org/paper/66815dd58d39cfee617e8b35f8f779661b35f35b
+  - doi:10.1109/ICASSP39728.2021.9413521
+  - Translating conversational text, in particular task-oriented dialogues, is an important application task for machine translation technology. However, it has so far not been extensively explored due to its inherent characteristics including data limitation, discourse, informality and personality. In this paper, we systematically investigate advanced models on the task-oriented dialogue translation…
+  - via: `query:machine translation nmt speech translation` (round 1)
+- **Mutually-Constrained Monotonic Multihead Attention for Online ASR** (2021) — Jae-gyun Song, Hajin Shim, Eunho Yang — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 0
+  - https://www.semanticscholar.org/paper/7e464656d5fbc1fd347b2bf3bf86457aeb4fb4d4
+  - arXiv:2103.14302 · doi:10.1109/ICASSP39728.2021.9413862
+  - Despite the feature of real-time decoding, Monotonic Multi-head Attention (MMA) shows comparable performance to the state-of-the-art offline methods in machine translation and automatic speech recognition (ASR) tasks. However, the latency of MMA is still a major issue in ASR and should be combined with a technique that can reduce the test latency at inference time, such as head-synchronous beam se…
+  - via: `query:automatic speech recognition machine translation` (round 2)
+- **Streaming Simultaneous Speech Translation with Augmented Memory Transformer** (2020) — Xutai Ma, Yongqiang Wang, M. Dousti, Philipp Koehn, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 43
+  - https://www.semanticscholar.org/paper/0d85f33d43ef7dbac3e559b94aea2fd8f5e64f7f
+  - arXiv:2011.00033 · doi:10.1109/ICASSP39728.2021.9414897
+  - Transformer-based models have achieved state-of-the-art performance on speech translation tasks. However, the model architecture is not efficient enough for streaming scenarios since self-attention is computed over an entire input sequence and the computational cost grows quadratically with the length of the input sequence. Nevertheless, most of the previous work on simultaneous speech translation…
+  - via: `query:streaming speech translation` (round 0)
+- **Controllable Time-Delay Transformer for Real-Time Punctuation Prediction and Disfluency Detection** (2020) — Qian Chen, Mengzhe Chen, Bo Li, Wen Wang — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 39
+  - https://www.semanticscholar.org/paper/441e48ff5a233f243fea1759d9dbfbbbf9598595
+  - arXiv:2003.01309 · doi:10.1109/ICASSP40776.2020.9053159
+  - With the increased applications of automatic speech recognition (ASR) in recent years, it is essential to automatically insert punctuation marks and remove disfluencies in transcripts, to improve the readability of the transcripts as well as the performance of subsequent applications, such as machine translation, dialogue systems, and so forth. In this paper, we propose a Controllable Time-delay T…
+  - via: `query:automatic speech recognition machine translation` (round 2)
+- **SkinAugment: Auto-Encoding Speaker Conversions for Automatic Speech Translation** (2020) — Arya D. McCarthy, Liezl Puzon, J. Pino — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 26
+  - https://www.semanticscholar.org/paper/56f77f36ebf93fa5e28def4c7ad17231ebddf9b2
+  - arXiv:2002.12231 · doi:10.1109/ICASSP40776.2020.9053406
+  - We propose autoencoding speaker conversion for training data augmentation in automatic speech translation. This technique directly transforms an audio sequence, resulting in audio thesized to resemble another speaker’s voice. Our method compares favorably to SpecAugment on English–French and English–Romanian automatic speech translation (AST) tasks as well as on a low-resource English automatic sp…
+  - via: `cite_of:b6222ad8acdf327368b45fb7fa5f4cf374d6da80` (round 1)
+- **Sentence Boundary Augmentation for Neural Machine Translation Robustness** (2020) — Daniel Li, Te I, N. Arivazhagan, Colin Cherry, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 18
+  - https://www.semanticscholar.org/paper/2888a9f2c5ac411e56a7b47bea5ed58b73e424b9
+  - arXiv:2010.11132 · doi:10.1109/ICASSP39728.2021.9413492
+  - Neural Machine Translation (NMT) models have demonstrated strong state of the art performance on translation tasks where well-formed training and evaluation data are pro-vided, but they remain sensitive to inputs that include errors of various types. Specifically, in the context of long-form speech translation systems, where the input transcripts come from Automatic Speech Recognition (ASR), the N…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Cascaded Models with Cyclic Feedback for Direct Speech Translation** (2020) — Tsz Kin Lam, Shigehiko Schamoni, S. Riezler — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 17
+  - https://www.semanticscholar.org/paper/43def6aa1d62aecaf8213b2217eb939786a3ea35
+  - arXiv:2010.11153 · doi:10.1109/ICASSP39728.2021.9413719
+  - Direct speech translation describes a scenario where only speech inputs and corresponding translations are available. Such data are notoriously limited. We present a technique that allows cascades of automatic speech recognition (ASR) and machine translation (MT) to exploit in-domain direct speech translation data in addition to out-of-domain MT and ASR data. After pre-training MT and ASR, we use…
+  - via: `cite_of:b6222ad8acdf327368b45fb7fa5f4cf374d6da80` (round 1)
+- **End-to-End Speech Translation with Self-Contained Vocabulary Manipulation** (2020) — Mei Tu, Fan Zhang, W. Liu — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 2
+  - https://www.semanticscholar.org/paper/4dcb7b4fe6f01153a66b1c91ea1a344ae94e86a7
+  - doi:10.1109/ICASSP40776.2020.9053431
+  - In machine translation, vocabulary manipulation is a way to reduce the target vocabulary based on the source sentence and the word dictionary, which is effective to lower latency during inference for text translation in industrial application. But vocabulary manipulation is hard to apply to the end-to-end speech-text translation, because neither source text nor speech-to-target mapping is availabl…
+  - via: `query:translation quality speech translation` (round 1)
+- **Converting Written Language to Spoken Language with Neural Machine Translation for Language Modeling** (2020) — Shintaro Ando, Masayuki Suzuki, N. Itoh, Gakuto Kurata, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 1
+  - https://www.semanticscholar.org/paper/b8887cff629d59aa93cea692fdd759acfb90c876
+  - doi:10.1109/ICASSP40776.2020.9053226
+  - When building a language model (LM) for spontaneous speech, the ideal situation is to have a large amount of spoken, in-domain training data. Having such abundant data, however, is not realistic. We address this problem by generating texts in spoken language from those in written language by using a neural machine translation (NMT) model. We collected faithful transcripts of fully spontaneous spee…
+  - via: `query:machine translation nmt speech translation` (round 1)
+- **Analyzing ASR Pretraining for Low-Resource Speech-to-Text Translation** (2019) — Mihaela C. Stoian, Sameer Bansal, Sharon Goldwater — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 72
+  - https://www.semanticscholar.org/paper/10bec69f3d7b1c293b6e528d2d8734d465004495
+  - arXiv:1910.10762 · doi:10.1109/ICASSP40776.2020.9053847
+  - Previous work has shown that for low-resource source languages, automatic speech-to-text translation (AST) can be improved by pre-training an end-to-end model on automatic speech recognition (ASR) data from a high-resource language. However, it is not clear what factors—e.g., language relatedness or size of the pretraining data— yield the biggest improvements, or whether pretraining can be effecti…
+  - via: `query:speech recognition asr simultaneous translation` (round 2)
+- **Re-Translation Strategies for Long Form, Simultaneous, Spoken Language Translation** (2019) — N. Arivazhagan, Colin Cherry, Te I, Wolfgang Macherey, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 58
+  - https://www.semanticscholar.org/paper/dc6c0aa2d1e9cdb90232a37810f3794f179c3225
+  - arXiv:1912.03393 · doi:10.1109/ICASSP40776.2020.9054585
+  - We investigate the problem of simultaneous machine translation of long-form speech content. We target a continuous speech-to-text scenario, generating translated captions for a live audio feed, such as a lecture or play-by-play commentary. As this scenario allows for revisions to our incremental translations, we adopt a re-translation approach to simultaneous translation, where the source is repea…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Leveraging Weakly Supervised Data to Improve End-to-end Speech-to-text Translation** (2018) — Ye Jia, Melvin Johnson, Wolfgang Macherey, Ron J. Weiss, et al. — _IEEE International Conference on Acoustics, Speech, and Signal Processing_ — cites: 171
+  - https://www.semanticscholar.org/paper/b6222ad8acdf327368b45fb7fa5f4cf374d6da80
+  - arXiv:1811.02050 · doi:10.1109/ICASSP.2019.8683343
+  - End-to-end Speech Translation (ST) models have many potential advantages when compared to the cascade of Automatic Speech Recognition (ASR) and text Machine Translation (MT) models, including lowered inference latency and the avoidance of error compounding. However, the quality of end-to-end ST is often limited by a paucity of training data, since it is difficult to collect large parallel corpora…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+
+## Interspeech (56)
+
+- **Granary: Speech Recognition and Translation Dataset in 25 European Languages** (2025) — N. Koluguri, Monica Sekoyan, George Zelenfroynd, Sasha Meister, et al. — _Interspeech_ — cites: 17
+  - https://www.semanticscholar.org/paper/3c3c3084d3403dbd05356d2edab68bb986b67dbd
+  - arXiv:2505.13404 · doi:10.48550/arXiv.2505.13404
+  - Multi-task and multilingual approaches benefit large models, yet speech processing for low-resource languages remains underexplored due to data scarcity. To address this, we present Granary, a large-scale collection of speech datasets for recognition and translation across 25 European languages. This is the first open-source effort at this scale for both transcription and translation. We enhance d…
+  - via: `query:translation quality speech translation` (round 1)
+- **Self-Improvement for Audio Large Language Model using Unlabeled Speech** (2025) — Shaowen Wang, Xinyuan Chen, Yao Xu — _Interspeech_ — cites: 11
+  - https://www.semanticscholar.org/paper/38c8e28838cf9f72b5b80baef94594222734dd37
+  - arXiv:2507.20169 · doi:10.48550/arXiv.2507.20169
+  - Recent audio LLMs have emerged rapidly, demonstrating strong generalization across various speech tasks. However, given the inherent complexity of speech signals, these models inevitably suffer from performance degradation in specific target domains. To address this, we focus on enhancing audio LLMs in target domains without any labeled data. We propose a self-improvement method called SI-SDA, lev…
+  - via: `query:large language llms simultaneous translation` (round 1)
+- **Empowering Large Language Models for End-to-End Speech Translation Leveraging Synthetic Data** (2025) — Yu Pu, Xiaoqian Liu, Guangyu Zhang, Zheng Yan, et al. — _Interspeech_ — cites: 4
+  - https://www.semanticscholar.org/paper/130fe40224ea9dd77bfb43dd028b0bb1f412c308
+  - doi:10.21437/interspeech.2025-2341
+  - Speech-to-speech translation (S2ST) is a key technology for seamless cross-lingual communication. Traditional cascaded systems, which involve speech recognition, text translation, and speech synthesis, are prone to error propagation and latency. In this work, we present SLAM-TR, an end-to-end speech translation model which directly maps input speech to output speech, eliminating the need for inter…
+  - via: `query:streaming speech translation` (round 0)
+- **Simultaneous Speech Translation Integrated Compact Multiple Sound Spot Synthesis System On A Laptop Carried Out With A Backpack** (2025) — T. Okamoto, M. Kono — _Interspeech_ — cites: 2
+  - https://www.semanticscholar.org/paper/69369bfb293e234d37d901e6bbf843a6d0138358
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Scaling pseudo-labeling data for end-to-end low-resource speech translation (the case of Kurdish language)** (2025) — Mohammad MohammadAmini, Aghilas Sini, Marie Tahon, Antoine Laurent — _Interspeech_ — cites: 2
+  - https://www.semanticscholar.org/paper/cbd39dd097ffd062dd4d82ad98337fa6026138c5
+  - doi:10.21437/interspeech.2025-887
+  - In this paper we propose a pseudo-labeling pipeline to generate End-to-End Speech to Text Translation (E2E S2TT) data for low-resource languages. This pipeline allows us to achieve very promising results on S2TT task without having any parallel speech corpora. The proposed pipeline is composed of a speech segmentation, followed by a speech recognition system and a machine translation system. Our s…
+  - via: `query:streaming speech translation` (round 0)
+- **Directional Speech Recognition with Full-Duplex Capability** (2025) — Ju Lin, Yiteng Huang, Ming Sun, Frank Seide, et al. — _Interspeech_ — cites: 2
+  - https://www.semanticscholar.org/paper/cf51aa36b45ac81e466d538e672847af35204b5a
+  - doi:10.21437/interspeech.2025-535
+  - Recent work on directional automatic speech recognition (DASR) has enabled automatic transcription of a conversation partner several feet away via smart glasses. DASR leverages multiple microphones in the glasses by using multiple beam-formers simultaneously. We aim to make the DASR insensitive to scenarios that also involve text-to-speech (TTS) playback. This could enable additional future scenar…
+  - via: `query:simultaneous speech translation` (round 0)
+- **Is Synthetic Data Truly Effective for Training Speech Language Models?** (2025) — Tomoya Mizumoto, Atsushi Kojima, Yusuke Fujita, Lianbo Liu, et al. — _Interspeech_ — cites: 1
+  - https://www.semanticscholar.org/paper/e2a081fcd154fc0624aac7a5217b233e9544be34
+  - doi:10.21437/interspeech.2025-2693
+  - The development of Large Language Models (LLMs) has expanded beyond text-based tasks to speech applications such as Automatic Speech Recognition (ASR) and Automated Speech Translation (AST). However, training speech language models based on LLMs requires large-scale datasets, which are challenging to construct. To address data scarcity, previous studies have explored synthetic data generation usin…
+  - via: `query:large language llms speech translation` (round 1)
+- **ArticulateX: End-to-End Monolingual Speech Translation in Articulator Space** (2025) — Vishal Kumar, V. Abrol — _Interspeech_ — cites: 0
+  - https://www.semanticscholar.org/paper/594cdd0052587fcc5c872ea44e92a69382bacc18
+  - doi:10.21437/interspeech.2025-1305
+  - We present ArticulateX, the first non-autoregressive direct speech-to-speech translation (S2ST) model that operates through an articulatory latent space, offering an efficient alternative to existing cascaded models. It consists of a direct speech-to-articulator encoder, a latent articulator-to-MelSpectrogram mapper, and a vocoder for high-fidelity speech synthesis. By leveraging articulatory repr…
+  - via: `query:streaming speech translation` (round 0)
+- **Augment Mandarin to Cantonese Speech Databases via Retrieval-Augmented Generation and Speech Synthesis** (2025) — Fan Liu, Cheng Gong, Boyu Zhu, Ruihao Jing, et al. — _Interspeech_ — cites: 0
+  - https://www.semanticscholar.org/paper/464b5d4a2bb7b49c361d6cec02b598c29f9a6a64
+  - doi:10.21437/interspeech.2025-737
+  - Using large-scale training data has significantly driven recent advances in speech recognition models. However, the lack of corpus for some low-resource languages (e.g., Cantonese) is still a bottleneck for speech processing. With the continuous development of large language models (LLMs) and speech synthesis technologies, it has become possible to expand Can-tonese corpora using automatically gen…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **Extending the Fongbe to French Speech Translation Corpus: resources, models and benchmark** (2025) — D. F. Kponou, Salima Mdhaffar, F. Laleye, E. C. Ezin, et al. — _Interspeech_ — cites: 0
+  - https://www.semanticscholar.org/paper/9f37ff700518e6c49283cb5d52057d04e0d92ca4
+  - doi:10.21437/interspeech.2025-1801
+  - This paper introduces FFSTC 2, an expanded version of the existing Fongbe-to-French speech translation corpus, addressing the critical need for resources in African dialects for speech recognition and translation tasks. We extended the dataset by adding 36 hours of transcribed audio, bringing the total to 61 hours, thereby enhancing its utility for both automatic speech recognition (ASR) and speec…
+  - via: `query:machine translation nmt speech translation` (round 1)
+- **Novel Parasitic Dual-Scale Modeling for Efficient and Accurate Multilingual Speech Translation** (2025) — Chenyang Le, Yinfeng Xia, Huiyan Li, Manhong Wang, et al. — _Interspeech_ — cites: 0
+  - https://www.semanticscholar.org/paper/d32cf1f68d0413b35d8fc5124101578f1e184c57
+  - arXiv:2508.11189 · doi:10.48550/arXiv.2508.11189
+  - Recent advancements in speech-to-text translation have led to the development of multilingual models capable of handling multiple language pairs simultaneously. However, these unified models often suffer from large parameter sizes, making it challenging to balance inference efficiency and performance, particularly in local deployment scenarios. We propose an innovative Parasitic Dual-Scale Approac…
+  - via: `query:bleu points speech translation` (round 2)
+- **Navigating the Minefield of MT Beam Search in Cascaded Streaming Speech Translation** (2024) — Rastislav Rabatin, Frank Seide, Ernie Chang — _Interspeech_ — cites: 4
+  - https://www.semanticscholar.org/paper/251f7674abfa20b15fd677f3737d791f67bac270
+  - arXiv:2407.11010 · doi:10.48550/arXiv.2407.11010
+  - We adapt the well-known beam-search algorithm for machine translation to operate in a cascaded real-time speech translation system. This proved to be more complex than initially anticipated, due to four key challenges: (1) real-time processing of intermediate and final transcriptions with incomplete words from ASR, (2) emitting intermediate and final translations with minimal user perceived latenc…
+  - via: `query:streaming speech translation` (round 0)
+- **Contrastive Feedback Mechanism for Simultaneous Speech Translation** (2024) — Haotian Tan, S. Sakti — _Interspeech_ — cites: 1
+  - https://www.semanticscholar.org/paper/cb8c8528c0011cbdcdfada0a73f9d03a23a7690d
+  - arXiv:2407.20524 · doi:10.21437/Interspeech.2024-2426
+  - Recent advances in simultaneous speech translation (SST) focus on the decision policies that enable the use of offline-trained ST models for simultaneous inference. These decision policies not only control the quality-latency trade-off in SST but also mitigate the impact of unstable predictions on translation quality by delaying translation for more context or discarding these predictions through…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Diffusion Synthesizer for Efficient Multilingual Speech to Speech Translation** (2024) — Nameer Hirschkind, Xiao Yu, Mahesh Kumar Nandwana, Joseph Liu, et al. — _Interspeech_ — cites: 1
+  - https://www.semanticscholar.org/paper/18cf18e6a857f39f9354ab93668487a5a6f14fbb
+  - arXiv:2406.10223 · doi:10.48550/arXiv.2406.10223
+  - We introduce DiffuseST, a low-latency, direct speech-to-speech translation system capable of preserving the input speaker's voice zero-shot while translating from multiple source languages into English. We experiment with the synthesizer component of the architecture, comparing a Tacotron-based synthesizer to a novel diffusion-based synthesizer. We find the diffusion-based synthesizer to improve M…
+  - via: `query:translation quality speech translation` (round 1)
+- **Sign Value Constraint Decomposition for Efficient 1-Bit Quantization of Speech Translation Tasks** (2024) — Nan Chen, Yonghe Wang, Feilong Bao — _Interspeech_ — cites: 0
+  - https://www.semanticscholar.org/paper/2b06d12affad6306a59a07b818081795a2d24970
+  - doi:10.21437/interspeech.2024-2022
+  - Speech-to-text translation is vital in converting speech input to text output in different languages. While combining speech and machine translation pre-trained models enhances translation quality, it also escalates the number of parameters, resulting in substantial hardware costs for model training and deployment. We propose a 1-bit quantized model based on Sign Value Constraint Decomposition (SV…
+  - via: `query:translation quality speech translation` (round 1)
+- **AlignAtt: Using Attention-based Audio-Translation Alignments as a Guide for Simultaneous Speech Translation** (2023) — Sara Papi, Marco Turchi, Matteo Negri — _Interspeech_ — cites: 33
+  - https://www.semanticscholar.org/paper/e16da0a803c7a2df4820dd48bd5eb785ddc55232
+  - arXiv:2305.11408 · doi:10.21437/Interspeech.2023-170
+  - Attention is the core mechanism of today's most used architectures for natural language processing and has been analyzed from many perspectives, including its effectiveness for machine translation-related tasks. Among these studies, attention resulted to be a useful source of information to get insights about word alignment also when the input text is substituted with audio segments, as in the cas…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **StyleS2ST: Zero-shot Style Transfer for Direct Speech-to-speech Translation** (2023) — Kun Song, Yi Ren, Yinjiao Lei, Chunfeng Wang, et al. — _Interspeech_ — cites: 12
+  - https://www.semanticscholar.org/paper/d7ad1b04a805e970edcd8972236f4ea6ea2452c6
+  - arXiv:2305.17732 · doi:10.48550/arXiv.2305.17732
+  - Direct speech-to-speech translation (S2ST) has gradually become popular as it has many advantages compared with cascade S2ST. However, current research mainly focuses on the accuracy of semantic translation and ignores the speech style transfer from a source language to a target language. The lack of high-fidelity expressive parallel data makes such style transfer challenging, especially in more p…
+  - via: `cite_of:f93b523fe44e2ad2deaa1c6dac2da878a17eeeaf` (round 2)
+- **Incremental Blockwise Beam Search for Simultaneous Speech Translation with Controllable Quality-Latency Tradeoff** (2023) — Peter Polák, Brian Yan, Shinji Watanabe, A. Waibel, et al. — _Interspeech_ — cites: 10
+  - https://www.semanticscholar.org/paper/d24d60719e90e69749a75c160cb760d1d9fca44a
+  - arXiv:2309.11379 · doi:10.21437/Interspeech.2023-2225
+  - Blockwise self-attentional encoder models have recently emerged as one promising end-to-end approach to simultaneous speech translation. These models employ a blockwise beam search with hypothesis reliability scoring to determine when to wait for more input speech before translating further. However, this method maintains multiple hypotheses until the entire speech input is consumed -- this scheme…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **Learning When to Speak: Latency and Quality Trade-offs for Simultaneous Speech-to-Speech Translation with Offline Models** (2023) — Liam Dugan, Anshul Wadhawan, Kyle Spence, Chris Callison-Burch, et al. — _Interspeech_ — cites: 2
+  - https://www.semanticscholar.org/paper/730085698da1cedf1aae07b6a2e086e93996a352
+  - arXiv:2306.01201 · doi:10.48550/arXiv.2306.01201
+  - Recent work in speech-to-speech translation (S2ST) has focused primarily on offline settings, where the full input utterance is available before any output is given. This, however, is not reasonable in many real-world scenarios. In latency-sensitive applications, rather than waiting for the full utterance, translations should be spoken as soon as the information in the input is present. In this wo…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **Knowledge Distillation on Joint Task End-to-End Speech Translation** (2023) — Khandokar Md. Nayem, Ran Xue, Ching-Yun Chang, A. Shanbhogue — _Interspeech_ — cites: 2
+  - https://www.semanticscholar.org/paper/5011e031d2d4cc8ab83424256e53444d31d54ed4
+  - doi:10.21437/interspeech.2023-891
+  - An End-to-End Speech Translation (E2E-ST) model takes input audio in one language and directly produces output text in another language. The model requires to learn both speech-to-text modality conversion and translation tasks, which demands a large architecture for effective learning of this joint task. Yet, to the best of our knowledge, we are the first to optimize compression of E2E-ST models.…
+  - via: `query:distillation simultaneous machine translation` (round 0)
+- **Enhanced Direct Speech-to-Speech Translation Using Self-supervised Pre-training and Data Augmentation** (2022) — Sravya Popuri, Peng-Jen Chen, Changhan Wang, J. Pino, et al. — _Interspeech_ — cites: 69
+  - https://www.semanticscholar.org/paper/d6572f2250337975fc4a54abfcdf08b4829b2cfc
+  - arXiv:2204.02967 · doi:10.48550/arXiv.2204.02967
+  - Direct speech-to-speech translation (S2ST) models suffer from data scarcity issues as there exists little parallel S2ST data, compared to the amount of data available for conventional cascaded systems that consist of automatic speech recognition (ASR), machine translation (MT), and text-to-speech (TTS) synthesis. In this work, we explore self-supervised pre-training with unlabeled speech data and…
+  - via: `query:data augmentation simultaneous translation` (round 0)
+- **Large-Scale Streaming End-to-End Speech Translation with Neural Transducers** (2022) — Jian Xue, Peidong Wang, Jinyu Li, Matt Post, et al. — _Interspeech_ — cites: 37
+  - https://www.semanticscholar.org/paper/5a5704382fd8c980937e10618713d641c846b313
+  - arXiv:2204.05352 · doi:10.48550/arXiv.2204.05352
+  - Neural transducers have been widely used in automatic speech recognition (ASR). In this paper, we introduce it to streaming end-to-end speech translation (ST), which aims to convert audio signals to texts in other languages directly. Compared with cascaded ST that performs ASR followed by text-based machine translation (MT), the proposed Transformer transducer (TT)-based ST model drastically reduc…
+  - via: `query:streaming speech translation` (round 0)
+- **ESPnet-SE++: Speech Enhancement for Robust Speech Recognition, Translation, and Understanding** (2022) — Yen-Ju Lu, Xuankai Chang, Chenda Li, Wangyou Zhang, et al. — _Interspeech_ — cites: 36
+  - https://www.semanticscholar.org/paper/c76f817ebd178b0e6160cab90e704639a7938757
+  - arXiv:2207.09514 · doi:10.48550/arXiv.2207.09514
+  - This paper presents recent progress on integrating speech separation and enhancement (SSE) into the ESPnet toolkit. Compared with the previous ESPnet-SE work, numerous features have been added, including recent state-of-the-art speech enhancement models with their respective training and evaluation recipes. Importantly, a new interface has been designed to flexibly combine speech enhancement front…
+  - via: `query:available https github speech translation` (round 2)
+- **Leveraging Pseudo-labeled Data to Improve Direct Speech-to-Speech Translation** (2022) — Qianqian Dong, Fengpeng Yue, Tom Ko, Mingxuan Wang, et al. — _Interspeech_ — cites: 19
+  - https://www.semanticscholar.org/paper/6ea1adab9cfde8bbf1d5d32c0ab9c7b6dc0709bb
+  - arXiv:2205.08993 · doi:10.48550/arXiv.2205.08993
+  - Direct Speech-to-speech translation (S2ST) has drawn more and more attention recently. The task is very challenging due to data scarcity and complex speech-to-speech mapping. In this paper, we report our recent achievements in S2ST. Firstly, we build a S2ST Transformer baseline which outperforms the original Translatotron. Secondly, we utilize the external data by pseudo-labeling and obtain a new…
+  - via: `cite_of:b6222ad8acdf327368b45fb7fa5f4cf374d6da80` (round 1)
+- **Average Token Delay: A Latency Metric for Simultaneous Translation** (2022) — Yasumasa Kano, Katsuhito Sudoh, Satoshi Nakamura — _Interspeech_ — cites: 18
+  - https://www.semanticscholar.org/paper/c288d94e95166e3b8f4ce6ee836856cb66eeeb81
+  - arXiv:2211.13173 · doi:10.48550/arXiv.2211.13173
+  - Simultaneous translation is a task in which translation begins before the speaker has finished speaking. In its evaluation, we have to consider the latency of the translation in addition to the quality. The latency is preferably as small as possible for users to comprehend what the speaker says with a small delay. Existing latency metrics focus on when the translation starts but do not consider ad…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Blockwise Streaming Transformer for Spoken Language Understanding and Simultaneous Speech Translation** (2022) — Keqi Deng, Shinji Watanabe, Jiatong Shi, Siddhant Arora — _Interspeech_ — cites: 15
+  - https://www.semanticscholar.org/paper/1e4e2aceed87febcc643f1473507c9535ba5c19a
+  - arXiv:2204.08920 · doi:10.48550/arXiv.2204.08920
+  - Although Transformers have gained success in several speech processing tasks like spoken language understanding (SLU) and speech translation (ST), achieving online processing while keeping competitive performance is still essential for real-world interaction. In this paper, we take the first step on streaming SLU and simultaneous ST using a blockwise streaming Transformer, which is based on contex…
+  - via: `query:prefix-to-prefix translation` (round 0)
+- **Exploring Continuous Integrate-and-Fire for Adaptive Simultaneous Speech Translation** (2022) — Chih-Chiang Chang, Hung-yi Lee — _Interspeech_ — cites: 14
+  - https://www.semanticscholar.org/paper/6e07311008221fe53fa5231a4760d0a18e86f6ad
+  - arXiv:2204.09595 · doi:10.21437/Interspeech.2022-10627
+  - Simultaneous speech translation (SimulST) is a challenging task aiming to translate streaming speech before the complete input is observed. A SimulST system generally includes two components: the pre-decision that aggregates the speech information and the policy that decides to read or write. While recent works had proposed various strategies to improve the pre-decision, they mainly adopt the fixe…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **LAMASSU: A Streaming Language-Agnostic Multilingual Speech Recognition and Translation Model Using Neural Transducers** (2022) — Peidong Wang, Eric Sun, Jian Xue, Yu Wu, et al. — _Interspeech_ — cites: 11
+  - https://www.semanticscholar.org/paper/b08070b6b55bc81bec7d59fbca454fdba9b5937f
+  - arXiv:2211.02809 · doi:10.21437/interspeech.2023-2004
+  - Automatic speech recognition (ASR) and speech translation (ST) can both use neural transducers as the model structure. It is thus possible to use a single transducer model to perform both tasks. In real-world applications, such joint ASR and ST models may need to be streaming and do not require source language identification (i.e. language-agnostic). In this paper, we propose LAMASSU, a streaming…
+  - via: `query:streaming speech translation` (round 0)
+- **L2-GEN: A Neural Phoneme Paraphrasing Approach to L2 Speech Synthesis for Mispronunciation Diagnosis** (2022) — Dan Zhang, Ashwinkumar Ganesan, Sarah Campbell — _Interspeech_ — cites: 9
+  - https://www.semanticscholar.org/paper/487f9e74fff5e29b8aa37ba551edab71cfcbd256
+  - doi:10.21437/interspeech.2022-209
+  - In this paper, we study the problem of generating mispronounced speech mimicking non-native (L2) speakers learning English as a Second Language (ESL) for the mispronunciation detection and diagnosis (MDD) task. The paper is motivated by the widely observed yet not well addressed data sparsity is-sue in MDD research where both L2 speech audio and its ﬁne-grained phonetic annotations are difﬁcult to…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **Cross-Modal Decision Regularization for Simultaneous Speech Translation** (2022) — Mohd Abbas Zaidi, Beomseok Lee, Sangha Kim, Chanwoo Kim — _Interspeech_ — cites: 6
+  - https://www.semanticscholar.org/paper/4412334747a7491315e049de555179bc2f724309
+  - doi:10.21437/interspeech.2022-10617
+  - Simultaneous translation systems start producing the output while processing the partial source sentence in the incoming input stream. These systems need to decide when to read more input and when to write the output. The decisions taken by the model depend on the structure of source/target language and the information contained in the partial input sequence. Hence, read/write decision policy rema…
+  - via: `query:simultaneous speech translation` (round 0)
+- **Joint Speech Translation and Named Entity Recognition** (2022) — Marco Gaido, Sara Papi, Matteo Negri, Marco Turchi — _Interspeech_ — cites: 6
+  - https://www.semanticscholar.org/paper/af742fb1413b8c87c997f8720d68c67688f4ff33
+  - arXiv:2210.11987 · doi:10.21437/Interspeech.2023-1767
+  - Modern automatic translation systems aim at place the human at the center by providing contextual support and knowledge. In this context, a critical task is enriching the output with information regarding the mentioned entities, which is currently achieved processing the generated translation with named entity recognition (NER) and entity linking systems. In light of the recent promising results s…
+  - via: `query:translation quality speech translation` (round 1)
+- **Leveraging Simultaneous Translation for Enhancing Transcription of Low-resource Language via Cross Attention Mechanism** (2022) — Kak Soky, Sheng Li, M. Mimura, Chenhui Chu, et al. — _Interspeech_ — cites: 3
+  - https://www.semanticscholar.org/paper/2025f130a947d627fcb3e933e8964e5affe7ae69
+  - doi:10.21437/interspeech.2022-343
+  - This work addresses automatic speech recognition (ASR) of a low-resource language using a translation corpus, which includes the simultaneous translation of the low-resource language. In multi-lingual events such as international meetings and court proceedings, simultaneous interpretation by a human is often available for speeches of low-resource languages. In this setting, we can assume that the…
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Normalization of code-switched text for speech synthesis** (2022) — Sreeram Manghat, Sreeja Manghat, Tanja Schultz — _Interspeech_ — cites: 3
+  - https://www.semanticscholar.org/paper/2d814ea734032205a39a19835af220d19a2f3e8f
+  - doi:10.21437/interspeech.2022-10719
+  - In multilingual communities, code-switching is a common phenomenon. Due to the increase in usage of social media, high level of code-switching is present in social media text as well. These code-switched social media texts are often seen written in monolingual script. Text normalization techniques of the conventional Text-to-Speech (TTS) and machine translation systems may not be able to handle su…
+  - via: `query:LLM data synthesis machine translation` (round 0)
+- **Transformer-Based Automatic Speech Recognition with Auxiliary Input of Source Language Text Toward Transcribing Simultaneous Interpretation** (2022) — Shuta Taniguchi, T. Kato, Akihiro Tamura, K. Yasuda — _Interspeech_ — cites: 0
+  - https://www.semanticscholar.org/paper/03131d87b70447dafe1eaa5e3ff1efc668a51d1e
+  - doi:10.21437/interspeech.2022-448
+  - In the training programs of human simultaneous interpreters, trainee speech is transcribed into text for quality assessment. Despite the challenges that interpreter speech contains disﬂu-encies such as hesitations, ﬁlled pauses, interruptions, and self-repairs, automatic speech recognition (ASR) is expected to be introduced to save labor of transcription. In the training programs, source language…
+  - via: `query:simultaneous speech translation` (round 0)
+- **Large-Scale Self- and Semi-Supervised Learning for Speech Translation** (2021) — Changhan Wang, Anne Wu, J. Pino, Alexei Baevski, et al. — _Interspeech_ — cites: 47
+  - https://www.semanticscholar.org/paper/acc2b9493bfa4fcdd3e683a2a83eb61f1a5fc2e9
+  - arXiv:2104.06678 · doi:10.21437/interspeech.2021-1912
+  - In this paper, we improve speech translation (ST) through effectively leveraging large quantities of unlabeled speech and text data in different and complementary ways. We explore both pretraining and self-training by using the large Libri-Light speech audio corpus and language modeling with CommonCrawl. Our experiments improve over the previous state of the art by 2.6 BLEU on average on all four…
+  - via: `query:self-training simultaneous translation` (round 0)
+- **Lost in Interpreting: Speech Translation from Source or Interpreter?** (2021) — Dominik Machácek, Matús Zilinec, Ondrej Bojar — _Interspeech_ — cites: 23
+  - https://www.semanticscholar.org/paper/302b03cc77ed518405161a22beac71d1ac9bb232
+  - arXiv:2106.09343 · doi:10.21437/interspeech.2021-2232
+  - Interpreters facilitate multi-lingual meetings but the affordable set of languages is often smaller than what is needed. Automatic simultaneous speech translation can extend the set of provided languages. We investigate if such an automatic system should rather follow the original speaker, or an interpreter to achieve better translation quality at the cost of increased delay. To answer the questio…
+  - via: `query:simultaneous speech translation` (round 0)
+- **Phonetic and Prosodic Information Estimation from Texts for Genuine Japanese End-to-End Text-to-Speech** (2021) — N. Kakegawa, Sunao Hara, M. Abe, Yusuke Ijima — _Interspeech_ — cites: 8
+  - https://www.semanticscholar.org/paper/8fb7bf026379d6e2a51ee95b6dc3aa09ca53b4bc
+  - doi:10.21437/interspeech.2021-914
+  - The biggest obstacle to develop end-to-end Japanese text-to-speech (TTS) systems is to estimate phonetic and prosodic information (PPI) from Japanese texts. The following are the reasons: (1) the Kanji characters of the Japanese writing system have multiple corresponding pronunciations, (2) there is no separation mark between words, and (3) an accent nucleus must be assigned at appropriate positio…
+  - via: `query:machine translation nmt speech translation` (round 1)
+- **Impact of Encoding and Segmentation Strategies on End-to-End Simultaneous Speech Translation** (2021) — H. Nguyen, Y. Estève, L. Besacier — _Interspeech_ — cites: 6
+  - https://www.semanticscholar.org/paper/e7f4c3e62ed941c4d3ffd54fe5d3131b953b074a
+  - arXiv:2104.14470 · doi:10.21437/interspeech.2021-608
+  - Boosted by the simultaneous translation shared task at IWSLT 2020, promising end-to-end online speech translation approaches were recently proposed. They consist in incrementally encoding a speech input (in a source language) and decoding the corresponding text (in a target language) with the best possible trade-off between latency and translation quality. This paper investigates two key aspects o…
+  - via: `query:simultaneous speech translation` (round 0)
+- **Lexical Modeling of ASR Errors for Robust Speech Translation** (2021) — G. Martucci, Mauro Cettolo, Matteo Negri, Marco Turchi — _Interspeech_ — cites: 6
+  - https://www.semanticscholar.org/paper/3dc4a157ac85d75ac0fef3dada3888c18d5d932f
+  - doi:10.21437/interspeech.2021-265
+  - Error propagation from automatic speech recognition (ASR) to machine translation (MT) is a critical issue for the (still) dominant cascade approach to speech translation. To ro-bustify MT to ill-formed inputs, we propose a technique to ar-tiﬁcially corrupt clean transcripts so as to emulate noisy automatic transcripts. Our Lexical Noise model relies on estimating from ASR data: i) the probability…
+  - via: `query:automatic speech recognition machine translation` (round 2)
+- **From Start to Finish: Latency Reduction Strategies for Incremental Speech Synthesis in Simultaneous Speech-to-Speech Translation** (2021) — Danni Liu, Changhan Wang, Hongyu Gong, Xutai Ma, et al. — _Interspeech_ — cites: 4
+  - https://www.semanticscholar.org/paper/c717be6961788c6cb5f8eb1343915c98cf27eeef
+  - arXiv:2110.08214 · doi:10.21437/interspeech.2022-10568
+  - Speech-to-speech translation (S2ST) converts input speech to speech in another language. A challenge of delivering S2ST in real time is the accumulated delay between the translation and speech synthesis modules. While recently incremental text-to-speech (iTTS) models have shown large quality improvements, they typically require additional future text inputs to reach optimal performance. In this wo…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **Deliberation-Based Multi-Pass Speech Synthesis** (2021) — Qingyun Dou, Xixin Wu, Moquan Wan, Yiting Lu, et al. — _Interspeech_ — cites: 2
+  - https://www.semanticscholar.org/paper/b8233798ff4bd3b98c884a61b84e1fa02fd1aefa
+  - doi:10.21437/interspeech.2021-1405
+  - Sequence-to-sequence (seq2seq) models have achieved state-of-the-art performance in a wide range of tasks including Neural Machine Translation (NMT) and Text-To-Speech (TTS). These models are usually trained with teacher forcing, where the reference back-history is used to predict the next token. This makes training efﬁcient, but limits performance, because during inference the free-running back-h…
+  - via: `query:machine translation nmt speech translation` (round 1)
+- **Towards Simultaneous Machine Interpretation** (2021) — Alejandro Pérez-González-de-Martos, Javier Iranzo-Sánchez, Adrián Giménez Pastor, Javier Jorge, et al. — _Interspeech_ — cites: 0
+  - https://www.semanticscholar.org/paper/dfca6a5c40a4a3e88353902f20d3e3a69de8116a
+  - doi:10.21437/interspeech.2021-201
+  - Automatic speech-to-speech translation (S2S) is one of the most challenging speech and language processing tasks, especially when considering its application to real-time settings. Recent advances on streaming Automatic Speech Recognition (ASR), simultaneous Machine Translation (MT) and incremental neural Text-To-Speech (TTS) make it possible to develop real-time cascade S2S systems with greatly i…
+  - via: `query:streaming speech translation` (round 0)
+- **Efficient Wait-k Models for Simultaneous Machine Translation** (2020) — Maha Elbayad, L. Besacier, J. Verbeek — _Interspeech_ — cites: 85
+  - https://www.semanticscholar.org/paper/8f9f7a0714408fb49eeb7060ab16bc1eedb219fd
+  - arXiv:2005.08595 · doi:10.21437/interspeech.2020-1241
+  - Simultaneous machine translation consists in starting output generation before the entire input sequence is available. Wait-k decoders offer a simple but efficient approach for this problem. They first read k source tokens, after which they alternate between producing a target token and reading another source token. We investigate the behavior of wait-k decoding in low resource settings for spoken…
+  - via: `query:wait-k simultaneous translation` (round 0)
+- **Self-Training for End-to-End Speech Translation** (2020) — J. Pino, Qiantong Xu, Xutai Ma, M. Dousti, et al. — _Interspeech_ — cites: 68
+  - https://www.semanticscholar.org/paper/2d3182458ea6173d8897f0e53695c768c684bef6
+  - arXiv:2006.02490 · doi:10.21437/interspeech.2020-2938
+  - One of the main challenges for end-to-end speech translation is data scarcity. We leverage pseudo-labels generated from unlabeled audio by a cascade and an end-to-end speech translation model. This provides 8.3 and 5.7 BLEU gains over a strong semi-supervised baseline on the MuST-C English-French and English-German datasets, reaching state-of-the art performance. The effect of the quality of the p…
+  - via: `query:self-training simultaneous translation` (round 0)
+- **Low-Latency Sequence-to-Sequence Speech Recognition and Translation by Partial Hypothesis Selection** (2020) — Danni Liu, Gerasimos Spanakis, J. Niehues — _Interspeech_ — cites: 67
+  - https://www.semanticscholar.org/paper/8ac1663e3c954ed5f57ca85a2c1a89aa3c03f094
+  - arXiv:2005.11185 · doi:10.21437/interspeech.2020-2897
+  - Encoder-decoder models provide a generic architecture for sequence-to-sequence tasks such as speech recognition and translation. While offline systems are often evaluated on quality metrics like word error rates (WER) and BLEU, latency is also a crucial factor in many practical use-cases. We propose three latency reduction techniques for chunk-based incremental inference and evaluate their efficie…
+  - via: `query:translation quality speech translation` (round 1)
+- **Improving Cross-Lingual Transfer Learning for End-to-End Speech Recognition with Speech Translation** (2020) — Changhan Wang, J. Pino, Jiatao Gu — _Interspeech_ — cites: 36
+  - https://www.semanticscholar.org/paper/1f33167c7cd315b60822623b00bd1dd0a0b0e306
+  - arXiv:2006.05474 · doi:10.21437/interspeech.2020-2955
+  - Transfer learning from high-resource languages is known to be an efficient way to improve end-to-end automatic speech recognition (ASR) for low-resource languages. Pre-trained or jointly trained encoder-decoder models, however, do not share the language modeling (decoder) for the same language, which is likely to be inefficient for distant target languages. We introduce speech-to-text translation…
+  - via: `query:automatic speech recognition machine translation` (round 2)
+- **Incremental Text to Speech for Neural Sequence-to-Sequence Models using Reinforcement Learning** (2020) — D. Mohan, R. Lenain, Lorenzo Foglianti, Tian Huey Teh, et al. — _Interspeech_ — cites: 11
+  - https://www.semanticscholar.org/paper/c316f7012cc6a459cc6044b7ac384e3c41739fc3
+  - arXiv:2008.03096 · doi:10.21437/Interspeech.2020-1822
+  - Modern approaches to text to speech require the entire input character sequence to be processed before any audio is synthesised. This latency limits the suitability of such models for time-sensitive tasks like simultaneous interpretation. Interleaving the action of reading a character with that of synthesising audio reduces this latency. However, the order of this sequence of interleaved actions v…
+  - via: `cite_of:05b3a6acc8be299cc2a2678e5d81712b71c748e5` (round 1)
+- **Cross Attention with Monotonic Alignment for Speech Transformer** (2020) — Y. Zhao, Chongjia Ni, C. Leung, Shafiq R. Joty, et al. — _Interspeech_ — cites: 10
+  - https://www.semanticscholar.org/paper/8e7308a145108e971c241c16612e109d08600734
+  - doi:10.21437/interspeech.2020-1198
+  - Transformer, a state-of-the-art neural network architecture, has been used successfully for different sequence-to-sequence transformation tasks. This model architecture disperses the attention distribution over entire input to learn long-term dependencies, which is important for some sequence-to-sequence tasks, such as neural machine translation and text summarization. However, automatic speech re…
+  - via: `query:automatic speech recognition machine translation` (round 2)
+- **Subword Regularization: An Analysis of Scalability and Generalization for End-to-End Automatic Speech Recognition** (2020) — Egor Lakomkin, Jahn Heymann, I. Sklyar, Simon Wiesler — _Interspeech_ — cites: 8
+  - https://www.semanticscholar.org/paper/de2739aeb95c88e5b193fdda371885aaa93def4a
+  - arXiv:2008.04034 · doi:10.21437/interspeech.2020-1569
+  - Subwords are the most widely used output units in end-to-end speech recognition. They combine the best of two worlds by modeling the majority of frequent words directly and at the same time allow open vocabulary speech recognition by backing off to shorter units or characters to construct words unseen during training. However, mapping text to subwords is ambiguous and often multiple segmentation v…
+  - via: `query:streaming speech translation` (round 0)
+- **Neural Speech Completion** (2020) — Kazuki Tsunematsu, Johanes Effendi, S. Sakti, Satoshi Nakamura — _Interspeech_ — cites: 6
+  - https://www.semanticscholar.org/paper/f87298ebf3f2d45adb0141925afaa9e6e1117052
+  - doi:10.21437/interspeech.2020-2110
+  - During a conversation, humans often predict the end of a sentence even when the other person has not ﬁnished it. In contrast, most current automatic speech recognition systems remain limited to passively recognizing what is being said. But applications like voice search, simultaneous speech translation, and spoken language communication may require a system that not only recognizes what has been s…
+  - via: `query:simultaneous speech translation` (round 0)
+- **Direct speech-to-speech translation with a sequence-to-sequence model** (2019) — Ye Jia, Ron J. Weiss, Fadi Biadsy, Wolfgang Macherey, et al. — _Interspeech_ — cites: 268
+  - https://www.semanticscholar.org/paper/f93b523fe44e2ad2deaa1c6dac2da878a17eeeaf
+  - arXiv:1904.06037 · doi:10.21437/interspeech.2019-1951
+  - We present an attention-based sequence-to-sequence neural network which can directly translate speech from one language into speech in another language, without relying on an intermediate text representation. The network is trained end-to-end, learning to map speech spectrograms into target spectrograms in another language, corresponding to the translated content (in a different canonical voice).…
+  - via: `cite_of:b6222ad8acdf327368b45fb7fa5f4cf374d6da80` (round 1)
+- **End-to-End Speech Translation with Knowledge Distillation** (2019) — Yuchen Liu, Hao Xiong, Zhongjun He, Jiajun Zhang, et al. — _Interspeech_ — cites: 170
+  - https://www.semanticscholar.org/paper/e4d99f390901df5caac0b587ff685f9cde100342
+  - arXiv:1904.08075 · doi:10.21437/interspeech.2019-2582
+  - End-to-end speech translation (ST), which directly translates from source language speech into target language text, has attracted intensive attentions in recent years. Compared to conventional pipeline systems, end-to-end ST models have advantages of lower latency, smaller model size and less error propagation. However, the combination of speech recognition and text translation in one model is mo…
+  - via: `ref_of:f0dfe7f0528eded4096a741a751aea4b1f707e82` (round 1)
+- **Mitigating Noisy Inputs for Question Answering** (2019) — Denis Peskov, Joe Barrow, Pedro Rodriguez, Graham Neubig, et al. — _Interspeech_ — cites: 16
+  - https://www.semanticscholar.org/paper/970383c0a41d7ae1ec4b8abaa3033778203377b9
+  - arXiv:1908.02914 · doi:10.21437/interspeech.2019-3154
+  - Natural language processing systems are often downstream of unreliable inputs: machine translation, optical character recognition, or speech recognition. For instance, virtual assistants can only answer your questions after understanding your speech. We investigate and mitigate the effects of noise from Automatic Speech Recognition systems on two factoid Question Answering (QA) tasks. Integrating…
+  - via: `query:automatic speech recognition machine translation` (round 2)
+- **Multimedia Simultaneous Translation System for Minority Language Communication with Mandarin** (2019) — Shen Huang, Bojie Hu, Shan Huang, Pengfei Hu, et al. — _Interspeech_ — cites: 0
+  - https://www.semanticscholar.org/paper/843b6a4a9539915d64f120947921b52ea2eeb08a
+  - via: `query:anticipation simultaneous translation` (round 0)
+- **Low-Latency Neural Speech Translation** (2018) — J. Niehues, Ngoc-Quan Pham, Thanh-Le Ha, Matthias Sperber, et al. — _Interspeech_ — cites: 84
+  - https://www.semanticscholar.org/paper/3a6c8b467167781a8570dfdfa111a70bf4046d73
+  - arXiv:1808.00491 · doi:10.21437/Interspeech.2018-1055
+  - Through the development of neural machine translation, the quality of machine translation systems has been improved significantly. By exploiting advancements in deep learning, systems are now able to better approximate the complex mapping from source sentences to target sentences. But with this ability, new challenges also arise. An example is the translation of partial sentences in low-latency sp…
+  - via: `query:translation quality speech translation` (round 1)
+- **Incremental TTS for Japanese Language** (2018) — Tomoya Yanagita, S. Sakti, Satoshi Nakamura — _Interspeech_ — cites: 7
+  - https://www.semanticscholar.org/paper/56931f63d4140982cdf608789090f5fb402906dc
+  - doi:10.21437/Interspeech.2018-1561
+  - Simultaneous lecture translation requires speech to be translated in real time before the speaker has spoken an entire sentence since a long delay will create difficulties for the listeners trying to follow the lecture. The challenge is to construct a full-fledged system with speech recognition, machine translation, and textto-speech synthesis (TTS) components that could produce highquality speech…
+  - via: `query:simultaneous speech translation` (round 0)

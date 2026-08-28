@@ -1,0 +1,68 @@
+{
+  "utt_id": "AUD0000000003_1180",
+  "src_trajectory": [
+    "the",
+    "man who could kill",
+    "you deserves to",
+    "die",
+    "and he was about to",
+    "turn his sword on",
+    "himself, when the",
+    "true maria sprung",
+    "out from under the bed,",
+    " And flung",
+    "herself into his",
+    "arms. ",
+    "And the next day they",
+    "were married and lived",
+    "happily for many",
+    "years. "
+  ],
+  "source_full_text": "the man who could kill you deserves to die and he was about to turn his sword on himself, when the true maria sprung out from under the bed, And flung herself into his arms. And the next day they were married and lived happily for many years.",
+  "target_trajectory": [
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "那个本可以杀死你的人理应死去，就在他即将用剑自尽时，真正的玛丽亚从床下跳了出来，扑进了他的怀抱。第二天，他们就结婚了，从此幸福地生活在一起。",
+    ""
+  ],
+  "actions": [
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "WRITE",
+    "READ"
+  ],
+  "prediction": "那个本可以杀死你的人理应死去，就在他即将用剑自尽时，真正的玛丽亚从床下跳了出来，扑进了他的怀抱。第二天，他们就结婚了，从此幸福地生活在一起。",
+  "reference_text": "那个本可以杀死你的人理应死去，他正要将剑转向自己时，真正的玛丽亚从床下跳了出来，扑进了他的怀抱。第二天，他们就结婚了，幸福地生活了很多年。",
+  "decoder_impl": {
+    "method": "wait_k",
+    "k": 15
+  },
+  "metrics": {
+    "laal_text": 23.34285714285714,
+    "bleu_char": 75.55092634457031
+  }
+}

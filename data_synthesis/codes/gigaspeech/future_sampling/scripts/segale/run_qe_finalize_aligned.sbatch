@@ -38,7 +38,7 @@ MAX_RATIO_REF="${MAX_RATIO_REF:-1.5}"
 MIN_RATIO_REF="${MIN_RATIO_REF:-0.7}"
 NUM_SHARDS=8
 
-CODE=/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling
+CODE=/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling
 MERGED="${METRICX_RUN_DIR}/metricx_output.jsonl"
 QE_REPORT="${METRICX_RUN_DIR}/filter_report_per_utt.jsonl"
 LR_REPORT="${METRICX_RUN_DIR}/length_ratio_report.jsonl"

@@ -49,7 +49,7 @@ while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
         NCCL_P2P_DISABLE=1 \
         NCCL_IB_DISABLE=1 \
     uv run simuleval \
-        --agent /data/user_data/haolingp/scripts/infer/infinisst_omni.py \
+        --agent /home/haolingp/CMU_research_SMT/scripts/infer/infinisst_omni.py \
         --agent-class agents.InfiniSSTOmni \
         --source-segment-size ${SOURCE_SEGMENT_SIZE} \
         --prompt-type ${PROMPT_TYPE} \

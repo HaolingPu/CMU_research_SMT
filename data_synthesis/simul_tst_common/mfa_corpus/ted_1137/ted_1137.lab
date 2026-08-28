@@ -1,0 +1,90 @@
+Good afternoon, everybody.
+I got something to show you.
+Think about this as a pixel, a flying pixel.
+This is what we call in our lab sensible design.
+Let me tell you a bit about it.
+If you take this picture, I'm Italian originally, and every boy in Italy grows up with this picture on the wall of his bedroom.
+But the reason I'm showing you this is that something very interesting happened in Formula One racing over the past couple of decades.
+Now some time ago, if you wanted to win a Formula One race, you take a budget and you bet your budget on a good driver and a good car, and if the car and the driver were good enough, then you win the race.
+Today, if you want to win the race, actually you need also something like this.
+Something that monitors the car in real time, has a few thousand sensors collecting information from the car, transmitting this information into the system, and then processing it and using it in order to go back to the car with decisions and changing things in real time as information is collected.
+This is what in engineering terms you would call a real-time control system.
+And basically, it's a system made of two components, sensing and an actuating component.
+What is interesting today is that real-time control systems are entering, starting to enter into our life.
+Our cities, over the past few years, just have been blanketed with networks, electronics.
+They're becoming like computers in open air, and as computers in open air, they're starting to respond in a different way, to be able to be sensed and to be actuated.
+If we fix cities, actually it's a big deal.
+Just as an aside, I wanted to mention cities are only 2% of the Earth's crust, but they are 50% of the world's population.
+They're 75% of energy consumption, up to 80% of CO2 emissions.
+So if you're able to do something with cities, that's a big deal.
+Beyond cities, all of this, sensing and actuating, is entering our everyday objects.
+That's from an exhibition that Paolo Antonelli is organizing at MoMA later this year, during the summer, it's called Talk to Me, where our objects, our environment, is starting to talk back to us.
+In a certain sense, it's almost as if every atom out there were becoming both a sensor and an actuator, and that is radically changing the interaction we have as humans with the environment out there.
+In a certain sense, it's almost as if the old dream of Michelangelo, when Michelangelo sculpted the Moses, at the end it's said that he took the hammer, threw it at the Moses, actually you can still see a small chip underneath, and said, shouted, why don't you talk?
+Well today, for the first time, our environment is starting to talk back to us.
+And I'll show just a few examples, again with this idea of sensing our environment and actuating it.
+Let's start with sensing.
+Well, the first project I wanted to share with you is actually one of the first projects by our lab.
+Which was four and a half years ago in Italy, and what we did there was actually use a new type of network at the time that had been deployed all across the world, that's a cell phone network, and use anonymous aggregated information from that network that's collected anyway by the operator in order to understand how the city works.
+The summer was a lucky summer, 2006, it's when Italy won the soccer World Cup.
+Some of you might remember it was Italy and France playing, and then Zidane at the end the head-butting, anyway, Italy won at the end.
+Now, look at what happened that day just by monitoring activity happening on the network.
+Here you see the city, you see the Colosseum in the middle, the river Tevere, it's morning before the match, you see the timeline on the top, early afternoon, people here and there making calls and moving.
+The match begins, silence, France scores, Italy scores, half-time, people make a quick call and go to the bathroom, second half, end of normal time, first overtime, second, Zidane the head-butting in the moment, Italy wins, yeah.
+Well that night everybody went to celebrate in the center, you saw the big peak, the following day again, everybody went to the center to meet the winning team and the Prime Minister at the time, and then everybody moved down, you see it in the image at the place called Chirco Massimo, where since Roman times people go to celebrate, to have a big party and you see the peak at the end of the day.
+Well that's just one example how we can sense the city today in a way that we couldn't have done just a few years ago.
+Another quick example about sensing, it's about, not about people, but it's about things we use and consume.
+Well today we know everything about where our objects come from, this is a map that shows you all the chips that form a Mac computer, how they came together, but we know very little about where things go.
+So in this project we actually developed some small tags to track trash as it moves through the system.
+So we actually started with a number of volunteers who helped us in Seattle just over a year ago to tag what they were throwing away, different type of things as you can see here, things they would throw away anyway, then we put a little chip, little tag onto the trash and then started following it.
+Here are the results we just obtained.
+From Seattle.
+After one week.
+With this information we realised there's a lot of inefficiencies in the system, we can actually do the same thing with much less energy, this data was not available before but there's a lot of wasted transportation and convoluted things happening.
+But the other thing is that we believe that actually if we see everyday that the cap we are throwing away, it doesn't disappear, it's still somewhere on the planet and the plastic bottle we are throwing away everyday still stays there and we show that to people, then we can also promote some behavioural change.
+So that was the reason for the project, my colleague could tell you much more about sensing and many other wonderful things we can do with sensing but I wanted to go to the second part we discussed at the beginning and that's actuating our environment.
+And the first project is something we did a couple of years ago in Zaragoza, Spain.
+It started with a question by the mayor of the city who came to us saying that Spain and southern Europe have a beautiful tradition of using water in public space, in architecture, and the question was how could technology, new technology be added to that?
+And one of the ideas was developed at MIT in a workshop was imagine you've got this pipe and you've got valves, solenoid valves, tabs, opening and closing you create like a water curtain with pixels made of water, those pixels fall and you can write on it, you can show patterns, images, text and even you can approach it and it will open up to let you jump through as you see in this image.
+Well we presented this to Mayor Belioc, he liked it very much and we got a commission to design a building at the entrance of the expo.
+We called it Digital Water Pavilion, the whole building is made of water.
+There's no doors or windows but when you approach it, it will open up to let you in.
+The roof also is covered with water and if there's a bit of wind, if you want to minimize splashing you can actually lower the roof or you could close the building and the whole architecture will disappear like in this case.
+You know these days they always get emails during the winter when they take the roof down of people who've been there and say you know they demolished the building and no they didn't demolish it, just when it goes down the architecture almost disappear.
+Here's the building working, you see the person puzzled about what was going inside.
+Here it was myself trying not to get wet, testing the sensors that opened the water.
+Well I should tell you now what happened one night when all of the sensors stopped working but actually that night it was even more fun.
+All the kids from Zaragoza came to the building because the way of engaging with the building became something different.
+Not anymore a building that would open up to let you in but a building that would still make cuts and holes through the water and you had to jump without getting wet.
+And that was for us was very interesting because as architects, as engineers, as designers we always think about how people will use the things we design but then reality is always unpredictable and that's the beauty of doing things that are used and interact with people.
+Here is an image then of the building with the physical pixels, the pixels made of water and then projections on them and this is what led us to think about the following project I'll show you now.
+That's imagine those pixels could actually start flying.
+Imagine you know you could have small helicopters that move in the air and then each of them with a small pixel and changing lights almost as a cloud that can move in space.
+Here is the idea.
+So imagine one helicopter like the one we saw before moving with others in synchrony so you can have this cloud.
+You can have a kind of flexible screen or display like this, a regular configuration in two dimensions or in regular but in three dimensions where the thing that change is the light, not the pixels position.
+You can play with different type, imagine your screen could just appear in different scale or sizes, different type of resolution but then the whole thing can be a 3D kind of cloud of pixels that you can approach and move through it and see from many directions.
+Here is the real fly fire control and going down from the regular grid as before.
+When you turn on the light actually you see this, so the same we saw before and imagine each of them then controlled by people.
+You can have each pixel having an input that comes from people, from people's movement or so on.
+So I wanted to show you something here for the first time is we've been working with Roberto Bolle, one of today's top ballet dancers, the Etoualles at Metropolitan in New York and Lascale in Milan and actually captured his movement in 3D in order to use it as an input for fly fire.
+And here you can see Roberto dancing.
+You see on the left the pixels, the different resolution being captured, it's both 3D scanning in real time and motion capture.
+So you can reconstruct the whole movement.
+You can go all the way to.
+But then once you have the pixels then you can play with them and play with color and movement and gravity and rotation.
+So we want to use this as one of the possible inputs for fly fire.
+I wanted to show you the last project we are working on.
+It's something we're working on for the lantern Olympics.
+It's called the cloud.
+And the idea here is imagine that, again, we can involve people in doing something and changing our environment and almost doing what we call cloud raising, like barn raising but with a cloud.
+Imagine you can have everybody make a small donation for one pixel.
+And I think what is remarkable that happens over the past couple of years is that over the past couple of decades we went from the physical world to the digital one.
+This has been digitizing everything, knowledge and making that accessible through the internet.
+Now today for the first time, and the Obama campaign showed us that, we can go from the digital world, from the self-organizing power of networks to the physical one.
+This can be in our case we want to use it for designing and doing a symbol, doing something built in a city.
+But tomorrow it can be in order to tackle today's pressing challenges, think about climate change or CO2 emission, how we can go from the digital world to the physical one.
+So the idea that can we actually involve people in doing this thing together collectively, our cloud is a cloud again made of pixel in the same way as a real cloud is a cloud made of particles and those particles are water.
+Where our cloud is a cloud of pixel, is a physical structure in London but covered with pixel.
+You can move inside with different type of experiences, you can actually see it from underneath, sharing the main moments for the Olympics in 2012 and beyond and really using it as a way to connect with the community.
+So both physical cloud into the sky and something you can go to the top like a London's new mountain top, you can enter inside it and a kind of new digital beacon for the night but most importantly a new type of experience for anybody who will go to the top.

@@ -1,0 +1,7 @@
+python 3.12.12 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 20:16:04) [GCC 11.2.0]
+torch 2.8.0+cu129
+transformers 4.57.1
+vllm 0.11.0
+numpy 2.2.6
+datasets 4.4.1
+torch.cuda 12.9 arch ['sm_70', 'sm_75', 'sm_80', 'sm_86', 'sm_90', 'sm_100', 'sm_120', 'compute_120']

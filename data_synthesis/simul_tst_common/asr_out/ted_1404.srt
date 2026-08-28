@@ -1,0 +1,308 @@
+1
+00:00:00,000 --> 00:00:20,200
+This may sound strange, but I'm a big fan of the concrete block.
+
+2
+00:00:20,200 --> 00:00:22,880
+The first concrete blocks were manufactured in 1868.
+
+3
+00:00:22,880 --> 00:00:25,640
+It was a very simple idea.
+
+4
+00:00:25,640 --> 00:00:34,880
+Concrete blocks became the most used construction unit in the world.
+
+5
+00:00:34,880 --> 00:00:39,480
+They enabled us to build things that were larger than us, buildings, bridges, one brick
+
+6
+00:00:39,480 --> 00:00:41,080
+at a time.
+
+7
+00:00:41,080 --> 00:00:46,080
+Essentially, concrete blocks had become the building block of our time.
+
+8
+00:00:46,080 --> 00:00:50,600
+Almost 100 years later, in 1947, Lego came out with this.
+
+9
+00:00:50,600 --> 00:00:53,280
+It was called the automatic binding brick.
+
+10
+00:00:53,280 --> 00:00:57,600
+In a few short years, Lego bricks took place in every household.
+
+11
+00:00:57,600 --> 00:01:01,920
+It's estimated that over 400 billion bricks have been produced, or 75 bricks for every
+
+12
+00:01:01,920 --> 00:01:04,200
+person on the planet.
+
+13
+00:01:04,200 --> 00:01:08,240
+You didn't have to be an engineer to make beautiful houses, beautiful bridges, beautiful
+
+14
+00:01:08,240 --> 00:01:09,240
+buildings.
+
+15
+00:01:09,240 --> 00:01:10,240
+Lego made it accessible.
+
+16
+00:01:10,240 --> 00:01:14,640
+Lego had essentially taken the concrete block, the building block of the world, and made
+
+17
+00:01:14,640 --> 00:01:17,600
+it into the building block of our imagination.
+
+18
+00:01:17,600 --> 00:01:22,920
+Meanwhile, the exact same year, at Bell Labs, the next revolution was about to be announced.
+
+19
+00:01:22,920 --> 00:01:24,480
+The next building block.
+
+20
+00:01:24,480 --> 00:01:29,480
+The transistor was a small plastic unit that would take us from a world of static bricks
+
+21
+00:01:29,480 --> 00:01:33,960
+piled on top of each other to a world where everything was interactive.
+
+22
+00:01:33,960 --> 00:01:39,200
+Like the concrete block, the transistor allows you to build much larger, more complex circuits,
+
+23
+00:01:39,200 --> 00:01:42,160
+one brick at a time, but there's a main difference.
+
+24
+00:01:42,160 --> 00:01:44,440
+The transistor was only for experts.
+
+25
+00:01:44,440 --> 00:01:49,680
+I personally don't accept this, that the building block of our time is reserved for experts,
+
+26
+00:01:49,680 --> 00:01:52,960
+so I decided to change that.
+
+27
+00:01:52,960 --> 00:01:56,900
+Eight years ago, when I was at the Media Lab, I started exploring this idea of how to put
+
+28
+00:01:56,900 --> 00:02:01,200
+the power of engineers in the hands of artists and designers.
+
+29
+00:02:01,200 --> 00:02:03,760
+A few years ago, I started developing little bits.
+
+30
+00:02:03,760 --> 00:02:08,200
+Let me show you how they work.
+
+31
+00:02:08,200 --> 00:02:14,060
+Little bits are electronic modules with each one specific function.
+
+32
+00:02:14,060 --> 00:02:20,960
+They're pre-engineered to be light, sound, motors, and sensors.
+
+33
+00:02:20,960 --> 00:02:26,620
+And the best part about it is they snap together with magnets.
+
+34
+00:02:26,620 --> 00:02:29,680
+So you can't put them the wrong way.
+
+35
+00:02:29,680 --> 00:02:31,460
+The bricks are color coded.
+
+36
+00:02:31,460 --> 00:02:36,220
+Green is output, blue is power, pink is input, and orange is wire.
+
+37
+00:02:36,220 --> 00:02:40,860
+So all you need to do is snap a blue to a green, and very quickly, you can start making
+
+38
+00:02:40,860 --> 00:02:42,620
+larger circuits.
+
+39
+00:02:42,620 --> 00:02:45,900
+You put a blue to a green, you can make light.
+
+40
+00:02:45,900 --> 00:02:50,540
+You can put a knob in between.
+
+41
+00:02:50,540 --> 00:02:54,140
+And now you've made a little dimmer.
+
+42
+00:02:54,140 --> 00:03:01,980
+Switch out the dimmer, the knob, for a pulse module, which is here.
+
+43
+00:03:01,980 --> 00:03:05,300
+And now you've made a little blinker.
+
+44
+00:03:05,300 --> 00:03:11,900
+Add this buzzer for some extra punch, and you've created a noise machine.
+
+45
+00:03:11,900 --> 00:03:13,220
+I'm going to stop then.
+
+46
+00:03:13,220 --> 00:03:18,380
+So beyond simple play, little bits are actually pretty powerful.
+
+47
+00:03:18,380 --> 00:03:22,900
+Instead of having to program, to wire, to solder, little bits allow you to program using
+
+48
+00:03:22,900 --> 00:03:24,940
+very simple intuitive gestures.
+
+49
+00:03:24,940 --> 00:03:29,160
+So to make this blink faster or slower, you would just turn this knob and basically make
+
+50
+00:03:29,160 --> 00:03:32,180
+it pulse faster or slower.
+
+51
+00:03:32,180 --> 00:03:35,800
+The idea behind little bits is that it's a growing library.
+
+52
+00:03:35,800 --> 00:03:39,860
+We want to make every single interaction in the world into a ready-to-use brick.
+
+53
+00:03:39,860 --> 00:03:44,340
+Lights, sounds, solar panels, motors, everything should be accessible.
+
+54
+00:03:44,340 --> 00:03:47,820
+We've been giving little bits to kids and seeing them play with them, and it's been
+
+55
+00:03:47,820 --> 00:03:49,140
+an incredible experience.
+
+56
+00:03:49,140 --> 00:03:53,260
+The nicest thing is how they start to understand the electronics around them from every day
+
+57
+00:03:53,260 --> 00:03:54,840
+that they don't learn at schools.
+
+58
+00:03:54,840 --> 00:04:00,420
+For example, how a nightlight works, or why an elevator door stays open, or how an iPod
+
+59
+00:04:00,420 --> 00:04:02,540
+responds to touch.
+
+60
+00:04:02,540 --> 00:04:04,780
+We've also been taking little bits to design schools.
+
+61
+00:04:04,780 --> 00:04:09,020
+So for example, we've had designers with no experience with electronics whatsoever start
+
+62
+00:04:09,060 --> 00:04:11,740
+to play with little bits as a material.
+
+63
+00:04:11,740 --> 00:04:15,740
+Here you see, with felt and paper water bottles, we have Jordi making ...
+
+64
+00:04:15,740 --> 00:04:26,260
+A few weeks ago, we took little bits to RISD and gave them to some designers with no experience
+
+65
+00:04:26,260 --> 00:04:32,140
+in engineering whatsoever, just cardboard, wood, and paper, and told them, make something.
+
+66
+00:04:32,140 --> 00:04:38,260
+Here's an example of a project they made, a motion-activated confetti cannonball.
+
+67
+00:04:38,260 --> 00:04:41,740
+Oh, wait, this is actually my favorite project.
+
+68
+00:04:41,740 --> 00:04:53,020
+It's a lobster made of Play-Doh that's afraid of the dark.
+
+69
+00:04:53,020 --> 00:04:56,620
+To these non-engineers, little bits became another material.
+
+70
+00:04:56,620 --> 00:05:00,140
+Electronics became just another material, and we want to make this material accessible
+
+71
+00:05:00,140 --> 00:05:01,140
+to everyone.
+
+72
+00:05:01,140 --> 00:05:02,560
+So little bits is open source.
+
+73
+00:05:02,560 --> 00:05:06,180
+You can go on the website, download all the design files, make them yourself.
+
+74
+00:05:06,180 --> 00:05:11,940
+We want to encourage a world of creators, of inventors, of contributors, because this
+
+75
+00:05:11,940 --> 00:05:14,840
+world that we live in, this interactive world, is ours.
+
+76
+00:05:14,840 --> 00:05:17,340
+So go ahead and start inventing.
+
+77
+00:05:17,340 --> 00:05:17,700
+Thank you.
+

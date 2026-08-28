@@ -1,0 +1,62 @@
+{
+  "utt_id": "AUD0000000003_1090",
+  "src_trajectory": [
+    "and",
+    "she set to",
+    "work at once to",
+    "prepare the dinner,",
+    " ",
+    "not without many",
+    "misgivings",
+    "as to the tastes",
+    "of the cats,",
+    " ",
+    "And whether",
+    "she would be able",
+    "to satisfy",
+    "them. "
+  ],
+  "source_full_text": "and she set to work at once to prepare the dinner, not without many misgivings as to the tastes of the cats, And whether she would be able to satisfy them.",
+  "target_trajectory": [
+    "",
+    "",
+    "她立刻开始工作。",
+    "",
+    "",
+    "准备晚餐，期间不免有许多",
+    "顾虑。",
+    "",
+    "她担心猫咪们的口味。",
+    "",
+    "还有……",
+    "她能否做到。",
+    "",
+    ""
+  ],
+  "actions": [
+    "READ",
+    "READ",
+    "WRITE",
+    "READ",
+    "READ",
+    "WRITE",
+    "WRITE",
+    "READ",
+    "WRITE",
+    "READ",
+    "WRITE",
+    "WRITE",
+    "READ",
+    "READ"
+  ],
+  "prediction": "她立刻开始工作。准备晚餐，期间不免有许多顾虑。她担心猫咪们的口味。还有……她能否做到。",
+  "reference_text": "她立刻开始着手准备晚餐，但心中不免有些担忧，不确定猫咪们的口味，也不确定自己能否满足它们。",
+  "decoder_impl": {
+    "method": "wait_k",
+    "k": 3
+  },
+  "metrics": {
+    "laal_text": 3.1333333333333333,
+    "bleu_char": 31.932044632848495
+  }
+}

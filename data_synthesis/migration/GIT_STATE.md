@@ -1,0 +1,221 @@
+# Git state snapshot — 2026-08-24
+
+- Repo root: /data/user_data/haolingp
+- Remote: origin = git@github.com:HaolingPu/CMU_research_SMT.git
+- Branch: feature/llm-wiki
+- HEAD: 30099bb6b20a1a1d00302e75b65454ac849b1a12
+- Sync: feature/llm-wiki is level with origin/feature/llm-wiki — NO unpushed commits on any local branch
+- Local branches: feature/llm-wiki, main, refactor (origin also has refactor-consensus)
+- Submodule gotcha: data_synthesis/codes/metricx is a gitlink (fc4978e) with NO .gitmodules —
+  a fresh clone leaves it empty; the rsync step brings its working files.
+
+## Working tree (4 modified, ~195 untracked; nothing staged)
+
+```
+ M data_synthesis/codes/metricx
+ M scripts/debug/latency_quality_3models.png
+ M scripts/train/train_EAST-latency2mult_s.sh
+ M scripts/train/train_Simul-MuST-C_s.sh
+?? .claude/
+?? .env.example
+?? EMNLP_2026_Future_Aware_Data_Synthesis/
+?? IDL_final_3small/
+?? IDL_final_3small_deploy.tar.gz
+?? ckpts/
+?? code/
+?? data_synthesis/MIGRATION_PLAN.md
+?? data_synthesis/codes/gigaspeech/audit_asr_source_text.py
+?? data_synthesis/codes/gigaspeech/east/build_consensus_format_east.py
+?? data_synthesis/codes/gigaspeech/east/finalize_segale_qe_east.py
+?? data_synthesis/codes/gigaspeech/east/llm_de.sh
+?? data_synthesis/codes/gigaspeech/east/llm_ja.sh
+?? data_synthesis/codes/gigaspeech/east/resume_subsentence_qe_ja.sh
+?? data_synthesis/codes/gigaspeech/east/run_subsentence_finalize_de.sbatch
+?? data_synthesis/codes/gigaspeech/east/run_subsentence_finalize_ja.sbatch
+?? data_synthesis/codes/gigaspeech/east/run_subsentence_finalize_ja_perlat.sbatch
+?? data_synthesis/codes/gigaspeech/east/run_subsentence_qe_orchestrate_de.sbatch
+?? data_synthesis/codes/gigaspeech/east/run_subsentence_qe_orchestrate_ja.sbatch
+?? data_synthesis/codes/gigaspeech/east/stage1_de.sh
+?? data_synthesis/codes/gigaspeech/east/stage1_ja.sh
+?? data_synthesis/codes/gigaspeech/east/stage3_metricx_de.sh
+?? data_synthesis/codes/gigaspeech/east/stage3_metricx_ja.sh
+?? data_synthesis/codes/gigaspeech/east/stage4_final_de.sh
+?? data_synthesis/codes/gigaspeech/east/stage4_final_ja.sh
+?? data_synthesis/codes/gigaspeech/east/submit_de.sh
+?? data_synthesis/codes/gigaspeech/east/submit_de_100k_preempt.sh
+?? data_synthesis/codes/gigaspeech/east/submit_ja.sh
+?? data_synthesis/codes/gigaspeech/east/submit_ja_extend_to_100k.sh
+?? data_synthesis/codes/gigaspeech/east/submit_subsentence_qe_de.sh
+?? data_synthesis/codes/gigaspeech/east/submit_subsentence_qe_ja.sh
+?? data_synthesis/codes/gigaspeech/fig_waitk_50k.pdf
+?? data_synthesis/codes/gigaspeech/fig_waitk_la_50k.pdf
+?? data_synthesis/codes/gigaspeech/fig_waitk_la_50k.png
+?? data_synthesis/codes/gigaspeech/graph.py
+?? data_synthesis/codes/gigaspeech/hibiki/index.html
+?? data_synthesis/codes/gigaspeech/hibiki/output/
+?? data_synthesis/codes/gigaspeech/merge_frozen_ref_into_sentsplit.py
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/local_agreement/la_replay.py
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/local_agreement/la_replay_out.txt
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/local_agreement/la_verbose_driver.py
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/local_agreement/output_test/
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/local_agreement/result_seg1_AUD0000000003_1011.json
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/local_agreement/result_seg1_AUD0000000003_1011_buggy.json
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/local_agreement/result_seg2_AUD0000000003_100.json
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/local_agreement/result_seg2_AUD0000000003_100_buggy.json
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/local_agreement/result_seg3_AUD0000000003_0.json
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/local_agreement/result_seg3_AUD0000000003_0_buggy.json
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/local_agreement/script/
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/local_agreement/trace_seg1_AUD0000000003_1011.txt
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/local_agreement/trace_seg1_AUD0000000003_1011_buggy.txt
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/local_agreement/trace_seg2_AUD0000000003_100.txt
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/local_agreement/trace_seg2_AUD0000000003_100_buggy.txt
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/local_agreement/trace_seg3_AUD0000000003_0.txt
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/local_agreement/trace_seg3_AUD0000000003_0_buggy.txt
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/prefix_alignment/
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/aggregate_waitk_metrics.py
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/compute_waitk_metrics.sh
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/output/waitk12_100_stride1/
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/output/waitk12_metricx_input.jsonl
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/output/waitk12_metricx_output.jsonl
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/output/waitk15_100_stride1/
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/output/waitk15_metricx_input.jsonl
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/output/waitk15_metricx_output.jsonl
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/output/waitk3_100_stride1/
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/output/waitk3_metricx_input.jsonl
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/output/waitk3_metricx_output.jsonl
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/output/waitk6_100_stride1/
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/output/waitk6_metricx_input.jsonl
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/output/waitk6_metricx_output.jsonl
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/output/waitk9_100_stride1/
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/output/waitk9_metricx_input.jsonl
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/output/waitk9_metricx_output.jsonl
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/output/waitk_summary.json
+?? data_synthesis/codes/gigaspeech/rule-based-SMT/wait-k/script/
+?? data_synthesis/codes/gigaspeech/run_split_src_text_full.sbatch
+?? data_synthesis/codes/gigaspeech/salami/adapt_salami_to_east_format.py
+?? data_synthesis/codes/gigaspeech/salami/llm_de.sh
+?? data_synthesis/codes/gigaspeech/salami/llm_ja.sh
+?? data_synthesis/codes/gigaspeech/salami/run_metricx_qe_24_preempt.sbatch
+?? data_synthesis/codes/gigaspeech/salami/run_metricx_qe_24_preempt_de.sbatch
+?? data_synthesis/codes/gigaspeech/salami/run_segale_align_24_preempt.sbatch
+?? data_synthesis/codes/gigaspeech/salami/run_segale_finalize_salami_de.sbatch
+?? data_synthesis/codes/gigaspeech/salami/run_segale_finalize_salami_ja_t12500.sbatch
+?? data_synthesis/codes/gigaspeech/salami/run_segale_merge_de.sbatch
+?? data_synthesis/codes/gigaspeech/salami/run_segale_qeprep_de.sbatch
+?? data_synthesis/codes/gigaspeech/salami/salami_to_consensus_format.py
+?? data_synthesis/codes/gigaspeech/salami/stage1_de.sh
+?? data_synthesis/codes/gigaspeech/salami/stage1_ja.sh
+?? data_synthesis/codes/gigaspeech/salami/stage2_metricx_input_de.sh
+?? data_synthesis/codes/gigaspeech/salami/stage2_metricx_input_ja.sh
+?? data_synthesis/codes/gigaspeech/salami/stage3_metricx_de.sh
+?? data_synthesis/codes/gigaspeech/salami/stage3_metricx_ja.sh
+?? data_synthesis/codes/gigaspeech/salami/stage4_final_de.sh
+?? data_synthesis/codes/gigaspeech/salami/stage4_final_ja.sh
+?? data_synthesis/codes/gigaspeech/salami/submit_segale_salami_de.sh
+?? data_synthesis/codes/gigaspeech/salami/submit_segale_salami_ja.sh
+?? data_synthesis/codes/gigaspeech/split_asr_source_audit.py
+?? data_synthesis/codes/gigaspeech/split_src_text_full_punct.py
+?? data_synthesis/codes/gigaspeech/split_src_text_full_spacy.py
+?? data_synthesis/migration/
+?? data_synthesis/refactor_view/
+?? data_synthesis/simul_tst_common/
+?? datasets/
+?? pip_cache/
+?? scripts/babysitter/
+?? scripts/debug/consensus_vs_futures200_comparison.md
+?? scripts/debug/latency_quality_compare.png
+?? scripts/debug/mentor_plus_mine.png
+?? scripts/debug/plot_consensus_vs_futures200.py
+?? scripts/debug/plot_latency_quality_compare.py
+?? scripts/debug/plot_mentor_plus_mine.py
+?? scripts/infer/ckpts_de.txt
+?? scripts/infer/ckpts_ja.txt
+?? scripts/infer/ckpts_la_v2.txt
+?? scripts/infer/eval_all_ckpts_de.sh
+?? scripts/infer/eval_all_ckpts_ja.sh
+?? scripts/infer/eval_all_ckpts_v2.sh
+?? scripts/infer/image.png
+?? scripts/infer/incident_vllm_shm_deadlock.txt
+?? scripts/infer/infer_slurm.sh.bak.hangfix
+?? scripts/infer/infer_slurm_LA_t0_adapmnt.sh
+?? scripts/infer/infer_slurm_de.sh
+?? scripts/infer/infer_slurm_ja.sh
+?? scripts/infer/infer_slurm_la_v2.sh
+?? scripts/infer/la_v1_v2_compare.png
+?? scripts/infer/latency_quality_de.png
+?? scripts/infer/latency_quality_ja.png
+?? scripts/infer/plot_la_v1_v2.py
+?? scripts/infer/plot_latency_quality_de.py
+?? scripts/infer/plot_latency_quality_ja.py
+?? scripts/infer/rerun_eval_topk5.sbatch
+?? scripts/infer/rerun_eval_topk5_k4.sbatch
+?? scripts/infer/rerun_eval_topk5_k4_seg1920.sbatch
+?? scripts/infer/rerun_eval_topk5_k4_seg960.sbatch
+?? scripts/infer/rerun_eval_topk5_v2_v1.sbatch
+?? scripts/infer/rerun_eval_topk5_v2_v2.sbatch
+?? scripts/infer/run_eval_all_ckpts.sbatch
+?? scripts/infer/run_eval_all_ckpts_de.sbatch
+?? scripts/infer/run_eval_all_ckpts_ja.sbatch
+?? scripts/infer/run_eval_all_ckpts_simultst.sbatch
+?? scripts/infer/run_eval_all_ckpts_v2.sbatch
+?? scripts/infer/run_infer_after_train_generic.sbatch
+?? scripts/infer/run_win3_infer_after_train.sbatch
+?? "scripts/infer/word_alignment\345\257\271\346\257\224.png"
+?? scripts/plots/
+?? scripts/run_CLAUSE_win3_FULL_chain.sh
+?? scripts/run_FIX_win3_FULL_chain.sh
+?? scripts/run_PUNCT_win3_FULL_chain.sh
+?? scripts/run_win3_FULL_chain.sh
+?? scripts/run_win3_chain.sh
+?? scripts/train/convert2swift_LA.py
+?? scripts/train/convert2swift_PA.py
+?? scripts/train/convert2swift_consensus_matched.py
+?? scripts/train/convert2swift_east-low_de.py
+?? scripts/train/convert2swift_east-low_ja.py
+?? scripts/train/convert2swift_east-mult_de.py
+?? scripts/train/convert2swift_east-mult_ja.py
+?? scripts/train/convert2swift_salami_de.py
+?? scripts/train/convert2swift_salami_ja.py
+?? scripts/train/convert_qwen3omni_to_mcore.sh
+?? scripts/train/hibiki_chain.sh
+?? scripts/train/launch_infer_after_train.sbatch
+?? scripts/train/launch_infer_after_train_de.sbatch
+?? scripts/train/launch_infer_after_train_ja.sbatch
+?? scripts/train/launch_infer_after_train_salami_de.sbatch
+?? scripts/train/launch_infer_after_train_salami_ja.sbatch
+?? scripts/train/run_convert2swift_LA.sbatch
+?? scripts/train/run_convert2swift_PA.sbatch
+?? scripts/train/run_convert2swift_consensus.sbatch
+?? scripts/train/run_convert2swift_east-low_de.sbatch
+?? scripts/train/run_convert2swift_east-low_ja.sbatch
+?? scripts/train/run_convert2swift_east-mult_de.sbatch
+?? scripts/train/run_convert2swift_east-mult_ja.sbatch
+?? scripts/train/run_convert2swift_salami_de.sbatch
+?? scripts/train/run_convert2swift_salami_ja.sbatch
+?? scripts/train/stratified_sample_by_multiplier.py
+?? scripts/train/submit_east_de_full_pipeline.sh
+?? scripts/train/submit_east_ja_full_pipeline.sh
+?? scripts/train/submit_la2_seg14_full_pipeline.sh
+?? scripts/train/submit_la_full_pipeline.sh
+?? scripts/train/submit_salami_de_full_pipeline.sh
+?? scripts/train/submit_salami_ja_full_pipeline.sh
+?? scripts/train/train_EAST-even_s.sh
+?? scripts/train/train_EAST-latency2mult_s_de.sh
+?? scripts/train/train_EAST-latency2mult_s_ja.sh
+?? scripts/train/train_EAST-low_s_de.sh
+?? scripts/train/train_EAST-low_s_ja.sh
+?? scripts/train/train_EAST-lowonly_s.sh
+?? scripts/train/train_LA_s.sh
+?? scripts/train/train_PA_s.sh
+?? scripts/train/train_Simul-MuST-C_s_de.sh
+?? scripts/train/train_Simul-MuST-C_s_ja.sh
+?? scripts/train/train_hibiki_repro_s.sh
+?? scripts_2026-03-28.tar.gz
+?? tools/
+```
+
+## Notes
+- Modified: metricx submodule content, 1 png, 2 train scripts (train_EAST-latency2mult_s.sh, train_Simul-MuST-C_s.sh) — uncommitted research state, preserved by rsync.
+- High-value untracked: EMNLP_2026_Future_Aware_Data_Synthesis/ (paper), the whole east/ de+ja staged pipeline scripts, codes-refactored consensus files, .claude/, .env.example.
+- Untracked-and-excluded: IDL_final_3small*, ckpts/, code/, hibiki/output/ (see exclude.txt).
+- Nothing was committed or pushed as part of migration prep.

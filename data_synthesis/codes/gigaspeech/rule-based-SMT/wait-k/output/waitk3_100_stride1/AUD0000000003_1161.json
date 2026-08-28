@@ -1,0 +1,32 @@
+{
+  "utt_id": "AUD0000000003_1161",
+  "src_trajectory": [
+    "And",
+    "tried to make the people of",
+    "the land happy and",
+    "contented too. "
+  ],
+  "source_full_text": "And tried to make the people of the land happy and contented too.",
+  "target_trajectory": [
+    "",
+    "",
+    "并努力让当地人民快乐。",
+    ""
+  ],
+  "actions": [
+    "READ",
+    "READ",
+    "WRITE",
+    "READ"
+  ],
+  "prediction": "并努力让当地人民快乐。",
+  "reference_text": "并且也试图让当地人民感到快乐和满足。",
+  "decoder_impl": {
+    "method": "wait_k",
+    "k": 3
+  },
+  "metrics": {
+    "laal_text": 5.638888888888889,
+    "bleu_char": 26.257888400741187
+  }
+}

@@ -4,7 +4,7 @@
 #
 # Submit:
 #   sbatch --export=ALL,EXPERIMENT_DIR=/abs/consensus_dir \
-#     /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/run_metricx_qe_consensus_single.sbatch
+#     /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/run_metricx_qe_consensus_single.sbatch
 # ============================================================
 #SBATCH --job-name=cons_metricx
 #SBATCH --nodes=1
@@ -35,9 +35,9 @@ OUTPUT_BASE="${OUTPUT_BASE:-/data/user_data/haolingp/data_synthesis/outputs/giga
 EXPERIMENT_NAME="$(basename "${EXPERIMENT_DIR}")"
 RUN_DIR="${OUTPUT_BASE}/${EXPERIMENT_NAME}"
 
-CONVERTER="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/convert_metricx_consensus.py"
-SUMMARY="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/summarize_metricx_qe.py"
-METRICX_ROOT="/data/user_data/haolingp/data_synthesis/codes/metricx"
+CONVERTER="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/convert_metricx_consensus.py"
+SUMMARY="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/summarize_metricx_qe.py"
+METRICX_ROOT="/home/haolingp/CMU_research_SMT/data_synthesis/codes/metricx"
 TOKENIZER="/data/user_data/haolingp/models/mt5-xl"
 MODEL="/data/user_data/haolingp/models/metricx-24-hybrid-xl-v2p6"
 

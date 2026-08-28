@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/submit_gemma4_true_minp_100_metrics.sh"
+SCRIPT="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/submit_gemma4_true_minp_100_metrics.sh"
 
 echo "[compare] submit true min-p 0.05"
 OUT_005=$(MIN_P=0.05 RUN_TAG=true-minp-0p05-100-metrics bash "${SCRIPT}")

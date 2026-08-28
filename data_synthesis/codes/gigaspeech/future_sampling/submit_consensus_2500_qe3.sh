@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-GEN_SCRIPT="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/run_consensus_decoding_vllm_2500_8gpu.sbatch"
-POST_SCRIPT="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/run_metricx_qe_filter_consensus_qe3.sbatch"
+GEN_SCRIPT="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/run_consensus_decoding_vllm_2500_8gpu.sbatch"
+POST_SCRIPT="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/run_metricx_qe_filter_consensus_qe3.sbatch"
 
 INPUT_TSV="${INPUT_TSV:-/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_xl_case_robust_asr-filtered_zh.tsv}"
 CONS_OUTPUT="${CONS_OUTPUT:-/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_debug/consensus-2k}"

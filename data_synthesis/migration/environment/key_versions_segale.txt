@@ -1,0 +1,7 @@
+python 3.10.20 (main, Mar 11 2026, 17:46:40) [GCC 14.3.0]
+torch 2.5.0+cu124
+transformers 4.51.3
+sacrebleu 2.6.0
+numpy 1.23.5
+datasets 4.8.5
+torch.cuda 12.4 arch ['sm_50', 'sm_60', 'sm_70', 'sm_75', 'sm_80', 'sm_86', 'sm_90']

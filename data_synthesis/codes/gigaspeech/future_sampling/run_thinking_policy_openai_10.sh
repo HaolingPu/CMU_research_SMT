@@ -4,7 +4,7 @@
 #   - Thinking model: OpenAI Responses API (for example gpt-5.4)
 #
 # Submit:
-#   sbatch /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/run_thinking_policy_openai_10.sh
+#   sbatch /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/run_thinking_policy_openai_10.sh
 #
 # This script loads OPENAI_API_KEY from ~/.bashrc.
 
@@ -41,8 +41,8 @@ if [[ ! -f /data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_
   exit 1
 fi
 
-if [[ ! -f /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_thinking_policy_openai.py ]]; then
-  echo "ERROR: Script not found: /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_thinking_policy_openai.py"
+if [[ ! -f /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_thinking_policy_openai.py ]]; then
+  echo "ERROR: Script not found: /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_thinking_policy_openai.py"
   exit 1
 fi
 
@@ -52,7 +52,7 @@ echo "===== START OPENAI THINKING TRIAL ====="
 echo "job_id=${SLURM_JOB_ID:-N/A} node=$(hostname) time=$(date)"
 nvidia-smi --query-gpu=index,name,memory.total,memory.free --format=csv
 
-SIMALIGN_MODEL="/data/user_data/haolingp/models/LaBSE" CUDA_VISIBLE_DEVICES=0 python "/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_thinking_policy_openai.py" \
+SIMALIGN_MODEL="/data/user_data/haolingp/models/LaBSE" CUDA_VISIBLE_DEVICES=0 python "/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_thinking_policy_openai.py" \
   --input-tsv "/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_xl_case_robust_asr-filtered.tsv" \
   --output-root "/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_future_sampling_final/thinking_policy_openai_gpt54_10utt" \
   --task-id 0 \

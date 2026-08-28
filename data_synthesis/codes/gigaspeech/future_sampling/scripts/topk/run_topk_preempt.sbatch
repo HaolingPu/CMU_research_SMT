@@ -17,4 +17,4 @@
 TOPK="${TOPK:?Set TOPK via --export=ALL,TOPK=<int>}"
 LABEL="${LABEL:-topk${TOPK}}"
 
-bash /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/scripts/topk/run_topk_common.sh "${TOPK}" "${LABEL}"
+bash /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/scripts/topk/run_topk_common.sh "${TOPK}" "${LABEL}"

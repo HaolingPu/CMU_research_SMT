@@ -7,14 +7,14 @@
 #SBATCH --qos=normal
 #SBATCH --partition=general
 #SBATCH --time=00:20:00
-#SBATCH -o /data/user_data/haolingp/scripts/infer/slurm_logs/infer_launch_tst_%j.out
-#SBATCH -e /data/user_data/haolingp/scripts/infer/slurm_logs/infer_launch_tst_%j.err
+#SBATCH -o /home/haolingp/CMU_research_SMT/scripts/infer/slurm_logs/infer_launch_tst_%j.out
+#SBATCH -e /home/haolingp/CMU_research_SMT/scripts/infer/slurm_logs/infer_launch_tst_%j.err
 
 # Simul-tst-COMMON twin of run_infer_after_train_generic.sbatch. Fires
 # afterok:train, finds the HF export of ${EXP}, launches the 4-seg simultst
 # inference array, registers it in ckpts_simultst.txt, chains simultst eval.
 set -e
-cd /data/user_data/haolingp/scripts/infer
+cd /home/haolingp/CMU_research_SMT/scripts/infer
 
 EXP="${EXP:?EXP required}"
 BASE=/data/user_data/haolingp/ckpts/infinisst-omni/${EXP}

@@ -29,4 +29,4 @@ export TOTAL_ROWS=40000
 export ROW_OFFSET=0
 export NUM_TASKS=12
 
-exec bash /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/_run_J_40k_common.sh
+exec bash /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/_run_J_40k_common.sh

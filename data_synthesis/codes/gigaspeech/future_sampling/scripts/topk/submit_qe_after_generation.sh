@@ -18,7 +18,7 @@ METRICX_RUN_DIR="${OUTPUT_ROOT}/job_${GEN_JOB_ID}-metricx"
 FILTERED_OUTPUT_DIR="${OUTPUT_ROOT}/job_${GEN_JOB_ID}-qe3"
 QE_THRESHOLD=3.0
 NUM_SHARDS=8
-SCRIPT_DIR="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/scripts/topk"
+SCRIPT_DIR="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/scripts/topk"
 
 echo "Submitting QE<=3 pipeline"
 echo "top_k=${TOP_K}"

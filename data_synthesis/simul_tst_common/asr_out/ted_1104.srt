@@ -1,0 +1,228 @@
+1
+00:00:00,000 --> 00:00:26,280
+I want you now to imagine a wearable robot that gives you superhuman abilities, or another
+
+2
+00:00:26,280 --> 00:00:34,000
+one that takes wheelchair users up, standing and walking again.
+
+3
+00:00:34,000 --> 00:00:41,280
+We at Berkeley Bionics call these robots exoskeletons.
+
+4
+00:00:41,280 --> 00:00:46,120
+These are nothing else than something that you put on in the morning and it will give
+
+5
+00:00:46,120 --> 00:00:54,960
+you extra strength and it will further enhance your speed and it will help you, for instance,
+
+6
+00:00:54,960 --> 00:00:56,520
+to manage your balance.
+
+7
+00:00:56,520 --> 00:01:04,480
+It is actually the true integration of the man and the machine, but not only that, it
+
+8
+00:01:04,480 --> 00:01:11,300
+will integrate and network you to the universe and other devices out there.
+
+9
+00:01:11,300 --> 00:01:13,600
+This is just not some blue sky thinking.
+
+10
+00:01:13,600 --> 00:01:20,360
+To show you now what we are working on by starting out talking about the American soldier
+
+11
+00:01:20,360 --> 00:01:25,760
+that on average does carry about 100 pounds on their backs and they are being asked to
+
+12
+00:01:25,760 --> 00:01:28,280
+carry more equipment.
+
+13
+00:01:28,280 --> 00:01:36,620
+Obviously this is resulting in some major complications, back injuries, 30% of them
+
+14
+00:01:36,620 --> 00:01:39,040
+chronic back injuries.
+
+15
+00:01:39,040 --> 00:01:46,760
+So we thought we would look at this challenge and create an exoskeleton that would help
+
+16
+00:01:46,760 --> 00:01:49,120
+deal with this issue.
+
+17
+00:01:49,120 --> 00:01:56,640
+So let me now introduce to you Herc, or the human universal load carrier.
+
+18
+00:01:56,640 --> 00:02:03,680
+With the whole Texas Delta, I can carry 200 pounds over varied terrain for many hours.
+
+19
+00:02:03,680 --> 00:02:09,280
+Its flexible design allows for deep squats, crawls, and high agility movements.
+
+20
+00:02:09,280 --> 00:02:14,920
+It senses what I want to do, where I want to go, and then augments my strength and endurance.
+
+21
+00:02:14,920 --> 00:02:24,440
+We are ready with our industry partner to introduce this device, this new exoskeleton
+
+22
+00:02:24,440 --> 00:02:25,600
+this year.
+
+23
+00:02:25,600 --> 00:02:27,680
+So it is for real.
+
+24
+00:02:27,680 --> 00:02:35,000
+Now let's turn our heads towards the wheelchair users, something that I'm particularly passionate
+
+25
+00:02:35,000 --> 00:02:36,000
+about.
+
+26
+00:02:36,000 --> 00:02:42,040
+There are 68 million people estimated to be in wheelchairs worldwide.
+
+27
+00:02:42,080 --> 00:02:47,880
+This is about 1% of the total population, and that's actually a conservative estimate.
+
+28
+00:02:47,880 --> 00:02:52,680
+We are talking here about, oftentimes, very young individuals with spinal cord injuries
+
+29
+00:02:52,680 --> 00:02:58,560
+that in the prime of the life, 20s, 30s, 40s hit the wall.
+
+30
+00:02:58,560 --> 00:03:00,200
+And the wheelchair is the only option.
+
+31
+00:03:00,200 --> 00:03:06,780
+But it's also the aging population that is multiplying in numbers, and the only option
+
+32
+00:03:06,780 --> 00:03:12,220
+pretty much, whether it's stroke or other complications, is the wheelchair.
+
+33
+00:03:12,220 --> 00:03:17,820
+And that is actually for the last 500 years, since it's a very successful introduction
+
+34
+00:03:17,820 --> 00:03:20,460
+I must say.
+
+35
+00:03:20,460 --> 00:03:28,040
+So we thought we would start writing a brand new chapter of mobility.
+
+36
+00:03:28,040 --> 00:03:36,400
+Let me now introduce you to Elex, that is worn by Amanda Boxtel, that 19 years ago was
+
+37
+00:03:36,440 --> 00:03:38,760
+a spinal cord injury.
+
+38
+00:03:38,760 --> 00:03:45,400
+And as a result of that, she has not been able to walk for 19 years, until now.
+
+39
+00:03:45,400 --> 00:03:46,400
+Thank you.
+
+40
+00:03:46,400 --> 00:04:05,000
+Amanda is wearing our Elex like I said, it has sensors, it's completely non-invasive
+
+41
+00:04:05,040 --> 00:04:10,520
+sensors in the crutches that send signals back to an on-board computer that is sitting
+
+42
+00:04:10,520 --> 00:04:16,800
+here at her back, there are battery packs here as well that power motors that are sitting
+
+43
+00:04:16,800 --> 00:04:23,840
+at her hips, as well as her knee joints that move her forward in this kind of smooth and
+
+44
+00:04:23,840 --> 00:04:28,600
+very natural gait.
+
+45
+00:04:28,600 --> 00:04:32,840
+I was 24 years old and at the top of my game.
+
+46
+00:04:32,840 --> 00:04:38,220
+And a freak somersault while downhill skiing paralyzed me.
+
+47
+00:04:38,220 --> 00:04:45,960
+In a split second, I lost all sensation and movement below my pelvis.
+
+48
+00:04:45,960 --> 00:04:53,480
+Not long afterwards, a doctor strode into my hospital room and he said, Amanda, you'll
+
+49
+00:04:53,480 --> 00:04:57,000
+never walk again.
+
+50
+00:04:57,000 --> 00:05:00,520
+And that was 19 years ago.
+
+51
+00:05:00,520 --> 00:05:05,960
+He robbed every ounce of hope from my being.
+
+52
+00:05:05,960 --> 00:05:12,760
+Adaptive technology has since enabled me to learn how to downhill ski again, to rock climb
+
+53
+00:05:12,760 --> 00:05:25,760
+and even hand cycle, but nothing has been invented that enables me to walk until now.
+
+54
+00:05:25,760 --> 00:05:43,400
+As you can see, we have the technology, we have the platforms to sit down and have discussions
+
+55
+00:05:43,400 --> 00:05:45,640
+with you.
+
+56
+00:05:45,640 --> 00:05:54,800
+It's in our hands and we have all the potential here to change the life of future generations
+
+57
+00:05:54,800 --> 00:06:03,280
+not only for the soldiers or for Amanda here and all the VLC users, but for everyone.
+

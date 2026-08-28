@@ -44,7 +44,7 @@ apptainer exec \
   --env "HF_TOKEN=${HF_TOKEN}" \
   --env "VARIANT=${VARIANT}" \
   --env "EXP_NAME=${EXP_NAME}" \
-  --env "SSL_CERT_FILE=/data/user_data/haolingp/scripts/train/cacert.pem" \
+  --env "SSL_CERT_FILE=/home/haolingp/CMU_research_SMT/scripts/train/cacert.pem" \
   docker://modelscope-registry.us-west-1.cr.aliyuncs.com/modelscope-repo/modelscope:ubuntu22.04-cuda12.8.1-py311-torch2.8.0-vllm0.11.0-modelscope1.31.0-swift3.9.1 \
   bash -c '
 export train_dataset=/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_s_zh-consensus-${VARIANT}.jsonl

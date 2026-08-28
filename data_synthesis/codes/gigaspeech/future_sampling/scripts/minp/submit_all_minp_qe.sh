@@ -4,7 +4,7 @@ set -e
 # Submit MetricX QE pipeline (prepare -> 8gpu predict -> finalize) for all 4 minp values.
 # Each minp gets its own 3-stage chain with SLURM dependencies.
 
-SCRIPT_DIR="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/scripts/minp"
+SCRIPT_DIR="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/scripts/minp"
 OUTPUT_BASE="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_debug/minp"
 QE_THRESHOLD=3.0
 

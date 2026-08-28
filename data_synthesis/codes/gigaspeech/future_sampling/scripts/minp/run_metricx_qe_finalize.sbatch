@@ -24,8 +24,8 @@ FILTERED_OUTPUT_DIR="${FILTERED_OUTPUT_DIR:?FILTERED_OUTPUT_DIR is required}"
 QE_THRESHOLD="${QE_THRESHOLD:-3.0}"
 NUM_SHARDS=8
 
-SUMMARY_SCRIPT="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/summarize_metricx_qe.py"
-FILTER_SCRIPT="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/filter_consensus_by_metricx_qe.py"
+SUMMARY_SCRIPT="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/summarize_metricx_qe.py"
+FILTER_SCRIPT="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/filter_consensus_by_metricx_qe.py"
 SUMMARY_TXT="${METRICX_RUN_DIR}/summary.txt"
 SUMMARY_JSON="${METRICX_RUN_DIR}/summary.json"
 MERGED_OUTPUT="${METRICX_RUN_DIR}/metricx_output.jsonl"

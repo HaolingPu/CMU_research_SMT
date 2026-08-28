@@ -1,0 +1,68 @@
+{
+  "utt_id": "AUD0000000003_1015",
+  "src_trajectory": [
+    "And the fork",
+    "flew into a",
+    "dozen",
+    "pieces. ",
+    "This",
+    "giant was",
+    "even more",
+    "furious than the first",
+    "had been, ",
+    "and words were",
+    "just coming to",
+    "blows, When the",
+    "third giant",
+    "again",
+    "interposed. "
+  ],
+  "source_full_text": "And the fork flew into a dozen pieces. This giant was even more furious than the first had been, and words were just coming to blows, When the third giant again interposed.",
+  "target_trajectory": [
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "叉子飞成了十几片。这个巨人甚至更加",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "愤怒，言语之间已剑拔弩张，这时第三个巨人再次出面干预。"
+  ],
+  "actions": [
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "WRITE",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "WRITE"
+  ],
+  "prediction": "叉子飞成了十几片。这个巨人甚至更加愤怒，言语之间已剑拔弩张，这时第三个巨人再次出面干预。",
+  "reference_text": "叉子飞成了十几片。这个巨人比第一个更加愤怒，双方言语之间已剑拔弩张，这时第三个巨人又插了进来。",
+  "decoder_impl": {
+    "method": "local_agreement",
+    "la_n": 2,
+    "segment_size": 7,
+    "segment_size_sampling": "random_uniform_1_12_per_case",
+    "lcp_mode": "char"
+  },
+  "metrics": {
+    "laal_text": 9.46808510638298,
+    "bleu_char": 67.73972812230056
+  }
+}

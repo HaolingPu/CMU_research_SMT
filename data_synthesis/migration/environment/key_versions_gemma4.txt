@@ -1,0 +1,6 @@
+python 3.12.13 | packaged by Anaconda, Inc. | (main, Mar 19 2026, 20:20:58) [GCC 14.3.0]
+torch 2.10.0+cu129
+transformers 5.5.0
+vllm 0.19.1rc1.dev28+g8617f8676
+numpy 2.2.6
+torch.cuda 12.9 arch ['sm_70', 'sm_75', 'sm_80', 'sm_86', 'sm_90', 'sm_100', 'sm_120', 'compute_120']

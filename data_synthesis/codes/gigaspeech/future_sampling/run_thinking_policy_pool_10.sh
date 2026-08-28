@@ -35,8 +35,8 @@ if [[ ! -f /data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_
   echo "ERROR: MANIFEST not found: /data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_xl_case_robust_asr-filtered.tsv"
   exit 1
 fi
-if [[ ! -f /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_thinking_policy.py ]]; then
-  echo "ERROR: Script not found: /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_thinking_policy.py"
+if [[ ! -f /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_thinking_policy.py ]]; then
+  echo "ERROR: Script not found: /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_thinking_policy.py"
   exit 1
 fi
 
@@ -113,7 +113,7 @@ THINKING_API_BASES_CSV="$(IFS=,; echo "${THINKING_BASES[*]}")"
 echo "[Step 1] thinking_api_bases=${THINKING_API_BASES_CSV}"
 
 echo "[Step 2] Running thinking_policy on GPU 0 ..."
-SIMALIGN_MODEL="/data/user_data/haolingp/models/LaBSE" CUDA_VISIBLE_DEVICES=0 python "/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_thinking_policy.py" \
+SIMALIGN_MODEL="/data/user_data/haolingp/models/LaBSE" CUDA_VISIBLE_DEVICES=0 python "/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_thinking_policy.py" \
   --input-tsv "/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_xl_case_robust_asr-filtered.tsv" \
   --output-root "/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_future_sampling_final/thinking_policy_pool_7srv_10utt" \
   --task-id 0 \

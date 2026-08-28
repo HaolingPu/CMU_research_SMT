@@ -21,4 +21,4 @@ set -e
 
 LABEL="${LABEL:-qwen35_test_1}"
 
-bash /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/scripts/qwen35/run_qwen35_common.sh "${LABEL}"
+bash /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/scripts/qwen35/run_qwen35_common.sh "${LABEL}"

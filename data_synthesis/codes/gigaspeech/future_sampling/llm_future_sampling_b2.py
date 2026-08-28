@@ -2022,7 +2022,7 @@ if __name__ == "__main__":
 # Baseline2 (direct LLM LCP delta) - run 10 cases
 # INPUT_TSV="$(find /data/user_data/haolingp/data_synthesis -type f -name '*.tsv' | head -n 1)" && \
 # echo "Using INPUT_TSV=$INPUT_TSV" && \
-# CUDA_VISIBLE_DEVICES=0 python /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_b2.py \
+# CUDA_VISIBLE_DEVICES=0 python /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_b2.py \
 #   --input-tsv "$INPUT_TSV" \
 #   --output-root /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_future_sampling_final/baseline2_direct_llm_lcp_10 \
 #   --task-id 0 \

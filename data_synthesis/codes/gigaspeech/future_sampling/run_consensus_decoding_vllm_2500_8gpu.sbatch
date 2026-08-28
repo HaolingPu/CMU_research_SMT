@@ -9,7 +9,7 @@
 #   /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_debug/consensus-2k
 #
 # Submit:
-#   sbatch /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/run_consensus_decoding_vllm_2500_8gpu.sbatch
+#   sbatch /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/run_consensus_decoding_vllm_2500_8gpu.sbatch
 # =============================================================================
 #SBATCH --job-name=cons_dec_2500
 #SBATCH --nodes=1
@@ -48,7 +48,7 @@ export HF_HUB_CACHE="/data/user_data/haolingp/hf_cache/hub"
 export TRANSFORMERS_CACHE="/data/user_data/haolingp/hf_cache/transformers"
 export TOKENIZERS_PARALLELISM="false"
 
-SCRIPT_PATH="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/consensus_decoding_token_id_level.py"
+SCRIPT_PATH="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/consensus_decoding_token_id_level.py"
 MODEL_30B="/data/user_data/haolingp/models/Qwen3-30B-A3B-Instruct-2507-FP8"
 BASE_MODEL_PATH="${BASE_MODEL_PATH:-/data/user_data/haolingp/models/Qwen3-4B-Base}"
 

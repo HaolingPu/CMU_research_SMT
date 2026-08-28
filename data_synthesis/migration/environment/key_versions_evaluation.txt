@@ -1,0 +1,11 @@
+/data/user_data/haolingp/conda_envs/evaluation/lib/python3.12/site-packages/torchmetrics/utilities/imports.py:23: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import DistributionNotFound, get_distribution
+python 3.12.13 | packaged by Anaconda, Inc. | (main, Mar 19 2026, 20:20:58) [GCC 14.3.0]
+torch 2.10.0+cu128
+transformers 5.6.2
+vllm 0.19.1
+simuleval ?
+sacrebleu 2.6.0
+comet 2.2.6
+numpy 2.4.4
+torch.cuda 12.8 arch ['sm_70', 'sm_75', 'sm_80', 'sm_86', 'sm_90', 'sm_100', 'sm_120']

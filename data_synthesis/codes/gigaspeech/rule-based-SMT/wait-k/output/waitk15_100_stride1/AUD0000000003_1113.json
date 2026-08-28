@@ -1,0 +1,62 @@
+{
+  "utt_id": "AUD0000000003_1113",
+  "src_trajectory": [
+    "",
+    "Had never",
+    "once been",
+    "shaken",
+    "since Lizina",
+    "left the",
+    "house. ",
+    "At",
+    "Father Gatto's",
+    "next visit he",
+    "found the whole",
+    "colony in a",
+    "state of",
+    "uproar. "
+  ],
+  "source_full_text": "Had never once been shaken since Lizina left the house. At Father Gatto's next visit he found the whole colony in a state of uproar.",
+  "target_trajectory": [
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "自从丽齐娜离开家后，它就从未再动摇过。在加托神父下次来访时，他发现整个群体都处于一片混乱之中。"
+  ],
+  "actions": [
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "WRITE"
+  ],
+  "prediction": "自从丽齐娜离开家后，它就从未再动摇过。在加托神父下次来访时，他发现整个群体都处于一片混乱之中。",
+  "reference_text": "自从丽齐娜离开家后，它就从未再动摇过。在加托神父下次来访时，他发现整个殖民地都处于一片混乱之中。",
+  "decoder_impl": {
+    "method": "wait_k",
+    "k": 15
+  },
+  "metrics": {
+    "laal_text": 12.760416666666666,
+    "bleu_char": 90.42994759337464
+  }
+}

@@ -4,7 +4,7 @@
 # 8 GPUs in parallel via SLURM array, total 100 outputs.
 #
 # Usage:
-#   sbatch /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/run_gemini3_baseline_high_100_8gpu.sh
+#   sbatch /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/run_gemini3_baseline_high_100_8gpu.sh
 # ============================================================
 #SBATCH --job-name=gem3_base100
 #SBATCH --nodes=1
@@ -44,8 +44,8 @@ if [[ ! -f "/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train
   echo "ERROR: manifest not found: /data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_xl_case_robust_asr-filtered.tsv"
   exit 1
 fi
-if [[ ! -f "/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_thinking_policy_gemini.py" ]]; then
-  echo "ERROR: python script not found: /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_thinking_policy_gemini.py"
+if [[ ! -f "/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_thinking_policy_gemini.py" ]]; then
+  echo "ERROR: python script not found: /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_thinking_policy_gemini.py"
   exit 1
 fi
 
@@ -62,7 +62,7 @@ echo "task_id=${TASK_ID} num_tasks=8 max_rows=${MAX_ROWS}"
 echo "thinking_model=gemini-3-flash-preview reasoning=high prompt=base"
 nvidia-smi --query-gpu=index,name,memory.total,memory.free --format=csv
 
-CUDA_VISIBLE_DEVICES=0 python "/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_thinking_policy_gemini.py" \
+CUDA_VISIBLE_DEVICES=0 python "/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/llm_future_sampling_thinking_policy_gemini.py" \
   --input-tsv "/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_xl_case_robust_asr-filtered.tsv" \
   --output-root "/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/train_xl_future_sampling_thinking_gemini/gemini3_advanced_high_100" \
   --task-id "${TASK_ID}" \

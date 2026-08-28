@@ -36,7 +36,7 @@ EXPERIMENT_DIR="${EXPERIMENT_DIR:?EXPERIMENT_DIR not set}"
 METRICX_RUN_DIR="${METRICX_RUN_DIR:?METRICX_RUN_DIR not set}"
 NUM_SHARDS="${NUM_SHARDS:-4}"
 
-CONVERTER="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/convert_metricx_consensus_per_sentence.py"
+CONVERTER="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/convert_metricx_consensus_per_sentence.py"
 INPUT_JSONL="${METRICX_RUN_DIR}/metricx_input.jsonl"
 SHARD_DIR="${METRICX_RUN_DIR}/metricx_shards"
 

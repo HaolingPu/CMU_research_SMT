@@ -1,3 +1,91 @@
+# CMU_research_SMT — simultaneous speech translation (data synthesis → training → eval)
+
+> **Quick start / operations guide (Babel + Mac controller, updated 2026-08-28).**
+> The original pipeline description follows below under *Streaming Translation Data Synthesis Pipeline*.
+> Deeper docs: `data_synthesis/migration/` (`HOME_CHECKOUT.md`, `PROJECT_WORKFLOW.md`,
+> `BABEL_PATHS.md`, `PREEMPTION_READINESS.md`, `PULL_TO_MAC.md`) and the LLM wiki at `data_synthesis/wiki/`.
+
+## 1. Where things live
+
+| What | Path | Visible from |
+|---|---|---|
+| **Code (this repo, canonical)** | `/home/haolingp/CMU_research_SMT` on Babel | login + compute nodes |
+| Local copy on Mac | `/Users/haolingpu/Desktop/research/CMU_research_SMT` | Mac |
+| Synthesized data | `/data/user_data/haolingp/data_synthesis/outputs/` (1.8 TB) | compute nodes only |
+| Checkpoints | `/data/user_data/haolingp/ckpts/infinisst-omni/<EXP>/` (3.1 TB) | compute nodes only |
+| Model weights / HF cache | `/data/user_data/haolingp/{models,hf_cache}/` | compute nodes only |
+| GigaSpeech source | `/data/group_data/li_lab/siqiouya/datasets/gigaspeech/` | compute nodes only |
+| External deps (Megatron-LM, OmniSTEval, SEGALE w/ local patch, metricx) | `/data/user_data/haolingp/{code,tools}/` — pinned + patch in `external/` | compute nodes only |
+| Secrets | `/data/user_data/haolingp/.env`, `~/.keys/{wandb,huggingface}` — never commit | — |
+| Job logs | `scripts/{train,infer}/slurm_logs/`, `data_synthesis/codes/**/slurm_logs/` (in this repo → readable from login node) | login + compute |
+
+Login nodes do **not** mount `/data/user_data`. To read data files from a login node use
+`~/bin/ondata '<command>'` (hops into one of your running jobs; keep an `anchor` job alive:
+`sbatch -p preempt -q preempt_cpu_qos --requeue -t 2-00:00:00 -J anchor --wrap 'sleep infinity'`).
+
+## 2. Environment
+
+Conda envs on Babel (`source ~/miniconda3/etc/profile.d/conda.sh && conda activate <env>`):
+
+| Env | Used for |
+|---|---|
+| `evaluation` | simuleval / omnisteval streaming eval (torch 2.10 cu128) |
+| `vllm` | LLM synthesis servers (vLLM) |
+| `metricx` | MetricX-24 QE filtering |
+| `segale` | SEGALE QE — **sm_89 only** (L40S / 6000Ada); never run on RTX_PRO_6000 |
+| `SMT`, `gemma4` | misc synthesis / gemma experiments |
+
+Training runs inside **apptainer** (`scripts/train/launch_container.sh`, ms-swift + Megatron image);
+no conda env needed. Text captures of every env (pip freeze, conda list, key versions) are in
+`data_synthesis/migration/environment/`. Nothing here runs on the Mac except analysis/plots.
+
+## 3. Pipeline & entrypoints
+
+```
+synthesis  data_synthesis/codes/gigaspeech/{east,refined_east,salami,future_sampling}/
+           submit_*.sh → stage1 (LLM segmentation) → stage2 (streaming) → stage3 (MetricX QE) → stage4 (final JSONL)
+convert    scripts/train/convert2swift_*.py  (+ run_convert2swift_*.sbatch)  → SWIFT manifest
+train      scripts/train/train_<EXP>_s.sh     (4×L40S, Qwen3-Omni-30B LoRA via Megatron-SWIFT in apptainer)
+eval       scripts/infer/eval_all_ckpts*.sh   reads scripts/infer/ckpts*.txt → infer_slurm*.sh → omnisteval
+                                              results land in ckpts/infinisst-omni/<EXP>/v*-hf/evaluation/
+```
+Gotchas: zh EAST/Simul models were trained with the *Standard* prompt → infer with
+`--prompt-type Standard`; streaming `max-new-tokens` is ja=30 / de=60 per chunk; synthesis-time
+BLEU does not predict trained-model BLEU — rank by COMET.
+
+## 4. Running jobs (from a Babel login node)
+
+```bash
+cd ~/CMU_research_SMT && git pull --ff-only
+sbatch scripts/train/train_EAST-latency2mult_s.sh          # training
+sbatch data_synthesis/codes/gigaspeech/east/submit_de.sh   # synthesis (or bash, depending on script)
+bash   scripts/infer/eval_all_ckpts.sh                      # eval fan-out
+squeue -u haolingp                                          # status
+tail -f scripts/train/slurm_logs/<job>.out                  # logs (in /home, no ondata needed)
+```
+
+SLURM rules for this account (as of 2026-08-28): **only `preempt` partition / `preempt_qos`
+& `preempt_cpu_qos`** are available. Scripts that still say `--partition=general` must be
+submitted with `sbatch -p preempt -q preempt_qos ...` (CLI overrides `#SBATCH`), and
+`--time` must be ≤ partition MaxTime. Keep resource requests lean (4 CPU / 32 GB for vLLM
+serves; 4×L40S for training). Preempted training currently **restarts from step 0**
+(`--finetune true`, no `--requeue`) — see `PREEMPTION_READINESS.md` before long runs.
+
+## 5. Mac ↔ Babel workflow
+
+```bash
+# Mac: edit, then
+git push
+ssh babel 'cd ~/CMU_research_SMT && git pull --ff-only && sbatch <script>'
+ssh babel 'squeue -u haolingp'
+ssh babel 'tail -50 ~/CMU_research_SMT/scripts/train/slurm_logs/<job>.out'
+ssh babel "~/bin/ondata 'ls /data/user_data/haolingp/ckpts/infinisst-omni/<EXP>'"   # /data files only
+```
+Never rsync `.git` from `/data/user_data/haolingp` (966 GB of orphaned pack files); that tree
+is legacy — data only. Initial Mac setup is in `data_synthesis/migration/PULL_TO_MAC.md`.
+
+---
+
 # Streaming Translation Data Synthesis Pipeline
 
 This repository builds high-quality **bilingual streaming translation segments**

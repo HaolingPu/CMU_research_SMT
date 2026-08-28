@@ -31,7 +31,7 @@ EXPERIMENT_DIR="${EXPERIMENT_DIR:?EXPERIMENT_DIR is required}"
 METRICX_RUN_DIR="${METRICX_RUN_DIR:?METRICX_RUN_DIR is required}"
 NUM_SHARDS=8
 
-CONVERTER="${CONVERTER:-/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/convert_metricx_consensus.py}"
+CONVERTER="${CONVERTER:-/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/convert_metricx_consensus.py}"
 INPUT_JSONL="${METRICX_RUN_DIR}/metricx_input.jsonl"
 SHARD_DIR="${METRICX_RUN_DIR}/metricx_shards"
 

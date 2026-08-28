@@ -1,0 +1,129 @@
+\section{Experimental Setup}
+
+\subsection{Data}
+
+We construct simultaneous speech translation training trajectories from
+GigaSpeech \citep{chen2021gigaspeech}, a large-scale multi-domain English
+speech corpus. Each example provides English speech and transcript input; we
+use the transcript stream as the source-side incremental signal for data
+synthesis, and pair it with target translations generated for downstream
+SimulST training.
+
+Our main experiments focus on English-to-Chinese (EN$\rightarrow$ZH), where
+word-order divergence and future-dependent lexical choices make premature
+commitments especially harmful. We additionally evaluate
+English-to-German (EN$\rightarrow$DE) and English-to-Japanese
+(EN$\rightarrow$JA) to test whether the same synthesis procedure transfers
+across typologically different target languages. For all directions, source
+utterances are segmented into streaming chunks to simulate incremental ASR
+input. The synthesis algorithm then produces a sequence of READ/WRITE
+decisions and target deltas for each chunk, as described in
+Section~\ref{sec:method}.
+
+\subsection{Training Data Synthesis}
+
+For each source prefix, we sample multiple plausible English continuations
+from a base language model. Each sampled future is translated with an
+instruction-tuned translation model conditioned on the already committed
+target prefix. We then apply token-level distributional consensus over the
+next-token candidate sets across futures, committing only tokens supported by
+all sampled continuations. The resulting prefix-aligned trajectories are used
+to fine-tune the SimulST model, while examples with low quality-estimation
+scores are filtered with MetricX-QE before training.
+
+\subsection{SimulST Model and Training}
+\label{sec:setup-training}
+
+\paragraph{Backbone.} All SimulST models are obtained by fine-tuning
+\textbf{Qwen3-Omni-30B-A3B-Instruct} \citep{qwen3omni}, a Mixture-of-Experts
+omni-modal model with $\sim$30B total parameters and $\sim$3B active per
+token. We use the same backbone across all data-synthesis variants and all
+three language pairs so that observed quality differences are attributable to
+the synthesised supervision rather than to model capacity.
+
+\paragraph{Fine-tuning recipe.} We perform parameter-efficient
+fine-tuning with LoRA \citep{hu2022lora} of rank $r{=}32$ and scaling
+$\alpha{=}32$ applied to all linear projections; the audio encoder (ViT) and
+the modality aligner are frozen, while the LLM expert layers receive LoRA
+updates. Training is run with the Megatron-Swift toolkit using packing,
+expert parallelism of size $4$, fused MoE permutation, and grouped GEMM with
+auxiliary load-balancing loss (coefficient $10^{-3}$). We optimize with
+AdamW (clip $1.0$, weight decay $0.01$) at peak learning rate $10^{-4}$ with
+linear warmup over $5\%$ of total steps and a cosine decay to $10^{-5}$.
+Each example is packed to a maximum sequence length of $2048$ tokens, with
+micro-batch size $1$ and global batch size $4$; we train for one epoch.
+
+\paragraph{Audio chunking.} For training, source audio is segmented into
+$960$\,ms chunks at $16$\,kHz; each utterance is assigned a uniformly-random
+chunk \emph{multiplier} $r$ which groups $r$ consecutive $960$\,ms chunks
+into a single streaming step. The corresponding aligned target tokens are
+grouped accordingly. This randomised multiplier teaches the model to
+operate at a range of streaming granularities without requiring separate
+checkpoints per latency target, mirroring the data layout used by
+EAST~\citep{EAST}.
+
+\paragraph{Training data scale.} For each synthesis policy we randomly
+downsample the QE-filtered pool to $12{,}500$ trajectories so that
+comparisons across policies are matched on training-set size; the original
+pool sizes (before downsampling) are reported in
+Section~\ref{sec:results}.
+
+\paragraph{Compute.} Each fine-tuning run uses $4{\times}$ NVIDIA L40S
+($48$\,GB) GPUs and completes in roughly one wall-clock hour for the
+EN$\rightarrow$ZH variants and up to seven hours for the EAST training data
+on EN$\rightarrow$DE / EN$\rightarrow$JA, where the supervision sequences
+are longer.
+
+\subsection{Inference and Evaluation Protocol}
+\label{sec:setup-eval}
+
+\paragraph{Streaming inference.} At inference time we wrap the fine-tuned
+SimulST model in a custom \texttt{simuleval}~\citep{ma2020simuleval} agent
+backed by vLLM~\citep{kwon2023vllm} (tensor-parallel size $2$, max model
+length $32{,}768$, eager execution). Decoding uses temperature $\tau{=}0.6$,
+top-$p{=}0.95$, top-$k{=}20$, and at most $30$ new tokens per streaming
+step; the agent enforces a minimum start latency of $2$\,s to mimic the
+end-of-segment delay of a streaming ASR front-end. To measure the
+quality--latency trade-off of each model with a single set of weights, we
+sweep the source segment size over
+$\{960, 1920, 2880, 3840\}$\,ms, holding all other decoding hyper-parameters
+fixed.
+
+\paragraph{Test set.} We evaluate on the ACL~6060 development
+set~\citep{salesky2023acl6060}, which provides multi-way parallel
+human-translated references for EN$\rightarrow$\{ZH, DE, JA\} aligned to
+long-form English talk audio. This setting is substantially harder than
+sentence-level test sets because each utterance is a multi-minute talk
+segment, exposing the model to the full streaming regime rather than to
+isolated sentences.
+
+\paragraph{Quality metrics.} For each segment-size point we report two
+quality numbers. \emph{Chunk-level BLEU} is computed by SimulEval over the
+streaming hypothesis using sacre\-BLEU~\citep{post2018sacrebleu} with
+language-specific tokenisers
+(\texttt{zh}, \texttt{13a}, \texttt{ja-mecab} for ZH, DE, JA respectively).
+\emph{Long-form BLEU and COMET} are computed by aligning the streaming
+hypothesis to the reference sentence boundaries with
+\texttt{mwerSegmenter}~\citep{matusov2005evaluating} and then scoring with
+sacre\-BLEU and \textsc{XCOMET-XL}~\citep{guerreiro2024xcomet}.
+The long-form numbers are our primary quality measure because they correctly
+penalise hypotheses that drift across sentence boundaries.
+
+\paragraph{Latency metric.} Following recent SimulST
+work~\citep{papi2023longyaal}, we report \emph{LongYAAL}, a
+length-adaptive average lagging variant designed for long-form streaming,
+in its \emph{computation-unaware} (CU) form so that latency reflects the
+model's policy decisions rather than transient inference-engine cost.
+Reported latency is the mean LongYAAL\,(CU) in milliseconds across the
+ACL~6060 dev talks at each segment size.
+
+\paragraph{Baselines.} We compare against fixed-latency policies
+(wait-$k$~\citep{ma2019stacl}), alignment-based prefix construction
+(EAST~\citep{EAST}), local-agreement decoding
+(LA-$N$~\citep{liu2020low}), and recent LLM-based data-synthesis baselines
+(Simul-MuST-C, TAF, InfiniSST). All baselines are fine-tuned from the same
+Qwen3-Omni-30B-A3B-Instruct backbone with the recipe described in
+Section~\ref{sec:setup-training}, so any quality difference reflects the
+synthesised supervision rather than backbone or optimiser changes. Our
+primary comparison is on EN$\rightarrow$ZH; EN$\rightarrow$DE and
+EN$\rightarrow$JA serve as cross-lingual transfer settings.

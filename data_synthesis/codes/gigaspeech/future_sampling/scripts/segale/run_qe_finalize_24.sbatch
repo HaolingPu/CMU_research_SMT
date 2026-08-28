@@ -32,7 +32,7 @@ QE_FILTERED_DIR="${QE_FILTERED_DIR:?QE_FILTERED_DIR required}"
 QE_THRESHOLD="${QE_THRESHOLD:-3.0}"
 NUM_SHARDS=24
 
-CODE=/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling
+CODE=/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling
 MERGED="${METRICX_RUN_DIR}/metricx_output.jsonl"
 QE_REPORT="${METRICX_RUN_DIR}/filter_report_per_utt.jsonl"
 

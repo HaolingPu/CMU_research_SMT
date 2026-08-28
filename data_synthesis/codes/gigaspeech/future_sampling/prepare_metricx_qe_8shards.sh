@@ -8,10 +8,10 @@ fi
 
 OUTPUT_DIR="$1"
 NUM_SHARDS="${2:-8}"
-CONVERTER="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/convert_metricx_gigaspeech.py"
+CONVERTER="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/convert_metricx_gigaspeech.py"
 METRICX_INPUT="${OUTPUT_DIR}/metricx_input.jsonl"
 SHARD_DIR="${OUTPUT_DIR}/metricx_shards"
-ARRAY_SCRIPT="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/run_metricx_qe_8gpu_generic.sh"
+ARRAY_SCRIPT="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/run_metricx_qe_8gpu_generic.sh"
 
 if [[ ! -d "${OUTPUT_DIR}" ]]; then
   echo "ERROR: output dir not found: ${OUTPUT_DIR}"

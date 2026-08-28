@@ -31,4 +31,4 @@
 
 LABEL="${LABEL:-deepseek_test10}"
 
-bash /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/scripts/deepseek/run_deepseek_common.sh "${LABEL}"
+bash /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/scripts/deepseek/run_deepseek_common.sh "${LABEL}"

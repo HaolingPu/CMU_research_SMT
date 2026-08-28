@@ -1,0 +1,159 @@
+diff --git a/segale_align.py b/segale_align.py
+index 8f02d6e..469e8d6 100644
+--- a/segale_align.py
++++ b/segale_align.py
+@@ -701,6 +701,58 @@ def save_align_info(data, filename):
+                 f.write("\n")
+ 
+ 
++def append_doc_align_info(entry, fp):
++    """
++    Append a single doc's alignment records to an open file pointer and flush.
++    Used for incremental write so timeouts don't lose progress.
++    """
++    for i, (aligned_src, aligned_ref, aligned_mt) in enumerate(entry["ref_aligned"]):
++        record = {
++            "doc_id": entry["doc_id"],
++            "sys_id": entry["sys_id"],
++            "src": aligned_src,
++            "ref": aligned_ref,
++            "tgt": aligned_mt,
++            "seg_id": i + 1,
++        }
++        json.dump(record, fp, ensure_ascii=False)
++        fp.write("\n")
++    fp.flush()
++    try:
++        os.fsync(fp.fileno())
++    except OSError:
++        pass
++
++
++def load_done_doc_ids(aligned_file, failure_file):
++    """
++    Read existing aligned and failure files to recover doc_ids already processed.
++    Used for resume after a previous timeout.
++    """
++    done = set()
++    if os.path.exists(aligned_file):
++        with open(aligned_file, "r", encoding="utf-8") as f:
++            for line in f:
++                line = line.strip()
++                if not line:
++                    continue
++                try:
++                    done.add(json.loads(line)["doc_id"])
++                except Exception:
++                    pass
++    if os.path.exists(failure_file):
++        with open(failure_file, "r", encoding="utf-8") as f:
++            for line in f:
++                line = line.strip()
++                if not line:
++                    continue
++                try:
++                    done.add(json.loads(line))
++                except Exception:
++                    pass
++    return done
++
++
+ def init_config(task_lang):
+     """
+     Initialize the spaCy sentence segmenter based on the target language.
+@@ -711,7 +763,7 @@ def init_config(task_lang):
+         "ru": "ru_core_news_sm",
+         "de": "de_core_news_sm",
+         "zh": "zh_core_web_sm",
+-        "ja": "ja_ginza_electra",
++        "ja": "ja_core_news_md",
+         "es": "es_core_news_sm",
+     }
+     mt_seg = spacy.load(spacy_models[task_lang])
+@@ -828,34 +880,61 @@ def main():
+             args.proc_device, args.embedding_model
+         )
+ 
+-    sequential_results = []
+-    failed_doc_ids = []
++    # Pre-compute output file paths so we can incrementally append per-doc.
++    sys_basename = os.path.splitext(os.path.basename(args.system_file))[0]
++    aligned_file = os.path.join(
++        SAVE_FOLDER, f"aligned_{args.segmenter}_{sys_basename}.jsonl"
++    )
++    failure_file = os.path.join(
++        SAVE_FOLDER, f"failed_{args.segmenter}_{sys_basename}.jsonl"
++    )
+ 
+-    for doc in tqdm(combined_docs, desc="Processing documents"):
+-        doc_id = doc["doc_id"]
+-        result = prepare_doc_windows(doc, SAVE_FOLDER, tokenizer, model, args.max_size)
++    # Resume support: skip doc_ids already in aligned/failure files.
++    done_doc_ids = load_done_doc_ids(aligned_file, failure_file)
++    print(
++        f"Resume: {len(done_doc_ids)} doc_ids already processed; "
++        f"skipping them this run."
++    )
+ 
+-        if result is not None:
+-            sequential_results.append(result)
+-        else:
+-            failed_doc_ids.append(doc_id)
++    # Open aligned + failure files in append mode for the rest of the run.
++    aligned_fp = open(aligned_file, "a", encoding="utf-8")
++    failure_fp = open(failure_file, "a", encoding="utf-8")
++
++    new_aligned = 0
++    new_failed = 0
++    skipped = 0
++    try:
++        for doc in tqdm(combined_docs, desc="Processing documents"):
++            doc_id = doc["doc_id"]
++            if doc_id in done_doc_ids:
++                skipped += 1
++                continue
++
++            result = prepare_doc_windows(
++                doc, SAVE_FOLDER, tokenizer, model, args.max_size
++            )
+ 
+-    if failed_doc_ids:
+-        failure_file = os.path.join(
+-            SAVE_FOLDER,
+-            f"failed_{args.segmenter}_{os.path.splitext(os.path.basename(args.system_file))[0]}.jsonl",
+-        )
+-        with open(failure_file, "w", encoding="utf-8") as f_fail:
+-            for doc_id in failed_doc_ids:
+-                f_fail.write(json.dumps(doc_id, ensure_ascii=False) + "\n")
+-        print(f"Failed doc_id record: {failure_file}")
+-
+-    if sequential_results:
+-        aligned_file = os.path.join(
+-            SAVE_FOLDER,
+-            f"aligned_{args.segmenter}_{os.path.splitext(os.path.basename(args.system_file))[0]}.jsonl",
+-        )
+-        save_align_info(sequential_results, aligned_file)
++            if result is not None:
++                append_doc_align_info(result, aligned_fp)
++                new_aligned += 1
++            else:
++                failure_fp.write(json.dumps(doc_id, ensure_ascii=False) + "\n")
++                failure_fp.flush()
++                try:
++                    os.fsync(failure_fp.fileno())
++                except OSError:
++                    pass
++                new_failed += 1
++    finally:
++        aligned_fp.close()
++        failure_fp.close()
++
++    print(
++        f"Resume summary: skipped={skipped}, new_aligned={new_aligned}, "
++        f"new_failed={new_failed}"
++    )
++    print(f"Aligned file : {aligned_file}")
++    print(f"Failure file : {failure_file}")
+ 
+     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+     print(f"Alignment completed at: {timestamp}.")

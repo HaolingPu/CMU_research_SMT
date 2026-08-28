@@ -41,7 +41,7 @@ export TOKENIZERS_PARALLELISM="false"
 GEMMA4_ENV="${GEMMA4_ENV:-/data/user_data/haolingp/conda_envs/gemma4}"
 RUN_PYTHON="${GEMMA4_ENV}/bin/python"
 
-SCRIPT_PATH="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/consensus_decoding_token_id_level.py"
+SCRIPT_PATH="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/consensus_decoding_token_id_level.py"
 INSTRUCT_MODEL="${INSTRUCT_MODEL:-/data/user_data/haolingp/models/Qwen3-30B-A3B-Instruct-2507-FP8}"
 PRIMARY_BASE_MODEL="${PRIMARY_BASE_MODEL:-google/gemma-4-E2B}"
 SECONDARY_BASE_MODEL="${SECONDARY_BASE_MODEL:-/data/user_data/haolingp/models/Qwen3-4B-Base}"

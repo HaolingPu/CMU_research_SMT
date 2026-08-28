@@ -29,7 +29,7 @@ OUTPUT_DIR="${OUTPUT_DIR:?OUTPUT_DIR required}"
 MAX_RATIO_REF="${MAX_RATIO_REF:-1.5}"
 MIN_RATIO_REF="${MIN_RATIO_REF:-0.7}"
 
-CODE=/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling
+CODE=/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling
 REPORT_DIR="$(dirname "${OUTPUT_DIR}")/metricx-aligned"
 mkdir -p "${OUTPUT_DIR}" "${REPORT_DIR}" \
          /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_prod/slurm_logs

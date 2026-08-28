@@ -1,0 +1,1152 @@
+1
+00:00:00,000 --> 00:00:20,240
+I think we have to do something about a culture, a piece of the culture of medicine that has
+
+2
+00:00:20,240 --> 00:00:24,520
+to change, and I think it starts with one physician, and that's me, and maybe I've been
+
+3
+00:00:24,520 --> 00:00:28,520
+around long enough that I can afford to give away some of my false prestige to be able
+
+4
+00:00:28,520 --> 00:00:30,720
+to do that.
+
+5
+00:00:30,720 --> 00:00:34,760
+Before I actually begin the meat of my talk, let's begin with a bit of baseball.
+
+6
+00:00:34,760 --> 00:00:35,760
+Hey, why not?
+
+7
+00:00:35,760 --> 00:00:36,760
+We're near the end.
+
+8
+00:00:36,760 --> 00:00:39,040
+We're getting close to the World Series, right?
+
+9
+00:00:39,040 --> 00:00:44,120
+We all love baseball, don't we?
+
+10
+00:00:44,120 --> 00:00:49,600
+Baseball is filled with some amazing statistics, and there's hundreds of them.
+
+11
+00:00:49,600 --> 00:00:54,120
+Moneyball is about to come out, and it's all about statistics and using statistics to build
+
+12
+00:00:54,120 --> 00:00:55,120
+a great baseball team.
+
+13
+00:00:55,120 --> 00:01:00,000
+I'm going to focus on one stat that I hope a lot of you have heard of.
+
+14
+00:01:00,000 --> 00:01:02,280
+It's called batting average.
+
+15
+00:01:02,280 --> 00:01:05,360
+So we talk about a batter who bats 300.
+
+16
+00:01:05,360 --> 00:01:12,280
+That means that ball player batted safely, hit safely three times out of ten at bats.
+
+17
+00:01:12,280 --> 00:01:16,320
+That means hit the ball into the outfield, it drops, it didn't get caught, and whoever
+
+18
+00:01:16,320 --> 00:01:20,520
+tried to throw to first base didn't get there in time, and the runner was safe.
+
+19
+00:01:20,520 --> 00:01:23,560
+Three times out of ten.
+
+20
+00:01:24,480 --> 00:01:29,440
+Do you know what they call a 300 hitter in Major League Baseball?
+
+21
+00:01:29,440 --> 00:01:31,520
+Good.
+
+22
+00:01:31,520 --> 00:01:32,520
+Really good.
+
+23
+00:01:32,520 --> 00:01:34,520
+You know, maybe an all-star.
+
+24
+00:01:34,520 --> 00:01:38,920
+Do you know what they call a 400 baseball hitter?
+
+25
+00:01:38,920 --> 00:01:43,680
+That's somebody who hit, by the way, four times safely out of every ten.
+
+26
+00:01:43,680 --> 00:01:46,380
+Legendary.
+
+27
+00:01:46,380 --> 00:01:50,960
+As in Ted Williams' legendary, the last Major League Baseball player to hit over 400 during
+
+28
+00:01:50,960 --> 00:01:51,960
+a regular season.
+
+29
+00:01:52,960 --> 00:01:56,560
+Now let's take this back into my world of medicine where I'm a lot more comfortable,
+
+30
+00:01:56,560 --> 00:02:02,360
+or perhaps a bit less comfortable, after what I'm going to talk to you about.
+
+31
+00:02:02,360 --> 00:02:07,120
+Suppose you have appendicitis, and you're referred to a surgeon who's batting 400 on
+
+32
+00:02:07,120 --> 00:02:11,680
+appendectomies.
+
+33
+00:02:11,680 --> 00:02:13,960
+Somehow this isn't working out, is it?
+
+34
+00:02:13,960 --> 00:02:20,040
+Now suppose you live in a certain part of a certain remote place, and you have a loved
+
+35
+00:02:20,040 --> 00:02:26,200
+one who has blockages in two coronary arteries, and your family doctor refers that loved one
+
+36
+00:02:26,200 --> 00:02:29,880
+to a cardiologist who is batting 200 on angioplasties.
+
+37
+00:02:29,880 --> 00:02:33,560
+But, but, you know what, she's doing a lot better this year.
+
+38
+00:02:33,560 --> 00:02:38,640
+She's on the comeback trail, and she's hitting 257.
+
+39
+00:02:38,640 --> 00:02:42,360
+Somehow this isn't working, but I'm going to ask you a question.
+
+40
+00:02:42,360 --> 00:02:46,760
+What do you think a batting average for a cardiac surgeon or a nurse practitioner or
+
+41
+00:02:46,760 --> 00:02:53,360
+an orthopedic surgeon, an OBGYN, a paramedic, is supposed to be?
+
+42
+00:02:53,360 --> 00:02:54,360
+One thousand.
+
+43
+00:02:54,360 --> 00:02:55,360
+One thousand.
+
+44
+00:02:55,360 --> 00:02:56,360
+Very good.
+
+45
+00:02:56,360 --> 00:02:57,360
+Okay.
+
+46
+00:02:57,360 --> 00:03:02,400
+Now, the truth of the matter is, nobody knows in all of medicine what a good surgeon or
+
+47
+00:03:02,400 --> 00:03:06,040
+physician or paramedic is supposed to bat.
+
+48
+00:03:06,040 --> 00:03:09,960
+What we do, though, is we send each one of them, including myself, out into the world
+
+49
+00:03:09,960 --> 00:03:11,720
+with the admonition, be perfect.
+
+50
+00:03:11,720 --> 00:03:16,240
+Never, ever, ever make a mistake, but you worry about the details, about how that's
+
+51
+00:03:16,240 --> 00:03:17,600
+going to happen.
+
+52
+00:03:17,600 --> 00:03:20,760
+And that was the message that I absorbed when I was in med school.
+
+53
+00:03:20,760 --> 00:03:24,060
+I was an obsessive-compulsive student.
+
+54
+00:03:24,060 --> 00:03:32,160
+In high school, a classmate once said that Brian Goldman would study for a blood test.
+
+55
+00:03:32,160 --> 00:03:34,440
+And so I did.
+
+56
+00:03:34,440 --> 00:03:38,240
+I studied in my little garret at the nurse's residence at Toronto General Hospital not
+
+57
+00:03:38,240 --> 00:03:41,760
+far from here, and I memorized everything.
+
+58
+00:03:41,760 --> 00:03:46,480
+I memorized in my anatomy class the origins and insertions of every muscle, every branch
+
+59
+00:03:46,480 --> 00:03:52,180
+of every artery that came off the aorta, differential diagnoses, obscure and common.
+
+60
+00:03:52,180 --> 00:03:56,880
+I even knew the differential diagnosis and how to classify renal tubular acidosis.
+
+61
+00:03:56,880 --> 00:04:00,120
+And all the while, I was amassing more and more knowledge.
+
+62
+00:04:00,120 --> 00:04:01,120
+And I did well.
+
+63
+00:04:01,120 --> 00:04:04,080
+I graduated with honors, cum laude.
+
+64
+00:04:04,080 --> 00:04:09,800
+And I came out of medical school with the impression that if I memorized everything
+
+65
+00:04:09,800 --> 00:04:14,920
+and knew everything or as much as possible, as close to everything as possible, that it
+
+66
+00:04:14,920 --> 00:04:18,460
+would immunize me against making mistakes.
+
+67
+00:04:18,460 --> 00:04:25,840
+And it worked for a while until I met Mrs. Drucker.
+
+68
+00:04:25,840 --> 00:04:29,560
+I was a resident at a teaching hospital here in Toronto, and Mrs. Drucker was brought to
+
+69
+00:04:29,560 --> 00:04:32,560
+the emergency department at the hospital where I was working.
+
+70
+00:04:32,560 --> 00:04:37,560
+At the time, I was assigned to the cardiology service, cardiology rotation.
+
+71
+00:04:37,560 --> 00:04:42,000
+And it was my job when the emergency staff called for a cardiology consult to see that
+
+72
+00:04:42,000 --> 00:04:45,940
+patient in emerge and to report back to my attending.
+
+73
+00:04:45,940 --> 00:04:50,400
+And I saw Mrs. Drucker, and she was breathless, and when I listened to her, she was making
+
+74
+00:04:50,400 --> 00:04:55,220
+a wheezy sound, and when I listened to her chest with a stethoscope, I could hear crackly
+
+75
+00:04:55,220 --> 00:04:59,560
+sounds on both sides that told me that she was in congestive heart failure.
+
+76
+00:04:59,560 --> 00:05:03,160
+This is a condition in which the heart fails, and instead of being able to pump all the
+
+77
+00:05:03,160 --> 00:05:06,040
+blood forward, some of the blood backs up into the lungs.
+
+78
+00:05:06,040 --> 00:05:09,560
+The lungs fill up with blood, and that's why you have shortness of breath.
+
+79
+00:05:09,560 --> 00:05:11,360
+And that wasn't a difficult diagnosis to make.
+
+80
+00:05:11,360 --> 00:05:14,360
+I made it, and I set to work treating her.
+
+81
+00:05:14,360 --> 00:05:15,480
+I gave her aspirin.
+
+82
+00:05:15,480 --> 00:05:17,760
+I gave her medications to relieve the strain on her heart.
+
+83
+00:05:17,760 --> 00:05:23,000
+I gave her medications that we call diuretics, water pills, to get her to pee out the excess
+
+84
+00:05:23,000 --> 00:05:24,300
+fluid.
+
+85
+00:05:24,300 --> 00:05:28,440
+And over the course of the next hour and a half or two, she started to feel better, and
+
+86
+00:05:28,440 --> 00:05:30,720
+I felt really good.
+
+87
+00:05:30,720 --> 00:05:34,520
+And that's when I made my first mistake.
+
+88
+00:05:34,520 --> 00:05:36,840
+I sent her home.
+
+89
+00:05:36,840 --> 00:05:39,060
+Actually I made two more mistakes.
+
+90
+00:05:39,060 --> 00:05:43,120
+I sent her home without speaking to my attending.
+
+91
+00:05:43,120 --> 00:05:47,000
+I didn't pick up the phone and do what I was supposed to do, which was to call my attending
+
+92
+00:05:47,000 --> 00:05:51,160
+and run the story by him so he would have a chance to see her for himself.
+
+93
+00:05:51,160 --> 00:05:52,160
+And he knew her.
+
+94
+00:05:52,160 --> 00:05:56,400
+He would have been able to furnish additional information about her.
+
+95
+00:05:56,400 --> 00:05:58,520
+Maybe I did it for a good reason.
+
+96
+00:05:58,520 --> 00:06:00,860
+Maybe I didn't want to be a high maintenance resident.
+
+97
+00:06:00,860 --> 00:06:06,380
+Maybe I wanted to be so successful and so able to take responsibility that I would do
+
+98
+00:06:06,380 --> 00:06:09,780
+so and I would be able to take care of my attending's patients without even having to
+
+99
+00:06:09,780 --> 00:06:11,980
+contact him.
+
+100
+00:06:11,980 --> 00:06:15,400
+The second mistake that I made was worse.
+
+101
+00:06:15,400 --> 00:06:19,860
+In sending her home, I disregarded a little voice deep down inside that was trying to
+
+102
+00:06:19,860 --> 00:06:22,740
+tell me, Goldman, not a good idea.
+
+103
+00:06:22,740 --> 00:06:24,320
+Don't do this.
+
+104
+00:06:24,320 --> 00:06:29,460
+In fact, so lacking in confidence was I that I actually asked the nurse who was looking
+
+105
+00:06:29,460 --> 00:06:34,140
+after Mrs. Drucker, do you think it's okay if she goes home?
+
+106
+00:06:34,140 --> 00:06:38,400
+And the nurse thought about it and said, very matter of factly, yeah, I think she'll do okay.
+
+107
+00:06:38,400 --> 00:06:41,100
+I can remember that like it was yesterday.
+
+108
+00:06:41,100 --> 00:06:44,420
+And so I signed the discharge papers and an ambulance came.
+
+109
+00:06:44,420 --> 00:06:46,220
+Paramedics came to take her home.
+
+110
+00:06:46,220 --> 00:06:49,540
+And I went back to my work on the wards.
+
+111
+00:06:49,540 --> 00:06:55,000
+All the rest of that day, that afternoon, I had this kind of gnawing feeling inside
+
+112
+00:06:55,000 --> 00:06:56,620
+my stomach.
+
+113
+00:06:56,620 --> 00:07:00,780
+But I carried on with my work and at the end of the day, I packed up to leave the hospital
+
+114
+00:07:00,780 --> 00:07:05,620
+and walk to the parking lot to take my car and drive home.
+
+115
+00:07:05,620 --> 00:07:10,460
+When I did something that I don't usually do, I walked through the emergency department
+
+116
+00:07:10,460 --> 00:07:12,460
+on my way home.
+
+117
+00:07:12,460 --> 00:07:16,660
+And it was there that another nurse, not the nurse who was looking after Mrs. Drucker before,
+
+118
+00:07:16,660 --> 00:07:23,120
+but another nurse said three words to me that are the three words that most emergency physicians
+
+119
+00:07:23,120 --> 00:07:25,040
+I know dread.
+
+120
+00:07:25,040 --> 00:07:28,800
+Others in medicine dread them as well, but there's something particular about emergency
+
+121
+00:07:28,800 --> 00:07:32,800
+medicine because we see patients so fleetingly.
+
+122
+00:07:32,800 --> 00:07:39,680
+The three words are do, you, remember.
+
+123
+00:07:39,680 --> 00:07:42,220
+Do you remember that patient you sent home?
+
+124
+00:07:42,220 --> 00:07:45,160
+The other nurse asked matter of factly.
+
+125
+00:07:45,160 --> 00:07:48,680
+She's back in just that tone of voice.
+
+126
+00:07:48,680 --> 00:07:50,120
+She was back all right.
+
+127
+00:07:50,120 --> 00:07:53,840
+She was back in near death.
+
+128
+00:07:53,840 --> 00:07:58,520
+About an hour after she had arrived home, after I'd sent her home, she collapsed and
+
+129
+00:07:58,520 --> 00:08:02,640
+her family called 911 and the paramedics brought her back to the emergency department where
+
+130
+00:08:02,640 --> 00:08:07,600
+she had a blood pressure of 50, which is in severe shock and she was barely breathing
+
+131
+00:08:07,600 --> 00:08:08,960
+and she was blue.
+
+132
+00:08:08,960 --> 00:08:13,400
+And the emergency staff pulled out all the stops, they gave her medications to raise
+
+133
+00:08:13,400 --> 00:08:17,360
+her blood pressure, they put her on a ventilator.
+
+134
+00:08:17,360 --> 00:08:24,400
+And I was shocked and shaken to the core and I went through this roller coaster because
+
+135
+00:08:24,400 --> 00:08:28,480
+after they stabilized her, she went to the intensive care unit and I hoped against hope
+
+136
+00:08:28,480 --> 00:08:30,560
+that she would recover.
+
+137
+00:08:30,560 --> 00:08:34,200
+And over the next two or three days, it was clear that she was never going to wake up.
+
+138
+00:08:34,200 --> 00:08:37,920
+She had irreversible brain damage.
+
+139
+00:08:37,920 --> 00:08:42,400
+And the family gathered and over the course of the next eight or nine days, they resigned
+
+140
+00:08:42,400 --> 00:08:47,000
+themselves to what was happening at about the nine day mark they let her go.
+
+141
+00:08:47,000 --> 00:08:54,600
+Mrs. Drucker, a wife, a mother, and a grandmother.
+
+142
+00:08:54,600 --> 00:08:59,160
+They say you never forget the names of those who die, and that was my first time to be
+
+143
+00:08:59,160 --> 00:09:01,600
+acquainted with that.
+
+144
+00:09:01,600 --> 00:09:08,600
+Over the next few weeks, I beat myself up and I experienced for the first time the unhealthy
+
+145
+00:09:08,600 --> 00:09:15,300
+shame that exists in our culture of medicine, where I felt alone, isolated, not feeling
+
+146
+00:09:15,300 --> 00:09:19,260
+the healthy kind of shame that you feel because you can't talk about it with your colleagues.
+
+147
+00:09:19,260 --> 00:09:23,420
+You know that healthy kind when you betray a secret that a best friend made you promise
+
+148
+00:09:23,420 --> 00:09:29,060
+never to reveal and you get busted and then your best friend confronts you and you have
+
+149
+00:09:29,060 --> 00:09:32,940
+terrible discussions, but at the end of it all, that sick feeling guides you and you
+
+150
+00:09:32,940 --> 00:09:36,820
+say, you know, I'll never make that mistake again and you make amends and you never make
+
+151
+00:09:36,820 --> 00:09:38,220
+that mistake again.
+
+152
+00:09:38,220 --> 00:09:41,620
+That's the kind of shame that is a teacher.
+
+153
+00:09:41,620 --> 00:09:45,380
+The unhealthy shame I'm talking about is the one that makes you so sick inside.
+
+154
+00:09:45,380 --> 00:09:53,020
+It is the one that says, not that what you did was bad, but that you were bad.
+
+155
+00:09:53,020 --> 00:09:57,220
+And it was what I was feeling and, you know, it wasn't because of my attending.
+
+156
+00:09:57,220 --> 00:09:58,220
+He was a doll.
+
+157
+00:09:58,220 --> 00:10:01,500
+He talked to the family and I'm quite sure he smoothed things over and made sure that
+
+158
+00:10:01,500 --> 00:10:04,300
+I didn't get sued.
+
+159
+00:10:04,300 --> 00:10:06,940
+And I kept asking myself these questions.
+
+160
+00:10:06,940 --> 00:10:08,940
+Why didn't I ask my attending?
+
+161
+00:10:08,940 --> 00:10:10,420
+Why did I send her home?
+
+162
+00:10:10,420 --> 00:10:15,220
+And then at my worst moments, why, why did I make such a stupid mistake?
+
+163
+00:10:15,220 --> 00:10:17,620
+Why did I go into medicine?
+
+164
+00:10:17,620 --> 00:10:20,860
+Slowly but surely it lifted.
+
+165
+00:10:20,860 --> 00:10:25,100
+I began to feel a bit better and, and you know, on a cloudy day there was a crack in
+
+166
+00:10:25,100 --> 00:10:29,620
+the clouds and the sun started to come out and I wondered, you know, maybe I could feel
+
+167
+00:10:29,620 --> 00:10:30,700
+better again.
+
+168
+00:10:30,700 --> 00:10:39,580
+And I made myself a bargain, you know, that if only I redoubled my efforts to be perfect
+
+169
+00:10:39,820 --> 00:10:43,180
+and never make another mistake again, please make the voices stop.
+
+170
+00:10:43,180 --> 00:10:45,380
+And they did.
+
+171
+00:10:45,380 --> 00:10:50,260
+And I went back to work and then it happened again.
+
+172
+00:10:50,260 --> 00:10:53,860
+Two years later, I was an attending in the emergency department at a community hospital
+
+173
+00:10:53,860 --> 00:10:58,420
+just north of Toronto and I saw a 25 year old man with a sore throat who was busy.
+
+174
+00:10:58,420 --> 00:11:00,020
+I was in a bit of a hurry.
+
+175
+00:11:00,020 --> 00:11:02,180
+He kept pointing here.
+
+176
+00:11:02,180 --> 00:11:03,180
+I looked at his throat.
+
+177
+00:11:03,180 --> 00:11:07,060
+It was a little bit pink and I gave him a prescription for penicillin and sent him on
+
+178
+00:11:07,060 --> 00:11:08,420
+his way.
+
+179
+00:11:08,420 --> 00:11:12,860
+And even as he was walking out the door, it was still sort of pointing to his throat.
+
+180
+00:11:12,860 --> 00:11:17,700
+And two days later I came to do my next emergency shift and that's when my chief asked to speak
+
+181
+00:11:17,700 --> 00:11:26,140
+to me quietly in her office and, and she said the three words, do you remember, do you remember
+
+182
+00:11:26,140 --> 00:11:28,340
+that patient you saw with the sore throat?
+
+183
+00:11:28,340 --> 00:11:31,500
+Well, it turns out he didn't have a strep throat.
+
+184
+00:11:31,500 --> 00:11:35,780
+He had a potentially life threatening condition called epiglottitis.
+
+185
+00:11:35,780 --> 00:11:39,660
+You can Google it, but it's an infection, not of the throat, but of the upper airway
+
+186
+00:11:39,660 --> 00:11:42,900
+and it can actually cause the airway to close.
+
+187
+00:11:42,900 --> 00:11:45,360
+And you know, fortunately he didn't die.
+
+188
+00:11:45,360 --> 00:11:51,240
+He was placed on intravenous antibiotics and he recovered after a few days.
+
+189
+00:11:51,240 --> 00:11:58,140
+And I went through the same period of shame and recriminations and felt cleansed and went
+
+190
+00:11:58,140 --> 00:12:04,260
+back to work until it happened again and again and again.
+
+191
+00:12:04,260 --> 00:12:07,740
+Twice in one emergency shift I missed appendicitis.
+
+192
+00:12:07,740 --> 00:12:12,680
+Now that takes some doing, especially when you work in a hospital that at the time saw
+
+193
+00:12:12,680 --> 00:12:15,620
+about 14 people at night.
+
+194
+00:12:15,620 --> 00:12:19,260
+Now in both cases, you know, I didn't send them home and I don't think there was any
+
+195
+00:12:19,260 --> 00:12:20,260
+gap in their care.
+
+196
+00:12:20,260 --> 00:12:22,060
+One I thought had a kidney stone.
+
+197
+00:12:22,060 --> 00:12:24,340
+I ordered a kidney x-ray when it turned out to be normal.
+
+198
+00:12:24,340 --> 00:12:28,180
+My colleague who, who was doing a reassessment of the patient noticed some tenderness in
+
+199
+00:12:28,180 --> 00:12:30,280
+the right lower quadrant and called the surgeons.
+
+200
+00:12:30,280 --> 00:12:31,820
+The other one had a lot of diarrhea.
+
+201
+00:12:31,820 --> 00:12:38,380
+I ordered some fluids to rehydrate him and asked my colleague to reassess him and he
+
+202
+00:12:38,380 --> 00:12:39,380
+did.
+
+203
+00:12:39,380 --> 00:12:42,060
+And when he noticed some tenderness in the right lower quadrant called the surgeons.
+
+204
+00:12:42,060 --> 00:12:47,220
+So in both cases they had their operations and they did okay.
+
+205
+00:12:47,220 --> 00:12:50,880
+But each time they were gnawing at me, eating at me.
+
+206
+00:12:50,880 --> 00:12:54,980
+And I'd like to be able to say to you that my worst mistakes only happened in the first
+
+207
+00:12:54,980 --> 00:13:00,780
+five years of practice, as many of my colleagues say, which is total BS.
+
+208
+00:13:00,780 --> 00:13:06,780
+Some of my doozies have been in the last five years.
+
+209
+00:13:06,780 --> 00:13:09,580
+Alone, ashamed and unsupported.
+
+210
+00:13:09,580 --> 00:13:11,500
+Here's the problem.
+
+211
+00:13:11,500 --> 00:13:18,780
+If I can't come clean and, and, and, and talk about my mistakes, if I can't find the still
+
+212
+00:13:18,780 --> 00:13:23,780
+small voice that tells me what really happened, how can I share it with my colleagues?
+
+213
+00:13:23,780 --> 00:13:30,260
+How can I teach them about what I did so that they don't do the same thing?
+
+214
+00:13:30,260 --> 00:13:33,940
+If I were to walk into a room, like right now I'm telling, I have no idea what you think
+
+215
+00:13:33,940 --> 00:13:35,220
+of me.
+
+216
+00:13:35,220 --> 00:13:38,820
+When was the last time you heard about somebody talk about failure after failure after failure?
+
+217
+00:13:38,820 --> 00:13:43,460
+Oh yeah, you go to a cocktail party and you might hear about some other doctor, but you're
+
+218
+00:13:43,460 --> 00:13:46,940
+not going to hear somebody talking about their own mistakes.
+
+219
+00:13:46,940 --> 00:13:51,140
+If I were to walk into a room filled with my colleagues and ask for their support right
+
+220
+00:13:51,140 --> 00:13:55,220
+now and start to tell what I've just told you right now, I probably wouldn't get through
+
+221
+00:13:55,220 --> 00:14:00,100
+two of those stories before they would start to get really uncomfortable.
+
+222
+00:14:00,100 --> 00:14:06,060
+Somebody would crack a joke, they changed the subject and we would move on.
+
+223
+00:14:06,060 --> 00:14:10,780
+And in fact, if I knew and my colleagues knew that one of my orthopedic colleagues took
+
+224
+00:14:10,780 --> 00:14:15,700
+off the wrong leg in my hospital, believe me, I'd have trouble making eye contact with
+
+225
+00:14:15,700 --> 00:14:17,740
+that person.
+
+226
+00:14:17,740 --> 00:14:19,140
+That's the system that we have.
+
+227
+00:14:19,140 --> 00:14:21,860
+It's a complete denial of mistakes.
+
+228
+00:14:21,860 --> 00:14:28,100
+It's a system in which there are two kinds of positions.
+
+229
+00:14:28,100 --> 00:14:32,140
+Those who make mistakes and those who don't.
+
+230
+00:14:32,140 --> 00:14:35,620
+Those who can't handle sleep deprivation and those who can.
+
+231
+00:14:35,620 --> 00:14:40,020
+Those who have lousy outcomes and those who have great outcomes.
+
+232
+00:14:40,020 --> 00:14:45,780
+And it's almost like an immunological reaction, like the antibodies begin to attack that person
+
+233
+00:14:45,780 --> 00:14:51,900
+and we have this idea that if we drive the people who make mistakes out of medicine,
+
+234
+00:14:51,900 --> 00:14:56,140
+what will we be left with but a safe system?
+
+235
+00:14:56,180 --> 00:14:59,020
+But there are two problems with that.
+
+236
+00:14:59,020 --> 00:15:05,220
+In my 20 years or so of medical broadcasting and journalism, I've made a personal study
+
+237
+00:15:05,220 --> 00:15:09,260
+of medical malpractice and medical errors to learn everything I can from one of the
+
+238
+00:15:09,260 --> 00:15:14,080
+first articles I wrote for the Toronto Star to my show White Coat Black Art.
+
+239
+00:15:14,080 --> 00:15:18,740
+And what I've learned is that errors are absolutely ubiquitous.
+
+240
+00:15:18,740 --> 00:15:25,160
+We live in a, we work in a system where errors happen every day, where one in ten medications
+
+241
+00:15:25,200 --> 00:15:29,600
+are either the wrong medication given in hospital or at the wrong dosage, where hospital-acquired
+
+242
+00:15:29,600 --> 00:15:35,320
+infections are getting more and more numerous, causing havoc and death.
+
+243
+00:15:35,320 --> 00:15:41,320
+In this country, as many as 24,000 Canadians die of preventable medical errors.
+
+244
+00:15:41,320 --> 00:15:45,280
+In the United States, the Institute of Medicine pegged it at 100,000.
+
+245
+00:15:45,280 --> 00:15:50,040
+In both cases, these are gross underestimates because we really aren't ferreting out the
+
+246
+00:15:50,040 --> 00:15:52,880
+problem as we should.
+
+247
+00:15:52,880 --> 00:16:00,580
+And here's the thing, in a hospital system where medical knowledge is doubling every
+
+248
+00:16:00,580 --> 00:16:03,400
+two or three years, we can't keep up with it.
+
+249
+00:16:03,400 --> 00:16:06,480
+Sleep deprivation is absolutely pervasive.
+
+250
+00:16:06,480 --> 00:16:08,240
+We can't get rid of it.
+
+251
+00:16:08,240 --> 00:16:12,920
+We have our cognitive biases so that I can take a perfect history on a patient with chest
+
+252
+00:16:12,920 --> 00:16:17,200
+pain, now take the same patient with chest pain, make them moist and garrulous and put
+
+253
+00:16:17,200 --> 00:16:21,720
+a little bit of alcohol on their breath, and suddenly my history is laced with contempt.
+
+254
+00:16:21,760 --> 00:16:23,680
+I don't take the same history.
+
+255
+00:16:23,680 --> 00:16:24,680
+I'm not a robot.
+
+256
+00:16:24,680 --> 00:16:28,640
+I don't do things the same way each time, and my patients aren't cars.
+
+257
+00:16:28,640 --> 00:16:31,600
+They don't tell me their symptoms in the same way each time.
+
+258
+00:16:31,600 --> 00:16:34,320
+Given all of that, mistakes are inevitable.
+
+259
+00:16:34,320 --> 00:16:41,800
+So if you take the system as I was taught and weed out all the error-prone health professionals,
+
+260
+00:16:41,800 --> 00:16:47,000
+well, there won't be anybody left.
+
+261
+00:16:47,960 --> 00:16:53,400
+You know that business about people not wanting to talk about their worst cases?
+
+262
+00:16:53,400 --> 00:16:58,240
+On my show on White Coat Black Arrow, I made it a habit of saying, here's my worst mistake.
+
+263
+00:16:58,240 --> 00:17:03,760
+I would say to everybody from paramedics to the chief of cardiac surgery, here's my worst
+
+264
+00:17:03,760 --> 00:17:06,480
+mistake, blah, blah, blah, blah, blah, what about yours?
+
+265
+00:17:06,480 --> 00:17:11,920
+And I would point the microphone towards them, and their pupils would dilate, and they would
+
+266
+00:17:11,920 --> 00:17:12,920
+recoil.
+
+267
+00:17:12,960 --> 00:17:17,960
+They would look down and swallow hard and start to tell me their stories.
+
+268
+00:17:17,960 --> 00:17:19,600
+They want to tell their stories.
+
+269
+00:17:19,600 --> 00:17:20,960
+They want to share their stories.
+
+270
+00:17:20,960 --> 00:17:24,720
+They want to be able to say, look, don't make the same mistake I did.
+
+271
+00:17:24,720 --> 00:17:27,260
+What they need is an environment to be able to do that.
+
+272
+00:17:27,260 --> 00:17:34,760
+What they need is a redefined medical culture, and it starts with one physician at a time.
+
+273
+00:17:34,760 --> 00:17:41,240
+The redefined physician is human, knows she's human, accepts it, isn't proud of making mistakes,
+
+274
+00:17:41,240 --> 00:17:47,480
+but strives to learn one thing from what happened that she can teach to somebody else.
+
+275
+00:17:47,480 --> 00:17:49,480
+She shares her experience with others.
+
+276
+00:17:49,480 --> 00:17:54,480
+She's supportive when other people talk about their mistakes, and she points out other people's
+
+277
+00:17:54,480 --> 00:18:00,960
+mistakes, not in a gotcha way, but in a loving, supportive way so that everybody can benefit.
+
+278
+00:18:00,960 --> 00:18:06,480
+And she works in a culture of medicine that acknowledges that human beings run the system,
+
+279
+00:18:06,480 --> 00:18:10,300
+and when human beings run the system, they will make mistakes from time to time.
+
+280
+00:18:10,300 --> 00:18:20,640
+So the system is evolving to create backups that make it easier to detect those mistakes
+
+281
+00:18:20,640 --> 00:18:29,080
+that humans inevitably make, and also fosters in a loving, supportive way places where everybody
+
+282
+00:18:29,080 --> 00:18:33,820
+who is observing in the healthcare system can actually point out things that could be
+
+283
+00:18:33,820 --> 00:18:38,360
+potential mistakes and is rewarded for doing so, and especially people like me when we
+
+284
+00:18:38,400 --> 00:18:40,840
+do make mistakes, we're rewarded for coming clean.
+
+285
+00:18:40,840 --> 00:18:50,760
+My name is Brian Goldman. I am a redefined physician. I'm human. I make mistakes. I'm
+
+286
+00:18:50,760 --> 00:18:56,600
+sorry about that, but I strive to learn one thing that I can pass on to other people.
+
+287
+00:18:56,600 --> 00:19:04,040
+I still don't know what you think of me, but I can live with that. And let me close with
+
+288
+00:19:04,040 --> 00:19:09,200
+three words of my own. I do remember.
+

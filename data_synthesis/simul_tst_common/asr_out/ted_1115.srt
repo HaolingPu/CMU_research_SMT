@@ -1,0 +1,488 @@
+1
+00:00:00,000 --> 00:00:20,360
+I have had the distinct blessing in my life to have worked on a bunch of amazing projects,
+
+2
+00:00:20,360 --> 00:00:25,160
+but the coolest project I ever worked on was around this guy.
+
+3
+00:00:25,160 --> 00:00:26,720
+This guy's name is Tempt.
+
+4
+00:00:26,720 --> 00:00:31,320
+Tempt was one of the foremost graffiti artists in the 80s, and he came home from a run one
+
+5
+00:00:31,320 --> 00:00:35,940
+day and said, dad, my legs are tingling, and that was the onset of ALS.
+
+6
+00:00:35,940 --> 00:00:38,040
+So Tempt is now completely paralyzed.
+
+7
+00:00:38,040 --> 00:00:40,800
+He only has use of his eyes.
+
+8
+00:00:40,800 --> 00:00:45,000
+I was exposed to him and my company, I have a company that does design and animation,
+
+9
+00:00:45,000 --> 00:00:48,760
+so obviously graffiti is definitely an intricate part of what we admire and respect in the
+
+10
+00:00:48,760 --> 00:00:50,600
+art world.
+
+11
+00:00:50,600 --> 00:00:54,320
+So we decided that we were going to sponsor Tony and Tempt and his cause.
+
+12
+00:00:54,320 --> 00:00:59,720
+So I went and met with his brother and father and said, we're going to give you this money,
+
+13
+00:00:59,720 --> 00:01:00,720
+what are you going to do with it?
+
+14
+00:01:00,720 --> 00:01:04,240
+And his brother said, I just want to be able to talk to Tony again.
+
+15
+00:01:04,240 --> 00:01:06,960
+I just want to be able to communicate with him and him to be able to communicate with
+
+16
+00:01:06,960 --> 00:01:07,960
+me.
+
+17
+00:01:07,960 --> 00:01:10,640
+And I said, well, wait a second, isn't that, I mean, I've seen Stephen Hawking, don't all
+
+18
+00:01:10,640 --> 00:01:14,520
+paralyzed people have that ability to communicate via these devices?
+
+19
+00:01:14,520 --> 00:01:20,000
+And he said, no, unless you're in the upper echelon and you've got really amazing insurance,
+
+20
+00:01:20,000 --> 00:01:23,440
+you can't actually do that, that these devices aren't accessible to people.
+
+21
+00:01:23,440 --> 00:01:24,720
+I said, well, how do you actually communicate?
+
+22
+00:01:24,720 --> 00:01:28,600
+And he said, we run it, did everyone see the movie, The Diving Bell and the Butterfly?
+
+23
+00:01:28,600 --> 00:01:29,680
+That's how they communicate.
+
+24
+00:01:29,680 --> 00:01:34,200
+So run their finger along, that's archaic, how can that be?
+
+25
+00:01:34,200 --> 00:01:40,880
+So I showed up with the desire to just write a check and instead I wrote a check that I
+
+26
+00:01:40,880 --> 00:01:43,680
+had no freaking idea how I was going to cash.
+
+27
+00:01:43,680 --> 00:01:47,160
+I committed to his brother and his father right then and there, I'm like, all right,
+
+28
+00:01:47,160 --> 00:01:48,160
+here's the deal.
+
+29
+00:01:48,160 --> 00:01:50,960
+Tony's going to speak, we're going to get him a machine and we're going to figure out
+
+30
+00:01:50,960 --> 00:01:55,200
+a way for him to do his art again, because it's a travesty that someone who still has
+
+31
+00:01:55,200 --> 00:01:58,060
+all of that in them isn't able to communicate it.
+
+32
+00:01:58,060 --> 00:02:02,600
+So I spoke at a conference a couple months after that, I met these guys called GRL, Graffiti
+
+33
+00:02:02,600 --> 00:02:07,960
+Research Lab, and they have a technology that allows them to project the light on any surface
+
+34
+00:02:07,960 --> 00:02:11,960
+and then with a laser pointer draw on it and it just registers the negative space.
+
+35
+00:02:11,960 --> 00:02:15,720
+So they go around and do art installations like this.
+
+36
+00:02:15,720 --> 00:02:18,960
+All the things that go up there, they said there's a life cycle, at first it starts with
+
+37
+00:02:18,960 --> 00:02:25,400
+the sexual organs, then it starts with cuss words, then it was bush, you know, slanders,
+
+38
+00:02:25,400 --> 00:02:30,400
+and then people actually got to art, but there was always a life cycle of presentations.
+
+39
+00:02:30,400 --> 00:02:33,600
+So I went home and I was having dinner with my wife and was telling her about this and
+
+40
+00:02:33,600 --> 00:02:37,080
+we were like, well, wait a second, if we know that this technology exists where you can
+
+41
+00:02:37,080 --> 00:02:41,440
+use your eyes to control things, why don't we figure out a way for Tempt to control a
+
+42
+00:02:41,440 --> 00:02:44,520
+laser and he can do graph again, that would be awesome.
+
+43
+00:02:44,520 --> 00:02:50,520
+So that started the journey and about two years later, about a year later, after a bunch
+
+44
+00:02:50,520 --> 00:02:54,920
+of organization and a bunch of kind of moving things around, we'd accomplished a couple
+
+45
+00:02:54,920 --> 00:02:55,920
+of things.
+
+46
+00:02:55,920 --> 00:02:59,520
+One, we battered down the doors of the insurance companies and we actually got Tempt a machine
+
+47
+00:02:59,520 --> 00:03:06,800
+that let him communicate, a Stephen Hawking machine, yeah, which was awesome and he is
+
+48
+00:03:06,800 --> 00:03:10,320
+seriously one of the funny, I call him Yoda because you talk to the guy, you get an email
+
+49
+00:03:10,320 --> 00:03:14,360
+from him and you're like, I'm just, I'm not worthy, this guy is so amazing.
+
+50
+00:03:14,360 --> 00:03:19,240
+The other thing we did is we flew seven programmers from all over the world, literally every corner
+
+51
+00:03:19,240 --> 00:03:21,640
+of the world into our house.
+
+52
+00:03:21,640 --> 00:03:27,160
+My wife and kids and I moved to our back garage and these hackers and programmers and conspiracy
+
+53
+00:03:27,160 --> 00:03:30,080
+theorists and anarchists took over our house.
+
+54
+00:03:30,080 --> 00:03:34,220
+A lot of our friends thought we were absolutely stupid to do that and that we were gonna come
+
+55
+00:03:34,220 --> 00:03:37,960
+back and all the pictures on the wall would be removed and graph on the wall.
+
+56
+00:03:37,960 --> 00:03:44,240
+But for over two weeks, we programmed, we went to the Venice boardwalk, my kids got
+
+57
+00:03:44,240 --> 00:03:51,000
+involved, my dog got involved and we created this.
+
+58
+00:03:51,000 --> 00:03:55,200
+This is called the iRider and you can see the description.
+
+59
+00:03:55,200 --> 00:03:59,200
+This is a cheap pair of sunglasses that we bought at the Venice Beach boardwalk.
+
+60
+00:03:59,200 --> 00:04:03,760
+Some copper wire and some stuff from Home Depot and Radio Shack.
+
+61
+00:04:03,760 --> 00:04:09,220
+We took a PS3 camera, hacked it open, mounted it to an LED light and now there's a device
+
+62
+00:04:09,220 --> 00:04:13,560
+that is free, you build this yourself, we publish the code for free.
+
+63
+00:04:13,560 --> 00:04:18,080
+We download the software for free and now we've created a device that has absolutely
+
+64
+00:04:18,080 --> 00:04:19,640
+no limitation.
+
+65
+00:04:19,640 --> 00:04:23,320
+There's no insurance company that can say no.
+
+66
+00:04:23,320 --> 00:04:25,440
+There's no hospital that can say no.
+
+67
+00:04:25,440 --> 00:04:28,960
+Anybody who's paralyzed now has access to actually draw or communicate using only their
+
+68
+00:04:28,960 --> 00:04:29,960
+eyes.
+
+69
+00:04:29,960 --> 00:04:44,640
+Thank you.
+
+70
+00:04:44,640 --> 00:04:45,640
+Thank you guys very much.
+
+71
+00:04:45,640 --> 00:04:49,060
+That was awesome.
+
+72
+00:04:49,060 --> 00:04:53,000
+At the end of the two weeks, we went back to Temp's room.
+
+73
+00:04:53,000 --> 00:04:56,200
+I love this picture because this is someone else's room and that's his room so there's
+
+74
+00:04:56,200 --> 00:04:59,940
+all this hustle and bustle going on for the big unveiling.
+
+75
+00:04:59,940 --> 00:05:05,540
+After over a year of planning, two weeks of programming and carb fest and all night
+
+76
+00:05:05,540 --> 00:05:09,260
+sessions, Tony drew again for the first time in seven years.
+
+77
+00:05:09,260 --> 00:05:13,920
+This is an amazing picture because this is his life support system and he's looking over
+
+78
+00:05:13,920 --> 00:05:14,920
+his life support system.
+
+79
+00:05:14,920 --> 00:05:19,500
+We kicked his bed so that he could see out and we set up a projector on a wall out in
+
+80
+00:05:19,500 --> 00:05:24,120
+the parking lot outside of his hospital and he drew again for the first time in front
+
+81
+00:05:24,120 --> 00:05:29,260
+of his family and friends and it's just like you can only imagine what the feeling in the
+
+82
+00:05:29,260 --> 00:05:30,260
+parking lot was.
+
+83
+00:05:30,260 --> 00:05:32,820
+The funny thing is we had to break into the parking lot too so we totally felt like we
+
+84
+00:05:32,820 --> 00:05:37,460
+were legit in the whole graph scene too.
+
+85
+00:05:37,460 --> 00:05:42,100
+At the end of this, he sent us an email and this is what the email said.
+
+86
+00:05:42,100 --> 00:05:45,500
+That was the first time I've drawn anything for seven years.
+
+87
+00:05:45,500 --> 00:05:49,840
+I feel like I'd been held under water and someone finally reached down and pulled my
+
+88
+00:05:49,840 --> 00:05:51,860
+head up so I could breathe.
+
+89
+00:05:51,860 --> 00:05:58,120
+Isn't that awesome?
+
+90
+00:05:58,120 --> 00:05:59,360
+That's kind of our battle cry.
+
+91
+00:05:59,360 --> 00:06:05,000
+That's what keeps us going and keeps us developing and we've got such a long way to go with this.
+
+92
+00:06:05,000 --> 00:06:08,760
+This is an amazing device but it's the equivalent of an Etch A Sketch and someone who has that
+
+93
+00:06:08,760 --> 00:06:12,560
+kind of artistic potential deserves so much more so we're in the process of trying to
+
+94
+00:06:12,560 --> 00:06:15,960
+figure out how to make it better, faster, stronger.
+
+95
+00:06:15,960 --> 00:06:19,320
+Since that time, we've had all kinds of acknowledgement.
+
+96
+00:06:19,320 --> 00:06:20,320
+We've won a bunch of awards.
+
+97
+00:06:20,320 --> 00:06:21,320
+Remember, it's free.
+
+98
+00:06:21,320 --> 00:06:22,920
+None of us are making any money on this thing.
+
+99
+00:06:22,920 --> 00:06:26,400
+It's all coming out of our own pockets so the awards were like, oh, this is fantastic.
+
+100
+00:06:26,400 --> 00:06:30,040
+Armstrong twittered about us and then in December, Time Magazine honored us as one of the top
+
+101
+00:06:30,040 --> 00:06:35,720
+50 inventions of 2010 which is really cool.
+
+102
+00:06:35,720 --> 00:06:39,560
+The coolest thing about this and this is what's kind of completing the whole circle is that
+
+103
+00:06:39,560 --> 00:06:44,880
+in April of this year at the Geffen Mocha in downtown Los Angeles, there's going to
+
+104
+00:06:44,880 --> 00:06:48,760
+be an exhibition called Art of the Streets and Art of the Streets is going to have pretty
+
+105
+00:06:48,760 --> 00:06:51,400
+much the bad asses of the street art scene.
+
+106
+00:06:51,400 --> 00:06:56,520
+Dixie, Shepard Fairey, Kaws, all of these guys will be there.
+
+107
+00:06:56,520 --> 00:07:03,040
+Temp's going to be in the show which is pretty awesome.
+
+108
+00:07:03,040 --> 00:07:06,120
+Basically this is my point.
+
+109
+00:07:06,120 --> 00:07:10,240
+If you see something that's not possible, make it possible.
+
+110
+00:07:10,240 --> 00:07:11,800
+Everything in this room wasn't possible.
+
+111
+00:07:11,800 --> 00:07:17,120
+This stage, this computer, this mic, the iWriter wasn't possible at one point.
+
+112
+00:07:17,120 --> 00:07:18,200
+Make it possible.
+
+113
+00:07:18,200 --> 00:07:20,680
+Everyone in this room ... I'm not a programmer.
+
+114
+00:07:20,680 --> 00:07:24,440
+I've never done anything with ocular recognition technology but I just recognized something
+
+115
+00:07:24,440 --> 00:07:28,360
+and associated myself with amazing people so that we could make something happen.
+
+116
+00:07:28,360 --> 00:07:32,240
+This is the question I want everyone to ask yourself every single day when you come up
+
+117
+00:07:32,240 --> 00:07:34,720
+with something that you feel that needs to be done.
+
+118
+00:07:34,720 --> 00:07:36,680
+If not now, then when?
+
+119
+00:07:36,680 --> 00:07:37,680
+If not me, then who?
+
+120
+00:07:37,680 --> 00:07:38,680
+Thank you guys.
+
+121
+00:07:38,680 --> 00:07:39,680
+Thank you.
+
+122
+00:07:39,680 --> 00:07:39,700
+Thank you guys.
+

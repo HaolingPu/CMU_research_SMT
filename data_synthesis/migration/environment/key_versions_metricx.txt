@@ -1,0 +1,25 @@
+python 3.9.25 (main, Nov  3 2025, 22:33:05) 
+[GCC 11.2.0]
+torch 2.8.0+cu128
+transformers 4.30.2
+numpy 1.24.4
+datasets 2.13.1
+torch.cuda 12.8 arch ['sm_70', 'sm_75', 'sm_80', 'sm_86', 'sm_90', 'sm_100', 'sm_120']
+Fatal error condition occurred in /opt/vcpkg/buildtrees/aws-c-io/src/9e6648842a-364b708815.clean/source/event_loop.c:72: aws_thread_launch(&cleanup_thread, s_event_loop_destroy_async_thread_fn, el_group, &thread_options) == AWS_OP_SUCCESS
+Exiting Application
+################################################################################
+Stack trace:
+################################################################################
+/home/haolingp/miniconda3/envs/metricx/lib/python3.9/site-packages/pyarrow/libarrow.so.900(+0x200af06) [0x7faf495ecf06]
+/home/haolingp/miniconda3/envs/metricx/lib/python3.9/site-packages/pyarrow/libarrow.so.900(+0x20028e5) [0x7faf495e48e5]
+/home/haolingp/miniconda3/envs/metricx/lib/python3.9/site-packages/pyarrow/libarrow.so.900(+0x1f27e09) [0x7faf49509e09]
+/home/haolingp/miniconda3/envs/metricx/lib/python3.9/site-packages/pyarrow/libarrow.so.900(+0x200ba3d) [0x7faf495eda3d]
+/home/haolingp/miniconda3/envs/metricx/lib/python3.9/site-packages/pyarrow/libarrow.so.900(+0x1f25948) [0x7faf49507948]
+/home/haolingp/miniconda3/envs/metricx/lib/python3.9/site-packages/pyarrow/libarrow.so.900(+0x200ba3d) [0x7faf495eda3d]
+/home/haolingp/miniconda3/envs/metricx/lib/python3.9/site-packages/pyarrow/libarrow.so.900(+0x1ee0b46) [0x7faf494c2b46]
+/home/haolingp/miniconda3/envs/metricx/lib/python3.9/site-packages/pyarrow/libarrow.so.900(+0x194546a) [0x7faf48f2746a]
+/lib64/libc.so.6(+0x41ead) [0x7fb057441ead]
+/lib64/libc.so.6(+0x42000) [0x7fb057442000]
+/lib64/libc.so.6(+0x2a617) [0x7fb05742a617]
+/lib64/libc.so.6(__libc_start_main+0x80) [0x7fb05742a6c0]
+/home/haolingp/miniconda3/envs/metricx/bin/python() [0x587b3e]

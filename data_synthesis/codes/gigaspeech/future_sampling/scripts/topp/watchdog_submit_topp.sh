@@ -8,7 +8,7 @@ set -e
 # Run in background:
 #   nohup bash watchdog_submit_topp.sh > watchdog_topp.log 2>&1 &
 
-SCRIPT_DIR="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/scripts/topp"
+SCRIPT_DIR="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/scripts/topp"
 
 # pending (label, value) pairs. Edit if already-submitted set changes.
 PENDING=("0p7:0.7" "0p9:0.9" "0p99:0.99")

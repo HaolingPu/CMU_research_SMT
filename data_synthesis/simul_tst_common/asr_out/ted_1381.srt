@@ -1,0 +1,460 @@
+1
+00:00:00,000 --> 00:00:22,440
+So a couple of years ago, I started a program to try to get the rock star tech and design
+
+2
+00:00:22,440 --> 00:00:27,520
+people to take a year off and work in the one environment that represents pretty much
+
+3
+00:00:27,520 --> 00:00:34,400
+everything they're supposed to hate. We have them work in government. The program is called
+
+4
+00:00:34,400 --> 00:00:39,720
+Code for America, and it's a little bit like a Peace Corps for geeks. We select a few fellows
+
+5
+00:00:39,720 --> 00:00:46,100
+every year, and we have them work with city governments. Instead of sending them off into
+
+6
+00:00:46,100 --> 00:00:50,280
+the third world, we send them into the wilds of city hall, and there they make great apps.
+
+7
+00:00:50,280 --> 00:00:54,280
+They work with city staffers, but really what they're doing is they're showing what's possible
+
+8
+00:00:54,280 --> 00:01:01,640
+with technology today. So meet Al. Al is a fire hydrant in the city of Boston. Here it kind of
+
+9
+00:01:01,640 --> 00:01:05,960
+looks like he's looking for a date, but what he's really looking for is for someone to shovel him
+
+10
+00:01:05,960 --> 00:01:09,960
+out when he gets snowed in because he knows he's not very good at fighting fires when he's covered
+
+11
+00:01:09,960 --> 00:01:16,480
+in four feet of snow. Now how did he come to be looking for help in this very unique manner? We
+
+12
+00:01:16,480 --> 00:01:20,240
+had a team of fellows in Boston last year through the Code for America program. They were there in
+
+13
+00:01:20,240 --> 00:01:25,040
+February, and it snowed a lot in February last year, and they noticed that the city never gets
+
+14
+00:01:25,040 --> 00:01:30,680
+to digging out these fire hydrants. But one fellow in particular, a guy named Eric Michael Ober,
+
+15
+00:01:30,680 --> 00:01:35,800
+noticed something else, and that's that citizens are shoveling out sidewalks right in front of
+
+16
+00:01:35,800 --> 00:01:41,200
+these things. So he did what any good developer would do. He wrote an app. It's a cute little app
+
+17
+00:01:41,200 --> 00:01:46,360
+where you can adopt a fire hydrant. So you agree to dig it out when it snows. If you do, you get to
+
+18
+00:01:46,360 --> 00:01:51,720
+name it. He called the first one Al, and if you don't, someone can steal it from you. So it's got
+
+19
+00:01:51,720 --> 00:01:57,560
+cute little game dynamics on it. So this is a modest little app. It's probably the smallest of
+
+20
+00:01:57,560 --> 00:02:02,360
+the 21 apps that the fellows wrote last year, but it's doing something that no other government
+
+21
+00:02:02,360 --> 00:02:09,480
+technology does. It's spreading virally. There's a guy in the IT department of the city of Honolulu
+
+22
+00:02:09,480 --> 00:02:15,400
+who saw this app and realized that he could use it, not for snow, but to get citizens to adopt
+
+23
+00:02:15,440 --> 00:02:21,720
+tsunami sirens. It's very important that these tsunami sirens work, but people steal the batteries
+
+24
+00:02:21,720 --> 00:02:26,880
+out of them, so he's getting citizens to check on them. And then Seattle decided to use it to get
+
+25
+00:02:26,880 --> 00:02:31,960
+citizens to clear out clogged storm drains, and Chicago just rolled it out to get people to sign
+
+26
+00:02:31,960 --> 00:02:38,320
+up to shovel sidewalks when it snows. So we now know of nine cities that are planning to use this,
+
+27
+00:02:38,320 --> 00:02:44,400
+and this is spread just frictionlessly, organically, naturally. If you know anything about government
+
+28
+00:02:44,400 --> 00:02:50,000
+technology, you know that this isn't how it normally goes. Procuring software usually takes
+
+29
+00:02:50,000 --> 00:02:55,600
+a couple of years. We had a team that worked on a project in Boston last year that took three
+
+30
+00:02:55,600 --> 00:02:59,920
+people about two and a half months. It was a way that parents could figure out which were the right
+
+31
+00:02:59,920 --> 00:03:04,680
+public schools for their kids. We were told afterwards that if that had gone through normal
+
+32
+00:03:04,680 --> 00:03:10,120
+channels, it would have taken at least two years, and it would have cost about two million dollars.
+
+33
+00:03:10,120 --> 00:03:16,040
+And that's nothing. There is one project in the California court system right now that so far
+
+34
+00:03:16,040 --> 00:03:23,000
+cost taxpayers two billion dollars, and it doesn't work. And there are projects like this at every
+
+35
+00:03:23,000 --> 00:03:29,640
+level of government. So an app that takes, you know, a couple of days to write and then spreads
+
+36
+00:03:29,640 --> 00:03:35,120
+virally, that's sort of a shot across the bow to the institution of government. It suggests how
+
+37
+00:03:35,120 --> 00:03:40,440
+government could work better. Not more like a private company, as many people think it should,
+
+38
+00:03:40,440 --> 00:03:46,320
+and not even more like a tech company, but more like the internet itself. And that means
+
+39
+00:03:46,320 --> 00:03:55,040
+permissionless, it means open, it means generative. And that's important. But what's more important
+
+40
+00:03:55,040 --> 00:03:59,680
+about this app is that it represents how a new generation is tackling the problem of government.
+
+41
+00:03:59,680 --> 00:04:07,160
+Not as the problem of an ossified institution, but as a problem of collective action. And that's
+
+42
+00:04:07,160 --> 00:04:11,920
+great news, because it turns out we're very good at collective action with digital technology.
+
+43
+00:04:11,920 --> 00:04:17,040
+Now there's a very large community of people that are building the tools that we need to do things
+
+44
+00:04:17,040 --> 00:04:21,920
+together effectively. It's not just Code for America fellows, there are hundreds of people
+
+45
+00:04:21,920 --> 00:04:27,560
+all over the country that are standing and writing civic apps every day in their own communities.
+
+46
+00:04:27,560 --> 00:04:33,960
+They haven't given up on government. They are frustrated as hell with it, but they're not
+
+47
+00:04:33,960 --> 00:04:39,480
+complaining about it, they're fixing it. And these folks know something that we've lost sight of,
+
+48
+00:04:39,480 --> 00:04:45,440
+and that's that when you strip away all your feelings about politics and the line at the DMV
+
+49
+00:04:45,440 --> 00:04:52,240
+and all those other things that we're really mad about, government is at its core, in the words of
+
+50
+00:04:52,240 --> 00:05:00,360
+Tim O'Reilly, what we do together that we can't do alone. Now a lot of people have given up on
+
+51
+00:05:00,360 --> 00:05:06,520
+government, and if you're one of those people I would ask that you reconsider, because things are
+
+52
+00:05:06,520 --> 00:05:14,800
+changing. Politics is not changing, government is changing. And because government ultimately derives
+
+53
+00:05:14,800 --> 00:05:21,360
+its power from us, remember we the people, how we think about it is going to affect how that change
+
+54
+00:05:21,360 --> 00:05:27,280
+happens. Now I didn't know very much about government when I started this program, and like a lot of
+
+55
+00:05:27,280 --> 00:05:32,240
+people I thought government was basically about getting people elected to office. Well after two
+
+56
+00:05:32,240 --> 00:05:39,600
+years I've come to the conclusion that especially local government is about possums. This is the call
+
+57
+00:05:39,600 --> 00:05:44,800
+center for the services and information line, it's generally where you will get if you call 311 in
+
+58
+00:05:44,800 --> 00:05:51,000
+your city. If you should ever have the chance to staff your city's call center as our fellow Scott
+
+59
+00:05:51,040 --> 00:05:56,360
+Silverman did as part of the program, in fact they all do that, you will find that people call
+
+60
+00:05:56,360 --> 00:06:02,280
+government with a very wide range of issues, including having a possum stuck in your house. So Scott
+
+61
+00:06:02,280 --> 00:06:07,520
+gets this call, he types possum into this official knowledge base, he doesn't really come up with
+
+62
+00:06:07,520 --> 00:06:11,760
+anything, he starts with animal control, and finally he says look, you know, can you just open all the
+
+63
+00:06:11,760 --> 00:06:17,040
+doors to your house and play music really loud and see if the thing leaves? So that worked, so
+
+64
+00:06:17,280 --> 00:06:23,200
+boo you off for Scott. But that wasn't the end of the possums, Boston doesn't just have a call center,
+
+65
+00:06:23,200 --> 00:06:28,440
+it has an app, a web and mobile app called Citizens Connect. Now we didn't write this app, this is the
+
+66
+00:06:28,440 --> 00:06:33,400
+work of the very smart people in the Office of New Urban Mechanics in Boston, so one day this is an
+
+67
+00:06:33,400 --> 00:06:40,040
+actual report, this came in, possum in my trash can, can't tell if it's dead, how do I get this removed?
+
+68
+00:06:40,040 --> 00:06:47,240
+But what happens in Citizens Connect is different, so Scott was speaking person to person, but in
+
+69
+00:06:47,240 --> 00:06:52,520
+Citizens Connect everything is public, so everybody can see this, and in this case a neighbor saw it,
+
+70
+00:06:52,520 --> 00:06:59,080
+and the next report we got said, I walked over to this location, found the trash can behind the
+
+71
+00:06:59,080 --> 00:07:05,200
+house, possum check, living, yep, turned trash can on its side, walked home, good night sweet possum.
+
+72
+00:07:05,200 --> 00:07:14,400
+Pretty simple. So this is great, this is the digital meeting the physical, and it's also a great example
+
+73
+00:07:14,400 --> 00:07:19,720
+of government getting in on the crowdsourcing game, but it's also a great example of government as a
+
+74
+00:07:19,720 --> 00:07:25,680
+platform, and I don't mean necessarily a technological definition of platform here, I'm just talking about
+
+75
+00:07:25,680 --> 00:07:32,800
+a platform for people to help themselves and to help others. So one citizen helped another citizen,
+
+76
+00:07:32,800 --> 00:07:38,800
+but government played a key role here, it connected those two people, and it could have connected them
+
+77
+00:07:38,800 --> 00:07:43,360
+with government services if they'd been needed, but a neighbor is a far better and cheaper
+
+78
+00:07:43,360 --> 00:07:49,200
+alternative to government services. When one neighbor helps another, we strengthen our communities,
+
+79
+00:07:49,200 --> 00:07:56,520
+we call animal control, it just costs a lot of money. Now one of the important things we need to
+
+80
+00:07:56,520 --> 00:08:02,120
+think about government is that it's not the same thing as politics, and most people get that, but
+
+81
+00:08:02,120 --> 00:08:07,440
+they think that one is the input to the other, that our input to the system of government is voting.
+
+82
+00:08:07,440 --> 00:08:13,240
+Now how many times have we elected a political leader, and sometimes we spend a lot of energy
+
+83
+00:08:13,240 --> 00:08:18,680
+getting a new political leader elected, and then we sit back and we expect government to reflect
+
+84
+00:08:18,680 --> 00:08:27,240
+our values and meet our needs, and then not that much changes. That's because government is like a
+
+85
+00:08:27,360 --> 00:08:35,640
+vast ocean, and politics is the six-inch layer on top, and what's under that is what we call bureaucracy,
+
+86
+00:08:35,640 --> 00:08:43,600
+and we say that word with such contempt, but it's that contempt that keeps this thing that we own
+
+87
+00:08:43,600 --> 00:08:51,720
+and we pay for as something that's working against us, this other thing, and then we're disempowering
+
+88
+00:08:51,720 --> 00:08:58,080
+ourselves. People seem to think politics is sexy. If we want this institution to work for us,
+
+89
+00:08:58,080 --> 00:09:04,160
+we're going to have to make bureaucracy sexy, because that's where the real work of government
+
+90
+00:09:04,160 --> 00:09:10,960
+happens. We have to engage with the machinery of government, so that's what the Occupy SEC movement
+
+91
+00:09:10,960 --> 00:09:15,240
+has done. Have you seen these guys? It's a group of concerned citizens that have written a very
+
+92
+00:09:15,360 --> 00:09:21,920
+detailed 325-page report that's a response to the SEC's request for comment on the financial
+
+93
+00:09:21,920 --> 00:09:29,840
+reform bill. That's not being politically active. That's being bureaucratically active. Now for those
+
+94
+00:09:29,840 --> 00:09:35,000
+of us who've given up on government, it's time that we asked ourselves about the world that we
+
+95
+00:09:35,000 --> 00:09:40,240
+want to leave for our children. You have to see the enormous challenges that they're going to
+
+96
+00:09:40,240 --> 00:09:46,840
+face. Do we really think we're going to get where we need to go without fixing the one institution
+
+97
+00:09:46,840 --> 00:09:53,520
+that can act on behalf of all of us? We can't do without government, but we do need it to be more
+
+98
+00:09:53,520 --> 00:09:59,200
+effective. The good news is that technology is making it possible to fundamentally reframe the
+
+99
+00:09:59,200 --> 00:10:06,360
+function of government in a way that can actually scale by strengthening civil society, and there's
+
+100
+00:10:06,360 --> 00:10:10,760
+a generation out there that's grown up on the internet, and they know that it's not that hard
+
+101
+00:10:10,760 --> 00:10:18,280
+to do things together. You just have to architect the systems the right way. Now the average age of
+
+102
+00:10:18,280 --> 00:10:25,560
+our fellows is 28, so I am begrudgingly almost a generation older than most of them. This is a
+
+103
+00:10:25,560 --> 00:10:30,920
+generation that's grown up taking their voices pretty much for granted. They're not fighting
+
+104
+00:10:30,920 --> 00:10:36,520
+that battle that we're all fighting about who gets to speak. They all get to speak. They can
+
+105
+00:10:36,520 --> 00:10:43,240
+express their opinion on any channel at any time, and they do. So when they're faced with the problem
+
+106
+00:10:43,240 --> 00:10:51,480
+of government, they don't care as much about using their voices. They're using their hands. They're
+
+107
+00:10:51,480 --> 00:10:56,760
+using their hands to write applications that make government work better, and those applications let
+
+108
+00:10:56,840 --> 00:11:04,200
+us use our hands to make our communities better. That could be shoveling out a hydrant, pulling a
+
+109
+00:11:04,200 --> 00:11:10,920
+weed, turning over a garbage can with a possum in it, and certainly we could have been shoveling out
+
+110
+00:11:10,920 --> 00:11:17,000
+those fire hydrants all along, and many people do, but these apps are like little digital reminders
+
+111
+00:11:17,000 --> 00:11:22,280
+that we're not just consumers, and we're not just consumers of government putting in our taxes and
+
+112
+00:11:22,280 --> 00:11:30,520
+getting back services. We're more than that. We're citizens, and we're not going to fix government
+
+113
+00:11:30,520 --> 00:11:39,000
+until we fix citizenship. So the question I have for all of you here, when it comes to the big
+
+114
+00:11:39,000 --> 00:11:45,960
+important things that we need to do together, all of us together, are we just going to be a crowd of
+
+115
+00:11:45,960 --> 00:11:53,640
+voices, or are we also going to be a crowd of hands? Thank you.
+

@@ -7,7 +7,7 @@ set -e
 # Run in background:
 #   nohup bash watchdog_minp_1em1.sh > watchdog_1em1.log 2>&1 &
 
-SCRIPT="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/scripts/minp/submit_minp_1em1_pipeline.sh"
+SCRIPT="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/scripts/minp/submit_minp_1em1_pipeline.sh"
 MAX_QUEUED=6          # total SLURM jobs allowed before we queue 1em1 (+4 more)
 POLL_INTERVAL=300
 

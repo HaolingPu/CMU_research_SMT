@@ -1,0 +1,48 @@
+\section{Related Works}
+
+\subsection{Data Synthesis for Simultaneous Speech Translation}
+
+Training SimulST models requires aligned trajectories pairing partial
+source speech with partial target translations. Existing approaches
+synthesize such data from offline corpora using different strategies to
+determine when each target token should be committed.
+
+One line of work constructs prefix-aligned supervision through explicit
+alignment. Prefix Alignment \citep{kano-etal-2022-simultaneous} extracts
+alignments between bilingual prefix pairs, uses them to segment streaming
+input, and fine-tunes a translation model on the resulting prefix-to-prefix
+examples. This strategy is attractive because it is simple, interpretable, and
+does not require LLM calls, but its deterministic alignment rule cannot
+directly represent cases where the safety of a target prefix depends on
+unobserved future context.
+
+Simul-MuST-C \citep{Simul-must-c} prompts GPT-4o to re-segment offline
+translations into minimal monotonic chunks following source word order,
+inspired by the salami technique used by human interpreters.
+EAST \citep{EAST} uses GPT-4 to segment transcripts into semantically
+coherent chunks under multiple latency settings, reformatted as
+interleaved read/write sequences. Both approaches determine commit points
+from the current source prefix alone, without verifying whether the
+chosen translation remains valid given future context.
+
+InfiniSST \citep{ouyang2025infinisst} constructs trajectories through a
+pipeline of forced speech--transcript alignment (MFA) followed by
+word-level transcript--translation alignment with SimAlign
+\citep{jalili-sabet-etal-2020-simalign}, committing each translation
+token once its aligned source chunk arrives. Hibiki takes a softer
+approach, using the perplexity of an MT system to identify per-word
+optimal delays --- a target word is committed once it becomes predictable
+from the current source. While more adaptive than hard alignment, both
+methods rely on local signals and do not explicitly reason over what
+future source words might require.
+
+TAF and concurrent future-anticipation work
+\citep{ouyang2024anticipating} address future dependency by sampling
+multiple LLM-predicted source continuations, translating each, and
+selecting the longest common literal prefix across hypotheses. These
+methods demonstrate that future-aware reasoning substantially improves
+the quality--latency tradeoff, but their literal string aggregation is
+sensitive to surface variation among hypotheses, and they require LLM
+calls at inference time, adding cost and latency to deployment.
+
+In contrast, our method replaces literal prefix matching with token-level distributional consensus during training-data construction, decoupling future-aware reasoning from inference time.

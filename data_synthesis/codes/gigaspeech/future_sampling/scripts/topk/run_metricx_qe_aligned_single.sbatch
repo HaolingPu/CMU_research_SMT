@@ -34,7 +34,7 @@ export MKL_SERVICE_FORCE_INTEL=1
 METRICX_RUN_DIR="${METRICX_RUN_DIR:?METRICX_RUN_DIR is required}"
 FILTERED_OUTPUT_DIR="${FILTERED_OUTPUT_DIR:?FILTERED_OUTPUT_DIR is required}"
 QE_THRESHOLD="${QE_THRESHOLD:-3.0}"
-FILTER_SCRIPT="${FILTER_SCRIPT:-/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/filter_consensus_by_metricx_qe_per_sentence.py}"
+FILTER_SCRIPT="${FILTER_SCRIPT:-/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/filter_consensus_by_metricx_qe_per_sentence.py}"
 
 INPUT_JSONL="${METRICX_RUN_DIR}/metricx_input.jsonl"
 OUTPUT_JSONL="${METRICX_RUN_DIR}/metricx_output.jsonl"
@@ -54,7 +54,7 @@ echo "OUTPUT : ${OUTPUT_JSONL}"
 echo "FILTER OUTPUT DIR : ${FILTERED_OUTPUT_DIR}"
 echo "QE_THRESHOLD : ${QE_THRESHOLD}"
 
-cd /data/user_data/haolingp/data_synthesis/codes/metricx
+cd /home/haolingp/CMU_research_SMT/data_synthesis/codes/metricx
 PYTHONNOUSERSITE=1 python -m metricx24.predict \
   --tokenizer /data/user_data/haolingp/models/mt5-xl \
   --model_name_or_path /data/user_data/haolingp/models/metricx-24-hybrid-xl-v2p6 \

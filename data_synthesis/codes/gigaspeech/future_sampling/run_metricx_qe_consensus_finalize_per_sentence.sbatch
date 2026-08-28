@@ -30,7 +30,7 @@ FILTERED_OUTPUT_DIR="${FILTERED_OUTPUT_DIR:?FILTERED_OUTPUT_DIR not set}"
 QE_THRESHOLD="${QE_THRESHOLD:-3.0}"
 NUM_SHARDS="${NUM_SHARDS:-4}"
 
-FILTER_SCRIPT="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/filter_consensus_by_metricx_qe_per_sentence.py"
+FILTER_SCRIPT="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/filter_consensus_by_metricx_qe_per_sentence.py"
 MERGED_OUTPUT="${METRICX_RUN_DIR}/metricx_output.jsonl"
 REPORT_JSONL="${METRICX_RUN_DIR}/filter_report_per_utt.jsonl"
 

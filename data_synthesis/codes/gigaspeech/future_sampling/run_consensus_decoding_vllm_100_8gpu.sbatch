@@ -14,11 +14,11 @@
 #   task 3 -> rows  75-99
 #
 # Submit:
-#   sbatch /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/run_consensus_decoding_vllm_100_8gpu.sbatch
+#   sbatch /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/run_consensus_decoding_vllm_100_8gpu.sbatch
 #
 # Optional overrides at submit time:
 #   sbatch --export=ALL,TOTAL_ROWS=100,NUM_TASKS=4,INPUT_TSV=/path/to/file.tsv \
-#     /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/run_consensus_decoding_vllm_100_8gpu.sbatch
+#     /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/run_consensus_decoding_vllm_100_8gpu.sbatch
 # =============================================================================
 #SBATCH --job-name=cons_dec_100
 #SBATCH --nodes=1
@@ -51,7 +51,7 @@ CONDA_BASE="/home/haolingp/miniconda3"
 VLLM_PYTHON="${CONDA_BASE}/envs/vllm/bin/python"
 BASE_PYTHON="${CONDA_BASE}/bin/python"
 
-SCRIPT_PATH="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/consensus_decoding_token_id_level.py"
+SCRIPT_PATH="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/consensus_decoding_token_id_level.py"
 MODEL_30B="/data/user_data/haolingp/models/Qwen3-30B-A3B-Instruct-2507-FP8"
 BASE_MODEL_PATH="${BASE_MODEL_PATH:-/data/user_data/haolingp/models/Qwen3-4B-Base}"
 

@@ -55,7 +55,7 @@ echo "METRICX_RUN_DIR=${METRICX_RUN_DIR}"
 echo "INPUT=${INPUT}"
 echo "OUTPUT=${OUTPUT}"
 
-cd /data/user_data/haolingp/data_synthesis/codes/metricx
+cd /home/haolingp/CMU_research_SMT/data_synthesis/codes/metricx
 PYTHONNOUSERSITE=1 python -m metricx24.predict \
   --tokenizer /data/user_data/haolingp/models/mt5-xl \
   --model_name_or_path /data/user_data/haolingp/models/metricx-24-hybrid-xl-v2p6 \

@@ -1,0 +1,141 @@
+####################################################################################################
+# utt_id=AUD0000000003_100   segment_size=2   la_n=2
+# n_chunks=15   n_steps=8   target_lang=Chinese
+# full_source: When these were brought to the king he sent for the prince at once and asked if it had been he who had come to their rescue. Yes, your majesty, it was I answered the prince.
+# reference  : 当这些东西被带到国王面前时，他立刻召见了王子，并问他是否就是那位前来救援他们的人。是的，陛下，正是我，王子回答道。
+####################################################################################################
+
+───── step 0  chunks=[0..1]  LCP-decision step ─────
+  pre-read chunk[0]: ''  (READ, no MT call)
+  decision chunk[1]: 'When these were'
+  source_observed (sent to MT): 'When these were'
+  committed_text BEFORE step  : ''
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '当这些被'
+  sliding window (la_n=2) BEFORE append:
+    (empty)
+  sliding window AFTER append:
+    [h0] 当这些被
+  LCP skipped: window has 1 hyp(s) < la_n=2
+  >> LA-2 requires 2 hyps to agree → no commit (READ)
+  committed_text AFTER step   : ''
+
+───── step 1  chunks=[2..3]  LCP-decision step ─────
+  pre-read chunk[2]: 'brought to the king'  (READ, no MT call)
+  decision chunk[3]: 'he sent for the'
+  source_observed (sent to MT): 'When these were brought to the king he sent for the'
+  committed_text BEFORE step  : ''
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '当这些东西被带到国王面前时，他派人去召。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 当这些被
+  sliding window AFTER append:
+    [h0] 当这些被
+    [h1] 当这些东西被带到国王面前时，他派人去召。
+  LCP(char, |window|=2)       : '当这些'
+  >> LCP extends committed by 3 chars  → COMMIT delta: '当这些'
+  committed_text AFTER step   : '当这些'
+
+───── step 2  chunks=[4..5]  LCP-decision step ─────
+  pre-read chunk[4]: 'prince at'  (READ, no MT call)
+  decision chunk[5]: 'once and asked'
+  source_observed (sent to MT): 'When these were brought to the king he sent for the prince at once and asked'
+  committed_text BEFORE step  : '当这些'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '当这些被带到国王面前时，他立刻派人去召王子，并问道'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 当这些被
+    [h1] 当这些东西被带到国王面前时，他派人去召。
+  dropped oldest hyp from window: '当这些被'…
+  sliding window AFTER append:
+    [h0] 当这些东西被带到国王面前时，他派人去召。
+    [h1] 当这些被带到国王面前时，他立刻派人去召王子，并问道
+  LCP(char, |window|=2)       : '当这些'
+  >> LCP == committed_text  → no extension, no commit (READ)
+  committed_text AFTER step   : '当这些'
+
+───── step 3  chunks=[6..7]  LCP-decision step ─────
+  pre-read chunk[6]: 'if it'  (READ, no MT call)
+  decision chunk[7]: 'had been'
+  source_observed (sent to MT): 'When these were brought to the king he sent for the prince at once and asked if it had been'
+  committed_text BEFORE step  : '当这些'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '当这些被带到国王面前时，他立刻召见了王子，并问他是否……'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 当这些东西被带到国王面前时，他派人去召。
+    [h1] 当这些被带到国王面前时，他立刻派人去召王子，并问道
+  dropped oldest hyp from window: '当这些东西被带到国王面前时，他派人去召。'…
+  sliding window AFTER append:
+    [h0] 当这些被带到国王面前时，他立刻派人去召王子，并问道
+    [h1] 当这些被带到国王面前时，他立刻召见了王子，并问他是否……
+  LCP(char, |window|=2)       : '当这些被带到国王面前时，他立刻'
+  >> LCP extends committed by 12 chars  → COMMIT delta: '被带到国王面前时，他立刻'
+  committed_text AFTER step   : '当这些被带到国王面前时，他立刻'
+
+───── step 4  chunks=[8..9]  LCP-decision step ─────
+  pre-read chunk[8]: 'he who had come to their'  (READ, no MT call)
+  decision chunk[9]: 'rescue. '
+  source_observed (sent to MT): 'When these were brought to the king he sent for the prince at once and asked if it had been he who had come to their rescue.'
+  committed_text BEFORE step  : '当这些被带到国王面前时，他立刻'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '当这些被带到国王面前时，他立刻召见了王子，并问他是否就是那个前来救援他们的人。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 当这些被带到国王面前时，他立刻派人去召王子，并问道
+    [h1] 当这些被带到国王面前时，他立刻召见了王子，并问他是否……
+  dropped oldest hyp from window: '当这些被带到国王面前时，他立刻派人去召王子，并问道'…
+  sliding window AFTER append:
+    [h0] 当这些被带到国王面前时，他立刻召见了王子，并问他是否……
+    [h1] 当这些被带到国王面前时，他立刻召见了王子，并问他是否就是那个前来救援他们的人。
+  LCP(char, |window|=2)       : '当这些被带到国王面前时，他立刻召见了王子，并问他是否'
+  >> LCP extends committed by 11 chars  → COMMIT delta: '召见了王子，并问他是否'
+  committed_text AFTER step   : '当这些被带到国王面前时，他立刻召见了王子，并问他是否'
+
+───── step 5  chunks=[10..11]  LCP-decision step ─────
+  pre-read chunk[10]: ''  (READ, no MT call)
+  decision chunk[11]: 'Yes, your'
+  source_observed (sent to MT): 'When these were brought to the king he sent for the prince at once and asked if it had been he who had come to their rescue. Yes, your'
+  committed_text BEFORE step  : '当这些被带到国王面前时，他立刻召见了王子，并问他是否'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '当这些被带到国王面前时，他立刻召见了王子，并问他是否就是前来救援他们的人。是的，陛下，'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 当这些被带到国王面前时，他立刻召见了王子，并问他是否……
+    [h1] 当这些被带到国王面前时，他立刻召见了王子，并问他是否就是那个前来救援他们的人。
+  dropped oldest hyp from window: '当这些被带到国王面前时，他立刻召见了王子，并问他是否……'…
+  sliding window AFTER append:
+    [h0] 当这些被带到国王面前时，他立刻召见了王子，并问他是否就是那个前来救援他们的人。
+    [h1] 当这些被带到国王面前时，他立刻召见了王子，并问他是否就是前来救援他们的人。是的，陛下，
+  LCP(char, |window|=2)       : '当这些被带到国王面前时，他立刻召见了王子，并问他是否就是'
+  >> LCP extends committed by 2 chars  → COMMIT delta: '就是'
+  committed_text AFTER step   : '当这些被带到国王面前时，他立刻召见了王子，并问他是否就是'
+
+───── step 6  chunks=[12..13]  LCP-decision step ─────
+  pre-read chunk[12]: 'majesty, it was'  (READ, no MT call)
+  decision chunk[13]: 'I answered'
+  source_observed (sent to MT): 'When these were brought to the king he sent for the prince at once and asked if it had been he who had come to their rescue. Yes, your majesty, it was I answered'
+  committed_text BEFORE step  : '当这些被带到国王面前时，他立刻召见了王子，并问他是否就是'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '当这些被带到国王面前时，他立刻召见了王子，并问他是否就是那位前来救援的人。是的，陛下，正是我回答道。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 当这些被带到国王面前时，他立刻召见了王子，并问他是否就是那个前来救援他们的人。
+    [h1] 当这些被带到国王面前时，他立刻召见了王子，并问他是否就是前来救援他们的人。是的，陛下，
+  dropped oldest hyp from window: '当这些被带到国王面前时，他立刻召见了王子，并问他是否就是那个前来救援他们的人。'…
+  sliding window AFTER append:
+    [h0] 当这些被带到国王面前时，他立刻召见了王子，并问他是否就是前来救援他们的人。是的，陛下，
+    [h1] 当这些被带到国王面前时，他立刻召见了王子，并问他是否就是那位前来救援的人。是的，陛下，正是我回答道。
+  LCP(char, |window|=2)       : '当这些被带到国王面前时，他立刻召见了王子，并问他是否就是'
+  >> LCP == committed_text  → no extension, no commit (READ)
+  committed_text AFTER step   : '当这些被带到国王面前时，他立刻召见了王子，并问他是否就是'
+
+───── step 7  chunks=[14..14]  FORCE_COMPLETE (last step) ─────
+  decision chunk[14]: 'the prince. '
+  source_observed (sent to MT): 'When these were brought to the king he sent for the prince at once and asked if it had been he who had come to their rescue. Yes, your majesty, it was I answered the prince.'
+  committed_text BEFORE step  : '当这些被带到国王面前时，他立刻召见了王子，并问他是否就是'
+  >> FORCE_COMPLETE: pass full_source to MT, prefix-constrain on committed.
+  MT continuation delta       : '那位前来救援的人。是的，陛下，正是我回答了王子。'
+  committed_text AFTER step   : '当这些被带到国王面前时，他立刻召见了王子，并问他是否就是那位前来救援的人。是的，陛下，正是我回答了王子。'
+
+====================================================================================================
+FINAL prediction : 当这些被带到国王面前时，他立刻召见了王子，并问他是否就是那位前来救援的人。是的，陛下，正是我回答了王子。
+FINAL reference  : 当这些东西被带到国王面前时，他立刻召见了王子，并问他是否就是那位前来救援他们的人。是的，陛下，正是我，王子回答道。
+metrics: bleu_char=77.51  laal_text=11.65  pred_chars=52  ref_chars=57  src_words=36
+====================================================================================================

@@ -1,0 +1,121 @@
+vLLM shm_broadcast Deadlock — Suspected Node-Specific Issue
+=============================================================
+
+Reporter:  Haoling Pu (haolingp@andrew.cmu.edu)
+Date:      2026-04-28
+Cluster:   babel
+Severity:  Inference jobs hang indefinitely (need scancel + resubmit)
+
+
+Summary
+-------
+When running vllm-backed simuleval inference (tensor_parallel_size=2, 2x L40S
+per node), the EngineCore process consistently deadlocks on three specific
+nodes during/after model weight loading. Identical jobs (same script, same
+model, same args) submitted in the same period succeed on other nodes. The
+hang is reproducible on the same nodes across resubmissions hours apart, which
+points at a node-level issue rather than the workload.
+
+
+Symptom
+-------
+After all weight shards finish loading (visible in stderr as "Loading
+safetensors checkpoint shards: 100% Completed"), stdout enters an infinite
+loop with one line every 60 seconds:
+
+    (EngineCore pid=NNN) INFO HH:MM:SS [shm_broadcast.py:681] No available
+    shared memory broadcast block found in 60 seconds. This typically happens
+    when some processes are hanging or doing some time-consuming work
+    (e.g. compilation, weight/kv cache quantization).
+
+GPUs stay reserved, no further progress, no traceback. Process never exits on
+its own. Killed via scancel after >15 min observation.
+
+
+Reproduction across jobs
+------------------------
+All jobs ran the SAME script with the SAME args:
+
+  Script:    /data/user_data/haolingp/scripts/infer/infer_slurm.sh
+  Cmd:       sbatch infer_slurm.sh <ckpt> Standard
+  Resources: --gres=gpu:L40S:2 --cpus-per-task=4 --mem=64GB
+  Env:       conda env "evaluation"
+  vllm:      0.19.1 (V1 engine; V0 fallback no longer exists in 0.19)
+  TP:        tensor_parallel_size=2
+  MP:        VLLM_WORKER_MULTIPROC_METHOD=spawn
+  NCCL:      NCCL_P2P_DISABLE=1, NCCL_IB_DISABLE=1
+  /dev/shm:  378G free on every node observed (not a shm-size issue)
+
+Hung jobs (deadlocked, scancelled):
+  JobID         Node           Elapsed-at-cancel   When
+  7557704_2     babel-o5-24    00:52:09            2026-04-28 18:38–19:31
+  7561820_3     babel-q5-16    00:32:53            2026-04-28 20:19–20:52
+  7561820_4     babel-n5-32    00:32:19            2026-04-28 20:19–20:52
+  7562825_3     babel-q5-16    00:29:20            2026-04-28 20:58–21:27
+  7563365_3     babel-n5-32    >00:36              2026-04-28 21:27– (still hung at writeup)
+
+Successful jobs (identical workload, different nodes):
+  JobID         Node           Elapsed-at-completion
+  7557704_1     babel-m5-16    00:28:21
+  7560711_2     babel-o9-16    00:16:55     (a re-submit of seg1920 after hang on babel-o5-24)
+  7561820_1     babel-m5-16    00:24:41
+  7561820_2     babel-o5-32    00:20:25
+  7562825_4     babel-t5-28    00:12:29
+
+Pattern: every hang lands on one of {babel-o5-24, babel-q5-16, babel-n5-32}.
+babel-q5-16 hung on two independent submissions; babel-n5-32 likewise. No
+hang has ever been observed on babel-m5-16, babel-o5-32, babel-o9-16,
+babel-t5-28 (same code, same model, same vllm version, same env vars).
+
+
+Likely Cause
+------------
+Suspected node-specific issue (as suggested by mentor): something on these
+nodes (kernel/driver mismatch, CUDA/NCCL state, /dev/shm semantics, or
+scheduler-related cgroup/IPC misconfiguration) makes vllm 0.19's V1 engine
+fail to establish its shared-memory broadcast channel between the EngineCore
+process and TP worker(s). No traceback is produced and the process never
+times out internally — workers just keep re-polling for a broadcast block
+that never gets published.
+
+
+Workaround currently in place
+-----------------------------
+Added a wall-clock watchdog inside infer_slurm.sh:
+  - Each simuleval attempt is wrapped in `timeout 5400s` (90 min).
+  - On exit codes 124/137 (timed out / killed), the existing retry loop
+    treats it as a failure and resubmits; up to MAX_RETRIES=3 attempts.
+  - Orphaned worker processes are reaped via `pkill -9 -P $$` between retries.
+  - Backup of the original script: infer_slurm.sh.bak.hangfix
+
+This unblocks the workload but does not fix the root cause; we still waste
+~1.5 h GPU-hours per hung attempt before the watchdog fires.
+
+
+Suggested ask from cluster admins
+---------------------------------
+1. Investigate the three suspect nodes — diff their kernel / CUDA driver /
+   nvidia-fabricmanager / NCCL versions / /dev/shm config / cgroup IPC
+   limits against a known-good node like babel-m5-16 or babel-t5-28.
+2. If a config drift is found, drain + reimage / reconfigure those nodes.
+3. If not reproducible from admin side, consider adding the affected nodes to
+   a temporary exclude list until a kernel/driver pin is rolled out.
+
+For the user side, a partial mitigation is to add to the sbatch header:
+    #SBATCH --exclude=babel-o5-24,babel-q5-16,babel-n5-32
+which reduces the chance of landing on a known-bad node.
+
+
+Diagnostic artifacts
+--------------------
+  Hung stdout (representative):
+    /data/user_data/haolingp/slurm_logs/7563365_3.out
+    /data/user_data/haolingp/slurm_logs/7562825_3.out
+  Hung stderr (shows weight load completing before the deadlock):
+    /data/user_data/haolingp/slurm_logs/7563365_3.err
+  Successful run for comparison:
+    /data/user_data/haolingp/slurm_logs/7562825_4.out
+    /data/user_data/haolingp/slurm_logs/7560711_2.out
+  Script + watchdog patch:
+    /data/user_data/haolingp/scripts/infer/infer_slurm.sh
+    /data/user_data/haolingp/scripts/infer/infer_slurm.sh.bak.hangfix

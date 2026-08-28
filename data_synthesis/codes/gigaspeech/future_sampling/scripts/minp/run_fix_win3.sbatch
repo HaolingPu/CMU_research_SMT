@@ -16,7 +16,7 @@ IN_DIR="${IN_DIR:?}"
 OUT_DIR="${OUT_DIR:?}"
 mkdir -p /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_debug/slurm_logs
 /data/user_data/haolingp/conda_envs/evaluation/bin/python \
-  /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/fix_period_and_length_filter.py \
+  /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/fix_period_and_length_filter.py \
   --in-dir "${IN_DIR}" \
   --out-dir "${OUT_DIR}" \
   --min-ratio 0.7 \

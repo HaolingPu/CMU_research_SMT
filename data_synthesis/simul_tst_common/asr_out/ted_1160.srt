@@ -1,0 +1,492 @@
+1
+00:00:00,000 --> 00:00:21,840
+This is a representation of your brain, and your brain can be broken into two parts.
+
+2
+00:00:21,840 --> 00:00:26,360
+There's the left half, which is the logical side, and then the right half, which is the
+
+3
+00:00:26,360 --> 00:00:27,360
+intuitive.
+
+4
+00:00:27,600 --> 00:00:32,920
+And so if we add a scale to measure the aptitude of each hemisphere, then we can plot our brain.
+
+5
+00:00:32,920 --> 00:00:36,160
+And for example, this would be somebody who's completely logical.
+
+6
+00:00:36,160 --> 00:00:39,680
+This would be someone who's entirely intuitive.
+
+7
+00:00:39,680 --> 00:00:42,600
+So where would you put your brain on this scale?
+
+8
+00:00:42,600 --> 00:00:46,560
+Some of us may have opted for, you know, one of these extremes, but I think for most people
+
+9
+00:00:46,560 --> 00:00:51,200
+in the audience, your brain is something like this, with a high aptitude in both hemispheres
+
+10
+00:00:51,200 --> 00:00:52,200
+at the same time.
+
+11
+00:00:52,200 --> 00:00:54,500
+I mean, it's not like they're mutually exclusive or anything.
+
+12
+00:00:54,500 --> 00:00:57,240
+You can be logical and intuitive.
+
+13
+00:00:57,240 --> 00:01:01,520
+And so I consider myself one of these people, along with most of the other experimental
+
+14
+00:01:01,520 --> 00:01:02,520
+quantum physicists.
+
+15
+00:01:02,520 --> 00:01:07,840
+We need a good deal of logic to string together these complex ideas, but at the same time,
+
+16
+00:01:07,840 --> 00:01:12,240
+we need a good deal of intuition to actually make the experiments work.
+
+17
+00:01:12,240 --> 00:01:13,360
+How do we develop this intuition?
+
+18
+00:01:13,360 --> 00:01:14,840
+Well, we like to play with stuff.
+
+19
+00:01:14,840 --> 00:01:18,900
+So we go out and play with it, and then we see how it acts, and then we develop our intuition
+
+20
+00:01:18,900 --> 00:01:20,400
+from there.
+
+21
+00:01:20,400 --> 00:01:22,920
+And you know, really, you do the same thing.
+
+22
+00:01:22,920 --> 00:01:28,560
+So some intuition that you may have developed over the years is that one thing is only in
+
+23
+00:01:28,560 --> 00:01:30,280
+one place at a time.
+
+24
+00:01:30,280 --> 00:01:36,440
+I mean, it even sounds weird to think about one thing being in two different places at
+
+25
+00:01:36,440 --> 00:01:39,420
+the same time, but you weren't born with this notion.
+
+26
+00:01:39,420 --> 00:01:40,420
+You developed it.
+
+27
+00:01:40,420 --> 00:01:43,480
+You know, I remember watching a kid playing on a car stop.
+
+28
+00:01:43,480 --> 00:01:46,960
+He was just a toddler, and he wasn't very good at it, and he kept falling over.
+
+29
+00:01:46,960 --> 00:01:51,120
+But I bet playing with this car stop taught him a really valuable lesson, and that's that
+
+30
+00:01:51,120 --> 00:01:56,500
+large things don't let you get right past them, and that they stay in one place.
+
+31
+00:01:56,500 --> 00:02:00,800
+And so this is a great conceptual model to have of the world, unless you're a particle
+
+32
+00:02:00,800 --> 00:02:01,800
+physicist.
+
+33
+00:02:01,800 --> 00:02:06,160
+It'd be a terrible model for a particle physicist, because, well, they don't play with car stops.
+
+34
+00:02:06,160 --> 00:02:08,960
+They play with these little weird particles.
+
+35
+00:02:08,960 --> 00:02:13,480
+And when they play with their particles, they find they do all sorts of really weird things,
+
+36
+00:02:13,480 --> 00:02:17,720
+like they can fly right through walls, or they can be in two different places at the
+
+37
+00:02:17,720 --> 00:02:19,660
+same time.
+
+38
+00:02:19,660 --> 00:02:26,240
+And so they wrote down all these observations, and they called it the theory of quantum mechanics.
+
+39
+00:02:26,240 --> 00:02:29,740
+And so, you know, that's where physics was at a few years ago.
+
+40
+00:02:29,740 --> 00:02:35,140
+You needed quantum mechanics to describe little tiny particles, but you didn't need it to
+
+41
+00:02:35,140 --> 00:02:39,740
+describe the large, everyday objects around us.
+
+42
+00:02:39,740 --> 00:02:42,300
+This didn't really sit well with my intuition.
+
+43
+00:02:42,300 --> 00:02:45,380
+And maybe it's just because I don't play with particles very often.
+
+44
+00:02:45,380 --> 00:02:49,580
+Well, I mean, I play with them sometimes, but not very often.
+
+45
+00:02:49,580 --> 00:02:51,020
+And I've never seen them.
+
+46
+00:02:51,020 --> 00:02:53,860
+I mean, nobody's ever seen a particle.
+
+47
+00:02:53,860 --> 00:02:59,740
+But it didn't sit well with my logical side either, because if everything is made up of
+
+48
+00:02:59,740 --> 00:03:05,700
+little particles, and all the little particles follow quantum mechanics, then shouldn't everything
+
+49
+00:03:05,700 --> 00:03:07,940
+just follow quantum mechanics?
+
+50
+00:03:07,940 --> 00:03:12,740
+Yeah, I don't see any reason why it shouldn't.
+
+51
+00:03:12,740 --> 00:03:17,060
+And so I'd feel a lot better about the whole thing if we could somehow show that an everyday
+
+52
+00:03:17,060 --> 00:03:20,500
+object also follows quantum mechanics.
+
+53
+00:03:20,500 --> 00:03:24,420
+So a few years ago, I set off to do just that.
+
+54
+00:03:24,420 --> 00:03:26,700
+So I made one.
+
+55
+00:03:26,700 --> 00:03:34,380
+This is the first object that you can see that has been in a mechanical quantum superposition.
+
+56
+00:03:34,380 --> 00:03:39,740
+So what we're looking at here is a tiny computer chip, and you can sort of see this green dot
+
+57
+00:03:39,740 --> 00:03:40,780
+right in the middle.
+
+58
+00:03:40,780 --> 00:03:43,560
+And that's this piece of metal I'm going to be talking about in a minute.
+
+59
+00:03:43,560 --> 00:03:45,400
+This is a photograph of the object.
+
+60
+00:03:45,560 --> 00:03:47,000
+I'm going to zoom in a little bit.
+
+61
+00:03:47,000 --> 00:03:50,560
+We're looking right there in the center, and then here's a really, really big close-up
+
+62
+00:03:50,560 --> 00:03:52,120
+of the little piece of metal.
+
+63
+00:03:52,120 --> 00:03:55,280
+So what we're looking at is a little chunk of metal, and it's shaped like a diving board
+
+64
+00:03:55,280 --> 00:03:57,080
+and sticking out over a ledge.
+
+65
+00:03:57,080 --> 00:04:00,560
+And so I made this thing in nearly the same way as you make a computer chip.
+
+66
+00:04:00,560 --> 00:04:05,160
+I went into a clean room with a fresh silicon wafer, and then I just cranked away at all
+
+67
+00:04:05,160 --> 00:04:07,080
+the big machines for about 100 hours.
+
+68
+00:04:07,080 --> 00:04:11,960
+For the last step, I had to build my own machine to make this swimming pool-shaped hole underneath
+
+69
+00:04:11,960 --> 00:04:13,640
+the device.
+
+70
+00:04:13,640 --> 00:04:18,920
+This device has the ability to be in a quantum superposition, but it needs a little help
+
+71
+00:04:18,920 --> 00:04:19,920
+to do it.
+
+72
+00:04:19,920 --> 00:04:21,240
+Here, let me give you an analogy.
+
+73
+00:04:21,240 --> 00:04:24,240
+You know how comfortable it is to be in a crowded elevator?
+
+74
+00:04:24,240 --> 00:04:28,500
+I mean, when I'm in an elevator all alone, I do all sorts of weird things, but then other
+
+75
+00:04:28,500 --> 00:04:33,440
+people get on board, and I stop doing those things because I don't want to bother them
+
+76
+00:04:33,440 --> 00:04:36,660
+or, frankly, scare them.
+
+77
+00:04:36,660 --> 00:04:42,000
+So quantum mechanics says that inanimate objects feel the same way.
+
+78
+00:04:42,040 --> 00:04:46,920
+The fellow passengers for inanimate objects are not just people, but it's also the light
+
+79
+00:04:46,920 --> 00:04:51,460
+shining on it, and the wind blowing past it, and the heat of the room.
+
+80
+00:04:51,460 --> 00:04:55,440
+And so we knew if we wanted to see this piece of metal behave quantum mechanically, we're
+
+81
+00:04:55,440 --> 00:04:58,040
+going to have to kick out all the other passengers.
+
+82
+00:04:58,040 --> 00:04:59,480
+And so that's what we did.
+
+83
+00:04:59,480 --> 00:05:03,640
+We turned off the lights, and then we put it in vacuum and sucked out all the air, and
+
+84
+00:05:03,640 --> 00:05:07,920
+then we cooled it down to just a fraction of a degree above absolute zero.
+
+85
+00:05:07,920 --> 00:05:12,040
+Now all alone in the elevator, the little chunk of metal was free to act however it
+
+86
+00:05:12,040 --> 00:05:13,040
+wanted.
+
+87
+00:05:13,040 --> 00:05:16,040
+And so we measured its motion, and we found it was moving in really weird ways.
+
+88
+00:05:16,040 --> 00:05:20,120
+Instead of just sitting perfectly still, it was vibrating, and the way it was vibrating,
+
+89
+00:05:20,120 --> 00:05:24,600
+it was breathing something like this, like expanding and contracting bellows.
+
+90
+00:05:24,600 --> 00:05:29,920
+By giving it a gentle nudge, we were able to make it both vibrate and not vibrate at
+
+91
+00:05:29,920 --> 00:05:34,760
+the same time, something that's only allowed with quantum mechanics.
+
+92
+00:05:34,760 --> 00:05:38,200
+So what I'm telling you here is something truly fantastic.
+
+93
+00:05:38,200 --> 00:05:44,480
+What does it mean for one thing to be both vibrating and not vibrating at the same time?
+
+94
+00:05:44,480 --> 00:05:46,120
+So let's think about the atoms.
+
+95
+00:05:46,120 --> 00:05:50,720
+So in one case, all the trillions of atoms that make up that chunk of metal are just
+
+96
+00:05:50,720 --> 00:05:51,720
+sitting still.
+
+97
+00:05:51,720 --> 00:05:56,480
+Now at the same time, those same atoms are moving up and down.
+
+98
+00:05:56,480 --> 00:05:59,500
+Now it's only at precise times when they align.
+
+99
+00:05:59,500 --> 00:06:02,040
+The rest of the time, they're delocalized.
+
+100
+00:06:02,040 --> 00:06:07,560
+That means that every atom is in two different places at the same time, which in turn means
+
+101
+00:06:07,560 --> 00:06:10,800
+the entire chunk of metal is in two different places.
+
+102
+00:06:10,800 --> 00:06:13,360
+I think this is really cool.
+
+103
+00:06:13,360 --> 00:06:25,520
+It was worth locking myself in a clean room to do this for all those years, because check
+
+104
+00:06:25,520 --> 00:06:26,520
+this out.
+
+105
+00:06:26,520 --> 00:06:31,160
+The difference in scale between a single atom and that chunk of metal is about the same
+
+106
+00:06:31,160 --> 00:06:34,360
+as a difference between that chunk of metal and you.
+
+107
+00:06:34,360 --> 00:06:38,760
+So if a single atom can be in two different places at the same time, that chunk of metal
+
+108
+00:06:38,760 --> 00:06:42,240
+can be in two different places, then why not you?
+
+109
+00:06:42,240 --> 00:06:46,880
+I mean, this is just my logical side talking.
+
+110
+00:06:46,880 --> 00:06:50,360
+So imagine if you were in multiple places at the same time.
+
+111
+00:06:50,360 --> 00:06:53,960
+What would that be like?
+
+112
+00:06:53,960 --> 00:07:00,720
+How would your consciousness handle your body being delocalized in space?
+
+113
+00:07:00,720 --> 00:07:05,200
+Just one more part to the story is when we warmed it up and we turned on the lights and
+
+114
+00:07:05,200 --> 00:07:10,720
+looked inside the box, we saw that the piece of metal was still there in one piece.
+
+115
+00:07:10,720 --> 00:07:15,880
+And so I had to develop this new intuition that it seems like all the objects in the
+
+116
+00:07:15,880 --> 00:07:21,360
+elevator are really just quantum objects just crammed into a tiny space.
+
+117
+00:07:21,360 --> 00:07:25,440
+You hear a lot of talk about how quantum mechanics says that everything is all interconnected.
+
+118
+00:07:25,440 --> 00:07:27,440
+Well, that's not quite right.
+
+119
+00:07:27,440 --> 00:07:29,840
+It's actually more than that.
+
+120
+00:07:29,840 --> 00:07:34,400
+What makes quantum mechanics deeper is that those connections, your connections to all
+
+121
+00:07:34,400 --> 00:07:39,160
+the things around you, literally define who you are.
+
+122
+00:07:39,160 --> 00:07:41,400
+And that's the profound weirdness of quantum mechanics.
+
+123
+00:07:41,400 --> 00:07:42,400
+Thank you.
+

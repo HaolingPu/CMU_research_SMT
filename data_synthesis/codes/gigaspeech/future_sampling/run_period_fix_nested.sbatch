@@ -17,6 +17,6 @@ IN_ROOT="${IN_ROOT:?IN_ROOT required}"
 OUT_ROOT="${OUT_ROOT:?OUT_ROOT required}"
 mkdir -p /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_prod/slurm_logs
 /home/haolingp/miniconda3/bin/python \
-  /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/period_fix_traj_nested.py \
+  /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/period_fix_traj_nested.py \
   --in-root "${IN_ROOT}" \
   --out-root "${OUT_ROOT}"

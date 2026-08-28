@@ -34,7 +34,7 @@ EXPERIMENT_DIR="${EXPERIMENT_DIR:-/data/user_data/haolingp/data_synthesis/output
 METRICX_RUN_DIR="${METRICX_RUN_DIR:-/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_debug/consensus-100-qe-metricx}"
 NUM_SHARDS="${NUM_SHARDS:-8}"
 
-CONVERTER="/data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/convert_metricx_consensus.py"
+CONVERTER="/home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/convert_metricx_consensus.py"
 INPUT_JSONL="${METRICX_RUN_DIR}/metricx_input.jsonl"
 SHARD_DIR="${METRICX_RUN_DIR}/metricx_shards"
 

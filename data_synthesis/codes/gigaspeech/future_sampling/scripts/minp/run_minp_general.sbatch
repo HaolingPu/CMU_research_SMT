@@ -16,4 +16,4 @@
 MINP="${MINP:?Set MINP via --export=ALL,MINP=<float> e.g. 0.01 ; LABEL is optional, default minp_<MINP>}"
 LABEL="${LABEL:-minp_${MINP}}"
 
-bash /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/scripts/minp/run_minp_common.sh "${MINP}" "${LABEL}"
+bash /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/scripts/minp/run_minp_common.sh "${MINP}" "${LABEL}"

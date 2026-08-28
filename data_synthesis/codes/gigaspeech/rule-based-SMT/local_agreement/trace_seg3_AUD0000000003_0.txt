@@ -1,0 +1,167 @@
+####################################################################################################
+# utt_id=AUD0000000003_0   segment_size=3   la_n=2
+# n_chunks=25   n_steps=9   target_lang=Chinese
+# full_source: And these introductions are inevitably both monotonous and unavailing. A sense of literary honesty compels the editor to keep repeating that he is the editor, and not the author of the fairy tales, just as a distinguished man of science is only the editor, Not the author of nature.
+# reference  : 而这些介绍不可避免地既单调又无用。一种文学上的诚实感迫使编辑不断重复说明自己只是编辑，而非童话故事的作者，正如一位杰出的科学家只是自然的编辑，而非自然的作者。
+####################################################################################################
+
+───── step 0  chunks=[0..2]  LCP-decision step ─────
+  pre-read chunk[0]: ''  (READ, no MT call)
+  pre-read chunk[1]: 'And these'  (READ, no MT call)
+  decision chunk[2]: 'introductions are'
+  source_observed (sent to MT): 'And these introductions are'
+  committed_text BEFORE step  : ''
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '而这些介绍是'
+  sliding window (la_n=2) BEFORE append:
+    (empty)
+  sliding window AFTER append:
+    [h0] 而这些介绍是
+  LCP skipped: window has 1 hyp(s) < la_n=2
+  >> LA-2 requires 2 hyps to agree → no commit (READ)
+  committed_text AFTER step   : ''
+
+───── step 1  chunks=[3..5]  LCP-decision step ─────
+  pre-read chunk[3]: 'inevitably'  (READ, no MT call)
+  pre-read chunk[4]: 'both'  (READ, no MT call)
+  decision chunk[5]: 'monotonous and'
+  source_observed (sent to MT): 'And these introductions are inevitably both monotonous and'
+  committed_text BEFORE step  : ''
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '而且这些介绍不可避免地既单调又乏味。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 而这些介绍是
+  sliding window AFTER append:
+    [h0] 而这些介绍是
+    [h1] 而且这些介绍不可避免地既单调又乏味。
+  LCP(char, |window|=2)       : '而'
+  >> LCP extends committed by 1 chars  → COMMIT delta: '而'
+  committed_text AFTER step   : '而'
+
+───── step 2  chunks=[6..8]  LCP-decision step ─────
+  pre-read chunk[6]: 'unavailing. '  (READ, no MT call)
+  pre-read chunk[7]: 'A sense of'  (READ, no MT call)
+  decision chunk[8]: 'literary'
+  source_observed (sent to MT): 'And these introductions are inevitably both monotonous and unavailing. A sense of literary'
+  committed_text BEFORE step  : '而'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '而这些介绍不可避免地显得单调且毫无成效。一种文学上的感觉'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 而这些介绍是
+    [h1] 而且这些介绍不可避免地既单调又乏味。
+  dropped oldest hyp from window: '而这些介绍是'…
+  sliding window AFTER append:
+    [h0] 而且这些介绍不可避免地既单调又乏味。
+    [h1] 而这些介绍不可避免地显得单调且毫无成效。一种文学上的感觉
+  LCP(char, |window|=2)       : '而'
+  >> LCP == committed_text  → no extension, no commit (READ)
+  committed_text AFTER step   : '而'
+
+───── step 3  chunks=[9..11]  LCP-decision step ─────
+  pre-read chunk[9]: 'honesty'  (READ, no MT call)
+  pre-read chunk[10]: 'compels the editor'  (READ, no MT call)
+  decision chunk[11]: 'to keep'
+  source_observed (sent to MT): 'And these introductions are inevitably both monotonous and unavailing. A sense of literary honesty compels the editor to keep'
+  committed_text BEFORE step  : '而'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑坚持'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 而且这些介绍不可避免地既单调又乏味。
+    [h1] 而这些介绍不可避免地显得单调且毫无成效。一种文学上的感觉
+  dropped oldest hyp from window: '而且这些介绍不可避免地既单调又乏味。'…
+  sliding window AFTER append:
+    [h0] 而这些介绍不可避免地显得单调且毫无成效。一种文学上的感觉
+    [h1] 而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑坚持
+  LCP(char, |window|=2)       : '而这些介绍不可避免地显得单调且毫无成效。一种文学上的'
+  >> LCP extends committed by 25 chars  → COMMIT delta: '这些介绍不可避免地显得单调且毫无成效。一种文学上的'
+  committed_text AFTER step   : '而这些介绍不可避免地显得单调且毫无成效。一种文学上的'
+
+───── step 4  chunks=[12..14]  LCP-decision step ─────
+  pre-read chunk[12]: 'repeating that he is'  (READ, no MT call)
+  pre-read chunk[13]: 'the editor, '  (READ, no MT call)
+  decision chunk[14]: 'and not'
+  source_observed (sent to MT): 'And these introductions are inevitably both monotonous and unavailing. A sense of literary honesty compels the editor to keep repeating that he is the editor, and not'
+  committed_text BEFORE step  : '而这些介绍不可避免地显得单调且毫无成效。一种文学上的'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 而这些介绍不可避免地显得单调且毫无成效。一种文学上的感觉
+    [h1] 而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑坚持
+  dropped oldest hyp from window: '而这些介绍不可避免地显得单调且毫无成效。一种文学上的感觉'…
+  sliding window AFTER append:
+    [h0] 而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑坚持
+    [h1] 而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非
+  LCP(char, |window|=2)       : '而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑'
+  >> LCP extends committed by 7 chars  → COMMIT delta: '诚实感迫使编辑'
+  committed_text AFTER step   : '而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑'
+
+───── step 5  chunks=[15..17]  LCP-decision step ─────
+  pre-read chunk[15]: 'the author'  (READ, no MT call)
+  pre-read chunk[16]: 'of the fairy'  (READ, no MT call)
+  decision chunk[17]: 'tales, '
+  source_observed (sent to MT): 'And these introductions are inevitably both monotonous and unavailing. A sense of literary honesty compels the editor to keep repeating that he is the editor, and not the author of the fairy tales,'
+  committed_text BEFORE step  : '而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非童话故事的作者。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑坚持
+    [h1] 而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非
+  dropped oldest hyp from window: '而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑坚持'…
+  sliding window AFTER append:
+    [h0] 而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非
+    [h1] 而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非童话故事的作者。
+  LCP(char, |window|=2)       : '而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非'
+  >> LCP extends committed by 13 chars  → COMMIT delta: '不断重复自己只是编辑，而非'
+  committed_text AFTER step   : '而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非'
+
+───── step 6  chunks=[18..20]  LCP-decision step ─────
+  pre-read chunk[18]: 'just as a'  (READ, no MT call)
+  pre-read chunk[19]: 'distinguished man of'  (READ, no MT call)
+  decision chunk[20]: 'science is'
+  source_observed (sent to MT): 'And these introductions are inevitably both monotonous and unavailing. A sense of literary honesty compels the editor to keep repeating that he is the editor, and not the author of the fairy tales, just as a distinguished man of science is'
+  committed_text BEFORE step  : '而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非童话故事的作者，正如一位杰出的科学家一样。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非
+    [h1] 而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非童话故事的作者。
+  dropped oldest hyp from window: '而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非'…
+  sliding window AFTER append:
+    [h0] 而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非童话故事的作者。
+    [h1] 而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非童话故事的作者，正如一位杰出的科学家一样。
+  LCP(char, |window|=2)       : '而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非童话故事的作者'
+  >> LCP extends committed by 7 chars  → COMMIT delta: '童话故事的作者'
+  committed_text AFTER step   : '而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非童话故事的作者'
+
+───── step 7  chunks=[21..23]  LCP-decision step ─────
+  pre-read chunk[21]: 'only the'  (READ, no MT call)
+  pre-read chunk[22]: 'editor, Not the'  (READ, no MT call)
+  decision chunk[23]: 'author of'
+  source_observed (sent to MT): 'And these introductions are inevitably both monotonous and unavailing. A sense of literary honesty compels the editor to keep repeating that he is the editor, and not the author of the fairy tales, just as a distinguished man of science is only the editor, Not the author of'
+  committed_text BEFORE step  : '而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非童话故事的作者'
+  >> calling MT for hypothesis…
+  MT full hypothesis          : '而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非童话故事的作者，正如一位杰出的科学家也只是编辑，而非作者。'
+  sliding window (la_n=2) BEFORE append:
+    [h0] 而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非童话故事的作者。
+    [h1] 而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非童话故事的作者，正如一位杰出的科学家一样。
+  dropped oldest hyp from window: '而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非童话故事的作者。'…
+  sliding window AFTER append:
+    [h0] 而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非童话故事的作者，正如一位杰出的科学家一样。
+    [h1] 而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非童话故事的作者，正如一位杰出的科学家也只是编辑，而非作者。
+  LCP(char, |window|=2)       : '而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非童话故事的作者，正如一位杰出的科学家'
+  >> LCP extends committed by 11 chars  → COMMIT delta: '，正如一位杰出的科学家'
+  committed_text AFTER step   : '而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非童话故事的作者，正如一位杰出的科学家'
+
+───── step 8  chunks=[24..24]  FORCE_COMPLETE (last step) ─────
+  decision chunk[24]: 'nature. '
+  source_observed (sent to MT): 'And these introductions are inevitably both monotonous and unavailing. A sense of literary honesty compels the editor to keep repeating that he is the editor, and not the author of the fairy tales, just as a distinguished man of science is only the editor, Not the author of nature.'
+  committed_text BEFORE step  : '而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非童话故事的作者，正如一位杰出的科学家'
+  >> FORCE_COMPLETE: pass full_source to MT, prefix-constrain on committed.
+  MT continuation delta       : '只是自然的编者，而非自然的创造者。'
+  committed_text AFTER step   : '而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非童话故事的作者，正如一位杰出的科学家只是自然的编者，而非自然的创造者。'
+
+====================================================================================================
+FINAL prediction : 而这些介绍不可避免地显得单调且毫无成效。一种文学上的诚实感迫使编辑不断重复自己只是编辑，而非童话故事的作者，正如一位杰出的科学家只是自然的编者，而非自然的创造者。
+FINAL reference  : 而这些介绍不可避免地既单调又无用。一种文学上的诚实感迫使编辑不断重复说明自己只是编辑，而非童话故事的作者，正如一位杰出的科学家只是自然的编辑，而非自然的作者。
+metrics: bleu_char=78.80  laal_text=9.74  pred_chars=81  ref_chars=79  src_words=49
+====================================================================================================

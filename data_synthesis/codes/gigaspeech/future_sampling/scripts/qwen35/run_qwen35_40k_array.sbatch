@@ -74,4 +74,4 @@ export OUTPUT_ROOT="${OUTPUT_ROOT:-/data/user_data/haolingp/data_synthesis/outpu
 # Stable across requeues so --skip-existing resumes into the same run dir.
 export OUTPUT_JOB_ID="${OUTPUT_JOB_ID:-${SLURM_ARRAY_JOB_ID}}"
 
-bash /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/scripts/qwen35/run_qwen35_common.sh "${LABEL}"
+bash /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/scripts/qwen35/run_qwen35_common.sh "${LABEL}"

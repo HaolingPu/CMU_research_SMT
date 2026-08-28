@@ -15,4 +15,4 @@
 #SBATCH --mail-user=haolingp@andrew.cmu.edu
 
 set -e
-exec bash /data/user_data/haolingp/data_synthesis/codes/gigaspeech/future_sampling/_run_anchor_40k_common.sh
+exec bash /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/_run_anchor_40k_common.sh

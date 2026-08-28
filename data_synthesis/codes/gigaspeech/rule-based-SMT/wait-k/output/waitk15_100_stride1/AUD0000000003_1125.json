@@ -1,0 +1,59 @@
+{
+  "utt_id": "AUD0000000003_1125",
+  "src_trajectory": [
+    "on whose",
+    "forehead shone",
+    "a golden",
+    "star, ",
+    "And they knew",
+    "that this could",
+    "only be their",
+    "adored",
+    "Lizina. ",
+    "As the carriage",
+    "slowly passed in",
+    "front of the old",
+    "house, "
+  ],
+  "source_full_text": "on whose forehead shone a golden star, And they knew that this could only be their adored Lizina. As the carriage slowly passed in front of the old house,",
+  "target_trajectory": [
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "在她前额闪耀着一颗金色的星星，他们知道这只能是他们所钟爱的丽西娜。当马车缓缓驶过那所老房子前时，"
+  ],
+  "actions": [
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "READ",
+    "WRITE"
+  ],
+  "prediction": "在她前额闪耀着一颗金色的星星，他们知道这只能是他们所钟爱的丽西娜。当马车缓缓驶过那所老房子前时，",
+  "reference_text": "在她前额上闪耀着一颗金色的星星，他们知道这只能是他们所敬爱的莉齐娜。当马车缓缓驶过那所老房子前时，",
+  "decoder_impl": {
+    "method": "wait_k",
+    "k": 15
+  },
+  "metrics": {
+    "laal_text": 14.795918367346939,
+    "bleu_char": 82.57405977094132
+  }
+}
