@@ -13,8 +13,8 @@ DATA_ROOT="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_
 TOTAL_ROWS="${TOTAL_ROWS:-10000}"
 NUM_DECODE_TASKS="${NUM_DECODE_TASKS:-4}"
 DECODE_CONCURRENCY="${DECODE_CONCURRENCY:-2}"
-NUM_POST_SHARDS="${NUM_POST_SHARDS:-8}"
-POST_CONCURRENCY="${POST_CONCURRENCY:-4}"
+NUM_POST_SHARDS="${NUM_POST_SHARDS:-24}"
+POST_CONCURRENCY="${POST_CONCURRENCY:-24}"
 TARGETED_NUM_FUTURES="${TARGETED_NUM_FUTURES:-20}"
 MIN_VOTERS_RATIO="${MIN_VOTERS_RATIO:-1.0}"
 QE_THRESHOLD="${QE_THRESHOLD:-3.0}"
@@ -62,6 +62,9 @@ submit_run() {
   (( TOTAL_ROWS > 0 )) || die "TOTAL_ROWS must be positive"
   (( NUM_DECODE_TASKS > 0 )) || die "NUM_DECODE_TASKS must be positive"
   (( NUM_POST_SHARDS > 0 )) || die "NUM_POST_SHARDS must be positive"
+  (( POST_CONCURRENCY > 0 )) || die "POST_CONCURRENCY must be positive"
+  (( POST_CONCURRENCY <= NUM_POST_SHARDS )) || die "POST_CONCURRENCY cannot exceed NUM_POST_SHARDS"
+  (( POST_CONCURRENCY <= 24 )) || die "POST_CONCURRENCY cannot exceed the preempt_qos 24-GPU user limit"
 
   local run_tag="${1:-axis5-oldasr-strict-10k-$(date +%Y%m%d-%H%M%S)}"
   local variant_tag="${run_tag}"
@@ -95,6 +98,7 @@ targeted_num_futures=${TARGETED_NUM_FUTURES}
 min_voters_ratio=${MIN_VOTERS_RATIO}
 future_source_window=1
 num_post_shards=${NUM_POST_SHARDS}
+post_concurrency=${POST_CONCURRENCY}
 qe_threshold=${QE_THRESHOLD}
 length_ratio_ref=${MIN_RATIO_REF}:${MAX_RATIO_REF}
 sample_n=${SAMPLE_N}
