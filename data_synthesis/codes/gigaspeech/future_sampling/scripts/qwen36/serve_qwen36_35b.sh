@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Serve Qwen3.6-35B-A3B-FP8 as the local future SAMPLER for consensus decoding.
+# Serve Qwen3.6-35B-A3B-FP8 as the translation/probe model.
 #
 # Single L40S (FP8 weights 37.5GB): no TP, so none of the 122B NCCL hang
 # mitigations are needed. Same qwen3_5_moe arch family as Qwen3.5-122B, so the
@@ -17,6 +17,7 @@ PORT="${PORT:-8300}"
 GPU="${GPU:-0}"
 MAX_LEN="${MAX_LEN:-16384}"
 GPU_MEM_UTIL="${GPU_MEM_UTIL:-0.85}"
+SERVED_MODEL_NAME="${SERVED_MODEL_NAME:-qwen36-translator}"
 # Gated-DeltaNet recurrent state is allocated PER SEQUENCE SLOT (~1.03GiB/layer
 # at the vLLM default max_num_seqs=1024 -> ~32GiB for 30 linear-attn layers,
 # which OOMs a 46GB L40S regardless of --gpu-memory-utilization). The decoder
@@ -50,13 +51,13 @@ if [[ "${1:-}" == "stop" ]]; then
   exit 0
 fi
 
-echo "===== Qwen3.6-35B-A3B-FP8 sampler serve ====="
+echo "===== Qwen3.6-35B-A3B-FP8 translator/probe serve ====="
 echo "ENDPOINT for decode clients: http://$(hostname):${PORT}/v1"
 echo "model=${MODEL} port=${PORT} gpu=${GPU} max_len=${MAX_LEN}"
 
 CMD=(
   "${VLLM}" serve "${MODEL}"
-  --served-model-name qwen36-sampler
+  --served-model-name "${SERVED_MODEL_NAME}"
   --dtype auto
   --port "${PORT}"
   --host 0.0.0.0

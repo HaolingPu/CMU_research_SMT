@@ -3,18 +3,16 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
-#SBATCH --gres=gpu:L40S:1
 #SBATCH --mem=24G
 #SBATCH --partition=general
 #SBATCH --qos=normal
 #SBATCH --time=04:00:00
-#SBATCH --exclude=babel-t9-16
 #SBATCH -o /home/haolingp/CMU_research_SMT/scripts/train/slurm_logs/conv2swift_%j.out
 #SBATCH -e /home/haolingp/CMU_research_SMT/scripts/train/slurm_logs/conv2swift_%j.err
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=haolingp@andrew.cmu.edu
 
-# Build training manifest + chunked audio from a directory of consensus JSONs,
+# CPU-only: build training manifest + chunked audio from consensus JSONs,
 # then random-downsample to SAMPLE_N rows so all variants train on the same
 # count for fair comparison.
 #

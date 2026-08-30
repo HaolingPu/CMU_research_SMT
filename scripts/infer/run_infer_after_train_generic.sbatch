@@ -3,9 +3,9 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2
-#SBATCH --gres=gpu:L40S:1
-#SBATCH --qos=normal
-#SBATCH --partition=general
+#SBATCH --mem=4G
+#SBATCH --qos=cpu_qos
+#SBATCH --partition=cpu
 #SBATCH --time=00:20:00
 #SBATCH -o /home/haolingp/CMU_research_SMT/scripts/infer/slurm_logs/infer_launch_%j.out
 #SBATCH -e /home/haolingp/CMU_research_SMT/scripts/infer/slurm_logs/infer_launch_%j.err
@@ -19,6 +19,7 @@ EXP="${EXP:?EXP required}"
 CHILD_PARTITION="${CHILD_PARTITION:-general}"
 CHILD_GPU_QOS="${CHILD_GPU_QOS:-normal}"
 CKPTS_FILE="${CKPTS_FILE:-/home/haolingp/slurm_runs/${EXP}/ckpts.txt}"
+PIPELINE_MANIFEST="${PIPELINE_MANIFEST:-}"
 BASE=/data/user_data/haolingp/ckpts/infinisst-omni/${EXP}
 HF=$(ls -td "${BASE}"/v*-hf 2>/dev/null | head -1)
 if [[ -z "${HF}" ]]; then echo "ERROR: no -hf export under ${BASE}"; ls -la "${BASE}" || true; exit 1; fi
@@ -48,3 +49,10 @@ EVAL_JID=$(sbatch --parsable \
   run_eval_all_ckpts.sbatch)
 echo "eval: ${EVAL_JID} (afterok:${INFER_JID})"
 echo "${EXP} infer=${INFER_JID} eval=${EVAL_JID}" > /tmp/${EXP}_infer_eval_jids.txt
+if [[ -n "${PIPELINE_MANIFEST}" ]]; then
+  {
+    echo "infer=${INFER_JID}"
+    echo "comet_eval=${EVAL_JID}"
+    echo "comet_model=Unbabel/XCOMET-XL"
+  } >> "${PIPELINE_MANIFEST}"
+fi

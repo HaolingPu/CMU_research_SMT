@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-"""Consensus decoding with future sampling via vLLM serve API.
+"""Consensus decoding with future sampling via vLLM serve APIs.
 
-Two base models (e.g. gemma4-E2B + Qwen3-4B-Base) each generate future
-continuations of the observed source prefix.  An instruct model
-(Qwen3-30B-A3B-Instruct) provides next-token distributions for each
-hypothesised full source, and the consensus intersection selects the
-committed token.  Candidate sets are built via either top-k or min-p.
+Sampler models generate plausible and contrastive continuations of the observed
+source prefix. A separate translation/probe model provides next-token
+distributions for each hypothesized full source, and consensus selects the
+committed target token.
 """
 import argparse
 import ast
@@ -23,6 +22,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 from transformers import AutoTokenizer
+
+from ambiguity_sampler_prompt import PROMPT_VERSION, build_ambiguity_sampler_messages
 
 
 DEFAULT_TSV_PATH = "/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/eval_datasets/train_xl_case_robust_asr_filtered_frozen_llm_reference_subsentence_ref.tsv"
@@ -739,67 +740,13 @@ def sample_source_futures_multi(
     return merged, merged_info
 
 
-_AXIS_HINT_SUBJECT_CONTINUES = (
-    "For THIS batch: each continuation must keep the CURRENT subject / topic of "
-    "the partial sentence as the focus — the same entity that is acting or being "
-    "described continues to act or be described. Diversity comes from picking "
-    "DIFFERENT actions, predicates, attributes, or outcomes for that SAME subject. "
-    "Do NOT introduce a new subject, new actor, or scene shift in this batch."
-)
-_AXIS_HINT_FOCUS_SHIFTS = (
-    "For THIS batch: each continuation must SHIFT FOCUS away from the current "
-    "subject / topic of the partial sentence. Examples of shifts: a new entity "
-    "is introduced and takes over, a different referent of an ambiguous pronoun "
-    "or determiner is committed, the scene/setting changes, the perspective "
-    "pivots to a bystander, or an aside / parenthetical intrudes. Diversity "
-    "comes from picking DIFFERENT new subjects/topics/scenes. Do NOT keep the "
-    "current subject as the focus in this batch."
-)
-# Narrower axes used in the experimental 5-axis split. focus_shift is replaced
-# by 4 specific shift-types so both models can't collapse onto the same
-# "corner, a shadow..." literary template.
-_AXIS_HINT_NAMED_ACTOR_ENTERS = (
-    "For THIS batch: introduce a NEW NAMED entity (a specific person, role, "
-    "organization, or place name) that takes over as the actor of the next "
-    "clause. Do NOT use vague placeholders like 'a shadow', 'a figure', "
-    "'someone'. Use concrete names or specific roles (e.g. 'Lieutenant Cross', "
-    "'the foreman', 'the Bureau of Mines', 'Marseille'). The new entity must "
-    "be the grammatical subject of an action verb."
-)
-_AXIS_HINT_TIME_PIVOT = (
-    "For THIS batch: the continuation must pivot to a DIFFERENT TIME FRAME "
-    "than the present moment of the partial sentence — either a flash-forward "
-    "(years later, the next morning, by the time), a flashback (long before "
-    "that, as a child), or a frequency/habitual (every Sunday, in those days). "
-    "The new clause should clearly anchor in a different temporal frame, with "
-    "explicit temporal phrasing."
-)
-_AXIS_HINT_DIRECT_SPEECH = (
-    "For THIS batch: the continuation must contain DIRECT QUOTED SPEECH or a "
-    "speech-act report. Either an opening quote with attribution (\"That's "
-    "enough,\" she said) or reported speech that signals a speech act "
-    "(he muttered something about the price). The continuation must include "
-    "a speech verb (said/whispered/shouted/snapped/muttered/argued)."
-)
-_AXIS_HINT_FACTUAL_ASIDE = (
-    "For THIS batch: pivot the continuation into a FACTUAL, TECHNICAL, OR "
-    "NUMERICAL aside that doesn't continue the narrative. Examples: cite a "
-    "date or year ('the 1923 treaty had banned this'), give a measurement "
-    "or quantity ('the temperature reached 38 degrees'), reference a "
-    "document/law/source ('Article 14 of the constitution requires this'), "
-    "or state a domain-specific fact. The continuation should read like an "
-    "encyclopedia or footnote, not narrative prose."
-)
-
-
 def _sample_prefill_one_batch(
     sampler_tokenizer: Any,
     observed_source: str,
     committed_text: str,
     target_lang: str,
     num_futures: int,
-    axis_hint: str,
-    axis_tag: str,
+    sampling_mode: str,
     api_base: str,
     api_model: str,
     api_timeout: float,
@@ -807,109 +754,15 @@ def _sample_prefill_one_batch(
     top_p: float,
     max_tokens: int,
 ) -> Tuple[List[str], List[Dict[str, Any]]]:
-    """One sub-batch of prefill sampling with a specific axis hint.
-
-    Same prefill mechanism as before (partial only in prefilled assistant turn,
-    not in user msg), same (c) hard-drop filter, but the user message carries
-    an axis_hint that pins this batch to ONE diversity axis ("subject continues"
-    vs "focus shifts"). Two calls of this helper with the two hints together
-    span both axes and prevent gemma from collapsing all N samples into a single
-    axis (e.g. 16 paraphrases of "results suggest the hypothesis was flawed").
-    """
+    """Sample one natural or ambiguity-seeking continuation batch."""
     if not observed_source.strip() or num_futures <= 0:
         return [], []
 
-    system_msg = (
-        f"You are an adversarial future-probe for a simultaneous English-to-"
-        f"{target_lang} interpreter. The interpreter has heard only a partial "
-        f"English sentence and has already committed part of a {target_lang} "
-        f"translation. Your job is NOT to write the most natural next words. "
-        f"Your job is to surface continuations that would FORCE the interpreter "
-        f"to revise the current {target_lang} translation if they turned out to "
-        f"be true.\n\n"
-        f"Hard requirements:\n"
-        f"- Produce 4-15 word English continuations, one per sample.\n"
-        f"- Across your N samples, each continuation must commit to a DIFFERENT "
-        f"interpretation along at least one axis: (a) what an ambiguous pronoun "
-        f"or determiner refers to, (b) which verb sense is intended, (c) which "
-        f"phrase a PP / relative clause attaches to, (d) who/what becomes the "
-        f"new subject or topic, (e) polarity / outcome (positive vs negative).\n"
-        f"- Do NOT all collapse onto the same syntactic frame (e.g. all starting "
-        f"with the same subject pronoun). Span the space of plausible readings.\n"
-        f"- Each continuation should be one a competent reader would consider "
-        f"genuinely possible given the partial sentence, but it should pick a "
-        f"specific reading rather than stay vague.\n"
-        f"- Output only the continuation text. No analysis, no JSON, no "
-        f"markdown, no {target_lang}.\n\n"
-        f"Example A — verb polysemy. Partial: \"She decided to run\"\n"
-        f"BAD (all collapse to the athletic sense):\n"
-        f"  - \"the marathon next weekend\"\n"
-        f"  - \"five miles before breakfast\"\n"
-        f"  - \"in the park every morning\"\n"
-        f"GOOD (each picks a different verb sense):\n"
-        f"  - \"the company after her father retired\"      # run = manage\n"
-        f"  - \"for mayor in the next election\"            # run = stand for office\n"
-        f"  - \"the experiment one more time tonight\"      # run = conduct\n"
-        f"  - \"the water until it got warm enough\"        # run = operate (a faucet)\n"
-        f"  - \"away before they noticed her absence\"      # run = flee\n\n"
-        f"Example B — noun polysemy (bank = 银行 vs 河岸). Partial: \"The bank\"\n"
-        f"BAD (all collapse to financial):\n"
-        f"  - \"approved the loan quickly\"\n"
-        f"  - \"raised its lending rates\"\n"
-        f"  - \"lent us a large sum\"\n"
-        f"GOOD (forces a different {target_lang} word entirely):\n"
-        f"  - \"approved the loan by Friday afternoon\"     # bank = 银行\n"
-        f"  - \"collapsed after three days of heavy rain\"  # bank = 河岸 (caved in)\n"
-        f"  - \"was lined with old willow trees\"            # bank = 河岸 (scenery)\n"
-        f"  - \"froze all withdrawals without warning\"      # bank = 银行, negative\n\n"
-        f"Example C — long-distance dependency (matrix verb still pending). "
-        f"Partial: \"The agreement that the two countries signed last year\"\n"
-        f"BAD (no main verb chosen, all stay on the subject):\n"
-        f"  - \"is a very important document\"\n"
-        f"  - \"was very long and detailed\"\n"
-        f"  - \"contains many clauses\"\n"
-        f"GOOD (each commits to a different matrix predicate / outcome):\n"
-        f"  - \"expires at the end of this month\"           # 即将失效\n"
-        f"  - \"has been violated repeatedly since then\"    # 多次被违反 (negative)\n"
-        f"  - \"remains the foundation of their alliance\"   # 仍是基石 (positive)\n"
-        f"  - \"will be reviewed by the new government\"     # 将被审议 (future)\n"
-        f"  - \"was secretly abandoned only weeks later\"    # 被废止 (reversal)"
+    messages = build_ambiguity_sampler_messages(
+        target_lang=target_lang,
+        committed_text=committed_text,
+        sampling_mode=sampling_mode,
     )
-    # NOTE: Intentionally do NOT quote the partial English here. The partial
-    # appears ONLY in the prefilled assistant turn below, so the model has no
-    # "second copy" to rewrite from. This is the (a) fix for prefix
-    # regurgitation: the model can only continue the prefill, it cannot
-    # restate the partial because it never sees it as a quotable string.
-    if committed_text and committed_text.strip():
-        user_msg = (
-            f"The assistant turn has been started for you with a partial "
-            f"English sentence (mid-sentence). Continue it from exactly where "
-            f"it ends, by writing 4-15 more words. Do NOT restate, paraphrase, "
-            f"or capitalize the partial; begin mid-sentence in lowercase unless "
-            f"the partial ended with terminal punctuation.\n\n"
-            f"{target_lang} already committed by the interpreter:\n"
-            f"{committed_text}\n\n"
-            f"{axis_hint}\n\n"
-            f"Across your N samples, each continuation MUST pick a DIFFERENT "
-            f"interpretation that would force the interpreter to revise the "
-            f"committed {target_lang}. Output only the continuation text."
-        )
-    else:
-        user_msg = (
-            f"The assistant turn has been started for you with a partial "
-            f"English sentence (mid-sentence). Continue it from exactly where "
-            f"it ends, by writing 4-15 more words. Do NOT restate, paraphrase, "
-            f"or capitalize the partial; begin mid-sentence in lowercase unless "
-            f"the partial ended with terminal punctuation.\n\n"
-            f"{axis_hint}\n\n"
-            f"Across your N samples, each continuation MUST pick a DIFFERENT "
-            f"interpretation of what is currently ambiguous. Output only the "
-            f"continuation text."
-        )
-    messages = [
-        {"role": "system", "content": system_msg},
-        {"role": "user", "content": user_msg},
-    ]
 
     # Apply chat template up to (and including) the assistant turn opener, then
     # prefill the observed source so the model can only generate the continuation.
@@ -927,9 +780,8 @@ def _sample_prefill_one_batch(
         "top_p": top_p,
         "n": num_futures,
         # Push the N samples apart in token space to fight mode collapse.
-        # Reduced from 0.5 → 0.1: with 5 hard-coded axis hints already forcing
-        # divergence, a high presence_penalty stacks as double-divergence and
-        # over-pushes the sampler away from natural high-prob continuations.
+        # Keep this low: the prompt already requests contrastive continuations,
+        # while a large penalty pushes samples away from grammatical futures.
         "presence_penalty": 0.1,
         # Common end-of-turn / line tokens across Qwen / Gemma / Llama families.
         "stop": ["\n\n", "<|im_end|>", "<end_of_turn>", "<|endoftext|>", "<|eot_id|>"],
@@ -979,9 +831,10 @@ def _sample_prefill_one_batch(
         seen.add(key)
         futures.append(cleaned)
         items_info.append({
-            "source": f"targeted_prefill_{axis_tag}",
+            "source": f"targeted_prefill_{sampling_mode}",
             "path": api_model,
             "future": cleaned,
+            "prompt_version": PROMPT_VERSION,
         })
     return futures, items_info
 
@@ -1003,84 +856,47 @@ def sample_source_futures_targeted_prefill(
     sampler2_api_model: str = "",
     sampler2_api_timeout: float = 0.0,
 ) -> Tuple[List[str], List[Dict[str, Any]]]:
-    """C-2/C-3: dual-batch prefill sampler with optional 2nd model ensemble.
-
-    Single-sampler mode (default): runs 2 sub-batches with the same model:
-      - subject continues   (n=num_futures/2)
-      - focus shifts        (n=num_futures/2)
-
-    Dual-sampler mode (when sampler2_* all set): runs 4 sub-batches:
-      - sampler1 × subj_cont    (n=num_futures)
-      - sampler1 × focus_shift  (n=num_futures)
-      - sampler2 × subj_cont    (n=num_futures)
-      - sampler2 × focus_shift  (n=num_futures)
-    Each model produces 2*num_futures raw samples, total 4*num_futures, then
-    cross-batch dedup. The two models come from different families (e.g. gemma
-    + Qwen3) so the prior overlap that locks gemma into mode collapse on
-    "sent [NOUN]" type prefixes is broken by the orthogonal Qwen3 distribution.
-    """
+    """Sample natural and contrastive futures from one or two model families."""
     if not observed_source.strip():
         return [], []
     use_ensemble = bool(sampler2_tokenizer and sampler2_api_base and sampler2_api_model)
-    # PRODUCTION (J): artificial-forcing 5-axis split. Empirically beat both
-    # K-risk (detect-then-expose) and L (softened forcing) on BLEU / Jaccard
-    # / lenRef. The "artificial" requirement (must be named entity / must
-    # use quotes / must read like encyclopedia footnote) is what forces
-    # small models to break out of high-prob defaults — softening or
-    # replacing with risk detection lets the sampler fall back to default
-    # continuations (e.g. 33-36 "letters" futures at chunk 20 in K/L vs
-    # 1-2 "science" variants in J).
-    AXES = [
-        ("subj_cont",    _AXIS_HINT_SUBJECT_CONTINUES),
-        ("named_actor",  _AXIS_HINT_NAMED_ACTOR_ENTERS),
-        ("time_pivot",   _AXIS_HINT_TIME_PIVOT),
-        ("direct_speech",_AXIS_HINT_DIRECT_SPEECH),
-        ("factual",      _AXIS_HINT_FACTUAL_ASIDE),
-    ]
+    modes = ("plausible", "contrastive")
+    mode_counts = {
+        "plausible": max(1, num_futures // 2),
+        "contrastive": max(1, num_futures - num_futures // 2),
+    }
     if use_ensemble:
-        # num_futures is interpreted as "per-model total". With 5 axes that
-        # means num_futures/5 per (model, axis) sub-batch. With the user's
-        # num_futures=20: 4 samples × 5 axes × 2 models = 40 raw samples.
-        per_axis = max(1, num_futures // len(AXES))
         s2_to = sampler2_api_timeout if sampler2_api_timeout and sampler2_api_timeout > 0 else api_timeout
         batches = []
-        for tag, hint in AXES:
+        for mode in modes:
             batches.append(_sample_prefill_one_batch(
                 sampler_tokenizer=sampler_tokenizer,
                 observed_source=observed_source, committed_text=committed_text,
-                target_lang=target_lang, num_futures=per_axis,
-                axis_hint=hint, axis_tag=f"s1_{tag}",
+                target_lang=target_lang, num_futures=mode_counts[mode],
+                sampling_mode=mode,
                 api_base=api_base, api_model=api_model, api_timeout=api_timeout,
                 sample_temperature=sample_temperature, top_p=top_p, max_tokens=max_tokens,
             ))
             batches.append(_sample_prefill_one_batch(
                 sampler_tokenizer=sampler2_tokenizer,
                 observed_source=observed_source, committed_text=committed_text,
-                target_lang=target_lang, num_futures=per_axis,
-                axis_hint=hint, axis_tag=f"s2_{tag}",
+                target_lang=target_lang, num_futures=mode_counts[mode],
+                sampling_mode=mode,
                 api_base=sampler2_api_base, api_model=sampler2_api_model, api_timeout=s2_to,
                 sample_temperature=sample_temperature, top_p=top_p, max_tokens=max_tokens,
             ))
     else:
-        half_a = max(1, num_futures // 2)
-        half_b = max(1, num_futures - half_a)
-        s1_a = _sample_prefill_one_batch(
-            sampler_tokenizer=sampler_tokenizer,
-            observed_source=observed_source, committed_text=committed_text,
-            target_lang=target_lang, num_futures=half_a,
-            axis_hint=_AXIS_HINT_SUBJECT_CONTINUES, axis_tag="subj_cont",
-            api_base=api_base, api_model=api_model, api_timeout=api_timeout,
-            sample_temperature=sample_temperature, top_p=top_p, max_tokens=max_tokens,
-        )
-        s1_b = _sample_prefill_one_batch(
-            sampler_tokenizer=sampler_tokenizer,
-            observed_source=observed_source, committed_text=committed_text,
-            target_lang=target_lang, num_futures=half_b,
-            axis_hint=_AXIS_HINT_FOCUS_SHIFTS, axis_tag="focus_shift",
-            api_base=api_base, api_model=api_model, api_timeout=api_timeout,
-            sample_temperature=sample_temperature, top_p=top_p, max_tokens=max_tokens,
-        )
-        batches = [s1_a, s1_b]
+        batches = [
+            _sample_prefill_one_batch(
+                sampler_tokenizer=sampler_tokenizer,
+                observed_source=observed_source, committed_text=committed_text,
+                target_lang=target_lang, num_futures=mode_counts[mode],
+                sampling_mode=mode,
+                api_base=api_base, api_model=api_model, api_timeout=api_timeout,
+                sample_temperature=sample_temperature, top_p=top_p, max_tokens=max_tokens,
+            )
+            for mode in modes
+        ]
     # Merge with cross-batch dedup (lowercased).
     seen = set()
     merged_f: List[str] = []
