@@ -76,6 +76,12 @@ echo "embedding_model : ${EMBEDDING_MODEL}"
 echo "task_lang       : ${TASK_LANG}"
 echo "node            : ${SLURMD_NODENAME:-$(hostname)}  gpu=${CUDA_VISIBLE_DEVICES:-?}"
 
+requeue_job() {
+  echo "[REQUEUE] $1; requeueing ${SLURM_JOB_ID}"
+  scontrol requeue "${SLURM_JOB_ID}" || true
+  exit 0
+}
+
 # GPU free-memory precheck. preempt occasionally packs us onto a physical GPU
 # another tenant is already using (~40 GiB resident); loading LaBSE then OOMs
 # in seconds with exit 1, and SLURM --requeue does NOT auto-requeue user-code
@@ -85,11 +91,17 @@ GPU_FREE_MB=$(nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits 2
               | awk 'NR==1{gsub(/[^0-9]/, "", $0); print}')
 echo "gpu free        : ${GPU_FREE_MB:-?} MB  (require >= ${MIN_FREE_MB} MB)"
 if [[ -z "${GPU_FREE_MB}" || "${GPU_FREE_MB}" -lt "${MIN_FREE_MB}" ]]; then
-  echo "[REQUEUE] insufficient GPU memory on ${SLURMD_NODENAME:-$(hostname)} (free=${GPU_FREE_MB:-?} MB); requeueing ${SLURM_JOB_ID}"
-  scontrol requeue "${SLURM_JOB_ID}" || true
-  exit 0
+  requeue_job "insufficient GPU memory on ${SLURMD_NODENAME:-$(hostname)} (free=${GPU_FREE_MB:-?} MB)"
 fi
 
+GPU_ECC_ERRORS=$(nvidia-smi --query-gpu=ecc.errors.uncorrected.volatile.total \
+  --format=csv,noheader,nounits 2>/dev/null | awk 'NR==1{gsub(/[^0-9]/, "", $0); print}')
+echo "uncorrected ECC : ${GPU_ECC_ERRORS:-unknown}"
+if [[ "${GPU_ECC_ERRORS:-}" =~ ^[0-9]+$ ]] && (( GPU_ECC_ERRORS > 0 )); then
+  requeue_job "GPU has ${GPU_ECC_ERRORS} volatile uncorrectable ECC errors on ${SLURMD_NODENAME:-$(hostname)}"
+fi
+
+set +e
 segale-align \
   --system_file "${SYSTEM_FILE}" \
   --ref_file    "${REF_FILE}" \
@@ -98,6 +110,18 @@ segale-align \
   --proc_device "${PROC_DEVICE}" \
   --embedding_model "${EMBEDDING_MODEL}" \
   --max_size    "${MAX_SIZE}"
+ALIGN_RC=$?
+set -e
+
+if (( ALIGN_RC != 0 )); then
+  GPU_ECC_ERRORS=$(nvidia-smi --query-gpu=ecc.errors.uncorrected.volatile.total \
+    --format=csv,noheader,nounits 2>/dev/null | awk 'NR==1{gsub(/[^0-9]/, "", $0); print}')
+  if [[ "${GPU_ECC_ERRORS:-}" =~ ^[0-9]+$ ]] && (( GPU_ECC_ERRORS > 0 )); then
+    requeue_job "alignment exited ${ALIGN_RC} after GPU reported ${GPU_ECC_ERRORS} uncorrectable ECC errors"
+  fi
+  echo "ERROR: segale-align exited ${ALIGN_RC}" >&2
+  exit "${ALIGN_RC}"
+fi
 
 if [[ ! -s "${ALIGNED}" ]]; then
   echo "ERROR: expected aligned output missing or empty: ${ALIGNED}"
