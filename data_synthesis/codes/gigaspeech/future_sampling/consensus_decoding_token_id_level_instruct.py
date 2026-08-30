@@ -936,6 +936,63 @@ def select_diverse_futures(
     return selected
 
 
+def sampler_display_name(model: str) -> str:
+    return {
+        "gemma4-sampler": "Gemma 4",
+        "qwen38-sampler": "Qwen 3.8",
+    }.get(model, model)
+
+
+def format_raw_future_groups(audit: List[Dict[str, Any]]) -> List[str]:
+    """Render raw samples as four readable model/mode sections."""
+    groups: Dict[Tuple[str, str], List[Dict[str, Any]]] = {}
+    for item in audit:
+        key = (str(item.get("model", "?")), str(item.get("mode", "?")))
+        groups.setdefault(key, []).append(item)
+
+    lines: List[str] = []
+    for (model, mode), items in groups.items():
+        lines.append(
+            f"[Raw candidates] {sampler_display_name(model)} | "
+            f"model={model} mode={mode} count={len(items)}"
+        )
+        for index, item in enumerate(items, 1):
+            shown = item.get("future") or item.get("raw") or ""
+            lines.append(f"  {index:02d}. {shown!r}")
+        reasons = Counter(
+            str(item.get("reason", "unknown"))
+            for item in items
+            if not item.get("accepted")
+        )
+        kept = sum(bool(item.get("accepted")) for item in items)
+        dropped = ", ".join(f"{reason}={count}" for reason, count in sorted(reasons.items()))
+        lines.append(f"  Filter summary: kept={kept}/{len(items)}; dropped: {dropped or 'none'}")
+    return lines
+
+
+def format_selected_future_groups(
+    futures: List[str],
+    future_infos: List[Dict[str, Any]],
+) -> List[str]:
+    """Render candidates used by consensus without repeated per-line labels."""
+    groups: Dict[Tuple[str, str], List[str]] = {}
+    for index, future in enumerate(futures):
+        info = future_infos[index] if index < len(future_infos) else {}
+        label = str(info.get("source", "?"))
+        model = str(info.get("model") or info.get("path") or "?")
+        mode = str(info.get("mode") or label.removeprefix("targeted_prefill_"))
+        groups.setdefault((model, mode), []).append(future)
+
+    lines: List[str] = []
+    for (model, mode), items in groups.items():
+        lines.append(
+            f"[Selected candidates] {sampler_display_name(model)} | "
+            f"model={model} mode={mode} count={len(items)}"
+        )
+        lines.extend(f"  {index:02d}. {future!r}" for index, future in enumerate(items, 1))
+    return lines
+
+
 def sample_source_futures_targeted_prefill(
     sampler_tokenizer: Any,
     observed_source: str,
@@ -1663,33 +1720,12 @@ def run_one_utterance(
             accepted_raw = sum(bool(item.get("accepted")) for item in future_audit)
             _vlog(verbose_log_file,
                   f"[Step 1-1] raw_future_sampling total={len(future_audit)} accepted={accepted_raw}")
-            for ai, item in enumerate(future_audit):
-                status = "ACCEPTED" if item.get("accepted") else "DROPPED"
-                shown = item.get("future") or item.get("raw") or ""
-                _vlog(
-                    verbose_log_file,
-                    f"  raw_future[{ai}] model={item.get('model', '?')} "
-                    f"mode={item.get('mode', '?')} status={status} "
-                    f"reason={item.get('reason', '?')}: {shown!r}",
-                )
+            for line in format_raw_future_groups(future_audit):
+                _vlog(verbose_log_file, line)
         _vlog(verbose_log_file, f"[Step 1-2] future_sampling total={len(futures)}")
         if verbose_log_file is not None:
-            for fi, ftxt in enumerate(futures):
-                info = future_infos[fi] if fi < len(future_infos) else {}
-                label = info.get("source", "?")
-                model = info.get("model") or info.get("path") or "?"
-                mode = info.get("mode") or str(label).removeprefix("targeted_prefill_")
-                # For targeted instruct, also surface span/branch so we can later
-                # validate whether the instruct model is finding real ambiguities.
-                span = info.get("span")
-                branch = info.get("branch")
-                if span or branch:
-                    _vlog(verbose_log_file,
-                          f"  future[{fi}] model={model} mode={mode} "
-                          f"span={span!r} branch={branch!r}: {ftxt!r}")
-                else:
-                    _vlog(verbose_log_file,
-                          f"  future[{fi}] model={model} mode={mode}: {ftxt!r}")
+            for line in format_selected_future_groups(futures, future_infos):
+                _vlog(verbose_log_file, line)
 
         if len(futures) <= 3: #future太少无法做共识，等待更多源语言输入
             target_deltas.append("")

@@ -16,6 +16,10 @@ from typing import Any
 CHUNK_RE = re.compile(r"^Chunk (\d+)/(\d+)$")
 FUTURE_RE = re.compile(r"^future\[\d+\] model=(\S+) mode=(\S+): (.+)$")
 LEGACY_FUTURE_RE = re.compile(r"^future\[\d+\] \(([^)]+)\): (.+)$")
+SELECTED_HEADER_RE = re.compile(
+    r"^\[Selected candidates\].*\| model=(\S+) mode=(\S+) count=\d+$"
+)
+NUMBERED_FUTURE_RE = re.compile(r"^\d+\.\s+(.+)$")
 META_MARKERS = (
     "the prompt", "user prompt", "assistant turn", "sampling mode",
     "unfinished english prefix", "let's think", "4-15 words", "<think>",
@@ -45,6 +49,7 @@ def lexical_diversity(texts: list[str]) -> float:
 def parse_verbose(path: Path) -> list[dict[str, Any]]:
     chunks: list[dict[str, Any]] = []
     current: dict[str, Any] | None = None
+    selected_group: tuple[str, str] | None = None
     for raw_line in path.read_text(encoding="utf-8", errors="replace").splitlines():
         line = raw_line.strip()
         match = CHUNK_RE.match(line)
@@ -57,6 +62,7 @@ def parse_verbose(path: Path) -> list[dict[str, Any]]:
                 "action": "",
             }
             chunks.append(current)
+            selected_group = None
             continue
         if current is None:
             continue
@@ -65,6 +71,20 @@ def parse_verbose(path: Path) -> list[dict[str, Any]]:
         elif line.startswith("committed_before: "):
             current["committed_before"] = parse_repr(line.split(": ", 1)[1])
         else:
+            selected_match = SELECTED_HEADER_RE.match(line)
+            if selected_match:
+                selected_group = (selected_match.group(1), selected_match.group(2))
+                continue
+            if line.startswith("[Raw candidates]") or line.startswith("[Step "):
+                selected_group = None
+            numbered_match = NUMBERED_FUTURE_RE.match(line)
+            if selected_group and numbered_match:
+                current["futures"].append({
+                    "model": selected_group[0],
+                    "mode": selected_group[1],
+                    "text": parse_repr(numbered_match.group(1)),
+                })
+                continue
             future_match = FUTURE_RE.match(line)
             if future_match:
                 current["futures"].append({
