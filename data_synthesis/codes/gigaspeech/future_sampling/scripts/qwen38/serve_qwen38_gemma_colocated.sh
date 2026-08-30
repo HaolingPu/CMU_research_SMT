@@ -13,8 +13,8 @@ GEMMA_MODEL="${GEMMA_MODEL:-/data/user_data/haolingp/models/gemma-4-E2B-it}"
 GPU="${GPU:-0}"
 QWEN_PORT="${QWEN_PORT:-8310}"
 GEMMA_PORT="${GEMMA_PORT:-8311}"
-QWEN_GPU_MEM_UTIL="${QWEN_GPU_MEM_UTIL:-0.72}"
-GEMMA_GPU_MEM_UTIL="${GEMMA_GPU_MEM_UTIL:-0.22}"
+QWEN_GPU_MEM_UTIL="${QWEN_GPU_MEM_UTIL:-0.70}"
+GEMMA_GPU_MEM_UTIL="${GEMMA_GPU_MEM_UTIL:-0.23}"
 QWEN_MAX_LEN="${QWEN_MAX_LEN:-4096}"
 GEMMA_MAX_LEN="${GEMMA_MAX_LEN:-4096}"
 QWEN_MAX_NUM_SEQS="${QWEN_MAX_NUM_SEQS:-16}"
@@ -106,6 +106,7 @@ wait_health qwen38 "${QWEN_PORT}" "${QWEN_PID_FILE}"
   --gpu-memory-utilization "${GEMMA_GPU_MEM_UTIL}" \
   --limit-mm-per-prompt '{"image":0,"video":0,"audio":0}' \
   --trust-remote-code \
+  --enforce-eager \
   >"${LOG_DIR}/gemma4.log" 2>&1 &
 echo $! >"${GEMMA_PID_FILE}"
 wait_health gemma4 "${GEMMA_PORT}" "${GEMMA_PID_FILE}"
@@ -114,4 +115,3 @@ nvidia-smi --query-compute-apps=pid,used_memory --format=csv
 echo "Qwen endpoint: http://127.0.0.1:${QWEN_PORT}/v1"
 echo "Gemma endpoint: http://127.0.0.1:${GEMMA_PORT}/v1"
 wait
-
