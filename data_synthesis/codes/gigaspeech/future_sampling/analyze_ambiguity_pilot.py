@@ -14,7 +14,8 @@ from typing import Any
 
 
 CHUNK_RE = re.compile(r"^Chunk (\d+)/(\d+)$")
-FUTURE_RE = re.compile(r"^future\[\d+\] \(([^)]+)\): (.+)$")
+FUTURE_RE = re.compile(r"^future\[\d+\] model=(\S+) mode=(\S+): (.+)$")
+LEGACY_FUTURE_RE = re.compile(r"^future\[\d+\] \(([^)]+)\): (.+)$")
 META_MARKERS = (
     "the prompt", "user prompt", "assistant turn", "sampling mode",
     "unfinished english prefix", "let's think", "4-15 words", "<think>",
@@ -67,10 +68,19 @@ def parse_verbose(path: Path) -> list[dict[str, Any]]:
             future_match = FUTURE_RE.match(line)
             if future_match:
                 current["futures"].append({
-                    "mode": future_match.group(1).removeprefix("targeted_prefill_"),
-                    "text": parse_repr(future_match.group(2)),
+                    "model": future_match.group(1),
+                    "mode": future_match.group(2),
+                    "text": parse_repr(future_match.group(3)),
                 })
-            elif "commit_after_trim=" in line:
+            else:
+                legacy_match = LEGACY_FUTURE_RE.match(line)
+                if legacy_match:
+                    current["futures"].append({
+                        "model": "unknown",
+                        "mode": legacy_match.group(1).removeprefix("targeted_prefill_"),
+                        "text": parse_repr(legacy_match.group(2)),
+                    })
+            if "commit_after_trim=" in line:
                 current["commit"] = parse_repr(line.split("commit_after_trim=", 1)[1])
             elif line.startswith("-> "):
                 current["action"] = line.split()[1]
@@ -156,11 +166,11 @@ def render_markdown(cases: list[dict[str, Any]], root: Path) -> str:
             lines.extend([
                 "", f"### Chunk {chunk['index']}/{chunk['total']}", "",
                 f"Source prefix: `{chunk.get('source_prefix', '')}`", "",
-                "| Mode | Future |", "|---|---|",
+                "| Model | Mode | Future |", "|---|---|---|",
             ])
             for future in chunk["futures"]:
                 text = future["text"].replace("|", "\\|")
-                lines.append(f"| {future['mode']} | {text} |")
+                lines.append(f"| {future.get('model', 'unknown')} | {future['mode']} | {text} |")
             lines.append("")
             lines.append(f"Decision: `{chunk.get('action', '')}`; commit: `{chunk.get('commit', '')}`")
     return "\n".join(lines) + "\n"

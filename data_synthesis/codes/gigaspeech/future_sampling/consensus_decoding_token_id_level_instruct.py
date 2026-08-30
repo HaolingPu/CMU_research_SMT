@@ -819,9 +819,7 @@ def _sample_prefill_one_batch(
     # Use a min length to avoid false-positives on very short partials.
     partial_norm_min_len = max(8, len(partial_norm) // 2)
 
-    futures: List[str] = []
-    items_info: List[Dict[str, Any]] = []
-    seen: set = set()
+    candidates: List[str] = []
     for choice in choices:
         raw = str(choice.get("text", "")) if isinstance(choice, dict) else ""
         cleaned = strip_markdown_wrappers(raw.strip())
@@ -835,6 +833,11 @@ def _sample_prefill_one_batch(
         cleaned = re.sub(r"^[\.\s…\-]+", "", cleaned)
         if not cleaned or not is_valid_future_text(cleaned):
             continue
+        # A one-word fragment rarely carries enough evidence to test whether a
+        # translation commitment is safe. Require a short phrase while keeping
+        # genuinely concise continuations available.
+        if len(re.findall(r"[A-Za-z0-9']+", cleaned)) < 3:
+            continue
         # (c) Hard-drop continuations that contain the partial (or a long
         # substring of it) anywhere — handles restart/capitalization cases
         # where the model rewrote the partial before its actual continuation.
@@ -842,18 +845,62 @@ def _sample_prefill_one_batch(
             cleaned_norm = _norm_for_dup(cleaned)
             if partial_norm in cleaned_norm:
                 continue
-        key = cleaned.lower()
-        if key in seen:
-            continue
-        seen.add(key)
-        futures.append(cleaned)
+        candidates.append(cleaned)
+
+    futures = select_diverse_futures(candidates)
+    items_info: List[Dict[str, Any]] = []
+    for cleaned in futures:
         items_info.append({
             "source": f"targeted_prefill_{sampling_mode}",
             "path": api_model,
+            "model": api_model,
+            "mode": sampling_mode,
             "future": cleaned,
             "prompt_version": PROMPT_VERSION,
         })
     return futures, items_info
+
+
+def select_diverse_futures(
+    candidates: List[str],
+    *,
+    max_same_opening: int = 1,
+    similarity_threshold: float = 0.65,
+) -> List[str]:
+    """Remove lexical mode collapse within one model/mode sample batch."""
+    selected: List[str] = []
+    selected_tokens: List[set[str]] = []
+    opening_counts: Dict[str, int] = {}
+    seen: set[str] = set()
+    opening_stopwords = {
+        "a", "an", "and", "are", "as", "at", "be", "but", "by", "for",
+        "from", "has", "have", "he", "her", "his", "in", "is", "it", "its",
+        "of", "on", "or", "she", "that", "the", "their", "they", "this", "to",
+        "was", "were", "which", "who", "with", "would",
+    }
+
+    for candidate in candidates:
+        normalized = re.sub(r"\s+", " ", candidate.strip().lower())
+        if normalized in seen:
+            continue
+        tokens = re.findall(r"[a-z0-9']+", normalized)
+        if not tokens:
+            continue
+        opening = next((token for token in tokens if token not in opening_stopwords), tokens[0])
+        if opening_counts.get(opening, 0) >= max_same_opening:
+            continue
+        token_set = set(tokens)
+        if any(
+            len(token_set & prior) / len(token_set | prior) >= similarity_threshold
+            for prior in selected_tokens
+            if token_set | prior
+        ):
+            continue
+        seen.add(normalized)
+        opening_counts[opening] = opening_counts.get(opening, 0) + 1
+        selected.append(candidate)
+        selected_tokens.append(token_set)
+    return selected
 
 
 def sample_source_futures_targeted_prefill(
@@ -885,23 +932,22 @@ def sample_source_futures_targeted_prefill(
     if use_ensemble:
         s2_to = sampler2_api_timeout if sampler2_api_timeout and sampler2_api_timeout > 0 else api_timeout
         batches = []
-        for mode in modes:
-            batches.append(_sample_prefill_one_batch(
-                sampler_tokenizer=sampler_tokenizer,
-                observed_source=observed_source, committed_text=committed_text,
-                target_lang=target_lang, num_futures=mode_counts[mode],
-                sampling_mode=mode,
-                api_base=api_base, api_model=api_model, api_timeout=api_timeout,
-                sample_temperature=sample_temperature, top_p=top_p, max_tokens=max_tokens,
-            ))
-            batches.append(_sample_prefill_one_batch(
-                sampler_tokenizer=sampler2_tokenizer,
-                observed_source=observed_source, committed_text=committed_text,
-                target_lang=target_lang, num_futures=mode_counts[mode],
-                sampling_mode=mode,
-                api_base=sampler2_api_base, api_model=sampler2_api_model, api_timeout=s2_to,
-                sample_temperature=sample_temperature, top_p=top_p, max_tokens=max_tokens,
-            ))
+        model_specs = (
+            (sampler_tokenizer, api_base, api_model, api_timeout),
+            (sampler2_tokenizer, sampler2_api_base, sampler2_api_model, s2_to),
+        )
+        # Keep model groups contiguous so verbose logs show all Gemma outputs,
+        # followed by all Qwen outputs, with plausible then contrastive in each.
+        for model_tokenizer, model_base, model_name, model_timeout in model_specs:
+            for mode in modes:
+                batches.append(_sample_prefill_one_batch(
+                    sampler_tokenizer=model_tokenizer,
+                    observed_source=observed_source, committed_text=committed_text,
+                    target_lang=target_lang, num_futures=mode_counts[mode],
+                    sampling_mode=mode,
+                    api_base=model_base, api_model=model_name, api_timeout=model_timeout,
+                    sample_temperature=sample_temperature, top_p=top_p, max_tokens=max_tokens,
+                ))
     else:
         batches = [
             _sample_prefill_one_batch(
@@ -914,16 +960,12 @@ def sample_source_futures_targeted_prefill(
             )
             for mode in modes
         ]
-    # Merge with cross-batch dedup (lowercased).
-    seen = set()
+    # Preserve cross-model agreement as two independent votes. Each model/mode
+    # batch has already removed exact and near-duplicate candidates.
     merged_f: List[str] = []
     merged_i: List[Dict[str, Any]] = []
     for futs, infos in batches:
         for f, info in zip(futs, infos):
-            k = f.lower()
-            if k in seen:
-                continue
-            seen.add(k)
             merged_f.append(f)
             merged_i.append(info)
     return merged_f, merged_i
@@ -1586,15 +1628,19 @@ def run_one_utterance(
             for fi, ftxt in enumerate(futures):
                 info = future_infos[fi] if fi < len(future_infos) else {}
                 label = info.get("source", "?")
+                model = info.get("model") or info.get("path") or "?"
+                mode = info.get("mode") or str(label).removeprefix("targeted_prefill_")
                 # For targeted instruct, also surface span/branch so we can later
                 # validate whether the instruct model is finding real ambiguities.
                 span = info.get("span")
                 branch = info.get("branch")
                 if span or branch:
                     _vlog(verbose_log_file,
-                          f"  future[{fi}] ({label}) span={span!r} branch={branch!r}: {ftxt!r}")
+                          f"  future[{fi}] model={model} mode={mode} "
+                          f"span={span!r} branch={branch!r}: {ftxt!r}")
                 else:
-                    _vlog(verbose_log_file, f"  future[{fi}] ({label}): {ftxt!r}")
+                    _vlog(verbose_log_file,
+                          f"  future[{fi}] model={model} mode={mode}: {ftxt!r}")
 
         if len(futures) <= 3: #future太少无法做共识，等待更多源语言输入
             target_deltas.append("")

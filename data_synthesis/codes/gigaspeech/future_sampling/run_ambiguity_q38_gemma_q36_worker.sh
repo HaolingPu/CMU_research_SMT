@@ -137,6 +137,6 @@ if (( actual != ROWS_PER_TASK )); then
   echo "[ERROR] wrote ${actual}/${ROWS_PER_TASK} outputs" >&2
   exit 1
 fi
-printf 'task=%s rows=%s elapsed_seconds=%s prompt=ambiguity_icl_v1\n' \
+printf 'task=%s rows=%s elapsed_seconds=%s prompt=ambiguity_icl_v2\n' \
   "${TASK_ID}" "${actual}" "$(( $(date +%s) - start_ts ))" >"${DONE_FILE}"
 echo "[DONE] task ${TASK_ID}: ${actual} rows"

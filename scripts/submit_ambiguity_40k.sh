@@ -69,7 +69,7 @@ Decode                : ${TOTAL_ROWS} rows, ${NUM_DECODE_TASKS} tasks, ${DECODE_
 Decode GPUs           : 2/job x ${DECODE_CONCURRENCY} = $((2 * DECODE_CONCURRENCY))
 GPU 0                 : Qwen3.8-27B-FP8 + Gemma-4-E2B samplers
 GPU 1                 : Qwen3.6-35B-A3B-FP8 translator/probe
-Sampler prompt        : ambiguity_icl_v1 (plausible + contrastive)
+Sampler prompt        : ambiguity_icl_v2 (plausible + contrastive)
 Consensus             : min_voters_ratio=${MIN_VOTERS_RATIO}
 Post-processing       : SEGALE ${NUM_POST_SHARDS} shards, MetricX QE <= ${QE_THRESHOLD}, length ${MIN_RATIO_REF}:${MAX_RATIO_REF}
 Training sample target: ${TRAIN_SAMPLE_N} (0 means all surviving examples)

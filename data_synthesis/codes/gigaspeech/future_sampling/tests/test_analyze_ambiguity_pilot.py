@@ -29,8 +29,8 @@ class AnalyzeAmbiguityPilotTest(unittest.TestCase):
             verbose.write_text(
                 "Chunk 1/2\n"
                 "future_source_prefix: 'The bank'\n"
-                "future[0] (targeted_prefill_plausible): 'approved the loan'\n"
-                "future[1] (targeted_prefill_contrastive): 'collapsed after rain'\n"
+                "future[0] model=gemma4-sampler mode=plausible: 'approved the loan'\n"
+                "future[1] model=qwen38-sampler mode=contrastive: 'collapsed after rain'\n"
                 "[Step 6-7] commit_after_trim=''\n"
                 "-> READ (too few futures)\n",
                 encoding="utf-8",
@@ -40,6 +40,7 @@ class AnalyzeAmbiguityPilotTest(unittest.TestCase):
             self.assertEqual(case["too_few_chunks"], 1)
             self.assertEqual(case["meta_leakage"], [])
             self.assertEqual(case["chunks"][0]["action"], "READ")
+            self.assertEqual(case["chunks"][0]["futures"][0]["model"], "gemma4-sampler")
 
 
 if __name__ == "__main__":

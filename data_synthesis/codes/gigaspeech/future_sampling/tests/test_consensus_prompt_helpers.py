@@ -54,6 +54,19 @@ class ConsensusPromptHelpersTest(unittest.TestCase):
         self.assertFalse(decoder.is_valid_future_text("word " * 21))
         self.assertTrue(decoder.is_valid_future_text("collapsed after the heavy rain"))
 
+    def test_diversity_filter_caps_repeated_openings_and_near_duplicates(self) -> None:
+        selected = decoder.select_diverse_futures([
+            "crucial for training the model",
+            "crucial for training a larger model",
+            "crucial for training the final model",
+            "important for understanding the historical setting",
+            "important for understanding this historical setting",
+            "inevitably repetitive and less useful than intended",
+        ])
+        self.assertEqual(sum(text.startswith("crucial") for text in selected), 1)
+        self.assertEqual(sum(text.startswith("important") for text in selected), 1)
+        self.assertIn("inevitably repetitive and less useful than intended", selected)
+
 
 if __name__ == "__main__":
     unittest.main()

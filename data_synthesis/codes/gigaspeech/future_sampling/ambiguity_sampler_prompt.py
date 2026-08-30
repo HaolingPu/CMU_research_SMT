@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Dict
 
 
-PROMPT_VERSION = "ambiguity_icl_v1"
+PROMPT_VERSION = "ambiguity_icl_v2"
 
 SAMPLING_DIRECTIVES: Dict[str, str] = {
     "plausible": (
@@ -45,6 +45,13 @@ Rules:
 - Produce only continuation text: no analysis, labels, JSON, markdown, or {target_lang}.
 - Do not repeat or paraphrase the observed prefix.
 - Keep the continuation grammatical and locally coherent.
+- Respect the exact syntax created by the final words of the prefix. Your first
+  generated word must fit immediately after the prefix.
+- Stay in the topic and register established by the observed words. Do not invent
+  a technical, business, scientific, or data-analysis setting unless the prefix
+  already provides evidence for it.
+- Across independent samples, vary the first content word and the semantic
+  outcome. Avoid formulaic repetitions with only the final noun changed.
 - Resolve an uncertainty concretely instead of merely remaining ambiguous.
 
 In-context examples:
@@ -76,6 +83,13 @@ Partial: "The proposal was not"
 Possible futures:
 - "only feasible but considerably cheaper than expected" (not only)
 - "acceptable to the committee in its current form" (negative evaluation)
+
+Partial: "These introductions are"
+Possible futures:
+- "brief but necessary for understanding the historical setting"
+- "inevitably repetitive and less useful than the editor intended"
+Bad continuation:
+- "crucial for training the model" (unsupported change to a technical topic)
 """
 
     committed = committed_text.strip()

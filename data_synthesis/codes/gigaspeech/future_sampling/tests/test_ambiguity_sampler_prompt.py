@@ -20,12 +20,14 @@ class AmbiguitySamplerPromptTest(unittest.TestCase):
             sampling_mode="contrastive",
         )
         prompt = "\n".join(message["content"] for message in messages)
-        self.assertEqual(PROMPT_VERSION, "ambiguity_icl_v1")
+        self.assertEqual(PROMPT_VERSION, "ambiguity_icl_v2")
         self.assertIn('Partial: "The bank"', prompt)
         self.assertIn('Partial: "The agreement', prompt)
         self.assertIn("translation", prompt)
         self.assertNotIn("five-axis", prompt.lower())
         self.assertNotIn("axis (a)", prompt.lower())
+        self.assertIn("unsupported change to a technical topic", prompt)
+        self.assertIn("vary the first content word", prompt)
 
     def test_committed_translation_is_included(self) -> None:
         messages = build_ambiguity_sampler_messages(
