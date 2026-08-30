@@ -17,7 +17,7 @@ CHUNK_RE = re.compile(r"^Chunk (\d+)/(\d+)$")
 FUTURE_RE = re.compile(r"^future\[\d+\] model=(\S+) mode=(\S+): (.+)$")
 LEGACY_FUTURE_RE = re.compile(r"^future\[\d+\] \(([^)]+)\): (.+)$")
 SELECTED_HEADER_RE = re.compile(
-    r"^\[Selected candidates\].*\| model=(\S+) mode=(\S+) count=\d+$"
+    r"^\[Selected candidates\].*\| model=(\S+) (?:mode|set)=(\S+) count=\d+$"
 )
 NUMBERED_FUTURE_RE = re.compile(r"^\d+\.\s+(.+)$")
 META_MARKERS = (

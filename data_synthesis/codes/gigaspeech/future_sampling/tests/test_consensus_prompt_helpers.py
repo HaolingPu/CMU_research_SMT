@@ -68,21 +68,20 @@ class ConsensusPromptHelpersTest(unittest.TestCase):
         self.assertEqual(sum(text.startswith("important") for text in selected), 1)
         self.assertIn("inevitably repetitive and less useful than intended", selected)
 
-    def test_targeted_batch_audits_model_and_filter_status(self) -> None:
-        response = {"choices": [
-            {"text": "crucial for training models"},
-            {"text": "crucial for testing systems"},
-            {"text": "brief but historically grounded"},
-            {"text": "unclear"},
-        ]}
+    def test_coordinated_set_audits_model_and_filter_status(self) -> None:
+        response = {"choices": [{"text": (
+            "1. crucial for training models\n"
+            "2. crucial for testing systems\n"
+            "3. brief but historically grounded\n"
+            "4. unclear\n"
+        )}]}
         with patch.object(decoder, "_http_json", return_value=response):
-            futures, infos, audit = decoder._sample_prefill_one_batch(
+            futures, infos, audit = decoder._sample_coordinated_future_set(
                 sampler_tokenizer=FakeTokenizer(),
                 observed_source="These introductions are",
                 committed_text="",
                 target_lang="Chinese",
                 num_futures=4,
-                sampling_mode="plausible",
                 api_base="http://localhost:1/v1",
                 api_model="gemma4-sampler",
                 api_timeout=1.0,
@@ -98,12 +97,13 @@ class ConsensusPromptHelpersTest(unittest.TestCase):
         lines = decoder.format_raw_future_groups(audit)
         self.assertIn("[Raw candidates] Gemma 4 |", lines[0])
         self.assertEqual(sum("model=gemma4-sampler" in line for line in lines), 1)
+        self.assertIn("set=coordinated", lines[0])
         self.assertFalse(any("status=" in line for line in lines))
         self.assertTrue(any("Filter summary: kept=2/4" in line for line in lines))
 
         selected = decoder.format_selected_future_groups(futures, infos)
         self.assertIn("[Selected candidates] Gemma 4 |", selected[0])
-        self.assertEqual(sum("mode=plausible" in line for line in selected), 1)
+        self.assertEqual(sum("set=coordinated" in line for line in selected), 1)
 
 
 if __name__ == "__main__":

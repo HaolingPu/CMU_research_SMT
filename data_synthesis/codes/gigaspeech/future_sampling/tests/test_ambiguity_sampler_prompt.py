@@ -8,41 +8,44 @@ sys.path.insert(0, str(MODULE_DIR))
 
 from ambiguity_sampler_prompt import (  # noqa: E402
     PROMPT_VERSION,
-    build_ambiguity_sampler_messages,
+    build_coordinated_future_messages,
 )
 
 
-class AmbiguitySamplerPromptTest(unittest.TestCase):
-    def test_prompt_is_general_and_contains_icl_examples(self) -> None:
-        messages = build_ambiguity_sampler_messages(
+class CoordinatedFuturePromptTest(unittest.TestCase):
+    def test_prompt_requests_one_natural_coordinated_set(self) -> None:
+        messages = build_coordinated_future_messages(
+            observed_source="The bank",
             target_lang="Chinese",
             committed_text="",
-            sampling_mode="contrastive",
+            num_candidates=10,
         )
         prompt = "\n".join(message["content"] for message in messages)
-        self.assertEqual(PROMPT_VERSION, "ambiguity_icl_v2")
-        self.assertIn('Partial: "The bank"', prompt)
-        self.assertIn('Partial: "The agreement', prompt)
-        self.assertIn("translation", prompt)
-        self.assertNotIn("five-axis", prompt.lower())
-        self.assertNotIn("axis (a)", prompt.lower())
-        self.assertIn("unsupported change to a technical topic", prompt)
-        self.assertIn("vary the first content word", prompt)
+        self.assertEqual(PROMPT_VERSION, "future_set_v1")
+        self.assertIn("Observed English prefix:\nThe bank", prompt)
+        self.assertIn("exactly 10 continuations", prompt)
+        self.assertIn("Plan the complete set", prompt)
+        self.assertIn("mutually distinct", prompt)
+        self.assertNotIn("plausible mode", prompt.lower())
+        self.assertNotIn("contrastive", prompt.lower())
+        self.assertNotIn("These introductions are", prompt)
 
     def test_committed_translation_is_included(self) -> None:
-        messages = build_ambiguity_sampler_messages(
+        messages = build_coordinated_future_messages(
+            observed_source="The bank",
             target_lang="Chinese",
             committed_text="this-prefix",
-            sampling_mode="plausible",
+            num_candidates=10,
         )
         self.assertIn("this-prefix", messages[1]["content"])
 
-    def test_unknown_mode_is_rejected(self) -> None:
+    def test_invalid_requests_are_rejected(self) -> None:
         with self.assertRaises(ValueError):
-            build_ambiguity_sampler_messages(
+            build_coordinated_future_messages(
+                observed_source="",
                 target_lang="Chinese",
                 committed_text="",
-                sampling_mode="axis5",
+                num_candidates=10,
             )
 
 

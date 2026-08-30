@@ -1,111 +1,56 @@
-"""Reviewable prompt for translation-relevant future sampling."""
+"""Prompt for one coordinated set of natural future continuations."""
 
 from __future__ import annotations
 
-from typing import Dict
+
+PROMPT_VERSION = "future_set_v1"
 
 
-PROMPT_VERSION = "ambiguity_icl_v2"
-
-SAMPLING_DIRECTIVES: Dict[str, str] = {
-    "plausible": (
-        "Generate a natural, high-probability continuation. Commit to one concrete "
-        "interpretation rather than staying vague."
-    ),
-    "contrastive": (
-        "Generate a less obvious but still genuinely plausible continuation that "
-        "resolves an uncertainty differently enough to change how some part of the "
-        "observed English should be translated. Do not create arbitrary topic drift."
-    ),
-}
-
-
-def build_ambiguity_sampler_messages(
+def build_coordinated_future_messages(
     *,
+    observed_source: str,
     target_lang: str,
     committed_text: str,
-    sampling_mode: str,
+    num_candidates: int,
 ) -> list[dict[str, str]]:
-    """Build the sampler messages without repeating the observed source prefix.
-
-    The caller appends the observed prefix to the assistant turn. Keeping it out of
-    the user message prevents the model from copying or paraphrasing the prefix.
-    """
-    try:
-        directive = SAMPLING_DIRECTIVES[sampling_mode]
-    except KeyError as exc:
-        raise ValueError(f"unknown sampling mode: {sampling_mode}") from exc
-
-    system = f"""You generate possible future English continuations for a simultaneous English-to-{target_lang} interpreter.
-
-Goal: expose uncertainty that matters to translation. A useful pair of futures is both plausible after the observed prefix but would make a careful translator choose different wording, grammar, reference, or commitment timing. Differences that only add unrelated facts or decorative details are not useful.
-
-Rules:
-- Continue the unfinished English directly with 4-15 words.
-- Produce only continuation text: no analysis, labels, JSON, markdown, or {target_lang}.
-- Do not repeat or paraphrase the observed prefix.
-- Keep the continuation grammatical and locally coherent.
-- Respect the exact syntax created by the final words of the prefix. Your first
-  generated word must fit immediately after the prefix.
-- Stay in the topic and register established by the observed words. Do not invent
-  a technical, business, scientific, or data-analysis setting unless the prefix
-  already provides evidence for it.
-- Across independent samples, vary the first content word and the semantic
-  outcome. Avoid formulaic repetitions with only the final noun changed.
-- Resolve an uncertainty concretely instead of merely remaining ambiguous.
-
-In-context examples:
-
-Partial: "The bank"
-Possible futures:
-- "approved the loan before the Friday deadline" (financial institution)
-- "collapsed after three days of heavy rain" (edge of a river)
-
-Partial: "She decided to run"
-Possible futures:
-- "the company after her father retired" (manage)
-- "for mayor in the next local election" (seek office)
-- "the experiment again with a larger sample" (conduct)
-- "away before anyone noticed the missing key" (flee)
-
-Partial: "The agreement that the two countries signed last year"
-Possible futures:
-- "expires at the end of this month"
-- "has been violated repeatedly by both sides"
-- "remains the foundation of their defense partnership"
-
-Partial: "I saw the scientist with the telescope"
-Possible futures:
-- "that she had designed for the observatory" (the scientist had it)
-- "and used it to identify the distant object" (the observer used it)
-
-Partial: "The proposal was not"
-Possible futures:
-- "only feasible but considerably cheaper than expected" (not only)
-- "acceptable to the committee in its current form" (negative evaluation)
-
-Partial: "These introductions are"
-Possible futures:
-- "brief but necessary for understanding the historical setting"
-- "inevitably repetitive and less useful than the editor intended"
-Bad continuation:
-- "crucial for training the model" (unsupported change to a technical topic)
-"""
+    """Ask an instruction-tuned sampler to plan a diverse set jointly."""
+    if not observed_source.strip():
+        raise ValueError("observed_source must not be empty")
+    if num_candidates <= 0:
+        raise ValueError("num_candidates must be positive")
 
     committed = committed_text.strip()
-    committed_block = (
-        f"\nThe interpreter has already committed this {target_lang} prefix:\n"
+    commitment = (
+        f"\nThe interpreter has already committed this {target_lang} text:\n"
         f"{committed}\n"
-        "Prefer a future that tests whether this commitment remains safe."
+        "Include natural futures that test whether this commitment remains safe."
         if committed
         else ""
     )
-    user = f"""The assistant turn is prefilled with an unfinished English prefix. Continue exactly where it ends.
+    system = f"""You predict possible future English speech for a simultaneous English-to-{target_lang} interpreter.
 
-Sampling mode: {sampling_mode}
-{directive}{committed_block}
+Generate one coordinated set of natural continuations. Every item must be grammatically valid immediately after the observed prefix, remain grounded in its topic and register, and represent a genuinely plausible way the speaker could continue.
 
-Return only the English continuation."""
+Plan the complete set before answering:
+- Make the items mutually distinct in wording and semantic outcome.
+- Do not provide paraphrases that differ only in one final noun or adjective.
+- Avoid reusing the same first content word across items.
+- Do not force an ambiguity that the prefix does not support.
+- Do not invent a technical, business, scientific, or data-analysis setting unless the prefix supports it.
+- Each item must contain only 4-15 new English words after the prefix.
+- Do not repeat the prefix and do not output explanations, labels, Chinese, JSON, or markdown.
+"""
+    user = f"""Observed English prefix:
+{observed_source}
+{commitment}
+
+Generate exactly {num_candidates} continuations in one response. Before writing, compare the candidates internally and remove duplicates.
+
+Use exactly this numbered format:
+1. <continuation only>
+2. <continuation only>
+...
+{num_candidates}. <continuation only>"""
     return [
         {"role": "system", "content": system},
         {"role": "user", "content": user},

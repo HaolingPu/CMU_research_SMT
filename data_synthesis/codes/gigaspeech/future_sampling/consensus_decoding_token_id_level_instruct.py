@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Consensus decoding with future sampling via vLLM serve APIs.
 
-Sampler models generate plausible and contrastive continuations of the observed
-source prefix. A separate translation/probe model provides next-token
-distributions for each hypothesized full source, and consensus selects the
-committed target token.
+Each sampler model generates one coordinated set of distinct, natural
+continuations of the observed source prefix. A separate translation/probe model
+provides next-token distributions for each hypothesized full source, and
+consensus selects the committed target token.
 """
 import argparse
 import ast
@@ -23,7 +23,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import pandas as pd
 from transformers import AutoTokenizer
 
-from ambiguity_sampler_prompt import PROMPT_VERSION, build_ambiguity_sampler_messages
+from ambiguity_sampler_prompt import PROMPT_VERSION, build_coordinated_future_messages
 
 
 DEFAULT_TSV_PATH = "/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/eval_datasets/train_xl_case_robust_asr_filtered_frozen_llm_reference_subsentence_ref.tsv"
@@ -66,19 +66,18 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--secondary-num-futures", type=int, default=10)
     p.add_argument("--future-tokens", type=int, default=10)
     p.add_argument("--sample-temperature", type=float, default=1.0)
-    # targeted instruct future sampling (Method C) — bypass base-LM sampling and use the
-    # instruct model to generate ambiguity-targeted continuations via a 2-step JSON prompt.
+    # Coordinated instruct future sampling bypasses independent base-LM sampling.
     p.add_argument("--use-targeted-instruct-sampling", action="store_true",
-                   help="Use the instruct model (via --instruct-api-base) to generate "
-                        "ambiguity-targeted continuations via structured JSON, instead of "
-                        "base-LM sampling. When set, base_specs are ignored for future sampling.")
-    p.add_argument("--targeted-num-futures", type=int, default=20,
-                   help="Number of diverse continuations sampled in one /completions call (n=K).")
+                   help="Use one or two instruct samplers to generate a jointly planned, "
+                        "numbered continuation set instead of independent base-LM samples. "
+                        "When set, base_specs are ignored for future sampling.")
+    p.add_argument("--targeted-num-futures", type=int, default=10,
+                   help="Number of jointly planned continuations requested from each sampler model.")
     p.add_argument("--targeted-sample-temperature", type=float, default=1.0,
-                   help="Sampling temperature for the prefill sampler — higher → more diversity.")
+                   help="Sampling temperature for each coordinated future-set response.")
     p.add_argument("--targeted-top-p", type=float, default=0.98)
     p.add_argument("--targeted-max-tokens", type=int, default=40,
-                   help="Per-completion token budget (4-15 words ≈ 8-30 tokens; bumped to 40 to fight short/empty outputs).")
+                   help="Minimum output budget; coordinated-list generation scales it by candidate count.")
     p.add_argument("--targeted-sampler-tokenizer-path", default="",
                    help="HF path/name of the tokenizer matching the sampler model. "
                         "Required because the sampler may use a different chat template "
@@ -94,11 +93,8 @@ def parse_args() -> argparse.Namespace:
                    help="Served-model-name of the sampler endpoint. Defaults to --instruct-api-model.")
     p.add_argument("--targeted-sampler-api-timeout", type=float, default=0.0,
                    help="Timeout for sampler API. 0 or negative → fall back to --instruct-api-timeout.")
-    # Optional second sampler (ensemble across families). When all three of
-    # --targeted-sampler2-* are set, the targeted prefill pipeline runs 4
-    # sub-batches: (sampler1, subj_cont), (sampler1, focus_shift),
-    # (sampler2, subj_cont), (sampler2, focus_shift), each with n=K, then
-    # merges all futures with cross-batch dedup.
+    # Optional second sampler (ensemble across families). Each configured model
+    # returns one coordinated set; both models remain independent consensus voters.
     p.add_argument("--targeted-sampler2-tokenizer-path", default="",
                    help="HF path/name of the 2nd sampler's tokenizer (different family). "
                         "Enables dual-model ensemble when all 3 sampler2-* flags are set.")
@@ -754,60 +750,57 @@ def sample_source_futures_multi(
     return merged, merged_info
 
 
-def _sample_prefill_one_batch(
+def _sample_coordinated_future_set(
     sampler_tokenizer: Any,
     observed_source: str,
     committed_text: str,
     target_lang: str,
     num_futures: int,
-    sampling_mode: str,
     api_base: str,
     api_model: str,
     api_timeout: float,
     sample_temperature: float,
     top_p: float,
     max_tokens: int,
-) -> Tuple[List[str], List[Dict[str, Any]]]:
-    """Sample one natural or ambiguity-seeking continuation batch."""
+) -> Tuple[List[str], List[Dict[str, Any]], List[Dict[str, Any]]]:
+    """Generate a jointly planned numbered list in one model response."""
     if not observed_source.strip() or num_futures <= 0:
         return [], [], []
 
-    messages = build_ambiguity_sampler_messages(
+    messages = build_coordinated_future_messages(
+        observed_source=observed_source,
         target_lang=target_lang,
         committed_text=committed_text,
-        sampling_mode=sampling_mode,
+        num_candidates=num_futures,
     )
 
-    # Apply chat template up to (and including) the assistant turn opener, then
-    # prefill the observed source so the model can only generate the continuation.
+    # One response contains the whole list, allowing the instruction-tuned model
+    # to compare candidates and avoid duplicating its own likely completion.
     prompt = sampler_tokenizer.apply_chat_template(
         messages,
         add_generation_prompt=True,
         tokenize=False,
         enable_thinking=False,
     )
-    prompt += observed_source
 
     base = normalize_api_base(api_base)
     payload: Dict[str, Any] = {
         "model": api_model,
         "prompt": prompt,
-        "max_tokens": max_tokens,
+        "max_tokens": max(max_tokens, 32 * num_futures),
         "temperature": sample_temperature,
         "top_p": top_p,
-        "n": num_futures,
-        # Push the N samples apart in token space to fight mode collapse.
-        # Keep this low: the prompt already requests contrastive continuations,
-        # while a large penalty pushes samples away from grammatical futures.
-        "presence_penalty": 0.1,
-        # Common end-of-turn / line tokens across Qwen / Gemma / Llama families.
-        "stop": ["\n\n", "<|im_end|>", "<end_of_turn>", "<|endoftext|>", "<|eot_id|>"],
+        "n": 1,
+        "presence_penalty": 0.15,
+        "stop": ["<|im_end|>", "<end_of_turn>", "<|endoftext|>", "<|eot_id|>"],
     }
     try:
         data = _http_json(f"{base}/completions", payload=payload, timeout=api_timeout)
     except Exception:
         return [], [], []
     choices = data.get("choices", []) if isinstance(data, dict) else []
+    raw_response = str(choices[0].get("text", "")) if choices and isinstance(choices[0], dict) else ""
+    parsed = parse_method_a_output(raw_response, num_expected=num_futures)
 
     # Build a normalized form of the partial (lowercased, punctuation/space
     # stripped) so the (c) regurgitation check can catch capitalized/reformatted
@@ -821,22 +814,14 @@ def _sample_prefill_one_batch(
 
     candidates: List[str] = []
     audit: List[Dict[str, Any]] = []
-    for choice_index, choice in enumerate(choices):
-        raw = str(choice.get("text", "")) if isinstance(choice, dict) else ""
-        cleaned = strip_markdown_wrappers(raw.strip())
-        # vLLM /completions returns only the new tokens (not the prompt), so we
-        # should already be prefix-free. Defensive strip in case any echo sneaks in.
-        if cleaned.lower().startswith(observed_source.lower()):
-            cleaned = cleaned[len(observed_source):].lstrip()
-        # First-line only — the model may try to extend across multiple sentences.
-        cleaned = strip_markdown_wrappers(cleaned.split("\n")[0].strip())
-        # Reuse the existing validators (no zh chars, no analysis filler).
-        cleaned = re.sub(r"^[\.\s…\-]+", "", cleaned)
+    for choice_index in range(num_futures):
+        raw = parsed[choice_index] if choice_index < len(parsed) else ""
+        cleaned = clean_future_text(observed_source, raw)
         if not cleaned or not is_valid_future_text(cleaned):
             audit.append({
-                "choice": choice_index, "model": api_model, "mode": sampling_mode,
+                "choice": choice_index, "model": api_model, "mode": "coordinated",
                 "raw": raw.strip(), "future": cleaned, "accepted": False,
-                "reason": "invalid_or_meta",
+                "reason": "missing_or_invalid" if not raw else "invalid_or_meta",
             })
             continue
         # A one-word fragment rarely carries enough evidence to test whether a
@@ -844,7 +829,7 @@ def _sample_prefill_one_batch(
         # genuinely concise continuations available.
         if len(re.findall(r"[A-Za-z0-9']+", cleaned)) < 3:
             audit.append({
-                "choice": choice_index, "model": api_model, "mode": sampling_mode,
+                "choice": choice_index, "model": api_model, "mode": "coordinated",
                 "raw": raw.strip(), "future": cleaned, "accepted": False,
                 "reason": "too_short",
             })
@@ -856,14 +841,14 @@ def _sample_prefill_one_batch(
             cleaned_norm = _norm_for_dup(cleaned)
             if partial_norm in cleaned_norm:
                 audit.append({
-                    "choice": choice_index, "model": api_model, "mode": sampling_mode,
+                    "choice": choice_index, "model": api_model, "mode": "coordinated",
                     "raw": raw.strip(), "future": cleaned, "accepted": False,
                     "reason": "repeats_observed_prefix",
                 })
                 continue
         candidates.append(cleaned)
         audit.append({
-            "choice": choice_index, "model": api_model, "mode": sampling_mode,
+            "choice": choice_index, "model": api_model, "mode": "coordinated",
             "raw": raw.strip(), "future": cleaned, "accepted": None,
             "reason": "pending_diversity_filter",
         })
@@ -884,10 +869,10 @@ def _sample_prefill_one_batch(
     items_info: List[Dict[str, Any]] = []
     for cleaned in futures:
         items_info.append({
-            "source": f"targeted_prefill_{sampling_mode}",
+            "source": "coordinated_future_set",
             "path": api_model,
             "model": api_model,
-            "mode": sampling_mode,
+            "mode": "coordinated",
             "future": cleaned,
             "prompt_version": PROMPT_VERSION,
         })
@@ -944,17 +929,17 @@ def sampler_display_name(model: str) -> str:
 
 
 def format_raw_future_groups(audit: List[Dict[str, Any]]) -> List[str]:
-    """Render raw samples as four readable model/mode sections."""
-    groups: Dict[Tuple[str, str], List[Dict[str, Any]]] = {}
+    """Render raw samples as one readable section per sampler model."""
+    groups: Dict[str, List[Dict[str, Any]]] = {}
     for item in audit:
-        key = (str(item.get("model", "?")), str(item.get("mode", "?")))
-        groups.setdefault(key, []).append(item)
+        model = str(item.get("model", "?"))
+        groups.setdefault(model, []).append(item)
 
     lines: List[str] = []
-    for (model, mode), items in groups.items():
+    for model, items in groups.items():
         lines.append(
-            f"[Raw candidates] {sampler_display_name(model)} | "
-            f"model={model} mode={mode} count={len(items)}"
+            f"[Raw candidates] {sampler_display_name(model)} | coordinated set | "
+            f"model={model} set=coordinated count={len(items)}"
         )
         for index, item in enumerate(items, 1):
             shown = item.get("future") or item.get("raw") or ""
@@ -975,19 +960,17 @@ def format_selected_future_groups(
     future_infos: List[Dict[str, Any]],
 ) -> List[str]:
     """Render candidates used by consensus without repeated per-line labels."""
-    groups: Dict[Tuple[str, str], List[str]] = {}
+    groups: Dict[str, List[str]] = {}
     for index, future in enumerate(futures):
         info = future_infos[index] if index < len(future_infos) else {}
-        label = str(info.get("source", "?"))
         model = str(info.get("model") or info.get("path") or "?")
-        mode = str(info.get("mode") or label.removeprefix("targeted_prefill_"))
-        groups.setdefault((model, mode), []).append(future)
+        groups.setdefault(model, []).append(future)
 
     lines: List[str] = []
-    for (model, mode), items in groups.items():
+    for model, items in groups.items():
         lines.append(
-            f"[Selected candidates] {sampler_display_name(model)} | "
-            f"model={model} mode={mode} count={len(items)}"
+            f"[Selected candidates] {sampler_display_name(model)} | coordinated set | "
+            f"model={model} set=coordinated count={len(items)}"
         )
         lines.extend(f"  {index:02d}. {future!r}" for index, future in enumerate(items, 1))
     return lines
@@ -1009,49 +992,37 @@ def sample_source_futures_targeted_prefill(
     sampler2_api_base: str = "",
     sampler2_api_model: str = "",
     sampler2_api_timeout: float = 0.0,
-) -> Tuple[List[str], List[Dict[str, Any]], List[Dict[str, Any]]]:
-    """Sample natural and contrastive futures from one or two model families."""
+    return_audit: bool = False,
+) -> Any:
+    """Generate one coordinated natural-future set from each sampler model."""
     if not observed_source.strip():
-        return [], [], []
+        return ([], [], []) if return_audit else ([], [])
     use_ensemble = bool(sampler2_tokenizer and sampler2_api_base and sampler2_api_model)
-    modes = ("plausible", "contrastive")
-    mode_counts = {
-        "plausible": max(1, num_futures // 2),
-        "contrastive": max(1, num_futures - num_futures // 2),
-    }
+    batches = []
     if use_ensemble:
         s2_to = sampler2_api_timeout if sampler2_api_timeout and sampler2_api_timeout > 0 else api_timeout
-        batches = []
         model_specs = (
             (sampler_tokenizer, api_base, api_model, api_timeout),
             (sampler2_tokenizer, sampler2_api_base, sampler2_api_model, s2_to),
         )
-        # Keep model groups contiguous so verbose logs show all Gemma outputs,
-        # followed by all Qwen outputs, with plausible then contrastive in each.
         for model_tokenizer, model_base, model_name, model_timeout in model_specs:
-            for mode in modes:
-                batches.append(_sample_prefill_one_batch(
-                    sampler_tokenizer=model_tokenizer,
-                    observed_source=observed_source, committed_text=committed_text,
-                    target_lang=target_lang, num_futures=mode_counts[mode],
-                    sampling_mode=mode,
-                    api_base=model_base, api_model=model_name, api_timeout=model_timeout,
-                    sample_temperature=sample_temperature, top_p=top_p, max_tokens=max_tokens,
-                ))
-    else:
-        batches = [
-            _sample_prefill_one_batch(
-                sampler_tokenizer=sampler_tokenizer,
+            batches.append(_sample_coordinated_future_set(
+                sampler_tokenizer=model_tokenizer,
                 observed_source=observed_source, committed_text=committed_text,
-                target_lang=target_lang, num_futures=mode_counts[mode],
-                sampling_mode=mode,
-                api_base=api_base, api_model=api_model, api_timeout=api_timeout,
+                target_lang=target_lang, num_futures=num_futures,
+                api_base=model_base, api_model=model_name, api_timeout=model_timeout,
                 sample_temperature=sample_temperature, top_p=top_p, max_tokens=max_tokens,
-            )
-            for mode in modes
-        ]
-    # Preserve cross-model agreement as two independent votes. Each model/mode
-    # batch has already removed exact and near-duplicate candidates.
+            ))
+    else:
+        batches.append(_sample_coordinated_future_set(
+            sampler_tokenizer=sampler_tokenizer,
+            observed_source=observed_source, committed_text=committed_text,
+            target_lang=target_lang, num_futures=num_futures,
+            api_base=api_base, api_model=api_model, api_timeout=api_timeout,
+            sample_temperature=sample_temperature, top_p=top_p, max_tokens=max_tokens,
+        ))
+    # Preserve cross-model agreement as two independent votes. Each model's set
+    # has already removed exact and near-duplicate candidates.
     merged_f: List[str] = []
     merged_i: List[Dict[str, Any]] = []
     merged_audit: List[Dict[str, Any]] = []
@@ -1060,7 +1031,9 @@ def sample_source_futures_targeted_prefill(
             merged_f.append(f)
             merged_i.append(info)
         merged_audit.extend(audit)
-    return merged_f, merged_i, merged_audit
+    if return_audit:
+        return merged_f, merged_i, merged_audit
+    return merged_f, merged_i
 
 
 # ---------------------------------------------------------------------------
@@ -1678,10 +1651,8 @@ def run_one_utterance(
             continue
 
         if getattr(args, "use_targeted_instruct_sampling", False):
-            # C-1: prefill-based sampler. The observed English prefix is pushed
-            # into the assistant turn via apply_chat_template + manual prefill, so
-            # the model can only emit what comes AFTER it. One /completions call
-            # with n=K returns K diverse continuations.
+            # Each instruction-tuned sampler sees the observed prefix and plans
+            # its full numbered candidate set in one response.
             sampler_api_base = args.targeted_sampler_api_base or args.instruct_api_base
             sampler_api_model = args.targeted_sampler_api_model or args.instruct_api_model
             sampler_api_timeout = (
@@ -1705,6 +1676,7 @@ def run_one_utterance(
                 sampler2_api_base=args.targeted_sampler2_api_base,
                 sampler2_api_model=args.targeted_sampler2_api_model,
                 sampler2_api_timeout=args.targeted_sampler2_api_timeout,
+                return_audit=True,
             )
         else:
             futures, future_infos = sample_source_futures_multi( #call base models，用当前observed source采样多条未来续写
@@ -1934,7 +1906,7 @@ def main() -> None:
         else:
             print(f"[Sampler] targeted_instruct (same-model as probe): "
                   f"model={args.instruct_api_model} api={normalize_api_base(args.instruct_api_base)}")
-        print(f"[Sampler] mode=prefill n={args.targeted_num_futures} "
+        print(f"[Sampler] mode=coordinated_list per_model={args.targeted_num_futures} "
               f"temp={args.targeted_sample_temperature} top_p={args.targeted_top_p} "
               f"max_tokens={args.targeted_max_tokens}")
 
@@ -1945,7 +1917,7 @@ def main() -> None:
     instruct_tokenizer = load_tokenizer(args.instruct_tokenizer_path)
     print(f"[Instruct] model={args.instruct_api_model} api={normalize_api_base(args.instruct_api_base)}")
 
-    # Sampler tokenizer for the prefill chat-template path. Defaults to the
+    # Sampler tokenizer for the coordinated-list chat-template path. Defaults to the
     # probe's tokenizer (same-model setup); set --targeted-sampler-tokenizer-path
     # for cross-family (e.g. gemma sampler + qwen probe).
     sampler_tokenizer = None
