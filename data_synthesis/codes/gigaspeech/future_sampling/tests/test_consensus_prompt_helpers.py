@@ -2,6 +2,7 @@ from pathlib import Path
 import sys
 import types
 import unittest
+from unittest.mock import patch
 
 
 MODULE_DIR = Path(__file__).resolve().parents[1]
@@ -66,6 +67,33 @@ class ConsensusPromptHelpersTest(unittest.TestCase):
         self.assertEqual(sum(text.startswith("crucial") for text in selected), 1)
         self.assertEqual(sum(text.startswith("important") for text in selected), 1)
         self.assertIn("inevitably repetitive and less useful than intended", selected)
+
+    def test_targeted_batch_audits_model_and_filter_status(self) -> None:
+        response = {"choices": [
+            {"text": "crucial for training models"},
+            {"text": "crucial for testing systems"},
+            {"text": "brief but historically grounded"},
+            {"text": "unclear"},
+        ]}
+        with patch.object(decoder, "_http_json", return_value=response):
+            futures, infos, audit = decoder._sample_prefill_one_batch(
+                sampler_tokenizer=FakeTokenizer(),
+                observed_source="These introductions are",
+                committed_text="",
+                target_lang="Chinese",
+                num_futures=4,
+                sampling_mode="plausible",
+                api_base="http://localhost:1/v1",
+                api_model="gemma4-sampler",
+                api_timeout=1.0,
+                sample_temperature=1.0,
+                top_p=0.98,
+                max_tokens=40,
+            )
+        self.assertEqual(len(futures), 2)
+        self.assertTrue(all(info["model"] == "gemma4-sampler" for info in infos))
+        self.assertEqual([item["accepted"] for item in audit], [True, False, True, False])
+        self.assertEqual(audit[-1]["reason"], "too_short")
 
 
 if __name__ == "__main__":

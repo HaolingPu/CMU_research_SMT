@@ -727,7 +727,7 @@ def sample_source_futures_multi(
     observed_source: str,
     future_tokens: int,
     sample_temperature: float,
-) -> Tuple[List[str], List[Dict[str, Any]]]:
+) -> Tuple[List[str], List[Dict[str, Any]], List[Dict[str, Any]]]:
     merged: List[str] = []
     merged_info: List[Dict[str, Any]] = []
     seen: set = set()
@@ -770,7 +770,7 @@ def _sample_prefill_one_batch(
 ) -> Tuple[List[str], List[Dict[str, Any]]]:
     """Sample one natural or ambiguity-seeking continuation batch."""
     if not observed_source.strip() or num_futures <= 0:
-        return [], []
+        return [], [], []
 
     messages = build_ambiguity_sampler_messages(
         target_lang=target_lang,
@@ -806,7 +806,7 @@ def _sample_prefill_one_batch(
     try:
         data = _http_json(f"{base}/completions", payload=payload, timeout=api_timeout)
     except Exception:
-        return [], []
+        return [], [], []
     choices = data.get("choices", []) if isinstance(data, dict) else []
 
     # Build a normalized form of the partial (lowercased, punctuation/space
@@ -820,7 +820,8 @@ def _sample_prefill_one_batch(
     partial_norm_min_len = max(8, len(partial_norm) // 2)
 
     candidates: List[str] = []
-    for choice in choices:
+    audit: List[Dict[str, Any]] = []
+    for choice_index, choice in enumerate(choices):
         raw = str(choice.get("text", "")) if isinstance(choice, dict) else ""
         cleaned = strip_markdown_wrappers(raw.strip())
         # vLLM /completions returns only the new tokens (not the prompt), so we
@@ -832,11 +833,21 @@ def _sample_prefill_one_batch(
         # Reuse the existing validators (no zh chars, no analysis filler).
         cleaned = re.sub(r"^[\.\s…\-]+", "", cleaned)
         if not cleaned or not is_valid_future_text(cleaned):
+            audit.append({
+                "choice": choice_index, "model": api_model, "mode": sampling_mode,
+                "raw": raw.strip(), "future": cleaned, "accepted": False,
+                "reason": "invalid_or_meta",
+            })
             continue
         # A one-word fragment rarely carries enough evidence to test whether a
         # translation commitment is safe. Require a short phrase while keeping
         # genuinely concise continuations available.
         if len(re.findall(r"[A-Za-z0-9']+", cleaned)) < 3:
+            audit.append({
+                "choice": choice_index, "model": api_model, "mode": sampling_mode,
+                "raw": raw.strip(), "future": cleaned, "accepted": False,
+                "reason": "too_short",
+            })
             continue
         # (c) Hard-drop continuations that contain the partial (or a long
         # substring of it) anywhere — handles restart/capitalization cases
@@ -844,10 +855,32 @@ def _sample_prefill_one_batch(
         if partial_norm and len(partial_norm) >= partial_norm_min_len:
             cleaned_norm = _norm_for_dup(cleaned)
             if partial_norm in cleaned_norm:
+                audit.append({
+                    "choice": choice_index, "model": api_model, "mode": sampling_mode,
+                    "raw": raw.strip(), "future": cleaned, "accepted": False,
+                    "reason": "repeats_observed_prefix",
+                })
                 continue
         candidates.append(cleaned)
+        audit.append({
+            "choice": choice_index, "model": api_model, "mode": sampling_mode,
+            "raw": raw.strip(), "future": cleaned, "accepted": None,
+            "reason": "pending_diversity_filter",
+        })
 
     futures = select_diverse_futures(candidates)
+    selected_counts = Counter(re.sub(r"\s+", " ", text.strip().lower()) for text in futures)
+    for item in audit:
+        if item["accepted"] is not None:
+            continue
+        key = re.sub(r"\s+", " ", item["future"].strip().lower())
+        if selected_counts[key] > 0:
+            selected_counts[key] -= 1
+            item["accepted"] = True
+            item["reason"] = "accepted"
+        else:
+            item["accepted"] = False
+            item["reason"] = "duplicate_or_repetitive"
     items_info: List[Dict[str, Any]] = []
     for cleaned in futures:
         items_info.append({
@@ -858,7 +891,7 @@ def _sample_prefill_one_batch(
             "future": cleaned,
             "prompt_version": PROMPT_VERSION,
         })
-    return futures, items_info
+    return futures, items_info, audit
 
 
 def select_diverse_futures(
@@ -919,10 +952,10 @@ def sample_source_futures_targeted_prefill(
     sampler2_api_base: str = "",
     sampler2_api_model: str = "",
     sampler2_api_timeout: float = 0.0,
-) -> Tuple[List[str], List[Dict[str, Any]]]:
+) -> Tuple[List[str], List[Dict[str, Any]], List[Dict[str, Any]]]:
     """Sample natural and contrastive futures from one or two model families."""
     if not observed_source.strip():
-        return [], []
+        return [], [], []
     use_ensemble = bool(sampler2_tokenizer and sampler2_api_base and sampler2_api_model)
     modes = ("plausible", "contrastive")
     mode_counts = {
@@ -964,11 +997,13 @@ def sample_source_futures_targeted_prefill(
     # batch has already removed exact and near-duplicate candidates.
     merged_f: List[str] = []
     merged_i: List[Dict[str, Any]] = []
-    for futs, infos in batches:
+    merged_audit: List[Dict[str, Any]] = []
+    for futs, infos, audit in batches:
         for f, info in zip(futs, infos):
             merged_f.append(f)
             merged_i.append(info)
-    return merged_f, merged_i
+        merged_audit.extend(audit)
+    return merged_f, merged_i, merged_audit
 
 
 # ---------------------------------------------------------------------------
@@ -1597,7 +1632,7 @@ def run_one_utterance(
                 if args.targeted_sampler_api_timeout and args.targeted_sampler_api_timeout > 0
                 else args.instruct_api_timeout
             )
-            futures, future_infos = sample_source_futures_targeted_prefill(
+            futures, future_infos, future_audit = sample_source_futures_targeted_prefill(
                 sampler_tokenizer=sampler_tokenizer,
                 observed_source=source_observed,
                 committed_text=committed_text,
@@ -1621,8 +1656,22 @@ def run_one_utterance(
                 future_tokens=args.future_tokens,
                 sample_temperature=args.sample_temperature,
             )
+            future_audit = []
 
         # ── verbose: list futures ──
+        if future_audit:
+            accepted_raw = sum(bool(item.get("accepted")) for item in future_audit)
+            _vlog(verbose_log_file,
+                  f"[Step 1-1] raw_future_sampling total={len(future_audit)} accepted={accepted_raw}")
+            for ai, item in enumerate(future_audit):
+                status = "ACCEPTED" if item.get("accepted") else "DROPPED"
+                shown = item.get("future") or item.get("raw") or ""
+                _vlog(
+                    verbose_log_file,
+                    f"  raw_future[{ai}] model={item.get('model', '?')} "
+                    f"mode={item.get('mode', '?')} status={status} "
+                    f"reason={item.get('reason', '?')}: {shown!r}",
+                )
         _vlog(verbose_log_file, f"[Step 1-2] future_sampling total={len(futures)}")
         if verbose_log_file is not None:
             for fi, ftxt in enumerate(futures):
