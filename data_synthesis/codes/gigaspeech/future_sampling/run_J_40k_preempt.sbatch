@@ -9,6 +9,8 @@
 #SBATCH --array=0-11
 #SBATCH --time=3-00:00:00
 #SBATCH --requeue
+# Confirmed live ECC failures on 2026-08-29; avoid until BABEL admins repair them.
+#SBATCH --exclude=babel-o9-24,babel-q9-32,babel-t5-28
 #SBATCH -o /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/slurm_logs/J40k_p_%A_%a.out
 #SBATCH -e /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/slurm_logs/J40k_p_%A_%a.err
 #SBATCH --mail-type=END,FAIL

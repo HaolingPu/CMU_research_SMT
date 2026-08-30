@@ -10,7 +10,7 @@
 #SBATCH --qos=preempt_qos
 #SBATCH --time=3-00:00:00
 #SBATCH --requeue
-#SBATCH --exclude=babel-t9-16,babel-t5-32
+#SBATCH --exclude=babel-t9-16,babel-t5-32,babel-o9-24,babel-q9-32,babel-t5-28
 #SBATCH -o /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_prod/slurm_logs/segale_align_p24_%A_%a.out
 #SBATCH -e /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_prod/slurm_logs/segale_align_p24_%A_%a.err
 #SBATCH --mail-type=END,FAIL
