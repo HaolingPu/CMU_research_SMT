@@ -15,7 +15,7 @@ DECODE_CONCURRENCY="${DECODE_CONCURRENCY:-12}"
 NUM_CONCURRENT_CASES="${NUM_CONCURRENT_CASES:-4}"
 NUM_POST_SHARDS="${NUM_POST_SHARDS:-24}"
 POST_CONCURRENCY="${POST_CONCURRENCY:-24}"
-TARGETED_NUM_FUTURES="${TARGETED_NUM_FUTURES:-10}"
+TARGETED_NUM_FUTURES="${TARGETED_NUM_FUTURES:-20}"
 MIN_VOTERS_RATIO="${MIN_VOTERS_RATIO:-1.0}"
 QE_THRESHOLD="${QE_THRESHOLD:-3.0}"
 MIN_RATIO_REF="${MIN_RATIO_REF:-0.7}"
@@ -69,7 +69,7 @@ Decode                : ${TOTAL_ROWS} rows, ${NUM_DECODE_TASKS} tasks, ${DECODE_
 Decode GPUs           : 2/job x ${DECODE_CONCURRENCY} = $((2 * DECODE_CONCURRENCY))
 GPU 0                 : Qwen3.8-27B-FP8 + Gemma-4-E2B samplers
 GPU 1                 : Qwen3.6-35B-A3B-FP8 translator/probe
-Sampler prompt        : future_set_v1 (one coordinated natural-future list per model)
+Sampler prompt        : future_set_v2_two_groups (10 plausible + 10 contrastive per model)
 Consensus             : min_voters_ratio=${MIN_VOTERS_RATIO}
 Post-processing       : SEGALE ${NUM_POST_SHARDS} shards, MetricX QE <= ${QE_THRESHOLD}, length ${MIN_RATIO_REF}:${MAX_RATIO_REF}
 Training sample target: ${TRAIN_SAMPLE_N} (0 means all surviving examples)

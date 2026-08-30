@@ -29,9 +29,9 @@ class AnalyzeAmbiguityPilotTest(unittest.TestCase):
             verbose.write_text(
                 "Chunk 1/2\n"
                 "future_source_prefix: 'The bank'\n"
-                "[Selected candidates] Gemma 4 | coordinated set | model=gemma4-sampler set=coordinated count=1\n"
+                "[Selected candidates] Gemma 4 | plausible | model=gemma4-sampler mode=plausible count=1\n"
                 "  01. 'approved the loan'\n"
-                "[Selected candidates] Qwen 3.8 | coordinated set | model=qwen38-sampler set=coordinated count=1\n"
+                "[Selected candidates] Qwen 3.8 | contrastive | model=qwen38-sampler mode=contrastive count=1\n"
                 "  01. 'collapsed after rain'\n"
                 "[Step 6-7] commit_after_trim=''\n"
                 "-> READ (too few futures)\n",

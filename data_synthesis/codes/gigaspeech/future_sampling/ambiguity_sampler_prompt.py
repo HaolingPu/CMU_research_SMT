@@ -1,9 +1,9 @@
-"""Prompt for one coordinated set of natural future continuations."""
+"""Prompt for coordinated plausible and contrastive future continuations."""
 
 from __future__ import annotations
 
 
-PROMPT_VERSION = "future_set_v1"
+PROMPT_VERSION = "future_set_v2_two_groups"
 
 
 def build_coordinated_future_messages(
@@ -16,8 +16,10 @@ def build_coordinated_future_messages(
     """Ask an instruction-tuned sampler to plan a diverse set jointly."""
     if not observed_source.strip():
         raise ValueError("observed_source must not be empty")
-    if num_candidates <= 0:
-        raise ValueError("num_candidates must be positive")
+    if num_candidates <= 0 or num_candidates % 2:
+        raise ValueError("num_candidates must be a positive even number")
+
+    candidates_per_mode = num_candidates // 2
 
     committed = committed_text.strip()
     commitment = (
@@ -30,6 +32,10 @@ def build_coordinated_future_messages(
     system = f"""You predict possible future English speech for a simultaneous English-to-{target_lang} interpreter.
 
 Generate one coordinated set of natural continuations. Every item must be grammatically valid immediately after the observed prefix, remain grounded in its topic and register, and represent a genuinely plausible way the speaker could continue.
+
+The set has two groups:
+- Plausible: likely, ordinary continuations that follow the strongest local interpretation.
+- Contrastive: less obvious but still realistic continuations that resolve a lexical, syntactic, referential, or discourse uncertainty differently enough that a careful translator might change wording or wait before committing. Contrastive does not mean bizarre, adversarial, or unrelated.
 
 Plan the complete set before answering:
 - Make the items mutually distinct in wording and semantic outcome.
@@ -44,11 +50,15 @@ Plan the complete set before answering:
 {observed_source}
 {commitment}
 
-Generate exactly {num_candidates} continuations in one response. Before writing, compare the candidates internally and remove duplicates.
+Generate exactly {num_candidates} continuations in one response: first {candidates_per_mode} plausible candidates, then {candidates_per_mode} contrastive candidates. Plan and compare all {num_candidates} candidates together before answering, and remove repetition both within and across the two groups.
 
 Use exactly this numbered format:
+Plausible
 1. <continuation only>
-2. <continuation only>
+...
+{candidates_per_mode}. <continuation only>
+Contrastive
+{candidates_per_mode + 1}. <continuation only>
 ...
 {num_candidates}. <continuation only>"""
     return [

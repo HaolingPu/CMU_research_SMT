@@ -91,19 +91,20 @@ class ConsensusPromptHelpersTest(unittest.TestCase):
             )
         self.assertEqual(len(futures), 2)
         self.assertTrue(all(info["model"] == "gemma4-sampler" for info in infos))
+        self.assertEqual([info["mode"] for info in infos], ["plausible", "contrastive"])
         self.assertEqual([item["accepted"] for item in audit], [True, False, True, False])
         self.assertEqual(audit[-1]["reason"], "too_short")
 
         lines = decoder.format_raw_future_groups(audit)
         self.assertIn("[Raw candidates] Gemma 4 |", lines[0])
-        self.assertEqual(sum("model=gemma4-sampler" in line for line in lines), 1)
-        self.assertIn("set=coordinated", lines[0])
+        self.assertEqual(sum("model=gemma4-sampler" in line for line in lines), 2)
+        self.assertIn("mode=plausible", lines[0])
         self.assertFalse(any("status=" in line for line in lines))
-        self.assertTrue(any("Filter summary: kept=2/4" in line for line in lines))
+        self.assertTrue(any("Filter summary: kept=1/2" in line for line in lines))
 
         selected = decoder.format_selected_future_groups(futures, infos)
         self.assertIn("[Selected candidates] Gemma 4 |", selected[0])
-        self.assertEqual(sum("set=coordinated" in line for line in selected), 1)
+        self.assertEqual(sum("mode=" in line for line in selected), 2)
 
 
 if __name__ == "__main__":

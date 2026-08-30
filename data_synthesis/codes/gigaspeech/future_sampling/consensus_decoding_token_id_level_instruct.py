@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Consensus decoding with future sampling via vLLM serve APIs.
 
-Each sampler model generates one coordinated set of distinct, natural
-continuations of the observed source prefix. A separate translation/probe model
-provides next-token distributions for each hypothesized full source, and
-consensus selects the committed target token.
+Each sampler model generates one coordinated response containing distinct
+plausible and contrastive continuations of the observed source prefix. A
+separate translation/probe model provides next-token distributions for each
+hypothesized full source, and consensus selects the committed target token.
 """
 import argparse
 import ast
@@ -71,8 +71,9 @@ def parse_args() -> argparse.Namespace:
                    help="Use one or two instruct samplers to generate a jointly planned, "
                         "numbered continuation set instead of independent base-LM samples. "
                         "When set, base_specs are ignored for future sampling.")
-    p.add_argument("--targeted-num-futures", type=int, default=10,
-                   help="Number of jointly planned continuations requested from each sampler model.")
+    p.add_argument("--targeted-num-futures", type=int, default=20,
+                   help="Total jointly planned continuations per sampler model; must be even, "
+                        "with half plausible and half contrastive.")
     p.add_argument("--targeted-sample-temperature", type=float, default=1.0,
                    help="Sampling temperature for each coordinated future-set response.")
     p.add_argument("--targeted-top-p", type=float, default=0.98)
@@ -763,7 +764,7 @@ def _sample_coordinated_future_set(
     top_p: float,
     max_tokens: int,
 ) -> Tuple[List[str], List[Dict[str, Any]], List[Dict[str, Any]]]:
-    """Generate a jointly planned numbered list in one model response."""
+    """Generate jointly planned plausible and contrastive lists in one response."""
     if not observed_source.strip() or num_futures <= 0:
         return [], [], []
 
@@ -812,14 +813,16 @@ def _sample_coordinated_future_set(
     # Use a min length to avoid false-positives on very short partials.
     partial_norm_min_len = max(8, len(partial_norm) // 2)
 
-    candidates: List[str] = []
+    candidates_by_mode: Dict[str, List[str]] = {"plausible": [], "contrastive": []}
     audit: List[Dict[str, Any]] = []
+    candidates_per_mode = num_futures // 2
     for choice_index in range(num_futures):
+        mode = "plausible" if choice_index < candidates_per_mode else "contrastive"
         raw = parsed[choice_index] if choice_index < len(parsed) else ""
         cleaned = clean_future_text(observed_source, raw)
         if not cleaned or not is_valid_future_text(cleaned):
             audit.append({
-                "choice": choice_index, "model": api_model, "mode": "coordinated",
+                "choice": choice_index, "model": api_model, "mode": mode,
                 "raw": raw.strip(), "future": cleaned, "accepted": False,
                 "reason": "missing_or_invalid" if not raw else "invalid_or_meta",
             })
@@ -829,7 +832,7 @@ def _sample_coordinated_future_set(
         # genuinely concise continuations available.
         if len(re.findall(r"[A-Za-z0-9']+", cleaned)) < 3:
             audit.append({
-                "choice": choice_index, "model": api_model, "mode": "coordinated",
+                "choice": choice_index, "model": api_model, "mode": mode,
                 "raw": raw.strip(), "future": cleaned, "accepted": False,
                 "reason": "too_short",
             })
@@ -841,41 +844,50 @@ def _sample_coordinated_future_set(
             cleaned_norm = _norm_for_dup(cleaned)
             if partial_norm in cleaned_norm:
                 audit.append({
-                    "choice": choice_index, "model": api_model, "mode": "coordinated",
+                    "choice": choice_index, "model": api_model, "mode": mode,
                     "raw": raw.strip(), "future": cleaned, "accepted": False,
                     "reason": "repeats_observed_prefix",
                 })
                 continue
-        candidates.append(cleaned)
+        candidates_by_mode[mode].append(cleaned)
         audit.append({
-            "choice": choice_index, "model": api_model, "mode": "coordinated",
+            "choice": choice_index, "model": api_model, "mode": mode,
             "raw": raw.strip(), "future": cleaned, "accepted": None,
             "reason": "pending_diversity_filter",
         })
 
-    futures = select_diverse_futures(candidates)
-    selected_counts = Counter(re.sub(r"\s+", " ", text.strip().lower()) for text in futures)
+    futures_by_mode = {
+        mode: select_diverse_futures(candidates)
+        for mode, candidates in candidates_by_mode.items()
+    }
+    futures = futures_by_mode["plausible"] + futures_by_mode["contrastive"]
+    selected_counts = {
+        mode: Counter(re.sub(r"\s+", " ", text.strip().lower()) for text in selected)
+        for mode, selected in futures_by_mode.items()
+    }
     for item in audit:
         if item["accepted"] is not None:
             continue
         key = re.sub(r"\s+", " ", item["future"].strip().lower())
-        if selected_counts[key] > 0:
-            selected_counts[key] -= 1
+        mode_counts = selected_counts[str(item["mode"])]
+        if mode_counts[key] > 0:
+            mode_counts[key] -= 1
             item["accepted"] = True
             item["reason"] = "accepted"
         else:
             item["accepted"] = False
             item["reason"] = "duplicate_or_repetitive"
     items_info: List[Dict[str, Any]] = []
-    for cleaned in futures:
-        items_info.append({
-            "source": "coordinated_future_set",
-            "path": api_model,
-            "model": api_model,
-            "mode": "coordinated",
-            "future": cleaned,
-            "prompt_version": PROMPT_VERSION,
-        })
+    for mode in ("plausible", "contrastive"):
+        for cleaned in futures_by_mode[mode]:
+            items_info.append({
+                "source": "coordinated_future_set",
+                "path": api_model,
+                "model": api_model,
+                "mode": mode,
+                "future": cleaned,
+                "prompt_version": PROMPT_VERSION,
+            })
     return futures, items_info, audit
 
 
@@ -929,17 +941,18 @@ def sampler_display_name(model: str) -> str:
 
 
 def format_raw_future_groups(audit: List[Dict[str, Any]]) -> List[str]:
-    """Render raw samples as one readable section per sampler model."""
-    groups: Dict[str, List[Dict[str, Any]]] = {}
+    """Render raw samples as compact model/mode sections."""
+    groups: Dict[Tuple[str, str], List[Dict[str, Any]]] = {}
     for item in audit:
         model = str(item.get("model", "?"))
-        groups.setdefault(model, []).append(item)
+        mode = str(item.get("mode", "?"))
+        groups.setdefault((model, mode), []).append(item)
 
     lines: List[str] = []
-    for model, items in groups.items():
+    for (model, mode), items in groups.items():
         lines.append(
-            f"[Raw candidates] {sampler_display_name(model)} | coordinated set | "
-            f"model={model} set=coordinated count={len(items)}"
+            f"[Raw candidates] {sampler_display_name(model)} | {mode} | "
+            f"model={model} mode={mode} count={len(items)}"
         )
         for index, item in enumerate(items, 1):
             shown = item.get("future") or item.get("raw") or ""
@@ -960,17 +973,18 @@ def format_selected_future_groups(
     future_infos: List[Dict[str, Any]],
 ) -> List[str]:
     """Render candidates used by consensus without repeated per-line labels."""
-    groups: Dict[str, List[str]] = {}
+    groups: Dict[Tuple[str, str], List[str]] = {}
     for index, future in enumerate(futures):
         info = future_infos[index] if index < len(future_infos) else {}
         model = str(info.get("model") or info.get("path") or "?")
-        groups.setdefault(model, []).append(future)
+        mode = str(info.get("mode") or "?")
+        groups.setdefault((model, mode), []).append(future)
 
     lines: List[str] = []
-    for model, items in groups.items():
+    for (model, mode), items in groups.items():
         lines.append(
-            f"[Selected candidates] {sampler_display_name(model)} | coordinated set | "
-            f"model={model} set=coordinated count={len(items)}"
+            f"[Selected candidates] {sampler_display_name(model)} | {mode} | "
+            f"model={model} mode={mode} count={len(items)}"
         )
         lines.extend(f"  {index:02d}. {future!r}" for index, future in enumerate(items, 1))
     return lines
@@ -994,9 +1008,11 @@ def sample_source_futures_targeted_prefill(
     sampler2_api_timeout: float = 0.0,
     return_audit: bool = False,
 ) -> Any:
-    """Generate one coordinated natural-future set from each sampler model."""
+    """Generate one coordinated 50/50 plausible/contrastive set per model."""
     if not observed_source.strip():
         return ([], [], []) if return_audit else ([], [])
+    if num_futures <= 0 or num_futures % 2:
+        raise ValueError("num_futures must be a positive even number")
     use_ensemble = bool(sampler2_tokenizer and sampler2_api_base and sampler2_api_model)
     batches = []
     if use_ensemble:
