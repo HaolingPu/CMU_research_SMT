@@ -361,8 +361,14 @@ def is_valid_future_text(text: str) -> bool:
     if re.search(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]", text):
         return False
     lowered = text.lower()
-    banned = ["translate", "translation", "grammar analysis", "analyze", "analysis",
-              "这句话", "翻译", "语法", "句子结构"]
+    banned = [
+        "translate", "translation", "grammar analysis", "analyze", "analysis",
+        "<think>", "</think>", "assistant turn", "user prompt", "the prompt",
+        "sampling mode", "unfinished english prefix", "4-15 words", "let's think",
+        "这句话", "翻译", "语法", "句子结构",
+    ]
+    if len(text.split()) > 20:
+        return False
     return not any(b in lowered for b in banned)
 
 
@@ -474,13 +480,17 @@ def build_translation_probe_prompt_prefix_token_ids(
             "at the start of the assistant reply. You must continue from that "
             "exact prefix and produce only the continuation."
         )}]
-    prompt_ids = tokenizer.apply_chat_template(messages, add_generation_prompt=False, tokenize=True)
+    prompt_ids = tokenizer.apply_chat_template(
+        messages,
+        add_generation_prompt=True,
+        tokenize=True,
+        enable_thinking=False,
+    )
     if isinstance(prompt_ids, dict):
         prompt_ids = prompt_ids.get("input_ids", [])
     elif hasattr(prompt_ids, "input_ids"):
         prompt_ids = prompt_ids.input_ids
-    assistant_prefix_ids = tokenizer.encode("<|im_start|>assistant\n", add_special_tokens=False)
-    return list(prompt_ids) + list(assistant_prefix_ids) #返回翻译指令+assistant前缀的token ID列表，后面会拼上已提交翻译的token IDs
+    return list(prompt_ids)
 
 
 def build_final_completion_prompt(tokenizer: Any, full_source: str, committed_text: str, target_lang: str = "Chinese") -> str:
@@ -504,8 +514,12 @@ def build_final_completion_prompt(tokenizer: Any, full_source: str, committed_te
             "If there is no remaining source content to translate, output nothing.\n"
             f"Output only the remaining {target_lang} continuation."
         )}]
-    prompt = tokenizer.apply_chat_template(messages, add_generation_prompt=False, tokenize=False)
-    prompt += "<|im_start|>assistant\n"
+    prompt = tokenizer.apply_chat_template(
+        messages,
+        add_generation_prompt=True,
+        tokenize=False,
+        enable_thinking=False,
+    )
     if str(committed_text or "").strip():
         prompt += committed_text
     return prompt
@@ -767,7 +781,10 @@ def _sample_prefill_one_batch(
     # Apply chat template up to (and including) the assistant turn opener, then
     # prefill the observed source so the model can only generate the continuation.
     prompt = sampler_tokenizer.apply_chat_template(
-        messages, add_generation_prompt=True, tokenize=False
+        messages,
+        add_generation_prompt=True,
+        tokenize=False,
+        enable_thinking=False,
     )
     prompt += observed_source
 
