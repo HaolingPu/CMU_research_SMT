@@ -23,6 +23,9 @@ MAX_RATIO_REF="${MAX_RATIO_REF:-1.5}"
 TRAIN_SAMPLE_N="${TRAIN_SAMPLE_N:-40000}"
 SAMPLE_SEED="${SAMPLE_SEED:-42}"
 INPUT_TSV="${INPUT_TSV:-/data/group_data/li_lab/haolingp/consensus_handoff/train_xl_case_robust_asr_filtered_frozen_llm_reference.tsv}"
+PROMPT_VERSION="future_set_v2_two_groups"
+PREFIX_NORMALIZATION="case-insensitive-word-boundary"
+VALIDATION_PILOT="future-set-v2-prefixnorm-pilot10-r1-20260831-113627"
 
 usage() {
   cat <<'EOF'
@@ -57,6 +60,8 @@ validate_config() {
   (( POST_CONCURRENCY > 0 && POST_CONCURRENCY <= NUM_POST_SHARDS )) || \
     die "POST_CONCURRENCY must be in [1, NUM_POST_SHARDS]"
   (( POST_CONCURRENCY <= 24 )) || die "post-processing exceeds the 24-GPU limit"
+  (( TARGETED_NUM_FUTURES > 0 && TARGETED_NUM_FUTURES % 2 == 0 )) || \
+    die "TARGETED_NUM_FUTURES must be a positive even number"
   (( TRAIN_SAMPLE_N >= 0 )) || die "TRAIN_SAMPLE_N cannot be negative"
 }
 
@@ -69,7 +74,8 @@ Decode                : ${TOTAL_ROWS} rows, ${NUM_DECODE_TASKS} tasks, ${DECODE_
 Decode GPUs           : 2/job x ${DECODE_CONCURRENCY} = $((2 * DECODE_CONCURRENCY))
 GPU 0                 : Qwen3.8-27B-FP8 + Gemma-4-E2B samplers
 GPU 1                 : Qwen3.6-35B-A3B-FP8 translator/probe
-Sampler prompt        : future_set_v2_two_groups (10 plausible + 10 contrastive per model)
+Sampler prompt        : ${PROMPT_VERSION} ($((TARGETED_NUM_FUTURES / 2)) plausible + $((TARGETED_NUM_FUTURES / 2)) contrastive per model)
+Prefix normalization  : ${PREFIX_NORMALIZATION}
 Consensus             : min_voters_ratio=${MIN_VOTERS_RATIO}
 Post-processing       : SEGALE ${NUM_POST_SHARDS} shards, MetricX QE <= ${QE_THRESHOLD}, length ${MIN_RATIO_REF}:${MAX_RATIO_REF}
 Training sample target: ${TRAIN_SAMPLE_N} (0 means all surviving examples)
@@ -111,13 +117,18 @@ submit_run() {
 
   local git_commit
   git_commit=$(git -C "${REPO}" rev-parse HEAD)
+  local git_branch
+  git_branch=$(git -C "${REPO}" branch --show-current)
   cat >"${manifest}" <<EOF
 run_tag=${run_tag}
 created=$(date --iso-8601=seconds)
 git_commit=${git_commit}
-prompt_version=ambiguity_icl_v1
-sampler_1=Qwen3.8-27B-FP8
-sampler_2=gemma-4-E2B-it
+git_branch=${git_branch}
+prompt_version=${PROMPT_VERSION}
+prefix_normalization=${PREFIX_NORMALIZATION}
+validation_pilot=${VALIDATION_PILOT}
+sampler_1=gemma-4-E2B-it
+sampler_2=Qwen3.8-27B-FP8
 translator_probe=Qwen3.6-35B-A3B-FP8
 input_tsv=${INPUT_TSV}
 total_rows=${TOTAL_ROWS}
@@ -125,6 +136,9 @@ num_decode_tasks=${NUM_DECODE_TASKS}
 decode_concurrency=${DECODE_CONCURRENCY}
 decode_gpu_peak=$((2 * DECODE_CONCURRENCY))
 targeted_num_futures=${TARGETED_NUM_FUTURES}
+plausible_per_sampler=$((TARGETED_NUM_FUTURES / 2))
+contrastive_per_sampler=$((TARGETED_NUM_FUTURES / 2))
+max_raw_candidates_per_prefix=$((2 * TARGETED_NUM_FUTURES))
 min_voters_ratio=${MIN_VOTERS_RATIO}
 future_source_window=1
 num_post_shards=${NUM_POST_SHARDS}
