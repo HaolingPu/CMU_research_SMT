@@ -55,6 +55,21 @@ class ConsensusPromptHelpersTest(unittest.TestCase):
         self.assertFalse(decoder.is_valid_future_text("word " * 21))
         self.assertTrue(decoder.is_valid_future_text("collapsed after the heavy rain"))
 
+    def test_future_cleanup_strips_repeated_prefix_case_insensitively(self) -> None:
+        self.assertEqual(
+            decoder.clean_future_text("And these", "and these are the main challenges"),
+            "are the main challenges",
+        )
+        self.assertEqual(
+            decoder.clean_future_text(
+                "A sense of literary honesty compels the editor",
+                "EDITOR is merely a curator",
+            ),
+            "is merely a curator",
+        )
+        self.assertEqual(decoder.clean_future_text("The areas", "AREAS remain open"), "remain open")
+        self.assertEqual(decoder.clean_future_text("The areas are", "area remains open"), "area remains open")
+
     def test_diversity_filter_caps_repeated_openings_and_near_duplicates(self) -> None:
         selected = decoder.select_diverse_futures([
             "crucial for training the model",

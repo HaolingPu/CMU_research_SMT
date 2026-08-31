@@ -324,10 +324,21 @@ def strip_markdown_wrappers(text: str) -> str:
 
 
 def clean_future_text(observed_source: str, raw_text: str) -> str:
-    # 只保留第一行 (如果模型输出了多行，我们只取第一行作为续写)，并且如果第一行以observed source开头，就去掉这个重复的prefix（有些模型喜欢在续写里重复输入的source prefix）
+    def strip_prefix_ci(value: str, prefix: str) -> Optional[str]:
+        """Strip an English prefix case-insensitively at word boundaries."""
+        prefix = prefix.strip()
+        if not prefix or len(value) < len(prefix):
+            return None
+        if value[:len(prefix)].casefold() != prefix.casefold():
+            return None
+        if len(value) > len(prefix) and prefix[-1].isalnum() and value[len(prefix)].isalnum():
+            return None
+        return value[len(prefix):].lstrip()
+
     text = strip_markdown_wrappers(clean_model_text(raw_text))
-    if text.startswith(observed_source):
-        text = text[len(observed_source):].lstrip()
+    stripped = strip_prefix_ci(text, observed_source)
+    if stripped is not None:
+        text = stripped
     text = text.splitlines()[0].strip() if text else ""
     text = strip_markdown_wrappers(text)
     # Strip leading placeholders like "..." or "…" that instruct models sometimes prepend.
@@ -336,16 +347,14 @@ def clean_future_text(observed_source: str, raw_text: str) -> str:
     # observed source (instruct-model habit), strip the longest matching suffix-prefix.
     obs_trailing = observed_source.strip()
     if obs_trailing and text:
-        # Try the longest possible suffix of observed_source that matches the start of text.
+        # Try the longest word-boundary suffix that matches, ignoring capitalization.
         for k in range(min(len(obs_trailing), len(text)), 2, -1):
+            if k < len(obs_trailing) and obs_trailing[-k - 1].isalnum():
+                continue
             tail = obs_trailing[-k:]
-            if text.startswith(tail):
-                text = text[k:].lstrip()
-                break
-            # Also try after a leading space (text starts with a space in some models)
-            tail_space = " " + tail
-            if text.startswith(tail_space):
-                text = text[len(tail_space):].lstrip()
+            stripped = strip_prefix_ci(text, tail)
+            if stripped is not None:
+                text = stripped
                 break
     return text
 
