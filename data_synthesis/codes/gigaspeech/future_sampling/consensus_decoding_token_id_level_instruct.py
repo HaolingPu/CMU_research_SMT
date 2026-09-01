@@ -8,6 +8,7 @@ hypothesized full source, and consensus selects the committed target token.
 """
 import argparse
 import ast
+import glob
 import json
 import math
 import os
@@ -158,6 +159,12 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--num-concurrent-cases", type=int, default=8)
     p.add_argument("--skip-existing", action="store_true",
                    help="Skip rows whose per-utterance output JSON already exists.")
+    p.add_argument(
+        "--skip-existing-root",
+        default="",
+        help="Also skip utterance filenames already present under "
+             "ROOT/task_*/per_utt. This supports safe repartitioning on resume.",
+    )
     return p.parse_args()
 
 
@@ -1971,6 +1978,17 @@ def main() -> None:
     if args.verbose and args.verbose_dir:
         os.makedirs(args.verbose_dir, exist_ok=True)
 
+    existing_output_names: set[str] = set()
+    if args.skip_existing and args.skip_existing_root:
+        pattern = os.path.join(
+            os.path.abspath(args.skip_existing_root), "task_*", "per_utt", "*.json"
+        )
+        existing_output_names = {os.path.basename(path) for path in glob.glob(pattern)}
+        print(
+            f"[Resume index] {len(existing_output_names)} existing utterances under "
+            f"{args.skip_existing_root}"
+        )
+
     def _process_one_row(row_idx: int, series_dict: Dict[str, Any]) -> Dict[str, Any]:
         row = series_dict
         utt_id = str(row.get(args.id_column, row.get("id", f"row_{row_idx}")))
@@ -1979,8 +1997,13 @@ def main() -> None:
             if output_dir is not None else None
         )
 
-        if args.skip_existing and out_path is not None and os.path.exists(out_path):
-            print(f"[SKIP existing] {out_path}")
+        output_name = os.path.basename(out_path) if out_path is not None else ""
+        if (
+            args.skip_existing
+            and out_path is not None
+            and (os.path.exists(out_path) or output_name in existing_output_names)
+        ):
+            print(f"[SKIP existing] {output_name}")
             return {"utt_id": utt_id, "skipped_existing": True}
 
         verbose_log_file: Optional[Any] = None
