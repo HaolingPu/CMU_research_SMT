@@ -8,9 +8,9 @@
 # Usage (debug node, GPU 0):
 #   bash serve_qwen36_35b.sh          # foreground
 #   bash serve_qwen36_35b.sh stop
-set -e
+set -euo pipefail
 
-GEMMA4_ENV="/data/user_data/haolingp/conda_envs/gemma4"
+GEMMA4_ENV="${GEMMA4_ENV:-/data/user_data/haolingp/conda_envs/gemma4}"
 VLLM="${VLLM_BIN:-${GEMMA4_ENV}/bin/vllm}"
 MODEL="${MODEL:-/data/user_data/haolingp/models/Qwen3.6-35B-A3B-FP8}"
 PORT="${PORT:-8300}"
@@ -30,8 +30,8 @@ REASONING_PARSER="${REASONING_PARSER:-qwen3}"
 # ENFORCE_EAGER=1 skips torch.compile (fallback if compile crashes; slower/token).
 ENFORCE_EAGER="${ENFORCE_EAGER:-0}"
 
-export HF_HOME="/data/user_data/haolingp/hf_cache"
-export HF_HUB_CACHE="/data/user_data/haolingp/hf_cache/hub"
+export HF_HOME="${HF_HOME:-/data/user_data/haolingp/hf_cache}"
+export HF_HUB_CACHE="${HF_HUB_CACHE:-${HF_HOME}/hub}"
 export PATH="${GEMMA4_ENV}/bin:${PATH}"
 export CUDA_VISIBLE_DEVICES="${GPU}"
 
