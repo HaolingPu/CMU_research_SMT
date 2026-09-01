@@ -135,7 +135,7 @@ start_ts=$(date +%s)
   --num-concurrent-cases "${NUM_CONCURRENT_CASES}" \
   --skip-existing \
   --output-jsonl "${TASK_DIR}/per_utt/_.jsonl" \
-  --verbose --verbose-dir "${TASK_DIR}/verbose" \
+  --verbose --compact-verbose --verbose-dir "${TASK_DIR}/verbose" \
   2>&1 | tee -a "${TASK_DIR}/run.log"
 
 actual=$(find "${TASK_DIR}/per_utt" -maxdepth 1 -name '*.json' -type f | wc -l)

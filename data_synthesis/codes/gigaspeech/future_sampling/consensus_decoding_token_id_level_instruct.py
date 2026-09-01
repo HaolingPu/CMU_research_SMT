@@ -145,6 +145,12 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--output-jsonl", default=None)
     p.add_argument("--verbose", action="store_true")
     p.add_argument("--verbose-dir", default=None)
+    p.add_argument(
+        "--compact-verbose",
+        action="store_true",
+        help="Keep candidate/filter and consensus summaries, but omit the repeated "
+             "per-future next-token probability rows.",
+    )
     p.add_argument("--row-idx", type=int, default=0)
     p.add_argument("--utt-id", default=None)
     p.add_argument("--max-rows", type=int, default=1)
@@ -262,7 +268,6 @@ def _vlog(f: Optional[Any], msg: str) -> None:
         return
     line = str(msg) if msg.endswith("\n") else str(msg) + "\n"
     f.write(line)
-    f.flush()
 
 
 def _vlog_pretty_value(f: Optional[Any], label: str, value: Any) -> None:
@@ -1781,13 +1786,13 @@ def run_one_utterance(
                     accepted = gl.get("accepted_token_text", "?")
                     pending = gl.get("pending_text", "")
                     _vlog(verbose_log_file, f"  step={step} accepted={accepted!r} pending={pending!r}")
-                per_future = gl.get("per_future", [])
-                for pf in per_future:
-                    texts = pf.get("candidate_texts", [])
-                    probs = pf.get("candidate_probs", [])
-                    pairs = ", ".join(f"{t!r}:{p:.3f}" for t, p in zip(texts, probs))
-                    idx = per_future.index(pf)
-                    _vlog(verbose_log_file, f"    future[{idx}] candidates={len(texts)}: [{pairs}]")
+                if not args.compact_verbose:
+                    per_future = gl.get("per_future", [])
+                    for idx, pf in enumerate(per_future):
+                        texts = pf.get("candidate_texts", [])
+                        probs = pf.get("candidate_probs", [])
+                        pairs = ", ".join(f"{t!r}:{p:.3f}" for t, p in zip(texts, probs))
+                        _vlog(verbose_log_file, f"    future[{idx}] candidates={len(texts)}: [{pairs}]")
 
         new_committed, delta, committed_delta_token_ids, finalize_meta = finalize_external_commit( #修剪pending tokens，只提交解码后没有乱码的前缀部分
             tokenizer=instruct_tokenizer,
