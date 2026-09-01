@@ -23,6 +23,11 @@ TOTAL_ROWS="${TOTAL_ROWS:-40000}"
 ROW_OFFSET="${ROW_OFFSET:-0}"
 NUM_TASKS="${NUM_TASKS:-12}"
 NUM_CONCURRENT_CASES="${NUM_CONCURRENT_CASES:-8}"
+# Task 0 is the controlled throughput canary. Existing array tasks keep the
+# submitted value until they are explicitly requeued.
+if [[ "${TASK_ID}" == "${AMBIGUITY_TUNING_TASK_ID:-0}" ]]; then
+  NUM_CONCURRENT_CASES="${AMBIGUITY_TUNING_CONCURRENCY:-12}"
+fi
 TARGETED_NUM_FUTURES="${TARGETED_NUM_FUTURES:-20}"
 MIN_VOTERS_RATIO="${MIN_VOTERS_RATIO:-1.0}"
 FUTURE_SRC_WINDOW="${FUTURE_SRC_WINDOW:-1}"
@@ -88,6 +93,7 @@ wait_health() {
 
 echo "===== ambiguity decode task ${TASK_ID} ====="
 echo "job=${SLURM_JOB_ID} node=$(hostname) rows=${START_ROW}+${ROWS_PER_TASK}"
+echo "num_concurrent_cases=${NUM_CONCURRENT_CASES}"
 echo "samplers: qwen38=${QWEN38_PORT} gemma=${GEMMA_PORT}; translator: qwen36=${QWEN36_PORT}"
 nvidia-smi --query-gpu=index,name,memory.total,memory.free --format=csv
 

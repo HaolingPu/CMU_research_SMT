@@ -65,6 +65,7 @@ CMD=(
   --max-model-len "${MAX_LEN}"
   --max-num-seqs "${MAX_NUM_SEQS}"
   --gpu-memory-utilization "${GPU_MEM_UTIL}"
+  --enable-prefix-caching
   --limit-mm-per-prompt '{"image":0,"video":0}'
   --reasoning-parser "${REASONING_PARSER}"
   --trust-remote-code
