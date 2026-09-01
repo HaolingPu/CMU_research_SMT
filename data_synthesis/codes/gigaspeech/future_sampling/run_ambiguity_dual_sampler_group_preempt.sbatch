@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=amb40k_dual
 #SBATCH --nodes=1
-#SBATCH --cpus-per-task=24
+#SBATCH --cpus-per-task=16
 #SBATCH --gres=gpu:L40S:3
-#SBATCH --mem=144G
+#SBATCH --mem=96G
 #SBATCH --partition=preempt
 #SBATCH --qos=preempt_qos
 #SBATCH --array=0-7%8
