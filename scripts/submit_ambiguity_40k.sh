@@ -12,7 +12,7 @@ DATA_ROOT="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_
 TOTAL_ROWS="${TOTAL_ROWS:-40000}"
 NUM_DECODE_TASKS="${NUM_DECODE_TASKS:-12}"
 DECODE_CONCURRENCY="${DECODE_CONCURRENCY:-12}"
-NUM_CONCURRENT_CASES="${NUM_CONCURRENT_CASES:-4}"
+NUM_CONCURRENT_CASES="${NUM_CONCURRENT_CASES:-8}"
 NUM_POST_SHARDS="${NUM_POST_SHARDS:-24}"
 POST_CONCURRENCY="${POST_CONCURRENCY:-24}"
 TARGETED_NUM_FUTURES="${TARGETED_NUM_FUTURES:-20}"
@@ -57,6 +57,8 @@ validate_config() {
     die "DECODE_CONCURRENCY must be in [1, NUM_DECODE_TASKS]"
   (( 2 * DECODE_CONCURRENCY <= 24 )) || \
     die "decode requests $((2 * DECODE_CONCURRENCY)) GPUs; BABEL limit is 24"
+  (( NUM_CONCURRENT_CASES > 0 && NUM_CONCURRENT_CASES <= 16 )) || \
+    die "NUM_CONCURRENT_CASES must be in [1, 16] to match the sampler servers"
   (( POST_CONCURRENCY > 0 && POST_CONCURRENCY <= NUM_POST_SHARDS )) || \
     die "POST_CONCURRENCY must be in [1, NUM_POST_SHARDS]"
   (( POST_CONCURRENCY <= 24 )) || die "post-processing exceeds the 24-GPU limit"
@@ -72,6 +74,7 @@ Run tag              : ${run_tag}
 Input                 : ${INPUT_TSV}
 Decode                : ${TOTAL_ROWS} rows, ${NUM_DECODE_TASKS} tasks, ${DECODE_CONCURRENCY} concurrent
 Decode GPUs           : 2/job x ${DECODE_CONCURRENCY} = $((2 * DECODE_CONCURRENCY))
+Cases per worker      : ${NUM_CONCURRENT_CASES}
 GPU 0                 : Qwen3.8-27B-FP8 + Gemma-4-E2B samplers
 GPU 1                 : Qwen3.6-35B-A3B-FP8 translator/probe
 Sampler prompt        : ${PROMPT_VERSION} ($((TARGETED_NUM_FUTURES / 2)) plausible + $((TARGETED_NUM_FUTURES / 2)) contrastive per model)
@@ -135,6 +138,7 @@ total_rows=${TOTAL_ROWS}
 num_decode_tasks=${NUM_DECODE_TASKS}
 decode_concurrency=${DECODE_CONCURRENCY}
 decode_gpu_peak=$((2 * DECODE_CONCURRENCY))
+num_concurrent_cases=${NUM_CONCURRENT_CASES}
 targeted_num_futures=${TARGETED_NUM_FUTURES}
 plausible_per_sampler=$((TARGETED_NUM_FUTURES / 2))
 contrastive_per_sampler=$((TARGETED_NUM_FUTURES / 2))
