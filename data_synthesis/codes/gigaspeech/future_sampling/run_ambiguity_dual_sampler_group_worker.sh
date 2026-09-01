@@ -84,6 +84,7 @@ nvidia-smi --query-gpu=index,name,memory.total,memory.free --format=csv
 
 GPU=0 QWEN_PORT="${QWEN_A_PORT}" GEMMA_PORT="${GEMMA_A_PORT}" \
 QWEN_MODEL="${QWEN38_MODEL}" GEMMA_MODEL="${GEMMA_MODEL}" \
+PARALLEL_MODEL_START=1 \
 QWEN_PID_FILE="$(pid_file qwen_a)" GEMMA_PID_FILE="$(pid_file gemma_a)" \
 LOG_DIR="${RUN_LOG_DIR}/sampler_a" \
   "${SAMPLER_SERVER}" >"${RUN_LOG_DIR}/sampler_a.out" 2>"${RUN_LOG_DIR}/sampler_a.err" &
@@ -91,6 +92,7 @@ sampler_a_pid=$!
 
 GPU=1 QWEN_PORT="${QWEN_B_PORT}" GEMMA_PORT="${GEMMA_B_PORT}" \
 QWEN_MODEL="${QWEN38_MODEL}" GEMMA_MODEL="${GEMMA_MODEL}" \
+PARALLEL_MODEL_START=1 \
 QWEN_PID_FILE="$(pid_file qwen_b)" GEMMA_PID_FILE="$(pid_file gemma_b)" \
 LOG_DIR="${RUN_LOG_DIR}/sampler_b" \
   "${SAMPLER_SERVER}" >"${RUN_LOG_DIR}/sampler_b.out" 2>"${RUN_LOG_DIR}/sampler_b.err" &

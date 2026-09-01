@@ -19,6 +19,7 @@ QWEN_MAX_LEN="${QWEN_MAX_LEN:-4096}"
 GEMMA_MAX_LEN="${GEMMA_MAX_LEN:-4096}"
 QWEN_MAX_NUM_SEQS="${QWEN_MAX_NUM_SEQS:-16}"
 GEMMA_MAX_NUM_SEQS="${GEMMA_MAX_NUM_SEQS:-16}"
+PARALLEL_MODEL_START="${PARALLEL_MODEL_START:-0}"
 READY_TIMEOUT="${READY_TIMEOUT:-1200}"
 LOG_DIR="${LOG_DIR:-/tmp/qwen38_gemma_${SLURM_JOB_ID:-manual}}"
 QWEN_PID_FILE="${QWEN_PID_FILE:-/tmp/qwen38_${SLURM_JOB_ID:-manual}.pid}"
@@ -93,9 +94,9 @@ nvidia-smi --query-gpu=index,name,memory.total,memory.free --format=csv
   --trust-remote-code \
   >"${LOG_DIR}/qwen38.log" 2>&1 &
 echo $! >"${QWEN_PID_FILE}"
-wait_health qwen38 "${QWEN_PORT}" "${QWEN_PID_FILE}"
 
-"${VLLM_BIN}" serve "${GEMMA_MODEL}" \
+start_gemma() {
+  "${VLLM_BIN}" serve "${GEMMA_MODEL}" \
   --served-model-name gemma4-sampler \
   --dtype auto \
   --host 127.0.0.1 \
@@ -108,7 +109,16 @@ wait_health qwen38 "${QWEN_PORT}" "${QWEN_PID_FILE}"
   --trust-remote-code \
   --enforce-eager \
   >"${LOG_DIR}/gemma4.log" 2>&1 &
-echo $! >"${GEMMA_PID_FILE}"
+  echo $! >"${GEMMA_PID_FILE}"
+}
+
+if [[ "${PARALLEL_MODEL_START}" == "1" ]]; then
+  start_gemma
+  wait_health qwen38 "${QWEN_PORT}" "${QWEN_PID_FILE}"
+else
+  wait_health qwen38 "${QWEN_PORT}" "${QWEN_PID_FILE}"
+  start_gemma
+fi
 wait_health gemma4 "${GEMMA_PORT}" "${GEMMA_PID_FILE}"
 
 nvidia-smi --query-compute-apps=pid,used_memory --format=csv
