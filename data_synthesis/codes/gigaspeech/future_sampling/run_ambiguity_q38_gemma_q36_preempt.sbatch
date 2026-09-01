@@ -8,6 +8,8 @@
 #SBATCH --qos=preempt_qos
 #SBATCH --array=0-11%12
 #SBATCH --time=3-00:00:00
+# Model loading takes several minutes, so shorter backfill windows produce no data.
+#SBATCH --time-min=01:00:00
 #SBATCH --requeue
 #SBATCH --exclude=babel-o9-24,babel-q9-32,babel-t5-28
 #SBATCH -o /data/user_data/haolingp/data_synthesis/outputs/gigaspeech/slurm_logs/amb40k_%A_%a.out
