@@ -89,7 +89,6 @@ nvidia-smi --query-gpu=index,name,memory.total,memory.free --format=csv
   --max-model-len "${QWEN_MAX_LEN}" \
   --max-num-seqs "${QWEN_MAX_NUM_SEQS}" \
   --gpu-memory-utilization "${QWEN_GPU_MEM_UTIL}" \
-  --enable-prefix-caching \
   --limit-mm-per-prompt '{"image":0,"video":0}' \
   --trust-remote-code \
   >"${LOG_DIR}/qwen38.log" 2>&1 &
@@ -105,7 +104,6 @@ wait_health qwen38 "${QWEN_PORT}" "${QWEN_PID_FILE}"
   --max-model-len "${GEMMA_MAX_LEN}" \
   --max-num-seqs "${GEMMA_MAX_NUM_SEQS}" \
   --gpu-memory-utilization "${GEMMA_GPU_MEM_UTIL}" \
-  --enable-prefix-caching \
   --limit-mm-per-prompt '{"image":0,"video":0,"audio":0}' \
   --trust-remote-code \
   --enforce-eager \
