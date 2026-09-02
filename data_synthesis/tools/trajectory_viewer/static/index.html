@@ -20,21 +20,34 @@
         </div>
       </header>
 
-      <section class="control-deck" aria-label="Case navigation">
-        <button id="previous-case" class="icon-button" aria-label="Previous case">&#8592;</button>
-        <label class="case-picker">
-          <span>Review case</span>
-          <select id="case-select"></select>
-        </label>
-        <button id="next-case" class="icon-button" aria-label="Next case">&#8594;</button>
-        <label class="search-box">
-          <span class="sr-only">Search cases</span>
-          <input id="case-search" type="search" placeholder="Search utterance or source text">
-        </label>
-        <button id="play-trajectory" class="play-button">Play trajectory</button>
-      </section>
+      <div class="review-layout">
+        <aside class="case-sidebar" aria-label="Generated case index">
+          <div class="sidebar-heading">
+            <div>
+              <p class="eyebrow">CASE INDEX</p>
+              <h2>Generated cases</h2>
+            </div>
+            <span id="case-count" class="case-count"></span>
+          </div>
+          <div class="sidebar-search">
+            <span aria-hidden="true">&#8981;</span>
+            <input id="case-search" type="search" aria-label="Search cases" placeholder="Search ID or text">
+            <button id="clear-search" type="button" aria-label="Clear case search">&#215;</button>
+          </div>
+          <nav id="case-list" class="case-list" aria-label="Cases in input order"></nav>
+        </aside>
 
-      <main>
+        <main class="review-main">
+          <section class="control-deck" aria-label="Case navigation">
+            <button id="previous-case" class="icon-button" aria-label="Previous case">&#8592;</button>
+            <div class="current-selection">
+              <span>Current case</span>
+              <strong id="current-case-label">Loading...</strong>
+            </div>
+            <button id="next-case" class="icon-button" aria-label="Next case">&#8594;</button>
+            <button id="play-trajectory" class="play-button">Play trajectory</button>
+          </section>
+
         <section class="case-hero">
           <div class="case-title-block">
             <p id="case-position" class="eyebrow"></p>
@@ -81,7 +94,8 @@
             <p id="reference-text" lang="zh"></p>
           </article>
         </section>
-      </main>
+        </main>
+      </div>
     </div>
 
     <template id="step-template">

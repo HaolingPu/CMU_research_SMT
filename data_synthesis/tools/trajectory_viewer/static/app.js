@@ -7,11 +7,14 @@ const state = {
 
 const els = {
   runSummary: document.querySelector("#run-summary"),
-  caseSelect: document.querySelector("#case-select"),
+  caseList: document.querySelector("#case-list"),
+  caseCount: document.querySelector("#case-count"),
   caseSearch: document.querySelector("#case-search"),
+  clearSearch: document.querySelector("#clear-search"),
   previousCase: document.querySelector("#previous-case"),
   nextCase: document.querySelector("#next-case"),
   playTrajectory: document.querySelector("#play-trajectory"),
+  currentCaseLabel: document.querySelector("#current-case-label"),
   casePosition: document.querySelector("#case-position"),
   caseId: document.querySelector("#case-id"),
   sourceFull: document.querySelector("#source-full"),
@@ -111,14 +114,21 @@ function renderCase() {
   stopPlayback();
   const item = state.filtered[state.caseIndex];
   if (!item) return;
-  els.caseSelect.value = item.utt_id;
-  els.casePosition.textContent = `CASE ${state.caseIndex + 1} OF ${state.filtered.length} / ${item.task}`;
+  const totalCases = state.payload.cases.length;
+  els.casePosition.textContent = `CASE ${item.display_order} OF ${totalCases} / ${item.task}`;
+  els.currentCaseLabel.textContent = `${String(item.display_order).padStart(3, "0")} / ${item.utt_id}`;
   els.caseId.textContent = item.utt_id;
   els.sourceFull.textContent = item.source_full_text;
   els.finalPrediction.textContent = item.prediction || "No final prediction";
   els.referenceText.textContent = item.reference_text || "Reference unavailable";
   renderMetrics(item);
   els.trajectory.replaceChildren(...item.steps.map(renderStep));
+  document.querySelectorAll(".case-link").forEach((button) => {
+    button.classList.toggle("active", button.dataset.uttId === item.utt_id);
+    if (button.dataset.uttId === item.utt_id) button.scrollIntoView({ block: "nearest" });
+  });
+  const hash = `#case=${encodeURIComponent(item.utt_id)}`;
+  if (window.location.hash !== hash) window.history.replaceState(null, "", hash);
 
   if (item.audio_url) {
     els.audioPlayer.hidden = false;
@@ -132,14 +142,48 @@ function renderCase() {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-function rebuildCaseOptions() {
-  els.caseSelect.replaceChildren();
-  for (const item of state.filtered) {
-    const option = document.createElement("option");
-    option.value = item.utt_id;
-    option.textContent = `${item.utt_id} - ${item.source_full_text.slice(0, 72)}`;
-    els.caseSelect.append(option);
+function caseLinkElement(item, filteredIndex) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "case-link";
+  button.dataset.uttId = item.utt_id;
+  button.title = item.source_full_text;
+
+  const order = document.createElement("span");
+  order.className = "case-order";
+  order.textContent = String(item.display_order).padStart(3, "0");
+  const copy = document.createElement("span");
+  copy.className = "case-link-copy";
+  const id = document.createElement("span");
+  id.className = "case-link-id";
+  id.textContent = item.utt_id;
+  const source = document.createElement("span");
+  source.className = "case-link-source";
+  source.textContent = item.source_full_text;
+  copy.append(id, source);
+  button.append(order, copy);
+  button.addEventListener("click", () => {
+    state.caseIndex = filteredIndex;
+    renderCase();
+  });
+  return button;
+}
+
+function rebuildCaseList() {
+  els.caseList.replaceChildren();
+  if (!state.filtered.length) {
+    const empty = document.createElement("p");
+    empty.className = "case-list-empty";
+    empty.textContent = "No cases match this search.";
+    els.caseList.append(empty);
+    els.currentCaseLabel.textContent = "No matching case";
+    els.caseCount.textContent = `0 / ${state.payload.cases.length}`;
+    return;
   }
+  state.filtered.forEach((item, index) => els.caseList.append(caseLinkElement(item, index)));
+  els.caseCount.textContent = state.filtered.length === state.payload.cases.length
+    ? String(state.payload.cases.length)
+    : `${state.filtered.length} / ${state.payload.cases.length}`;
   state.caseIndex = Math.min(state.caseIndex, Math.max(0, state.filtered.length - 1));
   renderCase();
 }
@@ -151,7 +195,7 @@ function filterCases(query) {
     ? allCases.filter((item) => `${item.utt_id} ${item.source_full_text} ${item.prediction}`.toLowerCase().includes(normalized))
     : [...allCases];
   state.caseIndex = 0;
-  rebuildCaseOptions();
+  rebuildCaseList();
 }
 
 function moveCase(delta) {
@@ -203,19 +247,28 @@ async function load() {
   const response = await fetch("data/review.json");
   if (!response.ok) throw new Error(`Failed to load review data: ${response.status}`);
   state.payload = await response.json();
+  state.payload.cases.sort((left, right) =>
+    (left.row_index ?? Number.MAX_SAFE_INTEGER) - (right.row_index ?? Number.MAX_SAFE_INTEGER)
+      || left.utt_id.localeCompare(right.utt_id),
+  );
+  state.payload.cases.forEach((item, index) => { item.display_order = index + 1; });
   state.filtered = [...state.payload.cases];
   const { run_name: runName, case_count: caseCount, selection } = state.payload.meta;
   els.runSummary.textContent = `${runName} / ${caseCount} generated cases / ${selection}`;
-  rebuildCaseOptions();
+  const requestedId = new URLSearchParams(window.location.hash.slice(1)).get("case");
+  const requestedIndex = state.filtered.findIndex((item) => item.utt_id === requestedId);
+  state.caseIndex = requestedIndex >= 0 ? requestedIndex : 0;
+  rebuildCaseList();
 }
 
-els.caseSelect.addEventListener("change", () => {
-  state.caseIndex = state.filtered.findIndex((item) => item.utt_id === els.caseSelect.value);
-  renderCase();
-});
 els.previousCase.addEventListener("click", () => moveCase(-1));
 els.nextCase.addEventListener("click", () => moveCase(1));
 els.caseSearch.addEventListener("input", (event) => filterCases(event.target.value));
+els.clearSearch.addEventListener("click", () => {
+  els.caseSearch.value = "";
+  filterCases("");
+  els.caseSearch.focus();
+});
 els.playTrajectory.addEventListener("click", playTrajectory);
 els.showCumulative.addEventListener("change", () => {
   document.body.classList.toggle("show-cumulative", els.showCumulative.checked);
