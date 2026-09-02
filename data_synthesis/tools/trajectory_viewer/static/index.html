@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Future Consensus Trajectory Review</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="masthead">
+        <div>
+          <p class="eyebrow">SIMULTANEOUS SPEECH TRANSLATION</p>
+          <h1>Trajectory Review</h1>
+          <p id="run-summary" class="run-summary">Loading generated cases...</p>
+        </div>
+        <div class="legend" aria-label="Action legend">
+          <span><i class="dot dot-write"></i>WRITE</span>
+          <span><i class="dot dot-read"></i>READ</span>
+        </div>
+      </header>
+
+      <section class="control-deck" aria-label="Case navigation">
+        <button id="previous-case" class="icon-button" aria-label="Previous case">&#8592;</button>
+        <label class="case-picker">
+          <span>Review case</span>
+          <select id="case-select"></select>
+        </label>
+        <button id="next-case" class="icon-button" aria-label="Next case">&#8594;</button>
+        <label class="search-box">
+          <span class="sr-only">Search cases</span>
+          <input id="case-search" type="search" placeholder="Search utterance or source text">
+        </label>
+        <button id="play-trajectory" class="play-button">Play trajectory</button>
+      </section>
+
+      <main>
+        <section class="case-hero">
+          <div class="case-title-block">
+            <p id="case-position" class="eyebrow"></p>
+            <h2 id="case-id"></h2>
+            <p id="source-full" class="source-full"></p>
+          </div>
+          <div id="metric-grid" class="metric-grid"></div>
+        </section>
+
+        <section class="audio-card">
+          <div>
+            <p class="card-label">SOURCE AUDIO</p>
+            <p id="audio-status">Original GigaSpeech segment</p>
+          </div>
+          <audio id="audio-player" controls preload="metadata"></audio>
+        </section>
+
+        <section class="trajectory-section">
+          <div class="trajectory-heading">
+            <div>
+              <p class="eyebrow">INCREMENTAL DECODING</p>
+              <h2>Source-to-translation trajectory</h2>
+            </div>
+            <label class="compact-toggle">
+              <input id="show-cumulative" type="checkbox">
+              <span>Show cumulative text</span>
+            </label>
+          </div>
+
+          <div class="column-headings" aria-hidden="true">
+            <div>Source ASR chunks</div>
+            <div>Committed translation</div>
+          </div>
+          <div id="trajectory" class="trajectory"></div>
+        </section>
+
+        <section class="outcome-grid">
+          <article>
+            <p class="card-label">FINAL PREDICTION</p>
+            <p id="final-prediction" lang="zh"></p>
+          </article>
+          <article>
+            <p class="card-label">REFERENCE</p>
+            <p id="reference-text" lang="zh"></p>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <template id="step-template">
+      <article class="trajectory-row">
+        <div class="source-cell">
+          <div class="cell-topline">
+            <span class="step-number"></span>
+            <span class="source-label mobile-label">SOURCE</span>
+          </div>
+          <p class="source-chunk"></p>
+          <p class="source-cumulative cumulative-text"></p>
+          <details class="future-details">
+            <summary></summary>
+            <p class="future-prefix"></p>
+            <div class="future-groups"></div>
+          </details>
+        </div>
+        <div class="translation-cell">
+          <div class="cell-topline">
+            <span class="action-pill"></span>
+            <span class="translation-label mobile-label">TRANSLATION</span>
+          </div>
+          <p class="translation-delta" lang="zh"></p>
+          <p class="translation-cumulative cumulative-text" lang="zh"></p>
+        </div>
+      </article>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>
