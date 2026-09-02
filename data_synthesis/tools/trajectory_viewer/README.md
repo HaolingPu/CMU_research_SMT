@@ -5,6 +5,26 @@ read-only review site. It shows the source ASR chunks, committed translation del
 READ/WRITE actions, selected Gemma/Qwen futures, final prediction, reference, metrics,
 and the extracted GigaSpeech audio segment.
 
+## Packaged 100-case review set
+
+The shared bundle is stored at:
+
+```text
+/data/group_data/li_lab/haolingp/data_synthesis/trajectory_reviews/ambiguity-q38-gemma-q36-first100
+```
+
+It contains:
+
+- `raw/per_utt/`: generated trajectory JSONs.
+- `raw/verbose/`: complete future-generation and filtering logs.
+- `audio/`: extracted source clips.
+- `data/review.json`: browser-ready data for all 100 cases.
+- `index.html`, `styles.css`, and `app.js`: the review website.
+
+`/data/group_data` is mounted on compute nodes, not `login2`. From the login node,
+use `sbatch` as shown below or enter an existing allocation with
+`srun --jobid=<job_id> --overlap --pty bash` before listing the bundle.
+
 ## Build a 100-case bundle on a BABEL compute node
 
 ```bash
