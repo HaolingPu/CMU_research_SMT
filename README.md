@@ -35,9 +35,12 @@ Conda envs on Babel (`source ~/miniconda3/etc/profile.d/conda.sh && conda activa
 | `segale` | SEGALE QE — **sm_89 only** (L40S / 6000Ada); never run on RTX_PRO_6000 |
 | `SMT`, `gemma4` | misc synthesis / gemma experiments |
 
-Training runs inside **apptainer** (`scripts/train/launch_container.sh`, ms-swift + Megatron image);
-no conda env needed. Text captures of every env (pip freeze, conda list, key versions) are in
-`data_synthesis/migration/environment/`. Nothing here runs on the Mac except analysis/plots.
+Training runs inside **apptainer** (`scripts/train/launch_container.sh`, ms-swift + Megatron image).
+The ambiguity-consensus generation runtime also has a pinned container in
+`containers/generation/`; its portable Slurm runner is documented in
+`data_synthesis/codes/gigaspeech/future_sampling/external_runner/README.md`.
+Text captures of every Conda environment (pip freeze, conda list, key versions) are in
+`data_synthesis/migration/environment/`. Nothing GPU-dependent runs on the Mac.
 
 ## 3. Pipeline & entrypoints
 

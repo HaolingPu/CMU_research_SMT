@@ -1,0 +1,13 @@
+# The generation image needs only its runtime definition and frozen package
+# capture. Excluding everything else prevents local data, outputs, and secrets
+# from entering a Docker/BuildKit context.
+**
+!.dockerignore
+!containers/
+!containers/generation/
+!containers/generation/Dockerfile
+!containers/generation/verify_runtime.py
+!data_synthesis/
+!data_synthesis/migration/
+!data_synthesis/migration/environment/
+!data_synthesis/migration/environment/pip_freeze_gemma4.txt

@@ -8,10 +8,17 @@ REPO_ROOT="${REPO_ROOT:-$(cd -- "${SCRIPT_DIR}/../../../../.." && pwd)}"
 
 : "${INPUT_TSV:?Set INPUT_TSV to the frozen input TSV}"
 : "${OUTPUT_ROOT:?Set OUTPUT_ROOT to a shared output directory}"
-: "${PYTHON_BIN:?Set PYTHON_BIN to the vLLM environment's python}"
 : "${QWEN38_MODEL:?Set QWEN38_MODEL to Qwen3.8-27B-FP8}"
 : "${GEMMA_MODEL:?Set GEMMA_MODEL to gemma-4-E2B-it}"
 : "${QWEN36_MODEL:?Set QWEN36_MODEL to Qwen3.6-35B-A3B-FP8}"
+
+CONTAINER_IMAGE="${CONTAINER_IMAGE:-}"
+if [[ -z "${CONTAINER_IMAGE}" ]]; then
+  : "${PYTHON_BIN:?Set PYTHON_BIN, or set CONTAINER_IMAGE to use Apptainer}"
+else
+  # Some clusters expose Apptainer only inside scheduled compute jobs.
+  PYTHON_BIN=/opt/generation/bin/python
+fi
 
 NUM_TASKS="${NUM_TASKS:-8}"
 MAX_CONCURRENT_TASKS="${MAX_CONCURRENT_TASKS:-${NUM_TASKS}}"
@@ -29,6 +36,9 @@ if (( NUM_TASKS < 1 || MAX_CONCURRENT_TASKS < 1 )); then
 fi
 
 mkdir -p "${OUTPUT_ROOT}/slurm_logs"
+export HF_HOME="${HF_HOME:-${HOME}/.cache/huggingface}"
+export HF_HUB_CACHE="${HF_HUB_CACHE:-${HF_HOME}/hub}"
+mkdir -p "${HF_HOME}"
 COMMIT=$(git -C "${REPO_ROOT}" rev-parse HEAD)
 MANIFEST="${OUTPUT_ROOT}/external_run_manifest.txt"
 {
@@ -43,14 +53,18 @@ MANIFEST="${OUTPUT_ROOT}/external_run_manifest.txt"
   printf 'qwen38_model=%s\n' "${QWEN38_MODEL}"
   printf 'gemma_model=%s\n' "${GEMMA_MODEL}"
   printf 'qwen36_model=%s\n' "${QWEN36_MODEL}"
+  printf 'container_image=%s\n' "${CONTAINER_IMAGE:-none}"
+  printf 'python_bin=%s\n' "${PYTHON_BIN}"
 } >"${MANIFEST}"
 
-export REPO_ROOT INPUT_TSV OUTPUT_ROOT PYTHON_BIN
+export REPO_ROOT INPUT_TSV OUTPUT_ROOT PYTHON_BIN CONTAINER_IMAGE
 export QWEN38_MODEL GEMMA_MODEL QWEN36_MODEL
 export NUM_TASKS ROW_OFFSET SLICE_ROWS OUTPUT_TASK_OFFSET
 export NUM_CONCURRENT_CASES="${NUM_CONCURRENT_CASES:-12}"
-export HF_HOME="${HF_HOME:-${HOME}/.cache/huggingface}"
-export HF_HUB_CACHE="${HF_HUB_CACHE:-${HF_HOME}/hub}"
+for name in TARGETED_NUM_FUTURES MIN_VOTERS_RATIO FUTURE_SRC_WINDOW \
+  ID_COLUMN PORT_BASE; do
+  [[ -z "${!name:-}" ]] || export "${name}"
+done
 
 SBATCH_ARGS=(
   --parsable
