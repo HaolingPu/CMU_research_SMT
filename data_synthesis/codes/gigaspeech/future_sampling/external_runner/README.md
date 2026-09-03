@@ -50,11 +50,16 @@ an unrelated server. Pull the image from GHCR by immutable digest, then cache it
 as a `.sif` on a filesystem shared by the mentor's compute nodes:
 
 ```bash
-IMAGE='docker://ghcr.io/haolingpu/cmu-research-smt-generation@sha256:<digest>'
+IMAGE='docker://ghcr.io/haolingpu/cmu-research-smt-generation@sha256:f52a26baf96d561e8d80cf645f4d07a237f9d7c2a7f335fb19e341d13472f984'
 apptainer pull /shared/containers/ambiguity-generation.sif "$IMAGE"
 apptainer exec --nv /shared/containers/ambiguity-generation.sif \
   python /opt/verify_runtime.py
 ```
+
+This image was built successfully by GitHub Actions from environment commit
+`6ae6129284637d7582b0186cb29beee60c605b98`. The package currently permits
+anonymous pulls. `GENERATION_IMAGE.txt` contains the same immutable reference
+for scripts and manifests.
 
 For a private GHCR package, authenticate once with a GitHub token containing
 `read:packages`. Never store that token in this repository or a Slurm script.

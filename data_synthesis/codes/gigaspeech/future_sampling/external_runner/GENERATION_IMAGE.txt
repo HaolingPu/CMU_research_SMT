@@ -1,0 +1,1 @@
+docker://ghcr.io/haolingpu/cmu-research-smt-generation@sha256:f52a26baf96d561e8d80cf645f4d07a237f9d7c2a7f335fb19e341d13472f984
