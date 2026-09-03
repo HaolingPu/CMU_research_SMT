@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib
 import importlib.metadata
 import sys
 
@@ -36,6 +37,12 @@ def main() -> int:
         print(f"{package}={actual}")
         if actual != expected:
             failures.append(f"{package}: expected {expected}, found {actual}")
+
+    for module in ("torch", "transformers", "vllm"):
+        try:
+            importlib.import_module(module)
+        except Exception as exc:  # pragma: no cover - exercised in the image build
+            failures.append(f"cannot import {module}: {exc}")
 
     if not args.no_cuda:
         import torch

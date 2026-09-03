@@ -15,6 +15,8 @@ time.
 - Base: NVIDIA CUDA 12.9.1 cuDNN runtime, pinned by OCI digest in `Dockerfile`.
 - Python: 3.12.
 - Packages: `data_synthesis/migration/environment/pip_freeze_gemma4.txt`.
+- Compatibility substitution: `apache-tvm-ffi` 0.1.10 replaces the unpublished
+  0.1.10rc2 capture; all other package versions remain unchanged.
 - vLLM: commit `8617f8676b5ae936382ea00fa92693f59fbb9d69`,
   installed from its immutable per-commit wheel.
 - Architecture: `linux/amd64`; the tested GPUs are NVIDIA L40S.

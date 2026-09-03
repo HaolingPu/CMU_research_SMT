@@ -33,11 +33,15 @@ RUN python3.12 -m venv /opt/generation \
     && /opt/generation/bin/pip install --no-cache-dir pip==26.0.1
 
 # This capture came from the exact gemma4 environment used by the production
-# 40K run. vLLM is removed from the generic lock and installed from its immutable
-# per-commit upstream wheel below.
+# 40K run. Dependencies are installed without re-resolution because that tested
+# environment intentionally uses Transformers 5 with a vLLM wheel whose
+# conservative metadata still declares Transformers <5. The only substituted
+# package is an unpublished apache-tvm-ffi prerelease; 0.1.10 is ABI-compatible.
 COPY data_synthesis/migration/environment/pip_freeze_gemma4.txt /tmp/pip-freeze.txt
-RUN grep -v '^vllm==' /tmp/pip-freeze.txt > /tmp/requirements.txt \
-    && /opt/generation/bin/pip install --no-cache-dir \
+RUN sed -e '/^vllm==/d' \
+        -e 's/^apache-tvm-ffi==0.1.10rc2$/apache-tvm-ffi==0.1.10/' \
+        /tmp/pip-freeze.txt > /tmp/requirements.txt \
+    && /opt/generation/bin/pip install --no-cache-dir --no-deps \
         --extra-index-url https://download.pytorch.org/whl/cu129 \
         -r /tmp/requirements.txt \
     && /opt/generation/bin/pip install --no-cache-dir --no-deps \
