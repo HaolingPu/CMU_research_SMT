@@ -1,35 +1,37 @@
 # Research TODO
 
-Updated: 2026-09-04
+Updated: 2026-09-05
 
 This is the working task list for the ambiguity-aware future-consensus
 simultaneous translation project. Do not change the active 40K run's frozen
 method while it is in progress; new sampler designs belong in separate pilot
 runs with separate output roots.
 
-## Current sprint (as of 2026-09-04 23:00 ET), in priority order
+## Current sprint (as of 2026-09-05 10:20 ET), in priority order
 
-State: decode at 39,175 / 40,000 unique rows; tasks 2, 6, 9 and the gap-fill
-are DONE; tasks 3, 4, 5, 7, 8, 10, 11 are finishing on resubmits (job IDs in
-the run manifest). A 2-hour watcher in the Claude Code session resubmits
-TIMEOUT tasks and will run the verifier at 40,000. Main tasks 0 and 1 were
-released at ~10:40 ET and are regenerating rows already finished by task_12/13
-(892 + 859 duplicate files so far).
+State: decode COMPLETE, 40,000 / 40,000 unique utterances verified (0 missing,
+0 unreadable). Main tasks 0 and 1 were cancelled 2026-09-05 10:05 ET after
+writing 1,793 duplicate copies; those are excluded by the dedup symlink view
+`<decode_root>-dedup` (verified 40,000 / 0 duplicates). The post-decode chain
+was resubmitted from that view at 10:15 ET (jobs 10323222–10323232: SEGALE →
+MetricX QE → length filter → convert → LoRA train → eval on ACL 6060 dev and
+Simul-tst-COMMON). A 2-hour watcher in the Claude Code session follows it.
 
 ### P0 — needs a decision from Haoling
-- [ ] Cancel main-array tasks 0 and 1 (`scancel 10280652_0 10280652_1`). They
-  cover no missing rows and burn 4 GPUs writing duplicate utterance IDs.
-- [ ] Approve commit + push of the Simul-tst-COMMON eval chain change
+- [x] Cancel main-array tasks 0 and 1. (Cancelled by Haoling 2026-09-05 10:05 ET.)
+- [x] Approve commit + push of the Simul-tst-COMMON eval chain change (commit 4df4927, pulled on BABEL)
   (`scripts/infer/run_infer_after_train_generic.sbatch`,
   `scripts/infer/eval_all_ckpts_simultst.sh`, `scripts/submit_ambiguity_40k.sh`),
   then `git pull --ff-only` on BABEL before the downstream chain is rebuilt.
 
 ### P0 — right after decode reaches 40,000
-- [ ] Run the verifier over rows 0–39,999; expect duplicate IDs from task_00 /
-  task_01. Build a one-JSON-per-utterance manifest (prefer task_12/13/14/15
-  copies for rows 0–6667) before any downstream stage reads the decode root.
-- [ ] Cancel the stale chain 10280664–10280673 and resubmit from SEGALE prepare
-  through eval (ACL 6060 + Simul-tst-COMMON) with the committed launcher.
+- [x] Run the verifier over rows 0–39,999 and build the one-JSON-per-utterance view.
+  (Raw root: 40,000 unique, 0 missing, 1,793 duplicates from task_00/01. Dedup
+  symlink view `<decode_root>-dedup` built by `external_runner/dedupe_decode_root.py`,
+  verified 40,000 / 0 duplicates, 2026-09-05.)
+- [x] Cancel the stale chain 10280664–10280673 and resubmit from SEGALE prepare
+  through eval. (Resubmitted 2026-09-05 10:15 ET via `scripts/resubmit_ambiguity_40k_post.sh`,
+  jobs 10323222–10323232; 2-hour watcher active in the Claude Code session.)
 - [ ] Record survivor counts after MetricX QE ≤ 3.0 and after the 0.7–1.5
   length filter; report BLEU / LAAL / XCOMET vs top5-axis5 and hibiki on both
   test sets.
@@ -80,15 +82,15 @@ released at ~10:40 ET and are regenerating rows already finished by task_12/13
 
 ## P0: Finish and verify the active 40K experiment
 
-- [ ] Monitor BABEL run
-  `ambiguity-q38-gemma-q36-fsetv2-prefixnorm-strict-40k-r1-20260831`.
+- [x] Monitor BABEL run
+  `ambiguity-q38-gemma-q36-fsetv2-prefixnorm-strict-40k-r1-20260831` decode (complete 2026-09-05 06:53 ET).
 - [ ] Preserve completed JSONs and keep total concurrent GPU use at or below 24.
 - [x] Resolve the held-array coverage/dependency issue after current workers
   finish: the dual worker covers rows 0-4999, while held main-array task 1 also
   owns rows 5000-6667. (Gap-fill 10311095 completed rows 5000-6667 into
   task_14/15 on 2026-09-04. Dependency chain still to be rebuilt.)
-- [ ] Verify the exact intended 40,000 utterance IDs, not only the file count.
-- [ ] Repair the stale downstream Slurm dependencies without rerunning completed
+- [x] Verify the exact intended 40,000 utterance IDs, not only the file count.
+- [x] Repair the stale downstream Slurm dependencies without rerunning completed
   decode rows.
 - [ ] Complete 24-shard SEGALE alignment and verify all shard sentinels.
 - [ ] Complete 24-shard MetricX QE, retain cases with maximum sentence QE <= 3.0,
