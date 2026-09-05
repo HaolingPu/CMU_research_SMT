@@ -82,7 +82,7 @@ Prefix normalization  : ${PREFIX_NORMALIZATION}
 Consensus             : min_voters_ratio=${MIN_VOTERS_RATIO}
 Post-processing       : SEGALE ${NUM_POST_SHARDS} shards, MetricX QE <= ${QE_THRESHOLD}, length ${MIN_RATIO_REF}:${MAX_RATIO_REF}
 Training sample target: ${TRAIN_SAMPLE_N} (0 means all surviving examples)
-Final evaluation      : BLEU + latency + Unbabel/XCOMET-XL COMET
+Final evaluation      : BLEU + latency + Unbabel/XCOMET-XL COMET on ACL 6060 dev and Simul-tst-COMMON
 Output                : ${DATA_ROOT}/${run_tag}
 Model                 : /data/user_data/haolingp/ckpts/infinisst-omni/gigaspeech-zh-consensus-${run_tag}-s-bsz4
 EOF
@@ -152,6 +152,7 @@ length_ratio_ref=${MIN_RATIO_REF}:${MAX_RATIO_REF}
 train_sample_n=${TRAIN_SAMPLE_N}
 sample_seed=${SAMPLE_SEED}
 quality_metrics=BLEU,Unbabel/XCOMET-XL
+eval_sets=acl_6060_dev,simul_tst_common
 decode_root=${decode_root}
 post_root=${post_root}
 length_filtered=${length_filtered}
@@ -243,7 +244,7 @@ EOF
   eval_launcher_jid=$(sbatch --parsable --dependency="afterok:${train_jid}" \
     --partition=preempt --qos=preempt_cpu_qos --requeue \
     --output="${log_dir}/eval_launcher_%j.out" --error="${log_dir}/eval_launcher_%j.err" \
-    --export="ALL,EXP=${exp},CHILD_PARTITION=preempt,CHILD_GPU_QOS=preempt_qos,CKPTS_FILE=${ckpts_file},PIPELINE_MANIFEST=${manifest}" \
+    --export="ALL,EXP=${exp},CHILD_PARTITION=preempt,CHILD_GPU_QOS=preempt_qos,CKPTS_FILE=${ckpts_file},RUN_SIMULTST=1,CKPTS_SIMULTST_FILE=${run_dir}/ckpts_simultst.txt,PIPELINE_MANIFEST=${manifest}" \
     "${REPO}/scripts/infer/run_infer_after_train_generic.sbatch")
   echo "eval_launcher=${eval_launcher_jid}" | tee -a "${manifest}"
 
