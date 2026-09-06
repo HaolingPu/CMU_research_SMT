@@ -319,6 +319,42 @@ h2 {
 .future-group h4 { margin: 0 0 8px; font-size: 0.72rem; }
 .future-group ol { margin: 0; padding-left: 19px; color: var(--ink-soft); font-size: 0.76rem; line-height: 1.45; }
 
+/* Next-token consensus panel */
+.consensus-details { margin-top: 8px; }
+.consensus-details > summary { cursor: pointer; color: var(--ink-soft); font-size: 0.72rem; font-weight: 750; letter-spacing: 0.02em; }
+.consensus-body { margin-top: 8px; }
+.cons-line { margin: 4px 0; font-size: 0.76rem; line-height: 1.5; color: var(--ink); }
+.cons-line.muted { color: var(--ink-soft); }
+.cons-line.warn { color: #8a4b00; }
+.cons-step { margin: 6px 0; padding: 6px 9px; border-radius: 9px; background: rgba(255,255,255,0.55); border: 1px solid var(--line); }
+.cons-step > summary { cursor: pointer; font-size: 0.75rem; line-height: 1.5; }
+.cons-step.cons-stop { border-color: rgba(180, 60, 30, 0.35); }
+.cons-k { display: inline-block; min-width: 3.4em; color: var(--ink-soft); font-weight: 750; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.cons-token { display: inline-block; padding: 0 6px; border-radius: 6px; background: rgba(20, 120, 90, 0.16); color: #0f5a45; font-weight: 750; font-family: "Songti SC", Georgia, serif; }
+.cons-stopreason { color: #9a3a1c; font-weight: 750; }
+.cons-stat { margin-left: 8px; color: var(--ink-soft); font-size: 0.7rem; }
+.cons-body { margin-top: 6px; }
+.inter-list { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin: 4px 0 6px; }
+.inter-label { font-size: 0.68rem; color: var(--ink-soft); font-weight: 750; margin-right: 4px; }
+.fut-rows { display: flex; flex-direction: column; gap: 5px; max-height: 480px; overflow: auto; padding-right: 4px; }
+.fut-row { padding: 5px 7px; border-radius: 7px; background: rgba(255,255,255,0.7); border: 1px solid rgba(20, 43, 51, 0.08); }
+.fut-meta { display: flex; gap: 8px; align-items: baseline; min-width: 0; font-size: 0.72rem; line-height: 1.4; }
+.fut-idx { flex: 0 0 auto; color: var(--ink-soft); font-weight: 750; font-variant-numeric: tabular-nums; }
+.fut-tag { flex: 0 0 auto; padding: 0 5px; border-radius: 5px; font-size: 0.62rem; font-weight: 750; letter-spacing: 0.04em; }
+.fut-plausible { background: rgba(30, 90, 160, 0.14); color: #1d4f8a; }
+.fut-contrastive { background: rgba(160, 90, 20, 0.14); color: #7a4a10; }
+.fut-text { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-soft); }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.chip { display: inline-flex; align-items: baseline; gap: 4px; padding: 1px 6px; border-radius: 6px; background: rgba(20, 43, 51, 0.06); font-size: 0.7rem; line-height: 1.5; border: 1px solid transparent; }
+.chip b { font-weight: 600; font-family: "Songti SC", Georgia, serif; }
+.chip i { font-style: normal; color: var(--ink-soft); font-variant-numeric: tabular-nums; font-size: 0.64rem; }
+.chip.top1 { border-color: rgba(20, 43, 51, 0.25); }
+.chip.hit { background: rgba(20, 120, 90, 0.2); border-color: rgba(20, 120, 90, 0.5); }
+.chip.inter { background: rgba(180, 90, 30, 0.14); }
+.chip.hit.inter { background: rgba(20, 120, 90, 0.2); }
+.chip.miss { background: rgba(160, 40, 30, 0.12); color: #8a2a1c; }
+.raw-log-link { display: inline-block; margin-top: 6px; font-size: 0.72rem; color: var(--write); font-weight: 750; }
+
 .cumulative-text { display: none; margin: 7px 0 0; padding-top: 7px; border-top: 1px dashed var(--line); color: var(--ink-soft); font-size: 0.78rem; line-height: 1.4; }
 body.show-cumulative .cumulative-text { display: block; }
 .mobile-label { display: none; }

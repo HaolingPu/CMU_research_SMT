@@ -5,6 +5,32 @@ read-only review site. It shows the source ASR chunks, committed translation del
 READ/WRITE actions, selected Gemma/Qwen futures, final prediction, reference, metrics,
 and the extracted GigaSpeech audio segment.
 
+Since 2026-09-06 it also exposes the **next-token consensus trace** parsed from each
+verbose log. Every step row has a "next-token consensus" panel with: raw-sampling keep
+counts per model/mode, the accepted token sequence, and one expandable block per
+consensus step showing either the accepted token (with how many futures ranked it
+first, mean and min probability) or the stop reason with the candidate union; expanding
+a block lists every retained future (index, sampler, plausible/contrastive, text) with
+its top candidates and probabilities. Accepted tokens are highlighted green, union
+members orange; the horizon filter and byte-boundary trim are reported when they fire.
+The trace lives in `data/consensus/<utt_id>.json` (loaded lazily per case,
+`--top-candidates`, default 8, caps the candidates stored per future per step) and the
+case header links to the raw log under `raw/verbose/`. Two extra metrics appear per
+case: consensus steps and horizon drops.
+
+Rebuild from a previously packaged bundle without cluster access:
+
+```bash
+python3 data_synthesis/tools/trajectory_viewer/build_review_bundle.py \
+  --raw-dir <old_bundle>/raw \
+  --order-from <old_bundle>/data/review.json \
+  --output-dir <new_bundle> --limit 100 --skip-audio --overwrite
+```
+
+`--raw-dir` expects the flat `per_utt/` + `verbose/` layout of a bundle's `raw/`
+folder; `--order-from` reuses the row order, task names and audio metadata of the
+earlier `review.json` so case numbering stays stable.
+
 ## Packaged 100-case review set
 
 The shared bundle is stored at:
