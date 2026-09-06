@@ -21,7 +21,6 @@ BASE="${BASE:?BASE is required}"
 CODE_SNAPSHOT="${CODE_SNAPSHOT:?CODE_SNAPSHOT is required}"
 MODEL_PATH="${MODEL_PATH:-/data/user_data/haolingp/models/Qwen3.6-35B-A3B-FP8}"
 GENERATION_ENV="${GENERATION_ENV:-/data/user_data/haolingp/conda_envs/gemma4}"
-LEGACY_RUNNER="/home/haolingp/CMU_research_SMT/scripts/synth/run_legacy_vllm_script.py"
 INPUT_TSV="${INPUT_TSV:-/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_xl_case_robust_asr-filtered.tsv}"
 NUM_TASKS="${NUM_TASKS:-24}"
 TP="${TP:-1}"
@@ -70,13 +69,13 @@ nvidia-smi --query-gpu=index,name,memory.total,memory.free --format=csv
 
 case "${METHOD}" in
   east)
-    "${GENERATION_ENV}/bin/python" "${LEGACY_RUNNER}" \
+    "${GENERATION_ENV}/bin/python" \
       "${CODE_SNAPSHOT}/llm_output_gigaspeech_trajectory.py" \
       "${COMMON_ARGS[@]}" \
       --batch-size "${BATCH_SIZE:-4096}"
     ;;
   simul-must-c)
-    "${GENERATION_ENV}/bin/python" "${LEGACY_RUNNER}" \
+    "${GENERATION_ENV}/bin/python" \
       "${CODE_SNAPSHOT}/salami/llm_output_salami.py" \
       "${COMMON_ARGS[@]}" \
       --batch-size "${BATCH_SIZE:-2048}"

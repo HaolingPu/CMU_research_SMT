@@ -37,6 +37,7 @@ fi
 cd "${REPO}"
 mkdir -p "${RUN_ROOT}/code_snapshot/salami" "${RUN_ROOT}/east/logs" "${RUN_ROOT}/simul_must_c/logs"
 SNAPSHOT="${RUN_ROOT}/code_snapshot"
+GENERATION_RUNTIME="${RUN_ROOT}/generation_runtime"
 
 snapshot_file() {
   local path=$1
@@ -57,6 +58,13 @@ snapshot_file data_synthesis/codes/gigaspeech/final_output_gigaspeech.py
 snapshot_file data_synthesis/codes/gigaspeech/check_salami_final.py
 snapshot_file data_synthesis/codes/gigaspeech/salami/map_salami_to_offline_gigaspeech.py
 CODE_SNAPSHOT="${SNAPSHOT}/data_synthesis/codes/gigaspeech"
+GENERATION_CODE="${GENERATION_RUNTIME}/data_synthesis/codes/gigaspeech"
+python scripts/synth/patch_legacy_teacher_generator.py \
+  --input "${CODE_SNAPSHOT}/llm_output_gigaspeech_trajectory.py" \
+  --output "${GENERATION_CODE}/llm_output_gigaspeech_trajectory.py"
+python scripts/synth/patch_legacy_teacher_generator.py \
+  --input "${CODE_SNAPSHOT}/salami/llm_output_salami.py" \
+  --output "${GENERATION_CODE}/salami/llm_output_salami.py"
 
 EAST_VARIANT="east-even-qwen36-teacher-${RUN_TAG}-n12500-seed42"
 SIMUL_VARIANT="simul-must-c-fixed-v2-qwen36-teacher-${RUN_TAG}-n12500-seed42"
@@ -108,7 +116,7 @@ EAST_GEN=$(sbatch --parsable \
   --job-name=q36_east_gen \
   --output="${RUN_ROOT}/east/logs/generate_%A_%a.out" \
   --error="${RUN_ROOT}/east/logs/generate_%A_%a.err" \
-  --export="ALL,METHOD=east,BASE=${EAST_BASE},CODE_SNAPSHOT=${CODE_SNAPSHOT},MODEL_PATH=${MODEL_PATH},INPUT_TSV=${INPUT_TSV},NUM_TASKS=${NUM_TASKS}" \
+  --export="ALL,METHOD=east,BASE=${EAST_BASE},CODE_SNAPSHOT=${GENERATION_CODE},MODEL_PATH=${MODEL_PATH},INPUT_TSV=${INPUT_TSV},NUM_TASKS=${NUM_TASKS}" \
   "${REPO}/scripts/synth/run_teacher_baseline_generate.sbatch")
 
 EAST_PREP=$(sbatch --parsable \
@@ -177,7 +185,7 @@ SIMUL_GEN=$(sbatch --parsable \
   --job-name=q36_simul_gen \
   --output="${RUN_ROOT}/simul_must_c/logs/generate_%A_%a.out" \
   --error="${RUN_ROOT}/simul_must_c/logs/generate_%A_%a.err" \
-  --export="ALL,METHOD=simul-must-c,BASE=${SIMUL_BASE},CODE_SNAPSHOT=${CODE_SNAPSHOT},MODEL_PATH=${MODEL_PATH},INPUT_TSV=${INPUT_TSV},NUM_TASKS=${NUM_TASKS}" \
+  --export="ALL,METHOD=simul-must-c,BASE=${SIMUL_BASE},CODE_SNAPSHOT=${GENERATION_CODE},MODEL_PATH=${MODEL_PATH},INPUT_TSV=${INPUT_TSV},NUM_TASKS=${NUM_TASKS}" \
   "${REPO}/scripts/synth/run_teacher_baseline_generate.sbatch")
 
 SIMUL_PREP=$(sbatch --parsable \
@@ -248,6 +256,7 @@ cat > "${RUN_ROOT}/run_manifest.txt" <<EOF
 run_tag=${RUN_TAG}
 repo_commit=$(git rev-parse HEAD)
 baseline_code_commit=$(git rev-parse "${BASELINE_COMMIT}")
+generation_runtime=${GENERATION_CODE}
 teacher_model=${MODEL_PATH}
 training_examples=${SAMPLE_SIZE}
 sample_seed=${SAMPLE_SEED}
