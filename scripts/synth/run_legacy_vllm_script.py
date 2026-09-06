@@ -17,6 +17,8 @@ def install_guided_decoding_compatibility() -> None:
     if hasattr(sampling_params, "GuidedDecodingParams"):
         return
 
+    # Finish vLLM's lazy imports while SamplingParams is still its real class.
+    _ = vllm.LLM
     sampling_params.GuidedDecodingParams = sampling_params.StructuredOutputsParams
     sampling_params_class = sampling_params.SamplingParams
 
@@ -54,8 +56,8 @@ def main() -> None:
     if not script.is_file():
         raise SystemExit(f"legacy script not found: {script}")
 
-    install_guided_decoding_compatibility()
     install_qwen36_engine_limits()
+    install_guided_decoding_compatibility()
     sys.argv = [str(script), *sys.argv[2:]]
     runpy.run_path(str(script), run_name="__main__")
 
