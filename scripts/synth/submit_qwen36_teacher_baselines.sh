@@ -119,9 +119,18 @@ EAST_GEN=$(sbatch --parsable \
   --export="ALL,METHOD=east,BASE=${EAST_BASE},CODE_SNAPSHOT=${GENERATION_CODE},MODEL_PATH=${MODEL_PATH},INPUT_TSV=${INPUT_TSV},NUM_TASKS=${NUM_TASKS}" \
   "${REPO}/scripts/synth/run_teacher_baseline_generate.sbatch")
 
+EAST_VALIDATE=$(sbatch --parsable \
+  "${CPU_ARGS[@]}" \
+  --dependency="afterany:${EAST_GEN}" \
+  --job-name=q36_east_validate \
+  --output="${RUN_ROOT}/east/logs/validate_%j.out" \
+  --error="${RUN_ROOT}/east/logs/validate_%j.err" \
+  --export="ALL,METHOD=east,BASE=${EAST_BASE},INPUT_TSV=${INPUT_TSV},ALLOW_RECORDED_ERRORS=1" \
+  "${REPO}/scripts/synth/run_teacher_baseline_validate.sbatch")
+
 EAST_PREP=$(sbatch --parsable \
   "${CPU_ARGS[@]}" \
-  --dependency="afterok:${EAST_GEN}" \
+  --dependency="afterok:${EAST_VALIDATE}" \
   --job-name=q36_east_prepare \
   --output="${RUN_ROOT}/east/logs/prepare_%j.out" \
   --error="${RUN_ROOT}/east/logs/prepare_%j.err" \
@@ -188,9 +197,18 @@ SIMUL_GEN=$(sbatch --parsable \
   --export="ALL,METHOD=simul-must-c,BASE=${SIMUL_BASE},CODE_SNAPSHOT=${GENERATION_CODE},MODEL_PATH=${MODEL_PATH},INPUT_TSV=${INPUT_TSV},NUM_TASKS=${NUM_TASKS}" \
   "${REPO}/scripts/synth/run_teacher_baseline_generate.sbatch")
 
+SIMUL_VALIDATE=$(sbatch --parsable \
+  "${CPU_ARGS[@]}" \
+  --dependency="afterany:${SIMUL_GEN}" \
+  --job-name=q36_simul_validate \
+  --output="${RUN_ROOT}/simul_must_c/logs/validate_%j.out" \
+  --error="${RUN_ROOT}/simul_must_c/logs/validate_%j.err" \
+  --export="ALL,METHOD=simul-must-c,BASE=${SIMUL_BASE},INPUT_TSV=${INPUT_TSV},ALLOW_RECORDED_ERRORS=1" \
+  "${REPO}/scripts/synth/run_teacher_baseline_validate.sbatch")
+
 SIMUL_PREP=$(sbatch --parsable \
   "${CPU_ARGS[@]}" \
-  --dependency="afterok:${SIMUL_GEN}" \
+  --dependency="afterok:${SIMUL_VALIDATE}" \
   --job-name=q36_simul_prepare \
   --output="${RUN_ROOT}/simul_must_c/logs/prepare_%j.out" \
   --error="${RUN_ROOT}/simul_must_c/logs/prepare_%j.err" \
@@ -244,12 +262,12 @@ SIMUL_GATE=$(sbatch --parsable \
   "${REPO}/scripts/infer/wait_for_manifest_evaluations.sbatch")
 
 {
-  printf 'generation=%s\nprepare=%s\nmetricx=%s\nfinalize=%s\ntrain=%s\neval_launcher=%s\neval_gate=%s\n' \
-    "${EAST_GEN}" "${EAST_PREP}" "${EAST_QE}" "${EAST_FINAL}" "${EAST_TRAIN}" "${EAST_LAUNCH}" "${EAST_GATE}"
+  printf 'generation=%s\nvalidate=%s\nprepare=%s\nmetricx=%s\nfinalize=%s\ntrain=%s\neval_launcher=%s\neval_gate=%s\n' \
+    "${EAST_GEN}" "${EAST_VALIDATE}" "${EAST_PREP}" "${EAST_QE}" "${EAST_FINAL}" "${EAST_TRAIN}" "${EAST_LAUNCH}" "${EAST_GATE}"
 } >> "${EAST_RUN_MANIFEST}"
 {
-  printf 'generation=%s\nprepare=%s\nmetricx=%s\nfinalize=%s\ntrain=%s\neval_launcher=%s\neval_gate=%s\n' \
-    "${SIMUL_GEN}" "${SIMUL_PREP}" "${SIMUL_QE}" "${SIMUL_FINAL}" "${SIMUL_TRAIN}" "${SIMUL_LAUNCH}" "${SIMUL_GATE}"
+  printf 'generation=%s\nvalidate=%s\nprepare=%s\nmetricx=%s\nfinalize=%s\ntrain=%s\neval_launcher=%s\neval_gate=%s\n' \
+    "${SIMUL_GEN}" "${SIMUL_VALIDATE}" "${SIMUL_PREP}" "${SIMUL_QE}" "${SIMUL_FINAL}" "${SIMUL_TRAIN}" "${SIMUL_LAUNCH}" "${SIMUL_GATE}"
 } >> "${SIMUL_RUN_MANIFEST}"
 
 cat > "${RUN_ROOT}/run_manifest.txt" <<EOF
@@ -271,6 +289,6 @@ east_manifest=${EAST_RUN_MANIFEST}
 simul_must_c_manifest=${SIMUL_RUN_MANIFEST}
 EOF
 
-printf 'RUN_ROOT=%s\nEAST_GEN=%s\nEAST_TRAIN=%s\nEAST_GATE=%s\nSIMUL_GEN=%s\nSIMUL_TRAIN=%s\nSIMUL_GATE=%s\n' \
-  "${RUN_ROOT}" "${EAST_GEN}" "${EAST_TRAIN}" "${EAST_GATE}" \
-  "${SIMUL_GEN}" "${SIMUL_TRAIN}" "${SIMUL_GATE}"
+printf 'RUN_ROOT=%s\nEAST_GEN=%s\nEAST_VALIDATE=%s\nEAST_TRAIN=%s\nEAST_GATE=%s\nSIMUL_GEN=%s\nSIMUL_VALIDATE=%s\nSIMUL_TRAIN=%s\nSIMUL_GATE=%s\n' \
+  "${RUN_ROOT}" "${EAST_GEN}" "${EAST_VALIDATE}" "${EAST_TRAIN}" "${EAST_GATE}" \
+  "${SIMUL_GEN}" "${SIMUL_VALIDATE}" "${SIMUL_TRAIN}" "${SIMUL_GATE}"

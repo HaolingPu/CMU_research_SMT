@@ -44,3 +44,9 @@ Before a production run, validate compute-node smoke outputs with
 `python scripts/synth/validate_teacher_raw_output.py`; a successful generator
 process exit alone is insufficient because the historical generators record
 item errors in JSON.
+
+Production DAGs include a raw-coverage gate after each generation array. The
+gate requires one readable, unique-ID JSON file per input row, validates every
+successful record's schema, and reports generator error records for downstream
+filtering. It uses `afterany` so a time-limited array cannot silently block or
+bypass coverage verification.

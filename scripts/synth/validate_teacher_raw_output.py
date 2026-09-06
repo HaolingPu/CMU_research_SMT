@@ -17,6 +17,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--method", required=True, choices=("east", "simul-must-c"))
     parser.add_argument("--output-root", required=True, type=Path)
     parser.add_argument("--expected-count", required=True, type=int)
+    parser.add_argument(
+        "--allow-recorded-errors",
+        action="store_true",
+        help="Count generator error records as complete inputs but skip schema validation for them",
+    )
     return parser.parse_args()
 
 
@@ -63,16 +68,20 @@ def main() -> None:
         )
 
     utterance_ids: set[str] = set()
+    recorded_errors = 0
     for path in files:
         data = json.loads(path.read_text(encoding="utf-8"))
         if not isinstance(data, dict):
             raise ValueError(f"{path}: top-level value must be an object")
-        if data.get("error") or data.get("errors"):
-            raise ValueError(f"{path}: generator recorded an error")
         utterance_id = str(data.get("utt_id", "")).strip()
         if not utterance_id or utterance_id in utterance_ids:
             raise ValueError(f"{path}: missing or duplicate utt_id {utterance_id!r}")
         utterance_ids.add(utterance_id)
+        if data.get("error") or data.get("errors"):
+            if not args.allow_recorded_errors:
+                raise ValueError(f"{path}: generator recorded an error")
+            recorded_errors += 1
+            continue
         if args.method == "east":
             validate_east(data, path)
         else:
@@ -80,7 +89,7 @@ def main() -> None:
 
     print(
         f"Validated {len(files)} {args.method} outputs under {args.output_root} "
-        "with zero schema or generator errors"
+        f"with zero schema errors and {recorded_errors} recorded generator errors"
     )
 
 
