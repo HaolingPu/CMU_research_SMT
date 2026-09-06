@@ -39,3 +39,7 @@ The submitter prints all job IDs and writes immutable code snapshots and run
 manifests below `/home/haolingp/slurm_runs/qwen36-teacher-baselines-$RUN_TAG`.
 Generated data stays in a distinct `qwen36_teacher_ablation` output tree, so
 legacy baseline artifacts cannot be overwritten.
+
+Before a production run, validate compute-node smoke outputs with
+`scripts/synth/validate_teacher_raw_output.py`; a successful process exit alone
+is insufficient because the historical generators record item errors in JSON.
