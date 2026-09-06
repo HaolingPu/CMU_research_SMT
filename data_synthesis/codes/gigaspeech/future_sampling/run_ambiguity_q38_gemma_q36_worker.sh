@@ -136,6 +136,7 @@ start_ts=$(date +%s)
   --skip-existing \
   --output-jsonl "${TASK_DIR}/per_utt/_.jsonl" \
   --verbose --compact-verbose --verbose-dir "${TASK_DIR}/verbose" \
+  ${EXTRA_DECODER_ARGS:-} \
   2>&1 | tee -a "${TASK_DIR}/run.log"
 
 actual=$(find "${TASK_DIR}/per_utt" -maxdepth 1 -name '*.json' -type f | wc -l)

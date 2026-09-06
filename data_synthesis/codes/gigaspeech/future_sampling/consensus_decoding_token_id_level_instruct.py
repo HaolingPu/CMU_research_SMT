@@ -113,6 +113,17 @@ def parse_args() -> argparse.Namespace:
                         "If the pending buffer ends up shorter than this (after consensus breaks), "
                         "discard all pending tokens and READ instead. Default 2: avoid single-token "
                         "commits that the translator may misinterpret (reduces early lock-in).")
+    p.add_argument("--future-join-mode", choices=["space", "sentence-aware"], default="space",
+                   help="How a sampled future is appended to the observed source for the probe. "
+                        "'sentence-aware': if the observed prefix is mid-sentence and the future starts a "
+                        "new capitalized sentence, join with '. ' (and drop a trailing comma) so the probe "
+                        "sees a well-formed 'sentence ends here' hypothesis instead of a run-on.")
+    p.add_argument("--targeted-sampler-seed", type=int, default=None,
+                   help="If set, pass a deterministic per-prefix seed to the coordinated future samplers "
+                        "(vLLM 'seed'), so reruns of the same row are comparable.")
+    p.add_argument("--sentence-end-completion", action="store_true",
+                   help="When the current source chunk ends a sentence, skip consensus and let the "
+                        "translator finish that sentence (same call as the final chunk).")
     p.add_argument("--final-max-tokens", type=int, default=128,
                    help="Maximum tokens for the final tail-completion step.")
     p.add_argument("--candidate-top-k", type=int, default=TOP_K)
@@ -264,6 +275,51 @@ def append_text_continuation(prefix: str, continuation: str) -> str:
     if continuation[0] in ",.!?;:)]}\"'":
         return prefix + continuation
     return prefix + " " + continuation
+
+
+_SENTENCE_INITIAL_WORDS = {
+    "he", "she", "it", "they", "the", "a", "an", "but", "and", "then", "his", "her", "we", "i",
+    "you", "this", "that", "there", "when", "as", "so", "at", "in", "on", "after", "before",
+    "with", "now", "suddenly", "however", "meanwhile", "everyone", "no", "yes", "all", "his",
+    "their", "its", "my", "our", "some", "every", "each", "nothing", "nobody", "one",
+}
+_SENTENCE_END_RE = re.compile(r"[.!?][\"\u201d\u2019')\]]*\s*$")
+
+
+_CANNOT_END_SENTENCE = {
+    "the", "a", "an", "of", "to", "and", "but", "or", "in", "on", "at", "for", "with", "by",
+    "from", "as", "than", "that", "which", "who", "whose", "whom", "is", "are", "was", "were",
+    "be", "been", "being", "had", "has", "have", "will", "would", "could", "should", "can",
+    "may", "might", "must", "not", "very", "so", "into", "onto", "about", "over", "under",
+    "his", "her", "their", "its", "my", "our", "your", "this", "these", "those", "some", "any",
+    "every", "each", "no", "if", "when", "while", "because", "though", "although", "until",
+}
+
+
+def looks_like_sentence_restart(prefix: str, future: str) -> bool:
+    """True when the prefix could end a sentence here and the future begins a new capitalized one."""
+    if not prefix or not future:
+        return False
+    stripped = prefix.rstrip()
+    if _SENTENCE_END_RE.search(stripped):
+        return False
+    last = re.findall(r"[A-Za-z']+", stripped)
+    if last and last[-1].lower() in _CANNOT_END_SENTENCE:
+        return False
+    match = re.match(r"[\"\u201c(]?([A-Za-z][A-Za-z']*)", future.strip())
+    if not match:
+        return False
+    word = match.group(1)
+    return word[0].isupper() and word.lower() in _SENTENCE_INITIAL_WORDS
+
+
+def join_future_to_source(prefix: str, future: str, mode: str = "space") -> str:
+    """Append a sampled future to the observed source for the probe prompt."""
+    if mode == "sentence-aware" and looks_like_sentence_restart(prefix, future):
+        base = prefix.rstrip()
+        base = base[:-1].rstrip() if base and base[-1] in ",;:" else base
+        return base + ". " + future.strip()
+    return append_text_continuation(prefix, future)
 
 
 # ---------------------------------------------------------------------------
@@ -784,6 +840,7 @@ def _sample_coordinated_future_set(
     sample_temperature: float,
     top_p: float,
     max_tokens: int,
+    sampler_seed: Optional[int] = None,
 ) -> Tuple[List[str], List[Dict[str, Any]], List[Dict[str, Any]]]:
     """Generate jointly planned plausible and contrastive lists in one response."""
     if not observed_source.strip() or num_futures <= 0:
@@ -816,6 +873,9 @@ def _sample_coordinated_future_set(
         "presence_penalty": 0.15,
         "stop": ["<|im_end|>", "<end_of_turn>", "<|endoftext|>", "<|eot_id|>"],
     }
+    if sampler_seed is not None:
+        import zlib
+        payload["seed"] = (int(sampler_seed) + zlib.crc32(f"{observed_source}|{committed_text}|{api_model}".encode("utf-8"))) % (2**31)
     try:
         data = _http_json(f"{base}/completions", payload=payload, timeout=api_timeout)
     except Exception:
@@ -1028,6 +1088,7 @@ def sample_source_futures_targeted_prefill(
     sampler2_api_model: str = "",
     sampler2_api_timeout: float = 0.0,
     return_audit: bool = False,
+    sampler_seed: Optional[int] = None,
 ) -> Any:
     """Generate one coordinated 50/50 plausible/contrastive set per model."""
     if not observed_source.strip():
@@ -1049,6 +1110,7 @@ def sample_source_futures_targeted_prefill(
                 target_lang=target_lang, num_futures=num_futures,
                 api_base=model_base, api_model=model_name, api_timeout=model_timeout,
                 sample_temperature=sample_temperature, top_p=top_p, max_tokens=max_tokens,
+                sampler_seed=sampler_seed,
             ))
     else:
         batches.append(_sample_coordinated_future_set(
@@ -1057,6 +1119,7 @@ def sample_source_futures_targeted_prefill(
             target_lang=target_lang, num_futures=num_futures,
             api_base=api_base, api_model=api_model, api_timeout=api_timeout,
             sample_temperature=sample_temperature, top_p=top_p, max_tokens=max_tokens,
+            sampler_seed=sampler_seed,
         ))
     # Preserve cross-model agreement as two independent votes. Each model's set
     # has already removed exact and near-duplicate candidates.
@@ -1411,6 +1474,7 @@ def extend_pending_tokens(
     soft_vote_min_p: float = 0.1,
     soft_vote_threshold: float = 0.8,
     min_voters_ratio: float = 0.75,
+    future_join_mode: str = "space",
 ) -> Tuple[List[int], List[Dict[str, Any]]]:
     pending_token_ids: List[int] = []
     grow_logs: List[Dict[str, Any]] = []
@@ -1418,7 +1482,7 @@ def extend_pending_tokens(
     for step_idx in range(max_consensus_steps): #最多32 步
         # 2a) 每条 future 拼成完整 source，问 instruct 模型："给定这个完整英文 + 已有中文前缀，下一个中文 token 是啥？"
         target_prefix_token_ids = list(committed_token_ids) + list(pending_token_ids)
-        full_sources = [append_text_continuation(source_observed, f) for f in futures]
+        full_sources = [join_future_to_source(source_observed, f, future_join_mode) for f in futures]
 
         batch_results = batch_get_next_token_distributions(
             tokenizer=instruct_tokenizer,
@@ -1687,6 +1751,33 @@ def run_one_utterance(
             _vlog(verbose_log_file, f"  [Final] delta={final_delta!r}")
             continue
 
+        if getattr(args, "sentence_end_completion", False) and _SENTENCE_END_RE.search(current_source_chunk):
+            # The source sentence is complete: let the translator finish it instead of voting.
+            sentence_delta = force_complete_translation(
+                tokenizer=instruct_tokenizer,
+                full_source=source_observed_full,
+                committed_text=committed_text,
+                api_base=args.instruct_api_base,
+                api_model=args.instruct_api_model,
+                api_timeout=args.instruct_api_timeout,
+                target_lang=args.target_lang,
+                max_tokens=args.final_max_tokens,
+            )
+            if sentence_delta:
+                committed_text += sentence_delta
+                committed_token_ids.extend(
+                    instruct_tokenizer.encode(sentence_delta, add_special_tokens=False)
+                )
+                target_deltas.append(sentence_delta)
+                actions.append("WRITE")
+            else:
+                target_deltas.append("")
+                actions.append("READ")
+            _vlog(verbose_log_file, f"  [SentenceEnd] delta={sentence_delta!r}")
+            _vlog(verbose_log_file, f"-> {'WRITE' if sentence_delta else 'READ'} delta={sentence_delta!r}")
+            _vlog(verbose_log_file, f"committed_after: {committed_text!r}")
+            continue
+
         if getattr(args, "use_targeted_instruct_sampling", False):
             # Each instruction-tuned sampler sees the observed prefix and plans
             # its full numbered candidate set in one response.
@@ -1714,6 +1805,7 @@ def run_one_utterance(
                 sampler2_api_model=args.targeted_sampler2_api_model,
                 sampler2_api_timeout=args.targeted_sampler2_api_timeout,
                 return_audit=True,
+                sampler_seed=getattr(args, "targeted_sampler_seed", None),
             )
         else:
             futures, future_infos = sample_source_futures_multi( #call base models，用当前observed source采样多条未来续写
@@ -1746,6 +1838,7 @@ def run_one_utterance(
             instruct_tokenizer=instruct_tokenizer,
             source_observed=source_observed_full,
             futures=futures,
+            future_join_mode=getattr(args, "future_join_mode", "space"),
             committed_text=committed_text,
             committed_token_ids=committed_token_ids,
             max_consensus_steps=args.max_consensus_steps,
