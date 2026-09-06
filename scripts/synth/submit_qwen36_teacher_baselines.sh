@@ -22,6 +22,7 @@ PIPELINE_PARALLELISM="${PIPELINE_PARALLELISM:-8}"
 SAMPLE_SIZE=12500
 SAMPLE_SEED=42
 PRIOR_EVAL_GATE="${PRIOR_EVAL_GATE:-}"
+START_DEPENDENCY="${START_DEPENDENCY:-}"
 EXCLUDE="${EXCLUDE:-babel-p9-32,babel-p9-28,babel-m5-32,babel-o5-24,babel-q5-16,babel-n5-32,babel-o5-16,babel-n5-28,babel-q5-32,babel-s5-24,babel-q5-24,babel-o5-28,babel-p5-20,babel-p5-24,babel-o9-24,babel-q9-32,babel-t5-28,babel-v9-28}"
 
 if [[ "${SAMPLE_SIZE}" -ne 12500 || "${SAMPLE_SEED}" -ne 42 ]]; then
@@ -95,9 +96,14 @@ EOF
 
 GPU_ARGS=(--partition=preempt --qos=preempt_qos --requeue --exclude="${EXCLUDE}")
 CPU_ARGS=(--partition=preempt --qos=preempt_cpu_qos --requeue)
+EAST_START_ARGS=()
+if [[ -n "${START_DEPENDENCY}" ]]; then
+  EAST_START_ARGS+=(--dependency="${START_DEPENDENCY}")
+fi
 
 EAST_GEN=$(sbatch --parsable \
   "${GPU_ARGS[@]}" \
+  "${EAST_START_ARGS[@]}" \
   --array="0-$((NUM_TASKS - 1))%${EAST_GEN_PARALLELISM}" \
   --job-name=q36_east_gen \
   --output="${RUN_ROOT}/east/logs/generate_%A_%a.out" \
@@ -250,6 +256,7 @@ east_generation_parallelism=${EAST_GEN_PARALLELISM}
 pipeline_parallelism=${PIPELINE_PARALLELISM}
 gpu_cap=24
 prior_eval_gate=${PRIOR_EVAL_GATE}
+start_dependency=${START_DEPENDENCY}
 exclude=${EXCLUDE}
 east_manifest=${EAST_RUN_MANIFEST}
 simul_must_c_manifest=${SIMUL_RUN_MANIFEST}

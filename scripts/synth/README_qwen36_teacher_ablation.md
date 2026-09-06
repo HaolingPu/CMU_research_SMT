@@ -30,6 +30,7 @@ Run from the BABEL checkout:
 
 ```bash
 RUN_TAG=20260906-qwen36-teacher \
+START_DEPENDENCY=<optional-afterok-dependency> \
 PRIOR_EVAL_GATE=<optional-job-id> \
 bash scripts/synth/submit_qwen36_teacher_baselines.sh
 ```
