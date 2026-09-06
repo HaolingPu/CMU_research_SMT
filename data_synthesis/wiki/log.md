@@ -104,3 +104,9 @@ Append-only. See [[WIKI.md]] for format.
 - updated: [[scoreboard]], [[checkpoint-evaluation]], [[2026-09-ambiguity-fsetv2-40k]], index.md
 - key facts: chunk-level BLEU ≈ longform BLEU + 5 (Hibiki 51.85 vs 46.76 @3840); StreamLAAL ≈ LongYAAL(CU); ambiguity run chunk BLEU 46.45/54.76/56.56/57.23 on ACL (+5.4 over Hibiki @3840)
 - contradictions: none
+
+## [2026-09-06] ingest | Sentence-boundary carry-over profiling (100-case traces) + viewer consensus trace
+- source: viewer bundle `data/consensus/*.json` (parsed verbose logs, 100 cases); LLM annotation of 73 carry-over events (sonnet annotators + 2 second reads each)
+- updated: [[2026-09-ambiguity-fsetv2-40k]] (new Profiling section)
+- key facts: 15/169 sentence-end commits end on a comma; 73 carry-over events → 62 grounded / 8 next-sentence / 3 ungrounded (`_1015` 碎了一地, `_1169` 全部招认, `_1186` 陷入极度焦虑之中); vote strength does not predict the failure, an unclosed sentence does
+- contradictions: none

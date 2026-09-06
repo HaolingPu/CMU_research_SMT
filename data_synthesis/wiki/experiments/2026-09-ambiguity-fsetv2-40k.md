@@ -134,6 +134,37 @@ cannot be recovered by *post-hoc* editing, selection, or re-timing.
   mention the person, 36/36 default to 他 → WRITE. Antecedent row `_1124` is absent from the
   frozen TSV. Mechanisms: data boundary, reset-changes-the-question, probe gender prior.
 
+## Profiling (2026-09-06): sentence-boundary carry-over and invented filler
+
+Trigger case: `AUD0000000003_1015` — "And the fork flew into a dozen pieces." was committed as
+叉子飞出去，摔成了十几块**，** (trailing comma, weakest vote of the case: 6/15 futures top-1,
+min p 0.16), the sampler prefix then reset to the next sentence, and three chunks later all 40
+futures agreed on 碎了一地。 (p̄ 0.38 → 1.0) before 这巨人… began. "Shattered all over the ground"
+is not in the source. Mechanism = the case-71 reset problem in a new guise: once the committed
+Chinese is left mid-sentence, the probe's continuation of that clause is independent of the
+(now off-topic) futures, so unanimity carries no safety information.
+
+Scan of all 100 cases (viewer trace files):
+- 169 WRITE chunks coincide with an English sentence end: 43 % close the Chinese sentence,
+  49 % end without punctuation (translation lagging, normal), **9 % (15) end on a comma**.
+  Comma votes are usually strong (median top-1 share 0.92); case 1015 is the only weak one.
+- 73 unique "carry-over" events (Chinese ended on a comma at a reset, next WRITE closed the old
+  sentence before starting the new one). LLM annotation (sonnet, 1 annotator + 2 independent
+  second reads on every 'ungrounded' label): **62 grounded** (remaining content of the ended
+  sentence), **8 next-sentence** (punctuation misplaced only), **3 ungrounded**, 0 unclear.
+- The 3 ungrounded, all confirmed 2/2: `_1015` step 8 碎了一地 (invented location detail);
+  `_1169` step 25 全部招认 after 玛丽亚毫不隐瞒 for "Maria denied nothing" (paraphrase doubled);
+  `_1186` step 23 陷入极度焦虑之中 after 担心…会被弄糟 for "was in agony lest…" (intensifying
+  restatement). Comma votes there were 6/15, 35/35, 16/20 — the vote strength does not
+  discriminate; leaving the sentence open does.
+
+Takeaways: (1) invented content at sentence boundaries is rare in this run (3/100 cases,
+1 with a genuinely new fact) but it is a distinct failure class from early commitment;
+(2) rule candidates: forbid a commit ending in sentence-internal punctuation once the source
+sentence has ended, or route a finished-but-unclosed sentence through the final-completion
+path; and the reset-aware future window. Tooling: the trajectory viewer now renders the full
+next-token trace per step (`data/consensus/<utt>.json`, commit `db57a69`).
+
 ## Next
 
 - **In progress:** matched 12,500-instance rerun, seed 42, sampled from the same 17,306-row
