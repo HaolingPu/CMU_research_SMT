@@ -121,6 +121,10 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--targeted-sampler-seed", type=int, default=None,
                    help="If set, pass a deterministic per-prefix seed to the coordinated future samplers "
                         "(vLLM 'seed'), so reruns of the same row are comparable.")
+    p.add_argument("--future-source-window-mode", choices=["fixed", "until-closed"], default="fixed",
+                   help="'fixed': always --future-source-window-chunks units. 'until-closed': additionally "
+                        "include the previous sentence unit while the Chinese committed for it does not "
+                        "yet end with sentence-final punctuation; drop it once it is closed.")
     p.add_argument("--sentence-end-completion", action="store_true",
                    help="When the current source chunk ends a sentence, skip consensus and let the "
                         "translator finish that sentence (same call as the final chunk).")
@@ -249,6 +253,27 @@ def build_source_observed_recent_units(
         prev_full = full_through_unit
 
     return observed_full
+
+
+def current_unit_index(source_units: List[str], observed_full: str) -> int:
+    """Index of the sentence unit that the observed prefix currently ends inside (0 if unknown)."""
+    if not source_units or not observed_full:
+        return 0
+    prev_full = ""
+    for unit_idx, unit in enumerate(source_units):
+        full_through_unit = append_text_continuation(prev_full, unit)
+        if observed_full == full_through_unit or full_through_unit.startswith(observed_full):
+            return unit_idx
+        prev_full = full_through_unit
+    return len(source_units) - 1
+
+
+_TARGET_CLOSED_RE = re.compile(r"[。！？.!?][\"\u201d\u2019'\u300d\u300f)\]]*\s*$")
+
+
+def target_is_closed(committed_text: str) -> bool:
+    """True when the committed target text ends a sentence."""
+    return bool(committed_text.strip()) and bool(_TARGET_CLOSED_RE.search(committed_text.rstrip()))
 
 
 def get_full_source_text(row: Dict[str, Any]) -> str:
@@ -1714,18 +1739,30 @@ def run_one_utterance(
     _vlog(verbose_log_file, "# instruct_backend: vllm_completion")
     _vlog(verbose_log_file, "############################################################")
 
+    last_unit_idx = -1
+    unit_start_committed = ""
     for t in range(len(chunks)):
         current_source_chunk = str(chunks[t] or "")
         source_observed_full = build_source_observed(chunks, t)
+        window_units = args.future_source_window_chunks
+        if getattr(args, "future_source_window_mode", "fixed") == "until-closed" and window_units > 0:
+            unit_idx = current_unit_index(source_units, source_observed_full)
+            if unit_idx != last_unit_idx:
+                unit_start_committed = committed_text
+                last_unit_idx = unit_idx
+            if unit_idx > 0 and not target_is_closed(unit_start_committed):
+                window_units = max(window_units, 2)
         source_observed = build_source_observed_recent_units(
             source_units=source_units,
             observed_full=source_observed_full,
-            num_units=args.future_source_window_chunks,
+            num_units=window_units,
         )
         _vlog(verbose_log_file, f"\n{'='*60}")
         _vlog(verbose_log_file, f"Chunk {t + 1}/{len(chunks)}")
         _vlog(verbose_log_file, f"source_observed: {current_source_chunk!r}")
         _vlog(verbose_log_file, f"future_source_prefix: {source_observed!r}")
+        if getattr(args, "future_source_window_mode", "fixed") != "fixed":
+            _vlog(verbose_log_file, f"future_source_window_units: {window_units}")
         if source_observed != source_observed_full:
             _vlog(verbose_log_file, f"source_observed_full: {source_observed_full!r}")
         _vlog(verbose_log_file, f"committed_before: {committed_text!r}")

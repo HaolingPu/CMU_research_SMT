@@ -38,7 +38,7 @@ INPUT_TSV="${INPUT_TSV:-/data/group_data/li_lab/haolingp/consensus_handoff/train
 OUTPUT_ROOT="${OUTPUT_ROOT:?OUTPUT_ROOT required}"
 ROW_IDX="${ROW_IDX:-10}"
 SAMPLER_SEED="${SAMPLER_SEED:-1015}"
-VARIANTS="${VARIANTS:-baseline=;joinfix=--future-join-mode sentence-aware;joinfix_sentend=--future-join-mode sentence-aware --sentence-end-completion}"
+VARIANTS="${VARIANTS:-baseline=;joinfix=--future-join-mode sentence-aware;joinfix_sentend=--future-join-mode sentence-aware --sentence-end-completion;full=--future-join-mode sentence-aware --sentence-end-completion --future-source-window-mode until-closed}"
 TARGETED_NUM_FUTURES="${TARGETED_NUM_FUTURES:-20}"
 MIN_VOTERS_RATIO="${MIN_VOTERS_RATIO:-1.0}"
 FUTURE_SRC_WINDOW="${FUTURE_SRC_WINDOW:-1}"
