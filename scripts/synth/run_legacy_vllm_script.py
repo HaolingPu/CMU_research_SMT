@@ -18,18 +18,18 @@ def install_guided_decoding_compatibility() -> None:
         return
 
     sampling_params.GuidedDecodingParams = sampling_params.StructuredOutputsParams
-    original_init = sampling_params.SamplingParams.__init__
+    sampling_params_class = sampling_params.SamplingParams
 
-    @functools.wraps(original_init)
-    def compatible_init(self, *args, guided_decoding=None, **kwargs):
+    @functools.wraps(sampling_params_class)
+    def compatible_sampling_params(*args, guided_decoding=None, **kwargs):
         if guided_decoding is not None:
             if kwargs.get("structured_outputs") is not None:
                 raise TypeError("guided_decoding and structured_outputs are mutually exclusive")
             kwargs["structured_outputs"] = guided_decoding
-        original_init(self, *args, **kwargs)
+        return sampling_params_class(*args, **kwargs)
 
-    sampling_params.SamplingParams.__init__ = compatible_init
-    vllm.SamplingParams = sampling_params.SamplingParams
+    sampling_params.SamplingParams = compatible_sampling_params
+    vllm.SamplingParams = compatible_sampling_params
 
 
 def install_qwen36_engine_limits() -> None:
