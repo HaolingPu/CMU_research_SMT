@@ -2,9 +2,9 @@
 #SBATCH --job-name=teacher_gen
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=16
+#SBATCH --cpus-per-task=12
 #SBATCH --gres=gpu:L40S:1
-#SBATCH --mem=180G
+#SBATCH --mem=96G
 #SBATCH --partition=preempt
 #SBATCH --qos=preempt_qos
 #SBATCH --requeue
