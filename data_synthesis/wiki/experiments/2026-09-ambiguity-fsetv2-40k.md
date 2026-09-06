@@ -62,11 +62,16 @@ and the probe/sampler swap are both unresolved confounds.
 | system | BLEU | XCOMET | LongYAAL CU ms |
 |---|---|---|---|
 | **this run** | 37.0 / 45.7 / 47.2 / **47.8** | .748 / .787 / .796 / .798 | 1345 / 1970 / 2566 / 3031 |
+| **matched 12,500** (seed 42, ckpt `v2-20260906-174211-hf`) | 40.7 / 47.4 / **48.5** / 48.4 | .767 / .791 / **.803** / .799 | 1414 / 2105 / 2648 / 3167 |
 | `top5-axis5` flagship | 34.9 / 39.6 / 40.1 / 40.1 | .787 / .808 / .812 / **.817** | 1461 / 2176 / 2745 / 3107 |
 | hibiki (ref-based) | – / – / – / 46.8 | .780 / .812 / .814 / .820 | – / – / – / 3326 |
 | EAST-even | – / – / – / 46.8 | – / – / – / .789 | – / – / – / 3533 |
 
-chrF this run: 36.1 / 39.8 / 40.5 / 40.7.
+chrF this run: 36.1 / 39.8 / 40.5 / 40.7. chrF matched 12,500: 36.5 / 40.4 / 41.3 / 41.6.
+Matched-count control (ACL eval job 10333149, 2026-09-06): training on 12,500 of the same
+17,306 survivors matches or beats the 17,306-row run at every segment size, so the ACL gain over
+the `top5-axis5` flagship is not a training-size artifact. Simul-tst-COMMON for this checkpoint:
+pending (infer 10333150 + repair 10333556, eval 10333151).
 
 ## Results — Simul-tst-COMMON, monotonic refs (seg 960 / 1920 / 2880 / 3840)
 
