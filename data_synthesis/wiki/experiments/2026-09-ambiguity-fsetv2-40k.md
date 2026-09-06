@@ -22,11 +22,15 @@ generic [[ambiguity-future-set]] prompt (10 plausible + 10 contrastive continuat
 sampler, planned jointly), swap in newer samplers and probe, keep the strict 100 % gate.
 Does trained quality move, and in which metric?
 
-**Answer.** BLEU rises by 6–8 on [[acl-6060]] and by ~11 on [[simul-tst-common]] at every
-latency ≥ 1920 ms, passing the ref-based hibiki system on both sets. XCOMET falls by
-0.01–0.04. Under [[comet-vs-bleu-ranking]] this is **not yet a win** over the flagship
-`top5-axis5`; it is a large surface-form gain with a small adequacy loss, and two confounds
-(training-set size, probe/sampler swap) are unresolved.
+**Status: uncontrolled exploratory result. Do not use this checkpoint as the fair baseline
+comparison.** It trained on 17,306 examples while the established baselines trained on 12,500.
+A matched 12,500-example rerun (`-n12500-seed42`) was submitted on 2026-09-05 as jobs
+10328626–10328628 and must replace the numbers below in any primary comparison.
+
+**Exploratory answer.** BLEU rises by 6–8 on [[acl-6060]] and by ~11 on
+[[simul-tst-common]] at every latency ≥ 1920 ms, passing the ref-based hibiki system on both
+sets. XCOMET falls by 0.01–0.04. These numbers are not a controlled result: training-set size
+and the probe/sampler swap are both unresolved confounds.
 
 ## Frozen configuration (run tag `ambiguity-q38-gemma-q36-fsetv2-prefixnorm-strict-40k-r1-20260831`)
 
@@ -132,7 +136,9 @@ cannot be recovered by *post-hoc* editing, selection, or re-timing.
 
 ## Next
 
-- Matched 12,500-instance rerun (seed 42) to remove confound (a).
+- **In progress:** matched 12,500-instance rerun, seed 42, sampled from the same 17,306-row
+  full manifest. Resample job 10328626 completed and verified exactly 12,500 rows; training
+  job 10328627 and automatic ACL + Simul-tst evaluation launcher 10328628 are queued.
 - Per-sentence COMET diff vs flagship on tst seg3840 (July forensics recipe).
 - Inspect tst seg960 outputs; consider an inference-time repetition brake.
 - Sampler ablations on an ambiguity-stratified set (Qwen-only 20/40, + larger Gemma-4 12B/31B):

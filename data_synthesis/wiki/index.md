@@ -55,7 +55,10 @@ Master catalog. See [[WIKI.md]] for conventions.
 - [[2026-07-present-rank-winner]] — NEGATIVE (−2.15 paired char-BLEU, hygiene clean): strict gate leaves the winner rule no freedom; register bias enters at the GATE, not the winner
 - [[2026-07-present-propose-gate]] — successor: present distribution proposes candidates, futures verify by majority; smoke500 vs J_40k
 
-- [[2026-09-ambiguity-fsetv2-40k]] — ambiguity future set + Qwen3.6 probe, 40k, strict gate: BLEU 47.8 @ACL-3840 (flagship 40.1, hibiki 46.8) and 45.9 @tst; COMET −0.01…−0.04 → not promoted under rank-by-COMET; 17,306 training instances (confound); tst seg960 degenerate
+- [[2026-09-ambiguity-fsetv2-40k]] — ambiguity future set + Qwen3.6 probe, 40k,
+  strict gate: **17,306-example uncontrolled exploratory checkpoint** (BLEU 47.8
+  @ACL-3840, 45.9 @tst; COMET −0.01…−0.04). Do not use as the fair primary comparison;
+  matched 12,500-example rerun is jobs 10328626–10328628. Tst seg960 is degenerate.
 
 ## Comparisons
 - [[scoreboard]] — measured COMET/BLEU/chrF/latency of all trained checkpoints (ACL 6060 dev)

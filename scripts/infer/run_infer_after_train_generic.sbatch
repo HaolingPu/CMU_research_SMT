@@ -20,6 +20,7 @@ cd /home/haolingp/CMU_research_SMT/scripts/infer
 EXP="${EXP:?EXP required}"
 CHILD_PARTITION="${CHILD_PARTITION:-general}"
 CHILD_GPU_QOS="${CHILD_GPU_QOS:-normal}"
+CHILD_EXCLUDE="${CHILD_EXCLUDE:-}"
 CKPTS_FILE="${CKPTS_FILE:-/home/haolingp/slurm_runs/${EXP}/ckpts.txt}"
 RUN_SIMULTST="${RUN_SIMULTST:-0}"
 CKPTS_SIMULTST_FILE="${CKPTS_SIMULTST_FILE:-/home/haolingp/slurm_runs/${EXP}/ckpts_simultst.txt}"
@@ -31,10 +32,17 @@ echo "HF export: ${HF}"
 
 mkdir -p "$(dirname "${CKPTS_FILE}")"
 
+CHILD_SBATCH_ARGS=(
+  --partition="${CHILD_PARTITION}"
+  --qos="${CHILD_GPU_QOS}"
+  --requeue
+)
+if [[ -n "${CHILD_EXCLUDE}" ]]; then
+  CHILD_SBATCH_ARGS+=(--exclude="${CHILD_EXCLUDE}")
+fi
+
 INFER_JID=$(sbatch --parsable \
-  --partition="${CHILD_PARTITION}" \
-  --qos="${CHILD_GPU_QOS}" \
-  --requeue \
+  "${CHILD_SBATCH_ARGS[@]}" \
   infer_slurm.sh "${HF}/" Standard)
 echo "infer array: ${INFER_JID}"
 
@@ -65,9 +73,7 @@ if [[ "${RUN_SIMULTST}" == "1" ]]; then
   # Second chain: Simul-tst-COMMON inference (4 segs x 2 GPUs) -> simultst eval.
   # Runs concurrently with the ACL 6060 chain; both read the same HF export.
   TST_INFER_JID=$(sbatch --parsable \
-    --partition="${CHILD_PARTITION}" \
-    --qos="${CHILD_GPU_QOS}" \
-    --requeue \
+    "${CHILD_SBATCH_ARGS[@]}" \
     infer_slurm_simultst.sh "${HF}/" Standard)
   echo "simultst infer array: ${TST_INFER_JID}"
 

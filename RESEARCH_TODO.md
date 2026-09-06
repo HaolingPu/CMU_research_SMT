@@ -1,6 +1,6 @@
 # Research TODO
 
-Updated: 2026-09-05
+Updated: 2026-09-05 23:01 ET
 
 This is the working task list for the ambiguity-aware future-consensus
 simultaneous translation project. Do not change the active 40K run's frozen
@@ -8,6 +8,14 @@ method while it is in progress; new sampler designs belong in separate pilot
 runs with separate output roots.
 
 ## Current sprint (as of 2026-09-05 10:20 ET), in priority order
+
+### P0 — restore a fair training-size comparison
+- [x] Mark the 17,306-example checkpoint as uncontrolled/exploratory; do not use it as the
+  primary comparison against 12,500-example baselines.
+- [x] Sample exactly 12,500 rows from the same full survivor manifest with seed 42
+  (job 10328626, verified 12,500/12,500).
+- [ ] Complete matched training job 10328627 and automatic ACL 6060 + Simul-tst evaluation
+  chain launched by job 10328628; replace the primary result table with matched scores.
 
 State: decode COMPLETE, 40,000 / 40,000 unique utterances verified (0 missing,
 0 unreadable). Main tasks 0 and 1 were cancelled 2026-09-05 10:05 ET after
