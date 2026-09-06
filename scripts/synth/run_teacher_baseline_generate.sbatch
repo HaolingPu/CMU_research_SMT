@@ -9,6 +9,7 @@
 #SBATCH --qos=preempt_qos
 #SBATCH --requeue
 #SBATCH --time=2-00:00:00
+#SBATCH --time-min=01:00:00
 #SBATCH --array=0-0
 #SBATCH -o /home/haolingp/CMU_research_SMT/scripts/synth/slurm_logs/teacher_gen_%A_%a.out
 #SBATCH -e /home/haolingp/CMU_research_SMT/scripts/synth/slurm_logs/teacher_gen_%A_%a.err

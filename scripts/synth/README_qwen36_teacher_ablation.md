@@ -11,7 +11,8 @@ the baseline improvement? It reruns EAST-even and Simul-MuST-C-fixed-v2 with
 - Generation runs in `/data/user_data/haolingp/conda_envs/gemma4`, the same
   Qwen3.6-compatible vLLM runtime used by the completed ambiguity pipeline.
   A launcher maps the legacy guided-decoding API to its renamed structured-
-  output API without modifying the snapshotted baseline generators.
+  output API and caps engine sequence slots at 64, as required by Qwen3.6's
+  recurrent state on one L40S, without modifying the snapshotted generators.
 - Training uses exactly 12,500 rows, seed 42, and the unchanged
   `scripts/train/train_consensus_s.sh` Qwen3-Omni LoRA recipe.
 - EAST keeps its historical MetricX threshold 3.0 and balanced split of

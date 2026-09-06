@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import functools
+import os
 import runpy
 import sys
 from pathlib import Path
@@ -31,6 +32,20 @@ def install_guided_decoding_compatibility() -> None:
     vllm.SamplingParams = sampling_params.SamplingParams
 
 
+def install_qwen36_engine_limits() -> None:
+    import vllm
+
+    max_num_seqs = int(os.environ.get("QWEN36_MAX_NUM_SEQS", "64"))
+    original_init = vllm.LLM.__init__
+
+    @functools.wraps(original_init)
+    def compatible_init(self, *args, **kwargs):
+        kwargs.setdefault("max_num_seqs", max_num_seqs)
+        original_init(self, *args, **kwargs)
+
+    vllm.LLM.__init__ = compatible_init
+
+
 def main() -> None:
     if len(sys.argv) < 2:
         raise SystemExit("usage: run_legacy_vllm_script.py SCRIPT [ARGS ...]")
@@ -40,6 +55,7 @@ def main() -> None:
         raise SystemExit(f"legacy script not found: {script}")
 
     install_guided_decoding_compatibility()
+    install_qwen36_engine_limits()
     sys.argv = [str(script), *sys.argv[2:]]
     runpy.run_path(str(script), run_name="__main__")
 
