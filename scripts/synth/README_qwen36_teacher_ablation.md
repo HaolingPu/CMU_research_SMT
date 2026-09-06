@@ -8,6 +8,8 @@ the baseline improvement? It reruns EAST-even and Simul-MuST-C-fixed-v2 with
 
 - Baseline synthesis code is snapshotted from commit `9604507`, the code used
   for the February 2026 baseline artifacts. Only `--model-path` changes.
+- Generation runs in `/data/user_data/haolingp/conda_envs/gemma4`, the same
+  Qwen3.6-compatible vLLM runtime used by the completed ambiguity pipeline.
 - Training uses exactly 12,500 rows, seed 42, and the unchanged
   `scripts/train/train_consensus_s.sh` Qwen3-Omni LoRA recipe.
 - EAST keeps its historical MetricX threshold 3.0 and balanced split of

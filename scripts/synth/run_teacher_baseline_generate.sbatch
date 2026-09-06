@@ -19,6 +19,7 @@ METHOD="${METHOD:?METHOD must be east or simul-must-c}"
 BASE="${BASE:?BASE is required}"
 CODE_SNAPSHOT="${CODE_SNAPSHOT:?CODE_SNAPSHOT is required}"
 MODEL_PATH="${MODEL_PATH:-/data/user_data/haolingp/models/Qwen3.6-35B-A3B-FP8}"
+GENERATION_ENV="${GENERATION_ENV:-/data/user_data/haolingp/conda_envs/gemma4}"
 INPUT_TSV="${INPUT_TSV:-/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_xl_case_robust_asr-filtered.tsv}"
 NUM_TASKS="${NUM_TASKS:-24}"
 TP="${TP:-1}"
@@ -38,13 +39,16 @@ if [[ ! -d "${MODEL_PATH}" ]]; then
   echo "Missing model: ${MODEL_PATH}" >&2
   exit 2
 fi
+if [[ ! -x "${GENERATION_ENV}/bin/python" ]]; then
+  echo "Missing generation runtime: ${GENERATION_ENV}/bin/python" >&2
+  exit 2
+fi
 
 mkdir -p "${OUT_ROOT}"
-source /home/haolingp/miniconda3/etc/profile.d/conda.sh
-conda activate vllm
 
 export PYTHONUNBUFFERED=1
 export TQDM_MININTERVAL=5
+export PATH="${GENERATION_ENV}/bin:${PATH}"
 
 COMMON_ARGS=(
   --input-tsv "${INPUT_TSV}"
@@ -59,17 +63,17 @@ if [[ -n "${MAX_ROWS}" ]]; then
 fi
 
 echo "method=${METHOD} task=${SLURM_ARRAY_TASK_ID}/${NUM_TASKS} node=$(hostname)"
-echo "model=${MODEL_PATH} snapshot=${CODE_SNAPSHOT} started=$(date --iso-8601=seconds)"
+echo "model=${MODEL_PATH} runtime=${GENERATION_ENV} snapshot=${CODE_SNAPSHOT} started=$(date --iso-8601=seconds)"
 nvidia-smi --query-gpu=index,name,memory.total,memory.free --format=csv
 
 case "${METHOD}" in
   east)
-    python "${CODE_SNAPSHOT}/llm_output_gigaspeech_trajectory.py" \
+    "${GENERATION_ENV}/bin/python" "${CODE_SNAPSHOT}/llm_output_gigaspeech_trajectory.py" \
       "${COMMON_ARGS[@]}" \
       --batch-size "${BATCH_SIZE:-4096}"
     ;;
   simul-must-c)
-    python "${CODE_SNAPSHOT}/salami/llm_output_salami.py" \
+    "${GENERATION_ENV}/bin/python" "${CODE_SNAPSHOT}/salami/llm_output_salami.py" \
       "${COMMON_ARGS[@]}" \
       --batch-size "${BATCH_SIZE:-2048}"
     ;;
