@@ -6,7 +6,7 @@ sources:
   - ../codes/gigaspeech/future_sampling/experimental/consensus_decoding_present_propose.py
   - ../codes/gigaspeech/future_sampling/experimental/run_present_propose_smoke500.sbatch
 created: 2026-07-19
-updated: 2026-07-19
+updated: 2026-09-05
 status: smoke500 launched (job 9370692)
 ---
 
@@ -70,6 +70,10 @@ and LAAL held.
 - Post-edit: triple negative ([[2026-06-consensus-post-edit-bleu]]).
 - Soft-vote loosening (futures-proposed majority): −2..4.
 - Qwen3.6-35B thinking sampler: no gain, ~30 min/case; dropped.
+
+## Status (2026-09-05)
+Superseded before analysis: the sampler/probe swap in [[2026-09-ambiguity-fsetv2-40k]]
+closed the BLEU gap without changing the gate. Smoke500 output (job 9370692) remains unanalysed.
 
 ## Related
 [[2026-07-present-rank-winner]], [[2026-07-consensus-register-forensics]],

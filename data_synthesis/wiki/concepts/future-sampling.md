@@ -7,7 +7,7 @@ sources:
   - ../codes/gigaspeech/future_sampling/llm_future_sampling_core.py
   - ../codes/gigaspeech/future_sampling/LLM_FUTURE_SAMPLING_FINAL_WALKTHROUGH.md
 created: 2026-06-01
-updated: 2026-06-07
+updated: 2026-09-05
 ---
 
 # Future Sampling
@@ -41,6 +41,9 @@ Output: `../outputs/gigaspeech/train_xl_future_sampling_final/`, processed by [[
 
 In [[2026-07-anchor-smoke500-sweep]] futures switch role from choosing wording to only vetoing
 commit timing (anchor-and-veto): the anchor proposes greedy text, futures decide how far to commit.
+
+Current production sampler (2026-09): [[ambiguity-future-set]] — generic plausible+contrastive
+prompt on two instruction-tuned samplers; trained result in [[2026-09-ambiguity-fsetv2-40k]].
 
 ## Sources
 - code: `../codes/gigaspeech/future_sampling/`

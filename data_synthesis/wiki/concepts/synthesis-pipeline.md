@@ -6,7 +6,7 @@ sources:
   - ../codes/gigaspeech/east/pipeline.sh
   - ../codes/gigaspeech/salami/pipeline.sh
 created: 2026-06-01
-updated: 2026-06-01
+updated: 2026-09-05
 ---
 
 # Synthesis Pipeline
@@ -34,8 +34,12 @@ The committed token chunks rest on a ~960ms grid (15360 samples @ 16kHz); see
 - [[east]]: English-only, no `fix_llm_raw`.
 - [[salami]]: adds `fix_llm_raw` (`--sync_zh_punct`) + salami→offline mapping + `--allow-one-word`.
 - Future methods ([[future-sampling]], [[consensus-decoding]]) replace stage 1's segmentation
-  with online READ/WRITE decisions; current prod variant: anchor-and-veto
-  ([[2026-07-anchor-smoke500-sweep]], anchor_40k decode).
+  with online READ/WRITE decisions; current prod variant: [[ambiguity-future-set]]
+  ([[2026-09-ambiguity-fsetv2-40k]]). Before SEGALE, verify exactly 40,000 unique utt_ids and,
+  if task dirs overlap, build the one-JSON-per-utt symlink view with
+  `future_sampling/external_runner/dedupe_decode_root.py`; resubmit the post-decode chain with
+  `scripts/resubmit_ambiguity_40k_post.sh` (SEGALE → QE → filter → convert → train → eval on
+  [[acl-6060]] + [[simul-tst-common]]).
 
 ## Sources
 - code: `../codes/gigaspeech/east/pipeline.sh`, `../codes/gigaspeech/salami/pipeline.sh`

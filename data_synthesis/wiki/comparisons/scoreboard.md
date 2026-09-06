@@ -5,7 +5,7 @@ tags: [eval, results, scoreboard]
 sources:
   - ckpts/infinisst-omni/
 created: 2026-06-01
-updated: 2026-06-26
+updated: 2026-09-05
 ---
 
 # Checkpoint Scoreboard (ACL 6060 dev)
@@ -17,6 +17,8 @@ COMET = `Unbabel/XCOMET-XL`). **Latency = LongYAAL (CU)**, char-level ms (lower 
 Rank by **COMET** ([[comet-vs-bleu-ranking]]), not BLEU.
 
 Source of truth: `ckpts/infinisst-omni/<exp>/<version>-hf/evaluation/`.
+Chunk-level SimulEval BLEU + StreamLAAL (the pre-June metric family, ~5 BLEU higher) lives in
+[[chunk-bleu-streamlaal-scoreboard]].
 
 ## Reading the board (key observations)
 - **BLEU ≠ COMET.** [[east]] variants (`EAST-even`, `EAST-lowonly`) post the highest zh **BLEU**
@@ -29,6 +31,9 @@ Source of truth: `ckpts/infinisst-omni/<exp>/<version>-hf/evaluation/`.
   latency, and soft-vote/100-future scaling don't help — see [[2026-06-consensus-axis5-vs-futures200]].
 - **PA-40k** is a strong rule-based point (COMET ~0.81); **LA** ([[la-n-vs-wait-k]]) collapses at
   seg960 (burst mode: zh LA2 BLEU 5.6, latency 7200ms) — exclude seg960 for LA.
+- **2026-09 ambiguity run** ([[2026-09-ambiguity-fsetv2-40k]]) is the new zh **BLEU leader** (47.8 @3840, above hibiki)
+  but its COMET (0.798) sits below `top5-axis5` (0.817) — under the rank-by-COMET rule it is not yet the
+  new flagship; trained on 17,306 instances (not the 12,500 sample). Seg960 on Simul-tst is degenerate.
 - **`top5-axis5` is trained on the OLD ASR** (`asr_filtered`) and is the canonical **old-asr+QE
   baseline**. Re-decoding with a **new Qwen-ASR (sentsplit)** regresses every latency by −4–6 BLEU /
   −0.05 COMET; period-fix recovers only ~+1 BLEU. The `FULL40k-win3*` and `top5-axis5-qwenasr*` rows
@@ -37,6 +42,8 @@ Source of truth: `ckpts/infinisst-omni/<exp>/<version>-hf/evaluation/`.
 ## en→zh
 | checkpoint | seg | BLEU | chrF | COMET | LongYAAL(CU) |
 |---|---|---|---|---|---|
+| **consensus-ambiguity-fsetv2 (2026-09, Qwen3.8+Gemma-E2B futures, Qwen3.6 probe)** | 1920 | 45.69 | 39.78 | 0.787 | 1970 |
+| **consensus-ambiguity-fsetv2 (2026-09)** | 3840 | **47.81** | 40.71 | 0.798 | 3031 |
 | consensus-top5-axis5 (OLD asr, baseline) | 1920 | 39.61 | 35.64 | **0.808** | 2176 |
 | consensus-top5-axis5 (OLD asr, baseline) | 3840 | 40.14 | 35.77 | **0.817** | 3107 |
 | consensus-FULL40k-win3 (NEW asr, +pfix) | 1920 | 35.47 | 33.50 | 0.761 | 1551 |
@@ -60,6 +67,18 @@ _(Per-checkpoint full seg960/1920/2880/3840 rows live in each `…-hf/evaluation
 above shows headline seg points. LA-40k-s and LA-40k-seg13 have no eval output at the standard
 path — run pending / nested differently.)_
 
+## en→zh on Simul-tst-COMMON (monotonic refs; seg 960/1920/2880/3840)
+
+| checkpoint | BLEU | COMET | LongYAAL(CU) |
+|---|---|---|---|
+| consensus-ambiguity-fsetv2 (2026-09) | 20.8†/42.8/45.0/**45.9** | .769†/.840/.857/.860 | 15495†/2078/2442/2884 |
+| consensus-top5-axis5 | 27.5/32.1/34.1/34.2 | .831/.859/.867/**.872** | 3535/1543/2409/2855 |
+| hibiki (ref-based) | 38.3/40.4/40.8/41.1 | .838/.861/.866/.869 | 1282/1849/2429/2870 |
+| EAST-even | 40.1/43.7/44.2/43.6 | .765/.817/.837/.846 | 1107/1900/2620/3243 |
+| PA-40k | 25.1/32.3/34.0/33.6 | .805/.847/.859/.855 | 7274/2570/2491/2756 |
+
+† degenerate (len ratio 1.89, rep-4gram .30). Sources: [[2026-07-simul-tst-common-rescore]], [[2026-09-ambiguity-fsetv2-40k]].
+
 ## en→ja
 | checkpoint | seg | BLEU | chrF | COMET | LongYAAL(CU) |
 |---|---|---|---|---|---|
@@ -79,7 +98,7 @@ path — run pending / nested differently.)_
 ## Related
 - [[checkpoint-evaluation]], [[latency-quality-tradeoff]], [[comet-vs-bleu-ranking]],
   [[infinisst-omni]], [[consensus-decoding]], [[la-n-vs-wait-k]], [[east]], [[acl-6060]],
-  [[2026-07-anchor-smoke500-sweep]] (anchor_40k → train → new scoreboard row pending).
+  [[2026-07-anchor-smoke500-sweep]], [[2026-09-ambiguity-fsetv2-40k]].
 
 ## Sources
 - results: `ckpts/infinisst-omni/<exp>/<version>-hf/evaluation/acl_6060/<lang>/seg<N>/segmentation_output/scores.tsv`

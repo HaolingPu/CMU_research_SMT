@@ -6,7 +6,7 @@ sources:
   - scripts/debug/plot_latency_quality_3models.py
   - scripts/infer/plot_latency_quality_zh.py
 created: 2026-06-01
-updated: 2026-06-07
+updated: 2026-09-05
 ---
 
 # Latency–Quality Tradeoff
@@ -25,6 +25,9 @@ Note: rank policies by **COMET**, not BLEU — see [[comet-vs-bleu-ranking]].
 A worked example of reading the frontier "left": 5-axis consensus reaches the futures=200
 baseline's *best* COMET ~680 ms sooner — see [[2026-06-consensus-axis5-vs-futures200]]
 (`scripts/debug/consensus_vs_futures200.png`).
+
+2026-09: [[2026-09-ambiguity-fsetv2-40k]] shifts the zh BLEU frontier up 6–8 points at equal
+or lower LongYAAL while COMET dips ~0.02 — plot both metrics before ranking.
 
 ## Related
 - [[checkpoint-evaluation]], [[streaming-inference]], [[comet-vs-bleu-ranking]],

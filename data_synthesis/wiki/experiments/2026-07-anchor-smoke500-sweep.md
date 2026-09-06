@@ -8,7 +8,7 @@ sources:
   - ../codes/gigaspeech/future_sampling/analyze_anchor_smoke.py
   - ../outputs/gigaspeech/consensus_decoding_prod/anchor_smoke500/
 created: 2026-07-12
-updated: 2026-07-12
+updated: 2026-09-05
 ---
 
 # Anchor-and-veto smoke sweep (500 utts, A/B/C/D) — strict gate wins
@@ -113,6 +113,11 @@ boundary-trimming deferral (anchor_trim_to_boundary re-defers trimmed tokens).
 **Decision: method closed.** No 40k, no training run. The remaining ~7 BLEU gap vs hibiki on
 this axis is the honest cost of ref-free decoding; further consensus quality work should
 target the vote itself (e.g. context window, voter quality), not post-hoc reword/re-time.
+
+## Recurrence (2026-09-05)
+The TED non-speech over-generation reappeared at seg960 only in
+[[2026-09-ambiguity-fsetv2-40k]] (len ratio 1.89, rep-4gram .30, LongYAAL 15.5 s); higher
+segments are clean.
 
 ## Related
 - [[2026-07-consensus-register-forensics]] (parent fix plan), [[consensus-decoding]],

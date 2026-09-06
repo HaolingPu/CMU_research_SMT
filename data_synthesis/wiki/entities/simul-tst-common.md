@@ -6,7 +6,7 @@ sources:
   - ../codes/../simul_tst_common/
   - https://github.com/naist-nlp/Simul-tst-COMMON
 created: 2026-07-11
-updated: 2026-07-11
+updated: 2026-09-05
 ---
 
 # Simul-tst-COMMON (monotonic SMT eval set)
@@ -53,6 +53,11 @@ at high seg) → reference-style-bias hypothesis rejected; treat the deficit as 
 The EAST-even canary did **not** crater on BLEU (still leader) while posting the worst
 COMET — BLEU here still anti-correlates with adequacy. Next levers: paraphrased-oracle
 diagnostic, Qwen-122B futures.
+
+## Results (2026-09-05) — ambiguity run
+[[2026-09-ambiguity-fsetv2-40k]]: BLEU 42.8/45.0/45.9 at seg1920/2880/3840 (hibiki 40.4/40.8/41.1,
+top5-axis5 32.1/34.1/34.2), COMET .840/.857/.860 (vs .861/.866/.869 and .859/.867/.872). Seg960 is
+degenerate (len ratio 1.89, LongYAAL 15.5 s) — TED non-speech over-generation, exclude it.
 
 ## Related
 - [[acl-6060]], [[comet-vs-bleu-ranking]], [[consensus-decoding]], [[scoreboard]],

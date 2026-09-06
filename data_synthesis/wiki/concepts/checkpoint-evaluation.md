@@ -6,7 +6,7 @@ sources:
   - scripts/infer/eval_all_ckpts.sh
   - scripts/infer/normalize_instances.py
 created: 2026-06-01
-updated: 2026-06-01
+updated: 2026-09-05
 ---
 
 # Checkpoint Evaluation
@@ -22,6 +22,10 @@ tokenizers (MOSES; ja-mecab). Driver: `scripts/infer/eval_all_ckpts{,_ja,_de,_v2
 Results land in each checkpoint's `…-hf/evaluation/acl_6060/<lang>/seg<N>/` dir (the
 `segmentation_output/scores.tsv` is the COMET-bearing one), are consolidated in the [[scoreboard]],
 and feed the [[latency-quality-tradeoff]] plots.
+
+Two BLEU families exist: SimulEval chunk-level BLEU (`seg<N>/scores.tsv`, tabulated in
+[[chunk-bleu-streamlaal-scoreboard]]) and longform mwerSegmenter BLEU/XCOMET
+(`segmentation_output/scores.tsv`, tabulated in [[scoreboard]]). StreamLAAL ≈ LongYAAL (CU).
 
 ## Related
 - [[streaming-inference]], [[latency-quality-tradeoff]], [[acl-6060]], [[comet-vs-bleu-ranking]], [[infinisst-omni]], [[babel-cluster]].

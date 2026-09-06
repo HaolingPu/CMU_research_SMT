@@ -90,3 +90,17 @@ Append-only. See [[WIKI.md]] for format.
 - added: [[2026-07-anchor-smoke500-sweep]]
 - updated: [[2026-07-consensus-register-forensics]], [[consensus-decoding]], [[future-sampling]], [[synthesis-pipeline]], [[latency-quality-tradeoff]], [[scoreboard]], index.md (6 content pages — fewer than 15 relevant exist for this narrow result)
 - contradictions: none — confirms forensics fix plan #1's prediction (strict gate: char-BLEU 60→67, target 65+ met; 4-gram 0.58 vs target 0.6 near-miss); new caveat logged: anchor LAAL +1.8 vs consensus track, latency-matching deferred to trained-model eval
+
+## [2026-09-05] ingest | Ambiguity future-set 40k run (decode 40k → SEGALE → QE → train → eval on ACL 6060 + Simul-tst-COMMON)
+- source: run manifest `slurm_runs/ambiguity-q38-gemma-q36-fsetv2-prefixnorm-strict-40k-r1-20260831/run_manifest.txt`; ckpt `…-ambiguity-…-s-bsz4/v0-20260906-013823-hf/evaluation/`; `ambiguity_sampler_prompt.py`; 100-case viewer bundle + verbose logs `_1059`, `_1011`, `_1125`
+- added: [[2026-09-ambiguity-fsetv2-40k]], [[ambiguity-future-set]]
+- updated: [[scoreboard]] (zh rows + new Simul-tst table), [[consensus-decoding]], [[future-sampling]], [[simul-tst-common]], [[comet-vs-bleu-ranking]], [[2026-07-consensus-register-forensics]], [[2026-07-present-propose-gate]], [[2026-07-anchor-smoke500-sweep]], [[synthesis-pipeline]], [[acl-6060]], [[latency-quality-tradeoff]], index.md
+- key facts: BLEU 37.0/45.7/47.2/47.8 (ACL) and 20.8†/42.8/45.0/45.9 (tst); XCOMET .748/.787/.796/.798 and .769†/.840/.857/.860; QE survivors 17,326, length filter 17,306, trained on all 17,306; tst seg960 degenerate
+- contradictions: FLAGGED — "BLEU deficit is structural / honest cost of future-blindness" ([[2026-06-consensus-post-edit-bleu]], [[consensus-decoding]]) vs this run closing the gap while ref-free and future-blind; both claims kept, the narrower "not recoverable post-hoc" survives
+
+## [2026-09-05] ingest | Chunk-level BLEU / StreamLAAL results table (user-provided) + ambiguity-run SimulEval scores
+- source: Haoling's results table (EAST, Refined-EAST, Simul-MuST-C, Word-Alignment, Hibiki, Consensus top-k 5/10; 12.5K, ACL 6060 dev); `<ckpt>/evaluation/*/en-zh/seg*/scores.tsv` of the ambiguity run
+- added: [[chunk-bleu-streamlaal-scoreboard]]
+- updated: [[scoreboard]], [[checkpoint-evaluation]], [[2026-09-ambiguity-fsetv2-40k]], index.md
+- key facts: chunk-level BLEU ≈ longform BLEU + 5 (Hibiki 51.85 vs 46.76 @3840); StreamLAAL ≈ LongYAAL(CU); ambiguity run chunk BLEU 46.45/54.76/56.56/57.23 on ACL (+5.4 over Hibiki @3840)
+- contradictions: none

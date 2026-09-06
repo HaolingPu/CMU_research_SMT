@@ -14,6 +14,7 @@ Master catalog. See [[WIKI.md]] for conventions.
 - [[majority-vote]] — commit the most common candidate
 - [[segale-alignment]] — token-to-segment alignment for prefix truncation
 - [[min-p-sampling]] — min-p/top-k diversity-control ablations
+- [[ambiguity-future-set]] — generic plausible+contrastive future prompt, two instruction-tuned samplers, post-filter (2026-09 production sampler)
 
 ### Training / inference / eval
 - [[dataset-conversion-pipeline]] — synthesis JSONL → SWIFT/Megatron training instances
@@ -54,7 +55,10 @@ Master catalog. See [[WIKI.md]] for conventions.
 - [[2026-07-present-rank-winner]] — NEGATIVE (−2.15 paired char-BLEU, hygiene clean): strict gate leaves the winner rule no freedom; register bias enters at the GATE, not the winner
 - [[2026-07-present-propose-gate]] — successor: present distribution proposes candidates, futures verify by majority; smoke500 vs J_40k
 
+- [[2026-09-ambiguity-fsetv2-40k]] — ambiguity future set + Qwen3.6 probe, 40k, strict gate: BLEU 47.8 @ACL-3840 (flagship 40.1, hibiki 46.8) and 45.9 @tst; COMET −0.01…−0.04 → not promoted under rank-by-COMET; 17,306 training instances (confound); tst seg960 degenerate
+
 ## Comparisons
 - [[scoreboard]] — measured COMET/BLEU/chrF/latency of all trained checkpoints (ACL 6060 dev)
+- [[chunk-bleu-streamlaal-scoreboard]] — pre-June chunk-level SimulEval BLEU + StreamLAAL table for EAST / Refined-EAST / Simul-MuST-C / word-align / Hibiki / consensus, plus the 2026-09 ambiguity run in the same metric
 - [[la-n-vs-wait-k]] — rule-based LA/wait-k/PA offline policies + trained counterparts
 - [[comet-vs-bleu-ranking]] — why we rank by COMET, not BLEU

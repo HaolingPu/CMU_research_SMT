@@ -6,7 +6,7 @@ sources:
   - ../codes/metricx/
   - scripts/infer/eval_all_ckpts.sh
 created: 2026-06-01
-updated: 2026-07-11
+updated: 2026-09-05
 ---
 
 # COMET vs BLEU for Ranking
@@ -39,6 +39,12 @@ measurable win. Whether the BLEU deficit is real quality or reference-style bias
 BLEU gap persisted unchanged (6.5–8.3 at matched latency) with COMET again tied — see
 [[2026-07-simul-tst-common-rescore]]. Notably EAST-even kept its BLEU lead there too while
 scoring the worst COMET, so the rank-by-COMET rule survives on a second, independent test set.
+
+**Update (2026-09-05).** [[2026-09-ambiguity-fsetv2-40k]] is the first ref-free consensus run to
+*lead* BLEU (47.8 @ACL-3840, above hibiki and EAST-even) while trailing the flagship on COMET by
+~0.02. The rule still applies — it is not promoted — but the earlier statement that the consensus
+BLEU deficit is structural and un-recoverable no longer holds; it was a property of the candidate
+distribution, as [[2026-07-consensus-register-forensics]] argued.
 
 ## Related
 - [[scoreboard]], [[la-n-vs-wait-k]], [[consensus-decoding]], [[metricx]], [[checkpoint-evaluation]],

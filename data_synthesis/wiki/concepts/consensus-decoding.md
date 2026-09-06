@@ -6,7 +6,7 @@ sources:
   - ../codes/gigaspeech/future_sampling/consensus_decoding.py
   - ../codes/gigaspeech/future_sampling/consensus_decoding_token_id_level_instruct.py
 created: 2026-06-01
-updated: 2026-07-11
+updated: 2026-09-05
 ---
 
 # Consensus Decoding
@@ -76,6 +76,17 @@ feature already at its fluency frontier.
   [[2026-06-qwenasr-asr-regression-periodfix]], [[scoreboard]],
   [[2026-07-consensus-register-forensics]], [[2026-07-anchor-smoke500-sweep]] (anchor-and-veto
   fixes the register drift; strict-gate variant A → anchor_40k prod run).
+
+## 2026-09: ambiguity future set closes the BLEU gap, COMET dips
+[[2026-09-ambiguity-fsetv2-40k]] replaced the 5-axis sampler with the generic
+[[ambiguity-future-set]] prompt (10 plausible + 10 contrastive per sampler; Qwen3.8-27B +
+Gemma-4-E2B), and the probe with Qwen3.6-35B, keeping the strict gate. Trained result: BLEU
+47.8 @ACL-3840 (flagship 40.1, hibiki 46.8) and 45.9 @tst-3840 (hibiki 41.1) — the ~7 BLEU
+deficit is gone while staying ref-free and future-blind — but XCOMET falls 0.01–0.04 (.798 vs
+.817 @ACL-3840). **Contradiction with the 'structural cost' claim below is flagged, not
+resolved**: the gap was recoverable by changing the candidate distribution and probe; only the
+post-hoc route (edit / select / re-time) remains dead. Confounds: 17,306 vs 12,500 training
+instances; probe and samplers changed together.
 
 ## Sources
 - code: `../codes/gigaspeech/future_sampling/consensus_decoding*.py`

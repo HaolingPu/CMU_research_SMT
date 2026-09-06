@@ -8,7 +8,7 @@ sources:
   - ../codes/gigaspeech/hibiki/code/translate_subsentences.py
   - ../outputs/gigaspeech/consensus_decoding_prod/J_40k/
 created: 2026-07-11
-updated: 2026-07-11
+updated: 2026-09-05
 ---
 
 # Why consensus loses ~7 BLEU — register/canonicality forensics
@@ -106,6 +106,12 @@ ACROSS FUTURES). Register enters via:
    [[simul-tst-common]]. Success = BLEU gap vs hibiki shrinks, COMET holds, latency matched.
 5. Oracle-future diagnostic ([[2026-07-simul-tst-common-rescore]]) remains useful to bound
    any *residual* gap after 1.
+
+## Follow-up (2026-09-05)
+The register prediction was borne out by a different route than fix plans 1–3: changing the
+probe to Qwen3.6-35B and the futures to the [[ambiguity-future-set]] moved the committed text
+onto the canonical manifold — [[2026-09-ambiguity-fsetv2-40k]] gains +7.7 BLEU on ACL and +11.7
+on Simul-tst over top5-axis5, at a 0.01–0.04 COMET cost.
 
 ## Related
 - **Validated**: [[2026-07-anchor-smoke500-sweep]] executed fix plan #1's smoke protocol —
