@@ -23,7 +23,8 @@ SAMPLE_SIZE=12500
 SAMPLE_SEED=42
 PRIOR_EVAL_GATE="${PRIOR_EVAL_GATE:-}"
 START_DEPENDENCY="${START_DEPENDENCY:-}"
-EXCLUDE="${EXCLUDE:-babel-p9-32,babel-p9-28,babel-m5-32,babel-o5-24,babel-q5-16,babel-n5-32,babel-o5-16,babel-n5-28,babel-q5-32,babel-s5-24,babel-q5-24,babel-o5-28,babel-p5-20,babel-p5-24,babel-o9-24,babel-q9-32,babel-t5-28,babel-v9-28}"
+EXCLUDE="${EXCLUDE:-babel-p9-32,babel-p9-28,babel-m5-32,babel-o5-24,babel-q5-16,babel-n5-32,babel-o5-16,babel-n5-28,babel-q5-32,babel-s5-24,babel-q5-24,babel-o5-28,babel-p5-20,babel-p5-24,babel-o9-24,babel-o9-28,babel-q9-32,babel-t5-28,babel-v9-28}"
+EXCLUDE_ENCODED=${EXCLUDE//,/;}
 
 if [[ "${SAMPLE_SIZE}" -ne 12500 || "${SAMPLE_SEED}" -ne 42 ]]; then
   echo "The frozen recipe requires SAMPLE_SIZE=12500 and SAMPLE_SEED=42" >&2
@@ -88,6 +89,7 @@ training_recipe=frozen_unchanged
 output_root=${EAST_BASE}
 training_manifest=${EAST_MANIFEST}
 experiment=${EAST_EXP}
+exclude=${EXCLUDE}
 EOF
 cat > "${SIMUL_RUN_MANIFEST}" <<EOF
 method=Simul-MuST-C-fixed-v2
@@ -100,6 +102,7 @@ training_recipe=frozen_unchanged
 output_root=${SIMUL_BASE}
 training_manifest=${SIMUL_MANIFEST}
 experiment=${SIMUL_EXP}
+exclude=${EXCLUDE}
 EOF
 
 GPU_ARGS=(--partition=preempt --qos=preempt_qos --requeue --exclude="${EXCLUDE}")
@@ -176,7 +179,7 @@ EAST_LAUNCH=$(sbatch --parsable \
   --job-name=q36_east_eval_launch \
   --output="${RUN_ROOT}/east/logs/eval_launcher_%j.out" \
   --error="${RUN_ROOT}/east/logs/eval_launcher_%j.err" \
-  --export="ALL,EXP=${EAST_EXP},RUN_SIMULTST=1,CHILD_PARTITION=preempt,CHILD_GPU_QOS=preempt_qos,CHILD_EXCLUDE=${EXCLUDE},CKPTS_FILE=${RUN_ROOT}/east/ckpts.txt,CKPTS_SIMULTST_FILE=${RUN_ROOT}/east/ckpts_simultst.txt,PIPELINE_MANIFEST=${EAST_RUN_MANIFEST}" \
+  --export="ALL,EXP=${EAST_EXP},RUN_SIMULTST=1,CHILD_PARTITION=preempt,CHILD_GPU_QOS=preempt_qos,CHILD_EXCLUDE_ENCODED=${EXCLUDE_ENCODED},CKPTS_FILE=${RUN_ROOT}/east/ckpts.txt,CKPTS_SIMULTST_FILE=${RUN_ROOT}/east/ckpts_simultst.txt,PIPELINE_MANIFEST=${EAST_RUN_MANIFEST}" \
   "${REPO}/scripts/infer/run_infer_after_train_generic.sbatch")
 EAST_GATE=$(sbatch --parsable \
   "${CPU_ARGS[@]}" \
@@ -250,7 +253,7 @@ SIMUL_LAUNCH=$(sbatch --parsable \
   --job-name=q36_simul_eval_launch \
   --output="${RUN_ROOT}/simul_must_c/logs/eval_launcher_%j.out" \
   --error="${RUN_ROOT}/simul_must_c/logs/eval_launcher_%j.err" \
-  --export="ALL,EXP=${SIMUL_EXP},RUN_SIMULTST=1,CHILD_PARTITION=preempt,CHILD_GPU_QOS=preempt_qos,CHILD_EXCLUDE=${EXCLUDE},CKPTS_FILE=${RUN_ROOT}/simul_must_c/ckpts.txt,CKPTS_SIMULTST_FILE=${RUN_ROOT}/simul_must_c/ckpts_simultst.txt,PIPELINE_MANIFEST=${SIMUL_RUN_MANIFEST}" \
+  --export="ALL,EXP=${SIMUL_EXP},RUN_SIMULTST=1,CHILD_PARTITION=preempt,CHILD_GPU_QOS=preempt_qos,CHILD_EXCLUDE_ENCODED=${EXCLUDE_ENCODED},CKPTS_FILE=${RUN_ROOT}/simul_must_c/ckpts.txt,CKPTS_SIMULTST_FILE=${RUN_ROOT}/simul_must_c/ckpts_simultst.txt,PIPELINE_MANIFEST=${SIMUL_RUN_MANIFEST}" \
   "${REPO}/scripts/infer/run_infer_after_train_generic.sbatch")
 SIMUL_GATE=$(sbatch --parsable \
   "${CPU_ARGS[@]}" \

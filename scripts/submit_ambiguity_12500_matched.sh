@@ -15,7 +15,8 @@ CKPTS_FILE=${RUN_DIR}/ckpts.txt
 CKPTS_SIMULTST_FILE=${RUN_DIR}/ckpts_simultst.txt
 
 TRAIN_EXCLUDE=babel-p9-32,babel-o9-24,babel-q9-32,babel-t5-28
-INFER_EXCLUDE=babel-p9-32,babel-p9-28,babel-m5-32,babel-o5-24,babel-q5-16,babel-n5-32,babel-o5-16,babel-n5-28,babel-q5-32,babel-s5-24,babel-q5-24,babel-o5-28,babel-p5-20,babel-p5-24,babel-o9-24,babel-q9-32,babel-t5-28
+INFER_EXCLUDE=babel-p9-32,babel-p9-28,babel-m5-32,babel-o5-24,babel-q5-16,babel-n5-32,babel-o5-16,babel-n5-28,babel-q5-32,babel-s5-24,babel-q5-24,babel-o5-28,babel-p5-20,babel-p5-24,babel-o9-24,babel-o9-28,babel-q9-32,babel-t5-28
+INFER_EXCLUDE_ENCODED=${INFER_EXCLUDE//,/;}
 
 mkdir -p "${RUN_DIR}/logs"
 if [[ -s "${MANIFEST}" ]]; then
@@ -46,7 +47,7 @@ EVAL_LAUNCHER=$(sbatch --parsable \
   --dependency="afterok:${TRAIN}" \
   --output="${RUN_DIR}/logs/eval_launcher_%j.out" \
   --error="${RUN_DIR}/logs/eval_launcher_%j.err" \
-  --export="ALL,EXP=${EXP},RUN_SIMULTST=1,CHILD_PARTITION=preempt,CHILD_GPU_QOS=preempt_qos,CHILD_EXCLUDE=${INFER_EXCLUDE},CKPTS_FILE=${CKPTS_FILE},CKPTS_SIMULTST_FILE=${CKPTS_SIMULTST_FILE},PIPELINE_MANIFEST=${MANIFEST}" \
+  --export="ALL,EXP=${EXP},RUN_SIMULTST=1,CHILD_PARTITION=preempt,CHILD_GPU_QOS=preempt_qos,CHILD_EXCLUDE_ENCODED=${INFER_EXCLUDE_ENCODED},CKPTS_FILE=${CKPTS_FILE},CKPTS_SIMULTST_FILE=${CKPTS_SIMULTST_FILE},PIPELINE_MANIFEST=${MANIFEST}" \
   "${REPO}/scripts/infer/run_infer_after_train_generic.sbatch")
 
 cat > "${MANIFEST}" <<EOF
@@ -62,6 +63,7 @@ resample=${RESAMPLE}
 train=${TRAIN}
 eval_launcher=${EVAL_LAUNCHER}
 evaluation_sets=acl_6060,simul_tst_common
+infer_exclude=${INFER_EXCLUDE}
 status=submitted
 EOF
 

@@ -21,6 +21,7 @@ EXP="${EXP:?EXP required}"
 CHILD_PARTITION="${CHILD_PARTITION:-general}"
 CHILD_GPU_QOS="${CHILD_GPU_QOS:-normal}"
 CHILD_EXCLUDE="${CHILD_EXCLUDE:-}"
+CHILD_EXCLUDE_ENCODED="${CHILD_EXCLUDE_ENCODED:-}"
 CKPTS_FILE="${CKPTS_FILE:-/home/haolingp/slurm_runs/${EXP}/ckpts.txt}"
 RUN_SIMULTST="${RUN_SIMULTST:-0}"
 CKPTS_SIMULTST_FILE="${CKPTS_SIMULTST_FILE:-/home/haolingp/slurm_runs/${EXP}/ckpts_simultst.txt}"
@@ -32,12 +33,35 @@ echo "HF export: ${HF}"
 
 mkdir -p "$(dirname "${CKPTS_FILE}")"
 
+# Slurm parses commas in --export as variable separators. Prefer the encoded
+# value, then recover the latest full list from the run manifest for old jobs.
+if [[ -n "${CHILD_EXCLUDE_ENCODED}" ]]; then
+  CHILD_EXCLUDE="${CHILD_EXCLUDE_ENCODED//;/,}"
+elif [[ -n "${PIPELINE_MANIFEST}" ]]; then
+  for candidate in \
+    "${PIPELINE_MANIFEST}" \
+    "$(dirname "${PIPELINE_MANIFEST}")/../run_manifest.txt"; do
+    [[ -s "${candidate}" ]] || continue
+    manifest_exclude=$(awk -F= '
+      /^(exclude|infer_exclude|replacement_excludes)=/ {
+        value = substr($0, index($0, "=") + 1)
+      }
+      END { print value }
+    ' "${candidate}")
+    if [[ -n "${manifest_exclude}" ]]; then
+      CHILD_EXCLUDE="${manifest_exclude}"
+      break
+    fi
+  done
+fi
+
 CHILD_SBATCH_ARGS=(
   --partition="${CHILD_PARTITION}"
   --qos="${CHILD_GPU_QOS}"
   --requeue
 )
 if [[ -n "${CHILD_EXCLUDE}" ]]; then
+  echo "Child node exclusions: ${CHILD_EXCLUDE}"
   CHILD_SBATCH_ARGS+=(--exclude="${CHILD_EXCLUDE}")
 fi
 
