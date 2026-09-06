@@ -165,6 +165,71 @@ sentence has ended, or route a finished-but-unclosed sentence through the final-
 path; and the reset-aware future window. Tooling: the trajectory viewer now renders the full
 next-token trace per step (`data/consensus/<utt>.json`, commit `db57a69`).
 
+## Single-case A/B of the boundary fixes (2026-09-06, job 10333550, `AUD0000000003_1015`)
+
+Decoder commit `3077644` adds three flags; `experimental/run_single_case_ab.sbatch` decodes one
+TSV row under several flag sets with the production samplers/probe loaded once, all variants
+sharing `--targeted-sampler-seed 1015` (seed + crc32 of prefix|committed|model, so futures are
+identical across variants until the trajectories diverge). Outputs:
+`/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_pilots/single_ab_1015_20260906-1110/<variant>/task_00/`.
+
+| variant | flags | step-4 commit (source `pieces.`) | 碎了一地 | char-BLEU | LAAL |
+|---|---|---|---|---|---|
+| baseline | — | 散成十几块 (no punctuation; `碎片。` lands at step 6) | no | 59.3 | 6.12 |
+| joinfix | `--future-join-mode sentence-aware` | 散成十几块**，** | **yes, step 11** | 24.2 | 9.85 |
+| joinfix_sentend | + `--sentence-end-completion` | 成了十几块碎片**。** (`[SentenceEnd]`) | no | 57.8 | 6.54 |
+| full | + `--future-source-window-mode until-closed` | 成了十几块碎片。 | no | **66.0** | 6.16 |
+
+Reading: (1) the carry-over reproduces exactly when the source period is committed with a
+Chinese comma (joinfix) and disappears when the sentence-end completion closes it with 。;
+(2) the seed makes the futures reproducible (step-4 candidate lists are byte-identical between
+baseline and joinfix) but the probe's logprobs are not bit-stable across runs, so a 6/15-style
+vote can flip a trailing comma between otherwise identical variants — single-case deltas in
+BLEU are noise, the structural effect on the boundary is the signal; (3) `until-closed`
+widened the sampler window to 2 units for chunks 10–15 because unit 1 (`...had been,`) left
+the Chinese open, but at chunk 12 it still dropped `This giant was...` because the mode caps at
+2 units. Viewer bundle with the four logs: `/private/tmp/trajectory-viewer-ab1015`
+(laptop, port 8767).
+
+### What the sampler window really is (100-case measurement)
+
+`--future-source-window-chunks N` counts **units of `src_text_full`**, not ASR chunks, and the
+sampler prefix always starts at the beginning of the current unit (`build_source_observed_recent_units`).
+So an anchor at the unit start already exists. The problem is the units: over the 100 viewer
+cases, `src_text_full` has 537 units and only 230 end with `. ! ?`; 279 end with a comma and 28
+with no punctuation. Half of all sampler resets therefore happen mid-sentence, and at the first
+step of a new unit the sampler sees a median of 2 words (262/437 unit starts show ≤2 words).
+
+| step type (chunk position) | steps with futures | WRITE rate |
+|---|---|---|
+| starts a true sentence (after `. ! ?`) | 310 | 34.8 % |
+| starts a comma-fragment unit | 251 | 53.4 % |
+| mid-unit | 1857 | 48.4 % |
+
+| sampler-prefix length | steps | Gemma restart-as-new-sentence | Qwen |
+|---|---|---|---|
+| 1–2 words | 335 | 1.6 % | 0.5 % |
+| 3–4 words | 341 | 0.7 % | 0.1 % |
+| 5–8 words | 685 | 4.7 % | 0.2 % |
+| 9+ words | 1057 | 5.8 % | 0.2 % |
+
+Gemma's sentence restarts grow with prefix length, so widening the sampler window does not
+buy fewer restarts (the sentence-aware join handles those on the probe side). The 73
+carry-over WRITE steps sit mostly a few chunks into the new unit (46 mid-unit, 5 fragment
+starts, 4 sentence starts), and 21/73 had a sampler prefix of ≤2 words.
+
+Design options for the sampler prefix (decision pending, see RESEARCH_TODO):
+- **A. punctuation anchor** — prefix = observed text after the last `. ! ?`; ignores the
+  comma-fragment units, no 2-unit cap, no LLM call. Cheapest fix for the 262 mid-sentence resets.
+- **B. A + previous full sentence** — always prepend the previous sentence (or only when the
+  current-sentence prefix has < K words). Restores the antecedent that the case-71 gender
+  error lost; costs a longer prompt and slightly more Gemma restarts.
+- **C. until-closed** (implemented, `full` variant) — target-state driven, needs
+  `--sentence-end-completion` to be meaningful, capped at 2 units.
+June history: win3 (3 units, fixed) was confounded with the ASR change and never isolated
+([[2026-06-qwenasr-asr-regression-periodfix]]), so a wider *fixed* window has no clean
+evidence either way.
+
 ## Next
 
 - **In progress:** matched 12,500-instance rerun, seed 42, sampled from the same 17,306-row
@@ -174,7 +239,8 @@ next-token trace per step (`data/consensus/<utt>.json`, commit `db57a69`).
 - Inspect tst seg960 outputs; consider an inference-time repetition brake.
 - Sampler ablations on an ambiguity-stratified set (Qwen-only 20/40, + larger Gemma-4 12B/31B):
   metric = fraction of ambiguity steps where a sampler produces ≥1 cue-carrying future.
-- Reset-aware future window: sample from uncommitted source + current unit, capped at 2 units.
+- Sampler-window redesign: pick between options A/B/C above (punctuation anchor, + previous
+  sentence, until-closed) and test on a stratified pilot, not on the frozen 40k method.
 
 ## Related
 - [[ambiguity-future-set]], [[consensus-decoding]], [[future-sampling]], [[scoreboard]],

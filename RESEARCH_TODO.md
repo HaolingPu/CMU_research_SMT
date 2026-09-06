@@ -32,6 +32,14 @@ Simul-tst-COMMON). A 2-hour watcher in the Claude Code session follows it.
   `scripts/infer/eval_all_ckpts_simultst.sh`, `scripts/submit_ambiguity_40k.sh`),
   then `git pull --ff-only` on BABEL before the downstream chain is rebuilt.
 
+- [ ] Decide the sampler-prefix window for the next pilot (2026-09-06 analysis in
+  `wiki/experiments/2026-09-ambiguity-fsetv2-40k.md`, "What the sampler window really is"):
+  A punctuation anchor (prefix = text after the last `. ! ?`), B anchor + previous full
+  sentence, or C the implemented `until-closed` mode. Facts: units of `src_text_full` end
+  with a comma 279/537 times, so the current unit anchor resets mid-sentence half the time;
+  single-case A/B (job 10333550) confirms `--sentence-end-completion` removes the 碎了一地
+  carry-over. Do not change the frozen 40k method; run as a separate pilot root.
+
 ### P0 — right after decode reaches 40,000
 - [x] Run the verifier over rows 0–39,999 and build the one-JSON-per-utterance view.
   (Raw root: 40,000 unique, 0 missing, 1,793 duplicates from task_00/01. Dedup

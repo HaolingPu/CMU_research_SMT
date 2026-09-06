@@ -25,6 +25,10 @@ two samplers (Gemma-4-E2B-it + Qwen3.8-27B) → ≤ 40 raw candidates per prefix
 plus the committed target text. The probe/translator always sees the full observed source.
 At a sentence boundary the sampler prefix resets even if the previous clause is uncommitted —
 the mechanism behind the case-71 gender error in [[2026-09-ambiguity-fsetv2-40k]].
+The "sentence units" are the entries of the TSV column `src_text_full`, and they are not
+sentences: in the 100-case bundle 279/537 end with a comma, so half of the resets are
+mid-sentence and the sampler often sees 1–2 words (measurement and redesign options in
+[[2026-09-ambiguity-fsetv2-40k]], section "What the sampler window really is").
 
 ## Filter after sampling (per model, per mode)
 1. clean: strip think tags, markdown, leading `...`; strip a repeated observed prefix
