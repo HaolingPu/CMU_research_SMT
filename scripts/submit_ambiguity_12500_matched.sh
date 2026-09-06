@@ -15,7 +15,7 @@ CKPTS_FILE=${RUN_DIR}/ckpts.txt
 CKPTS_SIMULTST_FILE=${RUN_DIR}/ckpts_simultst.txt
 
 TRAIN_EXCLUDE=babel-p9-32,babel-o9-24,babel-q9-32,babel-t5-28
-INFER_EXCLUDE=babel-p9-32,babel-p9-28,babel-m5-32,babel-o5-24,babel-q5-16,babel-n5-32,babel-o5-16,babel-n5-28,babel-q5-32,babel-s5-24,babel-q5-24,babel-o5-28,babel-p5-20,babel-p5-24,babel-o9-24,babel-o9-28,babel-q9-32,babel-t5-28
+INFER_EXCLUDE=babel-p9-32,babel-p9-28,babel-m5-32,babel-o5-24,babel-q5-16,babel-q5-20,babel-n5-32,babel-o5-16,babel-n5-28,babel-q5-32,babel-s5-24,babel-q5-24,babel-o5-28,babel-p5-20,babel-p5-24,babel-o9-24,babel-o9-28,babel-q9-32,babel-t5-28
 INFER_EXCLUDE_ENCODED=${INFER_EXCLUDE//,/;}
 
 mkdir -p "${RUN_DIR}/logs"

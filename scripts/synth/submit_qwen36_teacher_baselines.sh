@@ -23,7 +23,7 @@ SAMPLE_SIZE=12500
 SAMPLE_SEED=42
 PRIOR_EVAL_GATE="${PRIOR_EVAL_GATE:-}"
 START_DEPENDENCY="${START_DEPENDENCY:-}"
-EXCLUDE="${EXCLUDE:-babel-p9-32,babel-p9-28,babel-m5-32,babel-o5-24,babel-q5-16,babel-n5-32,babel-o5-16,babel-n5-28,babel-q5-32,babel-s5-24,babel-q5-24,babel-o5-28,babel-p5-20,babel-p5-24,babel-o9-24,babel-o9-28,babel-q9-32,babel-t5-28,babel-v9-28}"
+EXCLUDE="${EXCLUDE:-babel-p9-32,babel-p9-28,babel-m5-32,babel-o5-24,babel-q5-16,babel-q5-20,babel-n5-32,babel-o5-16,babel-n5-28,babel-q5-32,babel-s5-24,babel-q5-24,babel-o5-28,babel-p5-20,babel-p5-24,babel-o9-24,babel-o9-28,babel-q9-32,babel-t5-28,babel-v9-28}"
 EXCLUDE_ENCODED=${EXCLUDE//,/;}
 
 if [[ "${SAMPLE_SIZE}" -ne 12500 || "${SAMPLE_SEED}" -ne 42 ]]; then
