@@ -167,3 +167,34 @@ one legitimate all-`None` abstention); 37 unit tests pass.
 Resubmitted 2026-09-07 14:35 UTC: generation `10345647` (array 0-3, `--skip-existing`
 keeps the 18 verified cases), report `10345648` (`afterok`). Superseded report `10345239`
 cancelled. GPU budget unchanged: Simul generation 16 + pilot 8.
+
+## Completed and published (2026-09-07 15:42 UTC)
+
+Generation `10345647` finished all 32 missing cases (tasks 0/1/3 decoded 20–32 min each; task 2
+found its rows already verified and skipped), report `10345648` validated 50/50 outputs and built
+the bundle. The retry path fired twice and recovered both times, so no case was lost; the raw
+responses are in `row_28/.../malformed_sampler_responses.jsonl` (Qwen3.8 heading garbled to
+`Contrastone` on `No, I'm not coming any`) and `row_38/...` (on the ASR-broken prefix `I did nt`
+Qwen3.8 started reasoning in prose and hit `max_tokens`; `finish_reason=length`, correctly rejected).
+Archive: `data_synthesis/outputs/trajectory_reviews/archives/suffix-icl-v3-50cases-20260907-130701`
+(gitignored, 160 files, sibling `.sha256.json`). Published with `manage_experiments.py publish`
+into the served comparison root; `http://127.0.0.1:8768/experiments.html` now shows all three arms.
+
+Same 50 cases, same models/seed/boundary flags; pilot metrics are synthesis-time char-BLEU vs the
+frozen LLM reference and word-based text LAAL, not speech-model results:
+
+| arm | mean char-BLEU | mean word LAAL | write steps |
+|---|---|---|---|
+| baseline (v2 prompt, dataset-unit window) | 45.02 | 7.33 | 10.98 |
+| source-only boundary (v2 prompt) | 46.95 | 6.23 | 10.82 |
+| **suffix-ICL v3** (v3 prompt, same boundary flags) | 44.88 | 5.62 | 11.54 |
+
+Paired against source-only boundary: BLEU improved in 16, regressed in 30, tied in 4 (mean −2.07);
+LAAL improved in 39, regressed in 10, tied in 1 (mean −0.61); both better in 14, both worse in 8.
+Largest BLEU regressions: `AUD0000000140_489` 57.3→39.0, `AUD0000000003_1015` 66.0→51.7,
+`AUD0000000086_115` 52.1→37.9. Against the historical baseline v3 is BLEU-neutral (−0.14, 22 up /
+26 down) and clearly earlier (LAAL −1.70, 42 up / 7 down). Reading: the v3 prompt (literal-suffix
+fit, fewer but stricter candidates, mean 9.5 per sampler instead of 20) makes the decoder commit
+earlier, and on this set that costs synthesis-time BLEU relative to the v2 prompt with the same
+boundary fixes. Per the rank-by-COMET rule, synthesis BLEU is not the decision metric; inspect the
+regressions in the viewer before deciding whether v3 goes to a 40k run.
