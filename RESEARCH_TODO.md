@@ -42,10 +42,11 @@ Simul-tst-COMMON). A 2-hour watcher in the Claude Code session follows it.
 
 - [ ] Simul-tst-COMMON repetition loops (found 2026-09-06, wiki experiment page section
   "Simul-tst repetition loops"): the TED intro jingle/applause makes the model loop `嘘！嘘！…`;
-  matched-12,500 loses 4–10 BLEU per segment size to 1–5 runaway talks. First experiment:
-  inference-only loop brake in `scripts/infer/infinisst_omni.py` (drop repeated/interjection-only
-  turns from the history, return READ) and re-run Simul-tst for both checkpoints; metric to move:
-  runaway-talk count → 0, LongLAAL CU back to 2–3 s. Training-side non-speech turns later.
+  matched-12,500 loses 4–10 BLEU per segment size to 1–5 runaway talks. Hibiki and EAST-even
+  (same agent, same converter) never loop, every consensus checkpoint does → the cause is in our
+  synthesized targets, not the pipeline. Haoling to discuss with the mentor before any change to
+  `scripts/infer/infinisst_omni.py`; candidate data-side fixes: non-speech turns with empty
+  targets in the converter, delta-style audit vs hibiki targets.
 
 ### P0 — right after decode reaches 40,000
 - [x] Run the verifier over rows 0–39,999 and build the one-JSON-per-utterance view.

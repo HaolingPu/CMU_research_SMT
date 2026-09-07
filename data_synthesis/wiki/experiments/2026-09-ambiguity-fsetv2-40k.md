@@ -308,6 +308,30 @@ Independent check (three-lens workflow, 2026-09-06 evening, scripts in scratchpa
   arm; then C a Silero-VAD generation gate (audio kept in history); D converter-level non-speech
   turns with empty targets needs a retrain; `--repetition-penalty` > 1 last (penalizes the whole
   history). Success metric: runaway talks → 0, LongLAAL CU back to 2–3 s, ACL BLEU within ±0.3.
+Is it the shared inference agent? No. Loop census over every checkpoint's saved Simul-tst
+outputs on BABEL (same `infinisst_omni.py`, same converter; share of output characters inside a
+loop / runaway talks, seg 960 / 1920 / 2880 / 3840):
+
+| checkpoint (training targets) | loop share % | runaway talks |
+|---|---|---|
+| hibiki (word-aligned reference) | 0.9 / 0.0 / 0.0 / 0.0 | 0 / 0 / 0 / 0 |
+| EAST-even (reference, even split) | 0.0 / 0.0 / 0.0 / 0.0 | 0 / 0 / 0 / 0 |
+| consensus top5-axis5 (flagship) | 11.1 / 2.5 / 0.0 / 0.0 | 1 / 1 / 0 / 0 |
+| consensus PA-40k | 19.8 / 7.2 / 2.6 / 3.3 | 3 / 2 / 1 / 0 |
+| consensus anchor40k | 48.6 / 17.2 / 8.3 / 5.7 | 2 / 3 / 1 / 2 |
+| consensus bestof4refsel / bestof5refsel | 15.5 / 17.6 / 0.0 / 0.0 and 24.8 / 0.1 / 0.3 / 0.3 | 2 / 1 / 0 / 0 and 2 / 0 / 0 / 0 |
+| ambiguity 17,306 (this run) | 17.0 / 2.1 / 0.7 / 0.8 | 3 / 0 / 0 / 0 |
+| ambiguity matched 12,500 | 35.8 / 27.6 / 12.3 / 11.2 | 5 / 2 / 1 / 2 |
+
+Hibiki at seg960 emits `嘘！` in 23 talks but only ~2 per talk and recovers at once. Every
+consensus-family checkpoint loops; the two reference-target baselines never run away. The
+susceptibility is therefore a property of the synthesized training targets, not of the
+train-infer-eval pipeline, and a decoding-time brake would help only our systems. In the
+100-case bundle 6.1 % of chunks have empty ASR text (in-clip silence) and 26/156 of those still
+commit a (grounded, lagged) delta; whether that or the delta style drives the susceptibility is
+not established (see [[2026-09-ambiguity-12500-tst-failure-audit]] for the read-only audit).
+Decision pending with the mentor: report as-is with the loop diagnostics, and treat the fix as
+a data-side question (non-speech turns with empty targets, delta style) rather than an agent change.
 Outputs: `<ckpt>/evaluation/simul_tst_common/en-zh/seg<N>/instances.log`; local copies and the
 analysis scripts in the session scratchpad `tst_bundle/`, `tst_audio_rms.json`.
 Fix candidates (none applied yet; the inference agent is `scripts/infer/infinisst_omni.py`):
