@@ -64,6 +64,18 @@ Simul-tst-COMMON). A 2-hour watcher in the Claude Code session follows it.
   cases, v2-boundary vs v3-JSON, XCOMET + step-level early-commit audit, candidate budget controlled
   (40 → 13.5 raw candidates per step is itself a variable).
 
+- [ ] Probe input marks what was heard vs guessed (idea 2026-09-07): today the future is glued onto the
+  observed English as if heard, so the translator commits content only the futures imply
+  (`进了` in 1015). Change the probe prompt to `[HEARD] ... [POSSIBLE CONTINUATION] ...` and
+  instruct it to translate only the heard part, using the continuation as context. Prompt-only;
+  test on the same 50 cases against v3-JSON.
+- [ ] Consensus voter floor: require a minimum absolute number of voters (or both samplers) in
+  addition to the ratio, so fewer candidates (40 → 13.5 per step under the JSON schema) do not
+  loosen strict consensus. Test with the item above.
+- [ ] Schema field for contrastive candidates naming the reading each one resolves (strip before
+  use); probe prompt reordering for prefix-cache hits; `--num-concurrent-cases` > 1 and parallel
+  Gemma/Qwen sampler calls for throughput (see wiki notes 2026-09-07).
+
 ### P0 — right after decode reaches 40,000
 - [x] Run the verifier over rows 0–39,999 and build the one-JSON-per-utterance view.
   (Raw root: 40,000 unique, 0 missing, 1,793 duplicates from task_00/01. Dedup
