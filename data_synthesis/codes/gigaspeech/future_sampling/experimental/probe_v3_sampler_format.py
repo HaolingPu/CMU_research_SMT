@@ -9,7 +9,7 @@ ap.add_argument("--models", required=True, help="name=api_base=tokenizer_path;..
 ap.add_argument("--seed", type=int, default=1015); ap.add_argument("--prefix-file", default=""); ap.add_argument("--short-prefixes", type=int, default=0); ap.add_argument("--num-futures", type=int, default=20)
 args = ap.parse_args()
 sys.path.insert(0, args.runtime)
-from ambiguity_sampler_prompt import build_coordinated_future_messages, parse_grouped_future_output, SUFFIX_ICL_PROMPT_VERSION
+from ambiguity_sampler_prompt import build_coordinated_future_messages, parse_grouped_future_output, structured_output_extras, SUFFIX_ICL_PROMPT_VERSION
 from transformers import AutoTokenizer
 END = re.compile(r"[.!?][\"”’')\]]*\s*$")
 def anchored(text):
@@ -59,7 +59,7 @@ with open(args.out, "w", encoding="utf-8") as out:
             prompt = tok.apply_chat_template(msgs, add_generation_prompt=True, tokenize=False, enable_thinking=False)
             payload = {"model": name, "prompt": prompt, "max_tokens": max(40, 32 * args.num_futures), "temperature": 1.0, "top_p": 0.98, "n": 1, "presence_penalty": 0.15,
                        "stop": ["<|im_end|>", "<end_of_turn>", "<|endoftext|>", "<|eot_id|>"],
-                       "seed": (args.seed + zlib.crc32(f"{prefix}||{name}".encode())) % (2**31)}
+                       "seed": (args.seed + zlib.crc32(f"{prefix}||{name}".encode())) % (2**31), **structured_output_extras(args.num_futures)}
             try:
                 data = post(f"{base}/completions", payload); raw = data["choices"][0]["text"]; fin = data["choices"][0].get("finish_reason")
             except Exception as e:

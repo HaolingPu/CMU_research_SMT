@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 
 
@@ -124,9 +125,7 @@ def _build_suffix_icl_messages(
     ambiguity_examples = "\n\n".join(
         f"Ambiguity example {i} ({example['kind']}):\n"
         f"Observed prefix: {example['prefix']}\n"
-        "Example response:\n"
-        f"Plausible\n1. {example['plausible']}\n"
-        f"Contrastive\n1. {example['contrastive']}\n"
+        f"Example response: {json.dumps({'plausible': [example['plausible']], 'contrastive': [example['contrastive']]})}\n"
         f"Teaching note (not part of the response): {example['explanation']}"
         for i, example in enumerate(AMBIGUITY_ICL_EXAMPLES, 1)
     )
@@ -142,7 +141,7 @@ Rules, in priority order:
 5. Prefer a few good candidates to a full list of weak ones. Return at most {num_candidates} candidates total: up to {per_group} Plausible and up to {per_group} Contrastive. Either group may be shorter or empty. Never pad a list to meet a quota.
 6. Plausible candidates are likely natural continuations. Contrastive candidates are less obvious but still realistic continuations that resolve a genuine uncertainty differently. Prefer contrasts that change how already observed words or relations could be translated. Merely changing the later action, adjective, or intensity under the same reading is not enough. If there is no good contrastive continuation, leave that group empty; do not force an ambiguity.
 7. Seek meaningful diversity only after grammatical fit and plausibility. It is okay to share necessary opening words. Omit redundant candidates instead of distorting the sentence to make them different.
-8. Each suffix should contain 4-15 new English words. Output English suffixes only, with the two group headings and numbered items. No reasoning, translations, full rewritten sentences, or copies of the examples.
+8. Each suffix should contain 4-15 new English words. Output English suffixes only, as a JSON object with the two group lists. No reasoning, translations, full rewritten sentences, or copies of the examples.
 
 Examples of checking suffixes (illustrative, not answers to the current input):
 
@@ -178,136 +177,62 @@ For the actual input, apply the same concatenation check to every candidate. Out
 
 Return only valid suffixes for this exact prefix: at most {num_candidates} total, up to {per_group} per group. Fewer is acceptable, including zero. Do not output the joined check or repeat the examples.
 
-Use both headings exactly as shown below. Under each heading, number only the candidates you actually provide, starting at 1. For an empty group write None on its own line. Do not include placeholders or explanations.
-
-Plausible
-<numbered suffixes, or None>
-Contrastive
-<numbered suffixes, or None>"""
+Respond with one JSON object of the form {{"plausible": ["<suffix>", ...], "contrastive": ["<suffix>", ...]}}. Each string is one suffix only. Use an empty list for a group with no valid candidate. No placeholders, explanations, or text outside the JSON."""
     return [
         {"role": "system", "content": system},
         {"role": "user", "content": user},
     ]
 
 
-_THINK_BLOCK_RE = re.compile(r"<think>.*?</think>", re.DOTALL)
-_GROUP_HEADING_RE = re.compile(
-    r"^[\W_]*(plausible|contrastive|contrast|contrasting)\b[\W_]*"
-    r"(?:(?:candidates?|continuations?|suffixes|suffix|readings?|group|list)\b[\W_]*)?"
-    r"(?:\([^)]*\)[\W_]*)?$",
-    re.IGNORECASE,
-)
-_NUMBERED_LINE_RE = re.compile(r"^\(?([1-9][0-9]*)[.):\-]?\)?\s*(.*)$")
-_BULLET_LINE_RE = re.compile(r"^[-*\u2022\u00b7]\s+(.+)$")
-_EMPTY_GROUP_RE = re.compile(
-    r"^(?:none|n/?a|nothing|no (?:valid |good |suitable |additional )?"
-    r"(?:candidates?|suffixes?|continuations?|contrastive[\w ]*|plausible[\w ]*|alternatives?))[\W_]*$",
-    re.IGNORECASE,
-)
+GROUP_KEYS = ("plausible", "contrastive")
+MAX_SUFFIX_CHARS = 200
 
 
-_WRAPPERS = (('"', '"'), ("'", "'"), ("`", "`"), ("**", "**"), ("\u201c", "\u201d"))
+def grouped_future_schema(num_candidates: int) -> dict:
+    """JSON schema the sampler server enforces: two lists of suffix strings, capped per group."""
+    if num_candidates <= 0 or num_candidates % 2:
+        raise ValueError("num_candidates must be a positive even number")
+    group = {"type": "array", "maxItems": num_candidates // 2,
+             "items": {"type": "string", "minLength": 1, "maxLength": MAX_SUFFIX_CHARS}}
+    return {"type": "object", "properties": {key: group for key in GROUP_KEYS},
+            "required": list(GROUP_KEYS), "additionalProperties": False}
 
 
-def _clean_candidate_text(text: str) -> str:
-    """Strip whitespace and any quote/backtick/bold wrapper around a candidate."""
-    text = text.strip()
-    stripped = True
-    while stripped and text:
-        stripped = False
-        for left, right in _WRAPPERS:
-            if len(text) > len(left) + len(right) and text.startswith(left) and text.endswith(right):
-                text = text[len(left):-len(right)].strip()
-                stripped = True
-    return text
+def structured_output_extras(num_candidates: int) -> dict:
+    """Extra request fields that make vLLM constrain the reply to ``grouped_future_schema``."""
+    return {"structured_outputs": {"json": grouped_future_schema(num_candidates)}}
 
 
 def parse_grouped_future_output(
     raw_text: str, num_candidates: int, finish_reason: str | None = None,
 ) -> list[tuple[str, str]]:
-    """Parse variable-size v3 groups by heading, never by flattened position.
+    """Parse the JSON reply into ``[(group, suffix), ...]`` in plausible-then-contrastive order.
 
-    Tolerated (benign) variations: preamble text before the first heading, a
-    stripped ``<think>`` block, decorated headings (``**Plausible:**``,
-    ``### Contrastive``, ``Plausible candidates``, ``Contrast``), ``1)``/``(1)``/``1-``/bullet
-    items, bold or quoted items, and an empty group written as ``None``,
-    ``None.``, ``(none)``, ``N/A`` or a numbered ``1. None``. An empty group that
-    is followed by the other heading is accepted; an empty trailing group is
-    accepted only when ``finish_reason == "stop"`` (the sampler ended on its own).
-    Any response with ``finish_reason == "length"`` is rejected outright: a
-    truncated list can end in a cut-off candidate that reads as a valid suffix.
-
-    Still rejected (raised as ValueError, never silent abstention): missing or
-    repeated headings, candidates before any heading, prose lines inside a group,
-    mixing ``None`` with candidates, duplicate numbers, more items than the group
-    budget, and a trailing empty group without ``None`` unless finish_reason is
-    ``stop``.
+    Raises ValueError for a reply cut off by the token budget (``finish_reason ==
+    "length"``), invalid JSON, missing or extra keys, non-string or blank items, or
+    more items than the per-group budget. Structured output makes these rare; the
+    checks keep a malformed reply from ever passing as fewer good candidates.
     """
     if num_candidates <= 0 or num_candidates % 2:
         raise ValueError("num_candidates must be a positive even number")
     if finish_reason == "length":
         raise ValueError("Truncated response: finish_reason=length")
-    text = _THINK_BLOCK_RE.sub("", raw_text or "")
-    groups: dict[str, list[str]] = {}
-    empty_groups: set[str] = set()
-    indices: dict[str, set[int]] = {}
-    order: list[str] = []
-    mode: str | None = None
-    for raw_line in text.splitlines():
-        line = raw_line.strip()
-        if not line:
-            continue
-        heading = _GROUP_HEADING_RE.match(line)
-        if heading:
-            name = heading.group(1).lower()
-            if name in ("contrast", "contrasting"):
-                name = "contrastive"  # Qwen3.8 occasionally shortens the heading
-            if name in groups:
-                raise ValueError(f"Repeated future group: {name}")
-            mode = name
-            groups[mode] = []
-            indices[mode] = set()
-            order.append(mode)
-            continue
-        numbered = _NUMBERED_LINE_RE.match(line)
-        bullet = _BULLET_LINE_RE.match(line)
-        if mode is None:
-            if numbered or bullet:
-                raise ValueError("Future candidates must follow a group heading")
-            continue  # preamble such as "Here are the suffixes:" is ignored
-        body = numbered.group(2) if numbered else (bullet.group(1) if bullet else line)
-        body = _clean_candidate_text(body)
-        bare = re.sub(r"^[\W_]+|[\W_]+$", "", body)
-        if _EMPTY_GROUP_RE.match(bare) or (not body and numbered is None and bullet is None):
-            if groups[mode]:
-                raise ValueError(f"Conflicting empty future group: {mode}")
-            empty_groups.add(mode)
-            continue
-        if not numbered and not bullet:
-            raise ValueError(f"Invalid candidate line in future group: {mode}")
-        if mode in empty_groups:
-            raise ValueError(f"Conflicting empty future group: {mode}")
-        if not body:
-            raise ValueError(f"Empty candidate line in future group: {mode}")
-        if numbered:
-            index = int(numbered.group(1))
-            if index in indices[mode]:
-                raise ValueError(f"Repeated candidate number in future group: {mode}")
-            indices[mode].add(index)
-        groups[mode].append(body)
-        if len(groups[mode]) > num_candidates // 2:
-            raise ValueError(f"Too many candidates in future group: {mode}")
-    if set(groups) != {"plausible", "contrastive"}:
-        raise ValueError("Both future group headings are required")
-    for position, name in enumerate(order):
-        if groups[name] or name in empty_groups:
-            continue
-        followed_by_heading = position < len(order) - 1
-        if followed_by_heading or finish_reason == "stop":
-            empty_groups.add(name)
-            continue
-        raise ValueError(f"Empty future group must explicitly say None: {name}")
-    return [(name, item) for name in ("plausible", "contrastive") for item in groups[name]]
+    try:
+        data = json.loads(raw_text)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"Response is not valid JSON: {exc}") from exc
+    if not isinstance(data, dict) or set(data) != set(GROUP_KEYS):
+        raise ValueError(f"Response must be an object with exactly the keys {GROUP_KEYS}")
+    items: list[tuple[str, str]] = []
+    for key in GROUP_KEYS:
+        group = data[key]
+        if not isinstance(group, list) or len(group) > num_candidates // 2:
+            raise ValueError(f"Group {key!r} must be a list of at most {num_candidates // 2} items")
+        for value in group:
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"Group {key!r} contains a non-string or blank item")
+            items.append((key, value.strip()))
+    return items
 
 
 def sample_grouped_futures(request, num_candidates: int, retries: int, record):

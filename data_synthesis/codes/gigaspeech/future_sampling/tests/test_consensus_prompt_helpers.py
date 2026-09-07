@@ -247,11 +247,11 @@ class ConsensusPromptHelpersTest(unittest.TestCase):
 
     def test_v3_short_response_does_not_fabricate_missing_candidates(self):
         tokenizer = FakeTokenizer()
-        response = {"choices": [{"text": (
-            "Plausible\n1. could arrive before the storm.\n2. may leave during the night.\n"
-            "Contrastive\n1. might stay despite the warning.\n"
-        )}]}
-        with patch.object(decoder, '_http_json', return_value=response):
+        response = {"choices": [{"text": json.dumps({
+            "plausible": ["could arrive before the storm.", "may leave during the night."],
+            "contrastive": ["might stay despite the warning."],
+        }), "finish_reason": "stop"}]}
+        with patch.object(decoder, '_http_json', return_value=response) as api:
             futures, infos, audit = decoder._sample_coordinated_future_set(
                 tokenizer, 'The guests', 'never send this target', 'Chinese', 20,
                 'http://localhost:1/v1', 'sampler', 1, 1, .98, 40,
@@ -264,6 +264,9 @@ class ConsensusPromptHelpersTest(unittest.TestCase):
         self.assertTrue(all(item['prompt_version'] == decoder.SUFFIX_ICL_PROMPT_VERSION for item in infos))
         self.assertNotIn('never send this target', str(tokenizer.messages))
         self.assertIn('Never pad a list', tokenizer.messages[0]['content'])
+        schema = api.call_args.kwargs['payload']['structured_outputs']['json']
+        self.assertEqual(schema['required'], ['plausible', 'contrastive'])
+        self.assertEqual(schema['properties']['plausible']['maxItems'], 10)
 
     def test_v3_does_not_disguise_malformed_response_as_fewer_good_candidates(self):
         with patch.object(decoder, '_http_json', return_value={'choices': [{'text': 'unstructured text'}]}):
@@ -290,7 +293,7 @@ class ConsensusPromptHelpersTest(unittest.TestCase):
 
     def test_v3_icl_uses_each_models_template_and_one_completion_request(self):
         tokenizers = [FakeTokenizer(), FakeTokenizer()]
-        response = {'choices': [{'text': 'Plausible\nNone\nContrastive\nNone'}]}
+        response = {'choices': [{'text': '{"plausible": [], "contrastive": []}', 'finish_reason': 'stop'}]}
         with patch.object(decoder, '_http_json', return_value=response) as api:
             decoder.sample_source_futures_targeted_prefill(
                 tokenizers[0], 'This giant was even more furious than the first',
@@ -319,8 +322,8 @@ class ConsensusPromptHelpersTest(unittest.TestCase):
 
     def test_v3_zero_or_too_few_candidates_read_without_probe(self):
         responses = [
-            'Plausible\nNone\nContrastive\nNone',
-            'Plausible\n1. could arrive before the storm.\nContrastive\nNone',
+            '{"plausible": [], "contrastive": []}',
+            '{"plausible": ["could arrive before the storm."], "contrastive": []}',
         ]
         for text in responses:
             with self.subTest(response=text):

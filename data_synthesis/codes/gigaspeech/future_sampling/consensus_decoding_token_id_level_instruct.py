@@ -29,6 +29,7 @@ from transformers import AutoTokenizer
 from ambiguity_sampler_prompt import (
     PROMPT_VERSION, PROMPT_VERSIONS, SUFFIX_ICL_PROMPT_VERSION,
     build_coordinated_future_messages, parse_grouped_future_output, sample_grouped_futures,
+    structured_output_extras,
 )
 from sentence_boundary_helpers import (
     close_translation_delta, observed_sentence_is_complete,
@@ -977,6 +978,8 @@ def _sample_coordinated_future_set(
     if sampler_seed is not None:
         import zlib
         payload["seed"] = (int(sampler_seed) + zlib.crc32(f"{observed_source}|{sampler_committed}|{api_model}".encode("utf-8"))) % (2**31)
+    if prompt_version == SUFFIX_ICL_PROMPT_VERSION:
+        payload.update(structured_output_extras(num_futures))
     def request(attempt: int) -> Tuple[str, Optional[str]]:
         attempt_payload = payload
         if attempt and "seed" in payload:

@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 import re
 import sys
 import unittest
@@ -12,8 +13,10 @@ from ambiguity_sampler_prompt import (  # noqa: E402
     PROMPT_VERSION,
     SUFFIX_ICL_PROMPT_VERSION,
     build_coordinated_future_messages,
+    grouped_future_schema,
     parse_grouped_future_output,
     sample_grouped_futures,
+    structured_output_extras,
 )
 
 
@@ -74,7 +77,8 @@ class CoordinatedFuturePromptTest(unittest.TestCase):
         self.assertIn("Continue the unfinished sentence", prompt)
         self.assertIn("PREFIX + one space + SUFFIX", prompt)
         self.assertIn("It is okay to share necessary opening words", prompt)
-        self.assertIn("For an empty group write None", prompt)
+        self.assertIn('{"plausible": ["<suffix>", ...], "contrastive": ["<suffix>", ...]}', prompt)
+        self.assertIn("Use an empty list for a group with no valid candidate", prompt)
         self.assertNotIn("exactly 20", prompt)
         self.assertNotIn("already committed", prompt)
         self.assertIn("Observed English prefix:\nA fresh prefix", messages[1]["content"])
@@ -115,7 +119,7 @@ class CoordinatedFuturePromptTest(unittest.TestCase):
         for example in AMBIGUITY_ICL_EXAMPLES:
             with self.subTest(kind=example["kind"]):
                 self.assertIn(f"Observed prefix: {example['prefix']}", system)
-                response = f"Plausible\n1. {example['plausible']}\nContrastive\n1. {example['contrastive']}"
+                response = json.dumps({"plausible": [example["plausible"]], "contrastive": [example["contrastive"]]})
                 self.assertIn(response, system)
                 self.assertIn(example["explanation"], system)
                 self.assertEqual(parse_grouped_future_output(response, 20),
@@ -149,102 +153,52 @@ class CoordinatedFuturePromptTest(unittest.TestCase):
 
 
 class GroupedFutureParserTest(unittest.TestCase):
-    def test_short_groups_keep_labels_with_reset_or_global_numbering(self) -> None:
-        for contrastive_index in (1, 3, 11):
-            with self.subTest(index=contrastive_index):
-                response = (
-                    "Plausible\n1. could arrive before the storm.\n2. may leave during the night.\n"
-                    f"Contrastive\n{contrastive_index}. might stay despite the warning.\n"
-                )
-                items = parse_grouped_future_output(response, 20)
-                self.assertEqual([mode for mode, _ in items], ["plausible", "plausible", "contrastive"])
-                self.assertEqual(len(items), 3)
+    def test_schema_caps_each_group_and_forbids_extra_keys(self) -> None:
+        schema = grouped_future_schema(20)
+        self.assertEqual(schema["required"], ["plausible", "contrastive"])
+        self.assertFalse(schema["additionalProperties"])
+        self.assertEqual(schema["properties"]["contrastive"]["maxItems"], 10)
+        self.assertEqual(structured_output_extras(4)["structured_outputs"]["json"]["properties"]["plausible"]["maxItems"], 2)
+        for budget in (0, -2, 3):
+            with self.subTest(budget=budget), self.assertRaises(ValueError):
+                grouped_future_schema(budget)
 
-    def test_either_group_can_be_empty(self) -> None:
-        for empty_mode, filled_mode in (("Plausible", "Contrastive"), ("Contrastive", "Plausible")):
-            response = f"{empty_mode}\nNone\n{filled_mode}\n1. could arrive before the storm."
-            self.assertEqual(parse_grouped_future_output(response, 20),
-                             [(filled_mode.lower(), "could arrive before the storm.")])
+    def test_groups_keep_labels_and_order(self) -> None:
+        response = json.dumps({"contrastive": ["might stay despite the warning."],
+                               "plausible": ["could arrive before the storm.", " may leave during the night. "]})
+        self.assertEqual(parse_grouped_future_output(response, 20, "stop"), [
+            ("plausible", "could arrive before the storm."), ("plausible", "may leave during the night."),
+            ("contrastive", "might stay despite the warning."),
+        ])
 
-    def test_explicit_abstention_returns_no_candidates(self) -> None:
-        self.assertEqual(parse_grouped_future_output("Plausible\nNone\nContrastive\nNone", 20), [])
-
-    def test_common_heading_decoration_is_tolerated(self) -> None:
-        response = "**Plausible:**\n1) could arrive before the storm.\n### Contrastive\nNone"
-        self.assertEqual(parse_grouped_future_output(response, 20),
+    def test_empty_groups_are_explicit_abstention(self) -> None:
+        self.assertEqual(parse_grouped_future_output('{"plausible": [], "contrastive": []}', 20, "stop"), [])
+        self.assertEqual(parse_grouped_future_output('{"plausible": ["could arrive before the storm."], "contrastive": []}', 20, "stop"),
                          [("plausible", "could arrive before the storm.")])
 
-    def test_malformed_or_truncated_output_is_not_silent_abstention(self) -> None:
-        responses = [
-            "", "1. no group heading here", "Plausible\nNone",
-            "Plausible\nNone\nContrastive", "Plausible\nNone\nContrastive\nexplanation",
-            "Plausible\nNone\n1. cannot mix empty and nonempty\nContrastive\nNone",
-            "Plausible\n1. first candidate here\n1. duplicated number here\nContrastive\nNone",
-            "Plausible\nNone\nPlausible\nNone\nContrastive\nNone",
-        ]
-        for response in responses:
-            with self.subTest(response=response), self.assertRaises(ValueError):
-                parse_grouped_future_output(response, 20)
-
-    def test_benign_format_variations_are_tolerated(self) -> None:
-        cases = {
-            "Here are the suffixes:\n**Plausible:**\n1) could arrive before the storm.\n### Contrastive\n(none)":
-                [("plausible", "could arrive before the storm.")],
-            "Plausible\n1. None\nContrastive\n- might stay despite the warning.":
-                [("contrastive", "might stay despite the warning.")],
-            "Plausible\nContrastive\n1. might stay despite the warning.":
-                [("contrastive", "might stay despite the warning.")],
-            "<think>\nplanning\n</think>\nPlausible candidates\n(1) \"could arrive before the storm.\"\nContrastive candidates\nN/A":
-                [("plausible", "could arrive before the storm.")],
-            "Plausible\n1. **could arrive before the storm.**\nContrastive\nNone.":
-                [("plausible", "could arrive before the storm.")],
-            # Observed from Qwen3.8-27B on the prefixes "I", "A" and "Most sure and" (pilot 10345238).
-            "Plausible\n1. hope that this will help everyone understand.\n\nContrast\n1. had never expected such a strong reaction.":
-                [("plausible", "hope that this will help everyone understand."),
-                 ("contrastive", "had never expected such a strong reaction.")],
-            "Plausible\n1. of it, I proceeded to the next step.\nContrast\nNone":
-                [("plausible", "of it, I proceeded to the next step.")],
+    def test_malformed_or_truncated_output_is_never_silent_abstention(self) -> None:
+        responses = {
+            "": "stop", "unstructured text": "stop", '{"plausible": []}': "stop",
+            '{"plausible": [], "contrastive": [], "extra": []}': "stop",
+            '{"plausible": ["ok suffix here."], "contrastive": [""]}': "stop",
+            '{"plausible": [1], "contrastive": []}': "stop",
+            '{"plausible": "not a list", "contrastive": []}': "stop",
+            '{"plausible": ["a", "b", "c"], "contrastive": []}': "stop",  # over the budget of 2 per group
+            '{"plausible": ["could arrive before the storm."], "contrastive": ["because she wanted to"]}': "length",
         }
-        for response, expected in cases.items():
-            with self.subTest(response=response):
-                self.assertEqual(parse_grouped_future_output(response, 20), expected)
-
-    def test_trailing_empty_group_needs_none_unless_sampler_stopped(self) -> None:
-        response = "Plausible\n1. could arrive before the storm.\nContrastive"
-        self.assertEqual(parse_grouped_future_output(response, 20, finish_reason="stop"),
-                         [("plausible", "could arrive before the storm.")])
-        for finish_reason in (None, "length"):
-            with self.subTest(finish_reason=finish_reason), self.assertRaises(ValueError):
-                parse_grouped_future_output(response, 20, finish_reason=finish_reason)
-
-    def test_length_truncated_response_is_rejected_even_with_content(self) -> None:
-        response = "Plausible\n1. could arrive before the storm.\nContrastive\n1. because she wanted to"
-        self.assertEqual(len(parse_grouped_future_output(response, 20, finish_reason="stop")), 2)
-        with self.assertRaises(ValueError):
-            parse_grouped_future_output(response, 20, finish_reason="length")
-
-    def test_prose_inside_a_group_is_still_malformed(self) -> None:
-        for response in (
-            "Plausible\n1. could arrive before the storm.\nJoined check: fine.\nContrastive\nNone",
-            "Plausible\nNone\nContrastive\n1. might stay.\nWhy: it resolves the ambiguity.",
-        ):
+        for response, finish_reason in responses.items():
             with self.subTest(response=response), self.assertRaises(ValueError):
-                parse_grouped_future_output(response, 20, finish_reason="stop")
-
-    def test_per_group_budget_is_enforced(self) -> None:
-        response = "Plausible\n1. a valid first suffix\n2. a valid second suffix\n3. over budget\nContrastive\nNone"
-        with self.assertRaises(ValueError):
-            parse_grouped_future_output(response, 4)
+                parse_grouped_future_output(response, 4, finish_reason)
 
     def test_bad_budgets_are_rejected(self) -> None:
         for budget in (0, -2, 3):
             with self.subTest(budget=budget), self.assertRaises(ValueError):
-                parse_grouped_future_output("Plausible\nNone\nContrastive\nNone", budget)
+                parse_grouped_future_output('{"plausible": [], "contrastive": []}', budget)
 
 
 class SampleGroupedFuturesTest(unittest.TestCase):
-    GOOD = "Plausible\n1. could arrive before the storm.\nContrastive\nNone"
-    BAD = "Plausible\n1. could arrive before the storm.\nContrastone\n1. might stay."
+    GOOD = '{"plausible": ["could arrive before the storm."], "contrastive": []}'
+    BAD = '{"plausible": ["could arrive before the storm."], "contrast": ["might stay."]}'
 
     def _run(self, responses, retries=2):
         events = []
