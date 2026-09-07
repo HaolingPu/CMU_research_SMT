@@ -13,6 +13,7 @@ from ambiguity_sampler_prompt import (  # noqa: E402
     SUFFIX_ICL_PROMPT_VERSION,
     build_coordinated_future_messages,
     parse_grouped_future_output,
+    sample_grouped_futures,
 )
 
 
@@ -216,6 +217,12 @@ class GroupedFutureParserTest(unittest.TestCase):
             with self.subTest(finish_reason=finish_reason), self.assertRaises(ValueError):
                 parse_grouped_future_output(response, 20, finish_reason=finish_reason)
 
+    def test_length_truncated_response_is_rejected_even_with_content(self) -> None:
+        response = "Plausible\n1. could arrive before the storm.\nContrastive\n1. because she wanted to"
+        self.assertEqual(len(parse_grouped_future_output(response, 20, finish_reason="stop")), 2)
+        with self.assertRaises(ValueError):
+            parse_grouped_future_output(response, 20, finish_reason="length")
+
     def test_prose_inside_a_group_is_still_malformed(self) -> None:
         for response in (
             "Plausible\n1. could arrive before the storm.\nJoined check: fine.\nContrastive\nNone",
@@ -233,6 +240,55 @@ class GroupedFutureParserTest(unittest.TestCase):
         for budget in (0, -2, 3):
             with self.subTest(budget=budget), self.assertRaises(ValueError):
                 parse_grouped_future_output("Plausible\nNone\nContrastive\nNone", budget)
+
+
+class SampleGroupedFuturesTest(unittest.TestCase):
+    GOOD = "Plausible\n1. could arrive before the storm.\nContrastive\nNone"
+    BAD = "Plausible\n1. could arrive before the storm.\nContrastone\n1. might stay."
+
+    def _run(self, responses, retries=2):
+        events = []
+        calls = []
+
+        def request(attempt):
+            calls.append(attempt)
+            item = responses[attempt]
+            if isinstance(item, Exception):
+                raise item
+            return item
+
+        def record(event, attempt, raw_text, finish_reason, error):
+            events.append((event, attempt, raw_text, error))
+
+        return request, record, events, calls
+
+    def test_retry_recovers_and_records_each_stage(self) -> None:
+        request, record, events, calls = self._run([(self.BAD, "stop"), (self.GOOD, "stop")])
+        items, raw = sample_grouped_futures(request, 20, 2, record)
+        self.assertEqual(items, [("plausible", "could arrive before the storm.")])
+        self.assertEqual(raw, self.GOOD)
+        self.assertEqual(calls, [0, 1])
+        self.assertEqual([(e[0], e[1]) for e in events], [("malformed", 0), ("recovered", 1)])
+        self.assertEqual(events[0][2], self.BAD)
+
+    def test_exhausted_retries_raise_after_recording(self) -> None:
+        request, record, events, calls = self._run([(self.BAD, "stop")] * 3)
+        with self.assertRaises(ValueError):
+            sample_grouped_futures(request, 20, 2, record)
+        self.assertEqual(calls, [0, 1, 2])
+        self.assertEqual([e[0] for e in events], ["malformed"] * 3 + ["exhausted"])
+
+    def test_malformed_response_is_recorded_before_a_later_request_fails(self) -> None:
+        request, record, events, calls = self._run([(self.BAD, "stop"), RuntimeError("endpoint down")])
+        with self.assertRaises(RuntimeError):
+            sample_grouped_futures(request, 20, 2, record)
+        self.assertEqual([(e[0], e[2]) for e in events], [("malformed", self.BAD)])
+
+    def test_first_good_response_records_nothing(self) -> None:
+        request, record, events, calls = self._run([(self.GOOD, "stop")])
+        sample_grouped_futures(request, 20, 2, record)
+        self.assertEqual(events, [])
+        self.assertEqual(calls, [0])
 
 
 if __name__ == "__main__":

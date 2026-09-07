@@ -57,7 +57,10 @@ Simul-tst-COMMON). A 2-hour watcher in the Claude Code session follows it.
   `Contrast` instead of `Contrastive` on short prefixes. Fixed and rerun 2026-09-07 (generation
   10345647, report 10345648): 50/50 verified, published to the 8768 comparison viewer. v3 vs
   source-only boundary on the same 50 cases: char-BLEU −2.07 (16 up / 30 down), word LAAL −0.61
-  (39 up / 10 down). Decision needed: inspect regressions (140_489, 1015, 086_115) before any 40k run.
+  (39 up / 10 down). Review 2026-09-07: v3 commits earlier but is not
+  safer (1015 commits 进了 before the period; candidates per step 33.1 → 16.5). P1/P2 retry bugs
+  fixed with tests. No v3 40k. Next: 200 held-out cases, v2-boundary vs v3, XCOMET + step-level
+  early-commit audit, candidate count controlled separately.
 
 ### P0 — right after decode reaches 40,000
 - [x] Run the verifier over rows 0–39,999 and build the one-JSON-per-utterance view.

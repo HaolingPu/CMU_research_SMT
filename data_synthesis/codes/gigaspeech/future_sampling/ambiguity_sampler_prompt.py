@@ -206,17 +206,20 @@ _EMPTY_GROUP_RE = re.compile(
 )
 
 
+_WRAPPERS = (('"', '"'), ("'", "'"), ("`", "`"), ("**", "**"), ("\u201c", "\u201d"))
+
+
 def _clean_candidate_text(text: str) -> str:
+    """Strip whitespace and any quote/backtick/bold wrapper around a candidate."""
     text = text.strip()
-    for _ in range(2):
-        text = text.strip()
-        if len(text) >= 2 and text[0] == text[-1] and text[0] in "\"'`":
-            text = text[1:-1]
-        elif text.startswith("**") and text.endswith("**") and len(text) > 4:
-            text = text[2:-2]
-        elif text.startswith("\u201c") and text.endswith("\u201d"):
-            text = text[1:-1]
-    return text.strip()
+    stripped = True
+    while stripped and text:
+        stripped = False
+        for left, right in _WRAPPERS:
+            if len(text) > len(left) + len(right) and text.startswith(left) and text.endswith(right):
+                text = text[len(left):-len(right)].strip()
+                stripped = True
+    return text
 
 
 def parse_grouped_future_output(
@@ -230,8 +233,9 @@ def parse_grouped_future_output(
     items, bold or quoted items, and an empty group written as ``None``,
     ``None.``, ``(none)``, ``N/A`` or a numbered ``1. None``. An empty group that
     is followed by the other heading is accepted; an empty trailing group is
-    accepted only when ``finish_reason == "stop"`` (the sampler ended on its own),
-    so a truncated response is still reported as malformed.
+    accepted only when ``finish_reason == "stop"`` (the sampler ended on its own).
+    Any response with ``finish_reason == "length"`` is rejected outright: a
+    truncated list can end in a cut-off candidate that reads as a valid suffix.
 
     Still rejected (raised as ValueError, never silent abstention): missing or
     repeated headings, candidates before any heading, prose lines inside a group,
@@ -241,6 +245,8 @@ def parse_grouped_future_output(
     """
     if num_candidates <= 0 or num_candidates % 2:
         raise ValueError("num_candidates must be a positive even number")
+    if finish_reason == "length":
+        raise ValueError("Truncated response: finish_reason=length")
     text = _THINK_BLOCK_RE.sub("", raw_text or "")
     groups: dict[str, list[str]] = {}
     empty_groups: set[str] = set()
@@ -302,3 +308,30 @@ def parse_grouped_future_output(
             continue
         raise ValueError(f"Empty future group must explicitly say None: {name}")
     return [(name, item) for name in ("plausible", "contrastive") for item in groups[name]]
+
+
+def sample_grouped_futures(request, num_candidates: int, retries: int, record):
+    """Request a grouped (v3) response until one parses, at most ``1 + retries`` times.
+
+    ``request(attempt)`` returns ``(raw_text, finish_reason)`` and may raise; a
+    raised request propagates unchanged. ``record(event, attempt, raw_text,
+    finish_reason, error)`` is called synchronously the moment a response is
+    found malformed (event ``"malformed"``), so nothing is lost if a later request
+    raises; it is also called once with ``"recovered"`` when a retry succeeds or
+    ``"exhausted"`` before the final ValueError. Returns ``(items, raw_text)``.
+    """
+    error = None
+    raw_text, finish_reason = "", None
+    for attempt in range(1 + max(0, int(retries))):
+        raw_text, finish_reason = request(attempt)
+        try:
+            items = parse_grouped_future_output(raw_text, num_candidates, finish_reason)
+        except ValueError as exc:
+            error = exc
+            record("malformed", attempt, raw_text, finish_reason, str(exc))
+            continue
+        if attempt:
+            record("recovered", attempt, raw_text, finish_reason, None)
+        return items, raw_text
+    record("exhausted", attempt, raw_text, finish_reason, str(error))
+    raise ValueError(f"malformed grouped response after {attempt + 1} attempt(s): {error}")

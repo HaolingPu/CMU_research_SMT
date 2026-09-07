@@ -198,3 +198,20 @@ fit, fewer but stricter candidates, mean 9.5 per sampler instead of 20) makes th
 earlier, and on this set that costs synthesis-time BLEU relative to the v2 prompt with the same
 boundary fixes. Per the rank-by-COMET rule, synthesis BLEU is not the decision metric; inspect the
 regressions in the viewer before deciding whether v3 goes to a 40k run.
+
+## Review fixes (2026-09-07, after the pilot)
+
+Haoling's code review found two holes in the retry path, both reproduced and now fixed with
+regression tests (42 tests pass):
+- P1, truncated responses: any sampler response with `finish_reason == "length"` is rejected by
+  `parse_grouped_future_output`, whichever groups it filled; a cut-off item such as
+  `because she wanted to` no longer passes as a future.
+- P2, lost evidence: the retry loop is now `sample_grouped_futures(request, n, retries, record)`
+  in `ambiguity_sampler_prompt.py`; every malformed response is written to
+  `malformed_sampler_responses.jsonl` the moment it is rejected (`event=malformed`), followed by
+  one `recovered` or `exhausted` line, so a later request exception cannot lose it.
+The decoder keeps the original exception on `--targeted-fail-on-api-error` and the
+`Invalid <version> response from <model>` message. The pilot above ran with the earlier version
+(runtime hashes in the manifest); the fixed code is what any future pilot or 40k run stages.
+Decision unchanged: no v3 40k, no training-recipe change; next is a 200-case held-out comparison
+of v2-boundary vs v3 with XCOMET and step-level early-commit checks, candidate count controlled.

@@ -28,7 +28,7 @@ from transformers import AutoTokenizer
 
 from ambiguity_sampler_prompt import (
     PROMPT_VERSION, PROMPT_VERSIONS, SUFFIX_ICL_PROMPT_VERSION,
-    build_coordinated_future_messages, parse_grouped_future_output,
+    build_coordinated_future_messages, parse_grouped_future_output, sample_grouped_futures,
 )
 from sentence_boundary_helpers import (
     close_translation_delta, observed_sentence_is_complete,
@@ -900,21 +900,27 @@ MALFORMED_RESPONSE_LOG_PATH: Optional[str] = None
 _MALFORMED_LOG_LOCK = threading.Lock()
 
 
-def _record_malformed_responses(attempts: List[Dict[str, Any]], *, recovered: bool) -> None:
-    """Persist every malformed sampler response verbatim (never silently dropped)."""
-    if not attempts:
-        return
-    for item in attempts:
-        item = dict(item, recovered=recovered, recorded_at=time.strftime("%Y-%m-%dT%H:%M:%S"))
-        print(
-            f"[MalformedSamplerResponse] model={item['model']} attempt={item['attempt']} "
-            f"recovered={recovered} finish_reason={item.get('finish_reason')} error={item['error']}",
-            file=sys.stderr, flush=True,
-        )
-        if MALFORMED_RESPONSE_LOG_PATH:
-            with _MALFORMED_LOG_LOCK:
-                with open(MALFORMED_RESPONSE_LOG_PATH, "a", encoding="utf-8") as stream:
-                    stream.write(json.dumps(item, ensure_ascii=False) + "\n")
+class _SamplerUnavailable(Exception):
+    """Sentinel for a failed sampler request when the caller opted for silent empties."""
+
+
+def _record_sampler_event(**event: Any) -> None:
+    """Append one JSON line per malformed/recovered/exhausted sampler response.
+
+    Called synchronously from the retry loop, so a raw response is on disk before
+    the next request is sent. Events are rare (about 1 per 1,000 calls), so the
+    per-event open/append/close under a lock is negligible at 40k-utterance scale.
+    """
+    event["recorded_at"] = time.strftime("%Y-%m-%dT%H:%M:%S")
+    print(
+        f"[SamplerResponse] event={event['event']} model={event['model']} attempt={event['attempt']} "
+        f"finish_reason={event.get('finish_reason')} error={event.get('error')}",
+        file=sys.stderr, flush=True,
+    )
+    if MALFORMED_RESPONSE_LOG_PATH:
+        line = json.dumps(event, ensure_ascii=False) + "\n"
+        with _MALFORMED_LOG_LOCK, open(MALFORMED_RESPONSE_LOG_PATH, "a", encoding="utf-8") as stream:
+            stream.write(line)
 
 
 def _sample_coordinated_future_set(
@@ -971,46 +977,36 @@ def _sample_coordinated_future_set(
     if sampler_seed is not None:
         import zlib
         payload["seed"] = (int(sampler_seed) + zlib.crc32(f"{observed_source}|{sampler_committed}|{api_model}".encode("utf-8"))) % (2**31)
-    failed_attempts: List[Dict[str, Any]] = []
-    grouped_candidates: List[Tuple[str, str]] = []
-    raw_response = ""
-    for attempt in range(1 + max(0, int(parse_retries))):
-        attempt_payload = dict(payload)
-        if attempt and "seed" in attempt_payload:
-            attempt_payload["seed"] = (attempt_payload["seed"] + 7919 * attempt) % (2**31)
+    def request(attempt: int) -> Tuple[str, Optional[str]]:
+        attempt_payload = payload
+        if attempt and "seed" in payload:
+            attempt_payload = {**payload, "seed": (payload["seed"] + 7919 * attempt) % (2**31)}
         try:
             data = _http_json(f"{base}/completions", payload=attempt_payload, timeout=api_timeout)
         except Exception:
             if fail_on_api_error:
                 raise
-            return [], [], []
-        choices = data.get("choices", []) if isinstance(data, dict) else []
-        raw_response = str(choices[0].get("text", "")) if choices and isinstance(choices[0], dict) else ""
-        finish_reason = choices[0].get("finish_reason") if choices and isinstance(choices[0], dict) else None
-        if prompt_version != SUFFIX_ICL_PROMPT_VERSION:
-            break
-        try:
-            grouped_candidates = parse_grouped_future_output(
-                raw_response, num_candidates=num_futures, finish_reason=finish_reason,
-            )
-            break
-        except ValueError as exc:
-            failed_attempts.append({
-                "attempt": attempt + 1, "model": api_model, "prompt_version": prompt_version,
-                "observed_source": observed_source, "committed_text": sampler_committed,
-                "seed": attempt_payload.get("seed"), "finish_reason": finish_reason,
-                "error": str(exc), "raw_response": raw_response,
-            })
-    else:
-        # Every attempt was malformed: preserve the raw responses, then fail loudly.
-        _record_malformed_responses(failed_attempts, recovered=False)
-        last = failed_attempts[-1]
-        raise ValueError(
-            f"Invalid {prompt_version} response from {api_model} after {len(failed_attempts)} attempt(s): "
-            f"{last['error']}; raw={last['raw_response'][:400]!r}"
+            raise _SamplerUnavailable() from None
+        choices = data.get("choices") if isinstance(data, dict) else None
+        choice = choices[0] if choices and isinstance(choices[0], dict) else {}
+        return str(choice.get("text", "")), choice.get("finish_reason")
+
+    def record(event: str, attempt: int, raw_text: str, finish_reason: Optional[str], error: Optional[str]) -> None:
+        _record_sampler_event(
+            event=event, model=api_model, prompt_version=prompt_version, attempt=attempt + 1,
+            observed_source=observed_source, committed_text=sampler_committed,
+            finish_reason=finish_reason, error=error, raw_response=raw_text,
         )
-    if failed_attempts:
-        _record_malformed_responses(failed_attempts, recovered=True)
+
+    try:
+        if prompt_version == SUFFIX_ICL_PROMPT_VERSION:
+            grouped_candidates, raw_response = sample_grouped_futures(request, num_futures, parse_retries, record)
+        else:
+            raw_response, _ = request(0)
+    except _SamplerUnavailable:
+        return [], [], []
+    except ValueError as exc:
+        raise ValueError(f"Invalid {prompt_version} response from {api_model}: {exc}") from exc
     if prompt_version != SUFFIX_ICL_PROMPT_VERSION:
         parsed = parse_method_a_output(raw_response, num_expected=num_futures)
         # Preserve the historical fixed-position interpretation, including missing slots.
