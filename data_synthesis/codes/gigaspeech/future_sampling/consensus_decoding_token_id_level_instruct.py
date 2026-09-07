@@ -137,6 +137,14 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--targeted-sampler-context", choices=["source-and-target", "source-only"],
                    default="source-and-target",
                    help="Opt-in source-only removes committed target text from both sampler prompt and seed.")
+    p.add_argument("--contrastive-notes", action="store_true",
+                   help="v3 JSON only: each contrastive item must also name the reading it resolves "
+                        "(object with suffix and resolves); the note is kept in the audit, not in the future.")
+    p.add_argument("--probe-input-mode", choices=["joined", "heard-guessed"], default="joined",
+                   help="'joined' (historical): future glued onto the observed English. 'heard-guessed': the "
+                        "probe sees [HEARD] observed text and [POSSIBLE CONTINUATION] future, translates only the heard part.")
+    p.add_argument("--min-voters-abs", type=int, default=0,
+                   help="Minimum absolute number of futures that must back a token, in addition to --min-voters-ratio.")
     p.add_argument("--targeted-parse-retries", type=int, default=2,
                    help="Resample a sampler whose grouped (v3) response is malformed, up to this many "
                         "extra attempts with a shifted seed; every malformed response is logged verbatim.")
@@ -601,8 +609,26 @@ def build_translation_probe_prompt_prefix_token_ids(
     full_source: str,
     has_target_prefix: bool,
     target_lang: str = "Chinese",
+    guessed_continuation: Optional[str] = None,
 ) -> List[int]:
-    if not has_target_prefix:
+    if guessed_continuation is not None:
+        # Heard-vs-guessed probe input. Everything shared across futures comes first so
+        # vLLM prefix caching covers it; only the continuation and the target prefix differ.
+        continuation_rule = (
+            f"A partial {target_lang} translation is already committed at the start of the assistant reply. "
+            "You must continue from that exact prefix and produce only the continuation."
+            if has_target_prefix else
+            f"Start the {target_lang} translation from the beginning and output only the next continuation token(s)."
+        )
+        messages = [{"role": "user", "content": (
+            f"[TASK]\nTranslate the [HEARD] English into {target_lang}.\n\n"
+            f"[HEARD]\n{full_source}\n\n"
+            "[IMPORTANT]\nThe speaker has only said the [HEARD] text so far. The [POSSIBLE CONTINUATION] below is one plausible "
+            "guess of what comes next: use it only to resolve ambiguity in the heard text. Translate only what was heard; "
+            f"do not translate the continuation itself. {continuation_rule}\n\n"
+            f"[POSSIBLE CONTINUATION]\n{guessed_continuation}"
+        )}]
+    elif not has_target_prefix:
         messages = [{"role": "user", "content": (
             f"[TASK]\nTranslate the [INPUT] text into {target_lang}.\n\n"
             f"[INPUT]\n{full_source}\n\n"
@@ -941,6 +967,7 @@ def _sample_coordinated_future_set(
     fail_on_api_error: bool = False,
     prompt_version: str = PROMPT_VERSION,
     parse_retries: int = 2,
+    contrastive_notes: bool = False,
 ) -> Tuple[List[str], List[Dict[str, Any]], List[Dict[str, Any]]]:
     """Generate jointly planned plausible and contrastive lists in one response."""
     if not observed_source.strip() or num_futures <= 0:
@@ -953,6 +980,7 @@ def _sample_coordinated_future_set(
         committed_text=sampler_committed,
         num_candidates=num_futures,
         prompt_version=prompt_version,
+        contrastive_notes=contrastive_notes,
     )
 
     # One response contains the whole list, allowing the instruction-tuned model
@@ -979,7 +1007,7 @@ def _sample_coordinated_future_set(
         import zlib
         payload["seed"] = (int(sampler_seed) + zlib.crc32(f"{observed_source}|{sampler_committed}|{api_model}".encode("utf-8"))) % (2**31)
     if prompt_version == SUFFIX_ICL_PROMPT_VERSION:
-        payload.update(structured_output_extras(num_futures))
+        payload.update(structured_output_extras(num_futures, contrastive_notes))
     def request(attempt: int) -> Tuple[str, Optional[str]]:
         attempt_payload = payload
         if attempt and "seed" in payload:
@@ -1014,7 +1042,7 @@ def _sample_coordinated_future_set(
         parsed = parse_method_a_output(raw_response, num_expected=num_futures)
         # Preserve the historical fixed-position interpretation, including missing slots.
         grouped_candidates = [
-            ("plausible" if i < num_futures // 2 else "contrastive", parsed[i] if i < len(parsed) else "")
+            ("plausible" if i < num_futures // 2 else "contrastive", parsed[i] if i < len(parsed) else "", "")
             for i in range(num_futures)
         ]
 
@@ -1030,12 +1058,12 @@ def _sample_coordinated_future_set(
 
     candidates_by_mode: Dict[str, List[str]] = {"plausible": [], "contrastive": []}
     audit: List[Dict[str, Any]] = []
-    for choice_index, (mode, raw) in enumerate(grouped_candidates):
+    for choice_index, (mode, raw, note) in enumerate(grouped_candidates):
         cleaned = clean_future_text(observed_source, raw)
         if not cleaned or not is_valid_future_text(cleaned):
             audit.append({
                 "choice": choice_index, "model": api_model, "mode": mode,
-                "raw": raw.strip(), "future": cleaned, "accepted": False,
+                "raw": raw.strip(), "future": cleaned, "accepted": False, "note": note,
                 "reason": "missing_or_invalid" if not raw else "invalid_or_meta",
             })
             continue
@@ -1045,7 +1073,7 @@ def _sample_coordinated_future_set(
         if len(re.findall(r"[A-Za-z0-9']+", cleaned)) < 3:
             audit.append({
                 "choice": choice_index, "model": api_model, "mode": mode,
-                "raw": raw.strip(), "future": cleaned, "accepted": False,
+                "raw": raw.strip(), "future": cleaned, "accepted": False, "note": note,
                 "reason": "too_short",
             })
             continue
@@ -1057,14 +1085,14 @@ def _sample_coordinated_future_set(
             if partial_norm in cleaned_norm:
                 audit.append({
                     "choice": choice_index, "model": api_model, "mode": mode,
-                    "raw": raw.strip(), "future": cleaned, "accepted": False,
+                    "raw": raw.strip(), "future": cleaned, "accepted": False, "note": note,
                     "reason": "repeats_observed_prefix",
                 })
                 continue
         candidates_by_mode[mode].append(cleaned)
         audit.append({
             "choice": choice_index, "model": api_model, "mode": mode,
-            "raw": raw.strip(), "future": cleaned, "accepted": None,
+            "raw": raw.strip(), "future": cleaned, "accepted": None, "note": note,
             "reason": "pending_diversity_filter",
         })
 
@@ -1224,6 +1252,7 @@ def sample_source_futures_targeted_prefill(
     fail_on_api_error: bool = False,
     prompt_version: str = PROMPT_VERSION,
     parse_retries: int = 2,
+    contrastive_notes: bool = False,
 ) -> Any:
     """Generate a coordinated set per model with equal group budgets."""
     if not observed_source.strip():
@@ -1238,8 +1267,9 @@ def sample_source_futures_targeted_prefill(
             (sampler_tokenizer, api_base, api_model, api_timeout),
             (sampler2_tokenizer, sampler2_api_base, sampler2_api_model, s2_to),
         )
-        for model_tokenizer, model_base, model_name, model_timeout in model_specs:
-            batches.append(_sample_coordinated_future_set(
+        def sample_one(spec):
+            model_tokenizer, model_base, model_name, model_timeout = spec
+            return _sample_coordinated_future_set(
                 sampler_tokenizer=model_tokenizer,
                 observed_source=observed_source, committed_text=committed_text,
                 target_lang=target_lang, num_futures=num_futures,
@@ -1248,7 +1278,11 @@ def sample_source_futures_targeted_prefill(
                 sampler_seed=sampler_seed,
                 sampler_context=sampler_context, fail_on_api_error=fail_on_api_error,
                 prompt_version=prompt_version, parse_retries=parse_retries,
-            ))
+                contrastive_notes=contrastive_notes,
+            )
+        # The two samplers sit on different servers; overlap their generation.
+        with ThreadPoolExecutor(max_workers=len(model_specs)) as pool:
+            batches.extend(pool.map(sample_one, model_specs))
     else:
         batches.append(_sample_coordinated_future_set(
             sampler_tokenizer=sampler_tokenizer,
@@ -1259,6 +1293,7 @@ def sample_source_futures_targeted_prefill(
             sampler_seed=sampler_seed,
             sampler_context=sampler_context, fail_on_api_error=fail_on_api_error,
             prompt_version=prompt_version, parse_retries=parse_retries,
+            contrastive_notes=contrastive_notes,
         ))
     # Preserve cross-model agreement as two independent votes. Each model's set
     # has already removed exact and near-duplicate candidates.
@@ -1344,9 +1379,10 @@ def batch_get_next_token_distributions(
     prompts = [
         build_translation_probe_prompt_prefix_token_ids(
             tokenizer,
-            src,
+            src[0] if isinstance(src, tuple) else src,
             has_target_prefix=bool(target_prefix_token_ids),
             target_lang=target_lang,
+            guessed_continuation=src[1] if isinstance(src, tuple) else None,
         ) + list(target_prefix_token_ids) # Step 3
         for src in full_sources
     ]
@@ -1450,6 +1486,7 @@ def choose_consensus_token(
     soft_vote_min_p: float = 0.1,
     soft_vote_threshold: float = 0.0,  # deprecated, unused
     min_voters_ratio: float = 0.75,
+    min_voters_abs: int = 0,
 ) -> Tuple[Optional[int], Dict[str, Any]]:
     # Looser-than-intersection majority vote.
     # Per future:  filter dist to {tok : p >= soft_vote_min_p}, then take top-K.
@@ -1472,7 +1509,9 @@ def choose_consensus_token(
         for tok, p in filtered:
             per_token_voters[tok] += 1
             agg_score[tok] += p
-    min_voters = max(1, math.ceil(num_futures * min_voters_ratio))
+    # The ratio scales with how many futures survived; the absolute floor keeps a thin
+    # candidate set (e.g. 8 futures) from reaching unanimity too cheaply.
+    min_voters = max(1, math.ceil(num_futures * min_voters_ratio), int(min_voters_abs))
     eligible = {tok: agg_score[tok] for tok, v in per_token_voters.items() if v >= min_voters}
     base_meta = {
         "candidate_lists": candidate_lists,
@@ -1614,6 +1653,8 @@ def extend_pending_tokens(
     soft_vote_threshold: float = 0.8,
     min_voters_ratio: float = 0.75,
     future_join_mode: str = "space",
+    min_voters_abs: int = 0,
+    probe_input_mode: str = "joined",
 ) -> Tuple[List[int], List[Dict[str, Any]]]:
     pending_token_ids: List[int] = []
     grow_logs: List[Dict[str, Any]] = []
@@ -1621,7 +1662,11 @@ def extend_pending_tokens(
     for step_idx in range(max_consensus_steps): #最多32 步
         # 2a) 每条 future 拼成完整 source，问 instruct 模型："给定这个完整英文 + 已有中文前缀，下一个中文 token 是啥？"
         target_prefix_token_ids = list(committed_token_ids) + list(pending_token_ids)
-        full_sources = [join_future_to_source(source_observed, f, future_join_mode) for f in futures]
+        if probe_input_mode == "heard-guessed":
+            full_sources: List[Any] = [(source_observed, f) for f in futures]
+        else:
+            full_sources = [join_future_to_source(source_observed, f, future_join_mode) for f in futures]
+        probe_started = time.perf_counter()
 
         batch_results = batch_get_next_token_distributions(
             tokenizer=instruct_tokenizer,
@@ -1664,16 +1709,19 @@ def extend_pending_tokens(
             soft_vote_min_p=soft_vote_min_p,
             soft_vote_threshold=soft_vote_threshold,
             min_voters_ratio=min_voters_ratio,
+            min_voters_abs=min_voters_abs,
         )
+        probe_elapsed = round(time.perf_counter() - probe_started, 3)
         if consensus_token_id is None: #没有共识token，停止本轮生长
             grow_logs.append({"step": step_idx, "stop": "no_consensus_token",
-                              "per_future": per_future, "meta": meta})
+                              "per_future": per_future, "meta": meta, "elapsed_s": probe_elapsed})
             break
 
         pending_token_ids.append(consensus_token_id) #共识成功，追加到pending buffer，继续下一步
         view = inspect_token_ids(instruct_tokenizer, pending_token_ids) #解码当前pending buffer，准备日志
         log_entry = {
             "step": step_idx,
+            "elapsed_s": probe_elapsed,
             "accepted_token_id": consensus_token_id,
             "accepted_token_text": view["last_token_text"],
             "pending_text": view["decoded_text"],
@@ -1858,6 +1906,7 @@ def run_one_utterance(
     _vlog(verbose_log_file, "# instruct_backend: vllm_completion")
     _vlog(verbose_log_file, f"# targeted_sampler_context: {args.targeted_sampler_context}")
     _vlog(verbose_log_file, f"# targeted_prompt_version: {args.targeted_prompt_version}")
+    _vlog(verbose_log_file, f"# probe_input_mode: {args.probe_input_mode} min_voters_abs: {args.min_voters_abs} contrastive_notes: {args.contrastive_notes}")
     _vlog(verbose_log_file, f"# sentence_end_punctuation: {args.sentence_end_punctuation}")
     _vlog(verbose_log_file, "############################################################")
 
@@ -1918,6 +1967,7 @@ def run_one_utterance(
         if t == len(chunks) - 1: #最后一个chunk，不再做共识，直接让instruct model把翻译补完
             log_sampling("skipped", "final_chunk")
             terminal = source_terminal_mark(source_observed_full) if args.sentence_end_punctuation == "match-source" else ""
+            completion_started = time.perf_counter()
             final_delta = force_complete_translation(
                 tokenizer=instruct_tokenizer,
                 full_source=source_observed_full,
@@ -1960,6 +2010,7 @@ def run_one_utterance(
             log_sampling("skipped", "source_sentence_end")
             # The source sentence is complete: let the translator finish it instead of voting.
             terminal = source_terminal_mark(source_observed_full) if args.sentence_end_punctuation == "match-source" else ""
+            completion_started = time.perf_counter()
             sentence_delta = force_complete_translation(
                 tokenizer=instruct_tokenizer,
                 full_source=source_observed_full,
@@ -1989,6 +2040,7 @@ def run_one_utterance(
                 target_deltas.append("")
                 actions.append("READ")
             _vlog(verbose_log_file, f"  [SentenceEnd] delta={sentence_delta!r}")
+            _vlog(verbose_log_file, f"[Timing] completion={time.perf_counter() - completion_started:.2f}s")
             _vlog(verbose_log_file, f"-> {'WRITE' if sentence_delta else 'READ'} delta={sentence_delta!r}")
             _vlog(verbose_log_file, f"committed_after: {committed_text!r}")
             continue
@@ -2011,6 +2063,7 @@ def run_one_utterance(
                 if args.targeted_sampler_api_timeout and args.targeted_sampler_api_timeout > 0
                 else args.instruct_api_timeout
             )
+            sampling_started = time.perf_counter()
             futures, future_infos, future_audit = sample_source_futures_targeted_prefill(
                 sampler_tokenizer=sampler_tokenizer,
                 observed_source=source_observed,
@@ -2033,6 +2086,7 @@ def run_one_utterance(
                 fail_on_api_error=args.targeted_fail_on_api_error,
                 prompt_version=args.targeted_prompt_version,
                 parse_retries=args.targeted_parse_retries,
+                contrastive_notes=args.contrastive_notes,
             )
         else:
             futures, future_infos = sample_source_futures_multi( #call base models，用当前observed source采样多条未来续写
@@ -2043,6 +2097,8 @@ def run_one_utterance(
             )
             future_audit = []
 
+        if args.use_targeted_instruct_sampling:
+            _vlog(verbose_log_file, f"[Timing] sampling={time.perf_counter() - sampling_started:.2f}s")
         # ── verbose: list futures ──
         if future_audit:
             accepted_raw = sum(bool(item.get("accepted")) for item in future_audit)
@@ -2080,7 +2136,11 @@ def run_one_utterance(
             soft_vote_min_p=args.soft_vote_min_p,
             soft_vote_threshold=args.soft_vote_threshold,
             min_voters_ratio=args.min_voters_ratio,
+            min_voters_abs=args.min_voters_abs,
+            probe_input_mode=args.probe_input_mode,
         )
+        _vlog(verbose_log_file, f"[Timing] probe_batches={sum(1 for g in grow_logs if 'elapsed_s' in g)} "
+                                f"total={sum(g.get('elapsed_s', 0.0) for g in grow_logs):.2f}s")
 
         # ── min-consensus-horizon filter ──
         # If the consensus only carried us a few tokens before breaking, the path is fragile.
@@ -2156,6 +2216,9 @@ def run_one_utterance(
             "future_join_mode": args.future_join_mode,
             "targeted_sampler_context": args.targeted_sampler_context,
             "targeted_prompt_version": args.targeted_prompt_version,
+            "probe_input_mode": args.probe_input_mode,
+            "min_voters_abs": args.min_voters_abs,
+            "contrastive_notes": args.contrastive_notes,
             "targeted_sampler_seed": args.targeted_sampler_seed,
             "targeted_fail_on_api_error": args.targeted_fail_on_api_error,
             "sentence_end_completion": args.sentence_end_completion,

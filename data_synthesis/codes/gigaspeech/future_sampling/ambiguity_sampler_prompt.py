@@ -17,6 +17,7 @@ AMBIGUITY_ICL_EXAMPLES = (
         "prefix": "The visitors stopped by the bank",
         "plausible": "to withdraw some cash before continuing their walk.",
         "contrastive": "of the river to watch the ducks swimming.",
+        "resolves": "bank = river edge, not the financial institution",
         "explanation": "The first suffix makes bank a financial institution; the second makes it the edge of a river. The already observed word bank would need different translations.",
     },
     {
@@ -24,6 +25,7 @@ AMBIGUITY_ICL_EXAMPLES = (
         "prefix": "The nurse watched her",
         "plausible": "daughter cross the room without any assistance.",
         "contrastive": "cross the room without any assistance.",
+        "resolves": "her = object of watched, not a possessive",
         "explanation": "In the first reading, her is possessive and modifies daughter. In the second, her is the person being watched. The continuation changes the grammatical role of an already observed word.",
     },
     {
@@ -31,6 +33,7 @@ AMBIGUITY_ICL_EXAMPLES = (
         "prefix": "I saw the man with",
         "plausible": "the binoculars, which helped me see that far.",
         "contrastive": "a broken arm waiting outside the clinic.",
+        "resolves": "with = attribute of the man, not the instrument of seeing",
         "explanation": "The first suffix supports with introducing the instrument used to see. The second attaches with to the man and describes his condition. This changes how the already observed relation should be translated.",
     },
     {
@@ -38,6 +41,7 @@ AMBIGUITY_ICL_EXAMPLES = (
         "prefix": "The editor knew the author whom the reviewers, despite their reservations, praised",
         "plausible": "from a conference they had attended together.",
         "contrastive": "would refuse to revise the final chapter.",
+        "resolves": "knew introduces a content clause; the author is its subject",
         "explanation": "The first reading makes the author the object of knew, meaning personal acquaintance. The second makes the author the subject of would refuse inside the content clause that knew introduces. In both readings, whom is the object of praised in a relative clause modifying author; the reviewers are its subject. The relative clause and the parenthetical despite their reservations delay the decision, but do not resolve it. Wait for the suffix before choosing the meaning of knew or the outer role of the author.",
     },
     {
@@ -45,6 +49,7 @@ AMBIGUITY_ICL_EXAMPLES = (
         "prefix": "The soldiers warned about the ambush",
         "plausible": "and advised the convoy to take another route.",
         "contrastive": "were ordered to stay inside the camp overnight.",
+        "resolves": "warned = reduced passive relative clause; the soldiers receive the warning",
         "explanation": "In the first reading, warned is a main-clause predicate and the soldiers give the warning. In the second, warned about the ambush is a reduced passive relative clause, equivalent to who were warned about the ambush; the soldiers receive the warning, and were ordered is the main-clause predicate. The suffix determines both the role of warned and who gives or receives the warning. Do not commit to the active reading before this is resolved.",
     },
 )
@@ -57,6 +62,7 @@ def build_coordinated_future_messages(
     committed_text: str,
     num_candidates: int,
     prompt_version: str = PROMPT_VERSION,
+    contrastive_notes: bool = False,
 ) -> list[dict[str, str]]:
     """Ask an instruction-tuned sampler to plan a diverse set jointly."""
     if not observed_source.strip():
@@ -78,7 +84,7 @@ def build_coordinated_future_messages(
     )
     if prompt_version == SUFFIX_ICL_PROMPT_VERSION:
         return _build_suffix_icl_messages(
-            observed_source, target_lang, commitment, num_candidates,
+            observed_source, target_lang, commitment, num_candidates, contrastive_notes,
         )
     system = f"""You predict possible future English speech for a simultaneous English-to-{target_lang} interpreter.
 
@@ -118,17 +124,28 @@ Contrastive
     ]
 
 
+def _example_response(example: dict, contrastive_notes: bool) -> str:
+    contrastive = ({"suffix": example["contrastive"], "resolves": example["resolves"]}
+                   if contrastive_notes else example["contrastive"])
+    return json.dumps({"plausible": [example["plausible"]], "contrastive": [contrastive]})
+
+
 def _build_suffix_icl_messages(
     observed_source: str, target_lang: str, commitment: str, num_candidates: int,
+    contrastive_notes: bool = False,
 ) -> list[dict[str, str]]:
     per_group = num_candidates // 2
     ambiguity_examples = "\n\n".join(
         f"Ambiguity example {i} ({example['kind']}):\n"
         f"Observed prefix: {example['prefix']}\n"
-        f"Example response: {json.dumps({'plausible': [example['plausible']], 'contrastive': [example['contrastive']]})}\n"
+        f"Example response: {_example_response(example, contrastive_notes)}\n"
         f"Teaching note (not part of the response): {example['explanation']}"
         for i, example in enumerate(AMBIGUITY_ICL_EXAMPLES, 1)
     )
+    contrastive_shape = ('{"suffix": "<suffix>", "resolves": "<reading of an already observed word or relation that this suffix settles, a few words>"}'
+                         if contrastive_notes else '"<suffix>"')
+    notes_rule = ("\nEach contrastive item must name a different reading in its \"resolves\" field; do not list two suffixes that settle the same reading."
+                  if contrastive_notes else "")
     system = f"""You predict short English speech continuations for a simultaneous English-to-{target_lang} interpreter.
 
 The observed prefix is the exact speech heard so far, not a topic for a new sentence. Return only the new words that can come immediately after it.
@@ -177,7 +194,7 @@ For the actual input, apply the same concatenation check to every candidate. Out
 
 Return only valid suffixes for this exact prefix: at most {num_candidates} total, up to {per_group} per group. Fewer is acceptable, including zero. Do not output the joined check or repeat the examples.
 
-Respond with one JSON object of the form {{"plausible": ["<suffix>", ...], "contrastive": ["<suffix>", ...]}}. Each string is one suffix only. Use an empty list for a group with no valid candidate. No placeholders, explanations, or text outside the JSON."""
+Respond with one JSON object of the form {{"plausible": ["<suffix>", ...], "contrastive": [{contrastive_shape}, ...]}}. Each suffix string is one suffix only. Use an empty list for a group with no valid candidate. No placeholders, explanations, or text outside the JSON.{notes_rule}"""
     return [
         {"role": "system", "content": system},
         {"role": "user", "content": user},
@@ -185,28 +202,41 @@ Respond with one JSON object of the form {{"plausible": ["<suffix>", ...], "cont
 
 
 GROUP_KEYS = ("plausible", "contrastive")
-MAX_SUFFIX_CHARS = 200
+MAX_SUFFIX_CHARS = 120  # the prompt asks for 4-15 words; this only trims runaway tails
+MAX_NOTE_CHARS = 120
 
 
-def grouped_future_schema(num_candidates: int) -> dict:
-    """JSON schema the sampler server enforces: two lists of suffix strings, capped per group."""
+def grouped_future_schema(num_candidates: int, contrastive_notes: bool = False) -> dict:
+    """JSON schema the sampler server enforces: two capped lists of suffixes.
+
+    With ``contrastive_notes`` each contrastive item is an object that must also
+    name the reading it resolves, so the model commits to a distinct reading per item.
+    """
     if num_candidates <= 0 or num_candidates % 2:
         raise ValueError("num_candidates must be a positive even number")
-    group = {"type": "array", "maxItems": num_candidates // 2,
-             "items": {"type": "string", "minLength": 1, "maxLength": MAX_SUFFIX_CHARS}}
-    return {"type": "object", "properties": {key: group for key in GROUP_KEYS},
+    suffix = {"type": "string", "minLength": 1, "maxLength": MAX_SUFFIX_CHARS}
+    contrastive_item = ({"type": "object", "properties": {"suffix": suffix, "resolves": {"type": "string", "minLength": 1, "maxLength": MAX_NOTE_CHARS}},
+                         "required": ["suffix", "resolves"], "additionalProperties": False}
+                        if contrastive_notes else suffix)
+    cap = num_candidates // 2
+    return {"type": "object",
+            "properties": {"plausible": {"type": "array", "maxItems": cap, "items": suffix},
+                           "contrastive": {"type": "array", "maxItems": cap, "items": contrastive_item}},
             "required": list(GROUP_KEYS), "additionalProperties": False}
 
 
-def structured_output_extras(num_candidates: int) -> dict:
+def structured_output_extras(num_candidates: int, contrastive_notes: bool = False) -> dict:
     """Extra request fields that make vLLM constrain the reply to ``grouped_future_schema``."""
-    return {"structured_outputs": {"json": grouped_future_schema(num_candidates)}}
+    return {"structured_outputs": {"json": grouped_future_schema(num_candidates, contrastive_notes)}}
 
 
 def parse_grouped_future_output(
     raw_text: str, num_candidates: int, finish_reason: str | None = None,
-) -> list[tuple[str, str]]:
-    """Parse the JSON reply into ``[(group, suffix), ...]`` in plausible-then-contrastive order.
+) -> list[tuple[str, str, str]]:
+    """Parse the JSON reply into ``[(group, suffix, note), ...]`` in plausible-then-contrastive order.
+
+    A contrastive item may be a plain string or an object with ``suffix`` and
+    ``resolves``; the note is empty for plain strings.
 
     Raises ValueError for a reply cut off by the token budget (``finish_reason ==
     "length"``), invalid JSON, missing or extra keys, non-string or blank items, or
@@ -223,15 +253,20 @@ def parse_grouped_future_output(
         raise ValueError(f"Response is not valid JSON: {exc}") from exc
     if not isinstance(data, dict) or set(data) != set(GROUP_KEYS):
         raise ValueError(f"Response must be an object with exactly the keys {GROUP_KEYS}")
-    items: list[tuple[str, str]] = []
+    items: list[tuple[str, str, str]] = []
     for key in GROUP_KEYS:
         group = data[key]
         if not isinstance(group, list) or len(group) > num_candidates // 2:
             raise ValueError(f"Group {key!r} must be a list of at most {num_candidates // 2} items")
         for value in group:
+            note = ""
+            if key == "contrastive" and isinstance(value, dict):
+                if set(value) != {"suffix", "resolves"} or not isinstance(value.get("resolves"), str):
+                    raise ValueError("Contrastive object must have exactly suffix and resolves strings")
+                note, value = value["resolves"].strip(), value["suffix"]
             if not isinstance(value, str) or not value.strip():
                 raise ValueError(f"Group {key!r} contains a non-string or blank item")
-            items.append((key, value.strip()))
+            items.append((key, value.strip(), note))
     return items
 
 

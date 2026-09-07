@@ -123,7 +123,7 @@ class CoordinatedFuturePromptTest(unittest.TestCase):
                 self.assertIn(response, system)
                 self.assertIn(example["explanation"], system)
                 self.assertEqual(parse_grouped_future_output(response, 20),
-                                 [(mode, example[mode]) for mode in ("plausible", "contrastive")])
+                                 [(mode, example[mode], "") for mode in ("plausible", "contrastive")])
                 for mode in ("plausible", "contrastive"):
                     count = len(re.findall(r"[A-Za-z0-9']+", example[mode]))
                     self.assertGreaterEqual(count, 4)
@@ -167,14 +167,14 @@ class GroupedFutureParserTest(unittest.TestCase):
         response = json.dumps({"contrastive": ["might stay despite the warning."],
                                "plausible": ["could arrive before the storm.", " may leave during the night. "]})
         self.assertEqual(parse_grouped_future_output(response, 20, "stop"), [
-            ("plausible", "could arrive before the storm."), ("plausible", "may leave during the night."),
-            ("contrastive", "might stay despite the warning."),
+            ("plausible", "could arrive before the storm.", ""), ("plausible", "may leave during the night.", ""),
+            ("contrastive", "might stay despite the warning.", ""),
         ])
 
     def test_empty_groups_are_explicit_abstention(self) -> None:
         self.assertEqual(parse_grouped_future_output('{"plausible": [], "contrastive": []}', 20, "stop"), [])
         self.assertEqual(parse_grouped_future_output('{"plausible": ["could arrive before the storm."], "contrastive": []}', 20, "stop"),
-                         [("plausible", "could arrive before the storm.")])
+                         [("plausible", "could arrive before the storm.", "")])
 
     def test_malformed_or_truncated_output_is_never_silent_abstention(self) -> None:
         responses = {
@@ -189,6 +189,40 @@ class GroupedFutureParserTest(unittest.TestCase):
         for response, finish_reason in responses.items():
             with self.subTest(response=response), self.assertRaises(ValueError):
                 parse_grouped_future_output(response, 4, finish_reason)
+
+    def test_contrastive_notes_schema_and_parse(self) -> None:
+        schema = grouped_future_schema(20, contrastive_notes=True)
+        item = schema["properties"]["contrastive"]["items"]
+        self.assertEqual(item["required"], ["suffix", "resolves"])
+        self.assertEqual(schema["properties"]["plausible"]["items"]["type"], "string")
+        response = json.dumps({"plausible": ["to withdraw some cash."],
+                               "contrastive": [{"suffix": "of the river to watch ducks.", "resolves": "bank = river edge"},
+                                               "of the river, plain string still accepted."]})
+        self.assertEqual(parse_grouped_future_output(response, 20, "stop"), [
+            ("plausible", "to withdraw some cash.", ""),
+            ("contrastive", "of the river to watch ducks.", "bank = river edge"),
+            ("contrastive", "of the river, plain string still accepted.", ""),
+        ])
+        for bad in ('{"plausible": [], "contrastive": [{"suffix": "x y z"}]}',
+                    '{"plausible": [], "contrastive": [{"suffix": "x y z", "resolves": 3}]}',
+                    '{"plausible": [{"suffix": "x", "resolves": "y"}], "contrastive": []}'):
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                parse_grouped_future_output(bad, 20, "stop")
+
+    def test_contrastive_notes_prompt_shows_object_form(self) -> None:
+        messages = build_coordinated_future_messages(
+            observed_source="The visitors stopped by the bank", target_lang="Chinese", committed_text="",
+            num_candidates=20, prompt_version=SUFFIX_ICL_PROMPT_VERSION, contrastive_notes=True,
+        )
+        system, user = (m["content"] for m in messages)
+        self.assertIn('"resolves": "bank = river edge, not the financial institution"', system)
+        self.assertIn('"resolves": "<reading of an already observed word', user)
+        self.assertIn("must name a different reading", user)
+        plain = build_coordinated_future_messages(
+            observed_source="The visitors stopped by the bank", target_lang="Chinese", committed_text="",
+            num_candidates=20, prompt_version=SUFFIX_ICL_PROMPT_VERSION,
+        )
+        self.assertNotIn("resolves", plain[1]["content"])
 
     def test_bad_budgets_are_rejected(self) -> None:
         for budget in (0, -2, 3):
@@ -219,7 +253,7 @@ class SampleGroupedFuturesTest(unittest.TestCase):
     def test_retry_recovers_and_records_each_stage(self) -> None:
         request, record, events, calls = self._run([(self.BAD, "stop"), (self.GOOD, "stop")])
         items, raw = sample_grouped_futures(request, 20, 2, record)
-        self.assertEqual(items, [("plausible", "could arrive before the storm.")])
+        self.assertEqual(items, [("plausible", "could arrive before the storm.", "")])
         self.assertEqual(raw, self.GOOD)
         self.assertEqual(calls, [0, 1])
         self.assertEqual([(e[0], e[1]) for e in events], [("malformed", 0), ("recovered", 1)])
