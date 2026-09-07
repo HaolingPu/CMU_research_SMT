@@ -66,8 +66,15 @@ and the probe/sampler swap are both unresolved confounds.
 | `top5-axis5` flagship | 34.9 / 39.6 / 40.1 / 40.1 | .787 / .808 / .812 / **.817** | 1461 / 2176 / 2745 / 3107 |
 | hibiki (ref-based) | – / – / – / 46.8 | .780 / .812 / .814 / .820 | – / – / – / 3326 |
 | EAST-even | – / – / – / 46.8 | – / – / – / .789 | – / – / – / 3533 |
+| EAST-Qwen3.6 teacher (12,500, seed 42, ckpt `v0-20260907-153451-hf`, eval 10343935) | 38.6 / 43.6 / 46.3 / 47.8 | .681 / .733 / .758 / .781 | 1241 / 2024 / 2805 / 3561 |
 
 chrF this run: 36.1 / 39.8 / 40.5 / 40.7. chrF matched 12,500: 36.5 / 40.4 / 41.3 / 41.6.
+EAST-Qwen3.6 teacher control (2026-09-07, other session; review in
+`slurm_runs/qwen36-teacher-baselines-20260906-qwen36-teacher-r2/east/evaluation_review_20260907.md`):
+same teacher as the ambiguity run, 12,500 rows, but only 6,386 training IDs shared with the
+historical EAST (6,114 replaced), so it is a teacher-through-pipeline control, not a pure teacher
+swap. No loops on Simul-tst (0 collapsed recordings). Simul-MuST-C teacher control still
+generating (8/24 tasks done on 2026-09-07 morning).
 Matched-count control (ACL eval job 10333149, 2026-09-06): training on 12,500 of the same
 17,306 survivors matches or beats the 17,306-row run at every segment size, so the ACL gain over
 the `top5-axis5` flagship is not a training-size artifact. Simul-tst-COMMON for this checkpoint:
@@ -82,6 +89,7 @@ pending (infer 10333150 + repair 10333556, eval 10333151).
 | `top5-axis5` flagship | 27.5 / 32.1 / 34.1 / 34.2 | .831 / .859 / .867 / **.872** | 3535 / 1543 / 2409 / 2855 |
 | hibiki (ref-based) | 38.3 / 40.4 / 40.8 / 41.1 | .838 / .861 / .866 / .869 | 1282 / 1849 / 2429 / 2870 |
 | EAST-even | 40.1 / 43.7 / 44.2 / 43.6 | .765 / .817 / .837 / .846 | 1107 / 1900 / 2620 / 3243 |
+| EAST-Qwen3.6 teacher (eval 10343937) | 40.1 / 45.3 / 46.5 / 46.7 | .755 / .806 / .832 / .843 | 1108 / 1920 / 2722 / 3390 |
 
 chrF this run: 28.3 / 36.7 / 38.7 / 39.0. † seg960 is degenerate (see hygiene) and should be
 excluded from any comparison. ‡ every matched-12,500 segment size carries 1–5 runaway talks
