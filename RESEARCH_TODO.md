@@ -64,7 +64,7 @@ Simul-tst-COMMON). A 2-hour watcher in the Claude Code session follows it.
   cases, v2-boundary vs v3-JSON, XCOMET + step-level early-commit audit, candidate budget controlled
   (40 → 13.5 raw candidates per step is itself a variable).
 
-- [ ] Probe input marks what was heard vs guessed (idea 2026-09-07): today the future is glued onto the
+- [ ] (implemented b1d54b1, 10-case test 10351383 running) Probe input marks what was heard vs guessed (idea 2026-09-07): today the future is glued onto the
   observed English as if heard, so the translator commits content only the futures imply
   (`进了` in 1015). Change the probe prompt to `[HEARD] ... [POSSIBLE CONTINUATION] ...` and
   instruct it to translate only the heard part, using the continuation as context. Prompt-only;

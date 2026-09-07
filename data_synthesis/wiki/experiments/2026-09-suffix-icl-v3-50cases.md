@@ -250,3 +250,21 @@ comparison root (`manage_experiments.py add-arm`, commit 2225fc4; the UI now acc
 and labels the 42 cases that were not generated). Compare v3 text vs v3 JSON at
 `http://127.0.0.1:8768/experiments.html#case=AUD0000000003_1015&left=suffix_icl_v3&right=suffix_icl_v3json`;
 trajectories at `http://127.0.0.1:8768/suffix_icl_v3json/index.html#case=<utt_id>`.
+
+## Combined changes test (2026-09-07 night, commit b1d54b1, job 10351383)
+
+Implemented as opt-in decoder flags, all off by default:
+- `--probe-input-mode heard-guessed`: probe prompt `[TASK] Translate the [HEARD] English … [HEARD] observed
+  … [IMPORTANT] translate only what was heard; the continuation is one plausible guess … [POSSIBLE
+  CONTINUATION] future`. Shared text first, future last, so prefix caching covers everything but the
+  future and the committed Chinese.
+- `--min-voters-abs N`: absolute voter floor on top of `--min-voters-ratio`; with N=10 a step with
+  fewer than 10 surviving futures cannot commit.
+- `--contrastive-notes`: v3 JSON schema makes each contrastive item `{"suffix", "resolves"}`; the note
+  is stored in the audit (`note`) and stripped before probing.
+- Non-method: Gemma and Qwen sampler calls run concurrently; suffix cap 200 → 120 characters;
+  `[Timing] sampling= / probe_batches= total= / completion=` lines in every verbose log.
+Test: pilot rows 0–9, same seed 1015, all three method flags on, output root
+`consensus_decoding_pilots/v3json-all-10cases-20260907T2327Z`, 2 GPUs. Compare against the v3-JSON
+arm (rows 0–7 done, rows 8–9 from array 10350658) and source-only boundary. The 42-case v3-JSON
+array 10350658 is still running (tasks preempted and requeued twice).
