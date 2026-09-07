@@ -280,6 +280,34 @@ many reference segments. On clean speech the matched checkpoint is not worse tha
 17,306-row one; which talks spiral is sampling luck on the jingle. ACL 6060 dev has no jingle,
 no applause and no clips, so neither checkpoint loops there (rep-4gram ≤ 0.22 on all 5 talks).
 
+Independent check (three-lens workflow, 2026-09-06 evening, scripts in scratchpad `wf/`):
+- Onset: on the matched checkpoint the first write lands inside the 0–15.4 s jingle window on
+  26/26/23/22 of 27 talks (seg 960/1920/2880/3840) and is an interjection or a sound description
+  (`嘘！`, `嘶嘶声。`, `（掌声）`, `（音乐）`), never translation; the first reference-matching write
+  comes at 17–19 s in every run. ACL: 40/40 first writes are real translation at 2.9–3.8 s.
+  The 17,306-row model even narrates the trigger: `*音效：开场音效，包含呼啸声、电子音效和掌声，随后是掌声。*`.
+- Persistence is the chat history, not the audio: 20/25 jingle-`嘘！` talks recover once speech
+  starts; the 5 runaway talks are exactly those with a max-new-tokens (30-char) stutter turn
+  among the first 15 turns (5/7 with such a turn ran away, 0/20 without); 96.6 % of loop
+  characters sit in turns ≥ 25 chars. History trimming (60→30 turns) does not break a loop.
+- Mid-talk onsets are all non-speech: closing applause over 20–50 s yaml segments
+  (`Come back.` 223–245 s in ted_1096 followed by a Siemens sponsor ad), the Double Rainbow
+  clip `Oh, my God!` ×4 in ted_1371, an embedded video in ted_1359. Only two matched loops
+  (<2 % of loop chars) start in ordinary speech.
+- Scoring is sound: BLEU reproduced to 4 decimals for all 16 runs, references/yaml/order all
+  match. One uniform defect: hypotheses are NFKC-normalized but references are not (9.5 % of
+  reference tokens are full-width punctuation); fixing it adds +4–8 BLEU to every row and does
+  not change any gap. Energy gating is ruled out: the jingle is 1.1–8.6× louder than speech.
+- Attribution: on talks clean in both runs the matched checkpoint is ≥ the 17,306-row one
+  (seg2880 46.7 vs 46.1, seg3840 47.0 vs 46.1); at seg960 the 17,306-row run is the worse one
+  (20.8 vs 23.9). Evidence that matched is more loop-prone is weak and post hoc
+  (pooled Fisher p = 0.36, one seed per run).
+- Fix order: A history-level loop brake in `infinisst_omni.py` (periodic-turn, interjection-only,
+  and 2-turn-repeat detectors → write `''` to history, return READ; 23 % of training turns are
+  empty so this is in-distribution) first, with `--presence-penalty 0.4` as a zero-code parallel
+  arm; then C a Silero-VAD generation gate (audio kept in history); D converter-level non-speech
+  turns with empty targets needs a retrain; `--repetition-penalty` > 1 last (penalizes the whole
+  history). Success metric: runaway talks → 0, LongLAAL CU back to 2–3 s, ACL BLEU within ±0.3.
 Outputs: `<ckpt>/evaluation/simul_tst_common/en-zh/seg<N>/instances.log`; local copies and the
 analysis scripts in the session scratchpad `tst_bundle/`, `tst_audio_rms.json`.
 Fix candidates (none applied yet; the inference agent is `scripts/infer/infinisst_omni.py`):
