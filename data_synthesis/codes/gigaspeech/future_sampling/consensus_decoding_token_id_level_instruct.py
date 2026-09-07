@@ -14,6 +14,8 @@ import math
 import os
 import re
 import sys
+import time
+import threading
 import unicodedata
 import urllib.error
 import urllib.request
@@ -24,7 +26,14 @@ from typing import Any, Dict, List, Optional, Tuple
 import pandas as pd
 from transformers import AutoTokenizer
 
-from ambiguity_sampler_prompt import PROMPT_VERSION, build_coordinated_future_messages
+from ambiguity_sampler_prompt import (
+    PROMPT_VERSION, PROMPT_VERSIONS, SUFFIX_ICL_PROMPT_VERSION,
+    build_coordinated_future_messages, parse_grouped_future_output,
+)
+from sentence_boundary_helpers import (
+    close_translation_delta, observed_sentence_is_complete,
+    sentence_anchored_prefix, source_terminal_mark,
+)
 
 
 DEFAULT_TSV_PATH = "/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/eval_datasets/train_xl_case_robust_asr_filtered_frozen_llm_reference_subsentence_ref.tsv"
@@ -73,8 +82,11 @@ def parse_args() -> argparse.Namespace:
                         "numbered continuation set instead of independent base-LM samples. "
                         "When set, base_specs are ignored for future sampling.")
     p.add_argument("--targeted-num-futures", type=int, default=20,
-                   help="Total jointly planned continuations per sampler model; must be even, "
-                        "with half plausible and half contrastive.")
+                   help="Continuations per sampler model (an upper limit for v3); must be even, "
+                        "with half the budget for each group.")
+    p.add_argument("--targeted-prompt-version", choices=PROMPT_VERSIONS, default=PROMPT_VERSION,
+                   help="Opt-in v3 adds suffix examples and variable-size groups. "
+                        "Default v2 preserves the historical fixed-count prompt and parser.")
     p.add_argument("--targeted-sample-temperature", type=float, default=1.0,
                    help="Sampling temperature for each coordinated future-set response.")
     p.add_argument("--targeted-top-p", type=float, default=0.98)
@@ -121,13 +133,32 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--targeted-sampler-seed", type=int, default=None,
                    help="If set, pass a deterministic per-prefix seed to the coordinated future samplers "
                         "(vLLM 'seed'), so reruns of the same row are comparable.")
-    p.add_argument("--future-source-window-mode", choices=["fixed", "until-closed"], default="fixed",
+    p.add_argument("--targeted-sampler-context", choices=["source-and-target", "source-only"],
+                   default="source-and-target",
+                   help="Opt-in source-only removes committed target text from both sampler prompt and seed.")
+    p.add_argument("--targeted-parse-retries", type=int, default=2,
+                   help="Resample a sampler whose grouped (v3) response is malformed, up to this many "
+                        "extra attempts with a shifted seed; every malformed response is logged verbatim.")
+    p.add_argument("--malformed-response-log", default="",
+                   help="JSONL file receiving every malformed sampler response (default: "
+                        "<verbose-dir>/malformed_sampler_responses.jsonl when --verbose-dir is set).")
+    p.add_argument("--targeted-fail-on-api-error", action="store_true",
+                   help="Fail a pilot case on sampler API errors instead of treating them as empty futures.")
+    p.add_argument("--future-source-window-mode", choices=["fixed", "until-closed", "sentence-anchor"], default="fixed",
                    help="'fixed': always --future-source-window-chunks units. 'until-closed': additionally "
                         "include the previous sentence unit while the Chinese committed for it does not "
-                        "yet end with sentence-final punctuation; drop it once it is closed.")
+                        "yet end with sentence-final punctuation; drop it once it is closed. "
+                        "'sentence-anchor': use only the observed current sentence, not source-unit boundaries.")
+    p.add_argument("--future-source-anchor-max-words", type=int, default=128,
+                   help="Word cap for sentence-anchor only; 0 disables the cap.")
     p.add_argument("--sentence-end-completion", action="store_true",
                    help="When the current source chunk ends a sentence, skip consensus and let the "
                         "translator finish that sentence (same call as the final chunk).")
+    p.add_argument("--sentence-end-boundary-mode", choices=["literal", "conservative"], default="literal",
+                   help="Boundary detector for sentence-end completion. Conservative defers ambiguous "
+                        "abbreviations, initials, ellipses and number-final periods. Default preserves prior pilots.")
+    p.add_argument("--sentence-end-punctuation", choices=["off", "match-source"], default="off",
+                   help="Opt-in Chinese boundary completion: request and normalize only the new delta's terminal mark.")
     p.add_argument("--final-max-tokens", type=int, default=128,
                    help="Maximum tokens for the final tail-completion step.")
     p.add_argument("--candidate-top-k", type=int, default=TOP_K)
@@ -180,7 +211,13 @@ def parse_args() -> argparse.Namespace:
         help="Also skip utterance filenames already present under "
              "ROOT/task_*/per_utt. This supports safe repartitioning on resume.",
     )
-    return p.parse_args()
+    args = p.parse_args()
+    if args.sentence_end_punctuation == "match-source" and (
+        not args.sentence_end_completion or args.sentence_end_boundary_mode != "conservative"
+        or args.target_lang.lower() != "chinese"
+    ):
+        p.error("match-source requires Chinese, --sentence-end-completion and conservative boundaries")
+    return args
 
 
 # ---------------------------------------------------------------------------
@@ -592,7 +629,7 @@ def build_translation_probe_prompt_prefix_token_ids(
     return list(prompt_ids)
 
 
-def build_final_completion_prompt(tokenizer: Any, full_source: str, committed_text: str, target_lang: str = "Chinese") -> str:
+def build_final_completion_prompt(tokenizer: Any, full_source: str, committed_text: str, target_lang: str = "Chinese", terminal_mark: str = "") -> str:
     if not str(committed_text or "").strip():
         messages = [{"role": "user", "content": (
             f"[TASK]\nTranslate the [INPUT] text into {target_lang}.\n\n"
@@ -613,6 +650,12 @@ def build_final_completion_prompt(tokenizer: Any, full_source: str, committed_te
             "If there is no remaining source content to translate, output nothing.\n"
             f"Output only the remaining {target_lang} continuation."
         )}]
+    if terminal_mark:
+        messages[0]["content"] += (
+            f"\nThe observed English sentence is finished. End its Chinese translation with {terminal_mark} "
+            "before any closing quotation mark. Do not invent a following sentence or any unobserved content. "
+            "If only the terminal punctuation is missing, output that punctuation only."
+        )
     prompt = tokenizer.apply_chat_template(
         messages,
         add_generation_prompt=True,
@@ -853,6 +896,27 @@ def sample_source_futures_multi(
     return merged, merged_info
 
 
+MALFORMED_RESPONSE_LOG_PATH: Optional[str] = None
+_MALFORMED_LOG_LOCK = threading.Lock()
+
+
+def _record_malformed_responses(attempts: List[Dict[str, Any]], *, recovered: bool) -> None:
+    """Persist every malformed sampler response verbatim (never silently dropped)."""
+    if not attempts:
+        return
+    for item in attempts:
+        item = dict(item, recovered=recovered, recorded_at=time.strftime("%Y-%m-%dT%H:%M:%S"))
+        print(
+            f"[MalformedSamplerResponse] model={item['model']} attempt={item['attempt']} "
+            f"recovered={recovered} finish_reason={item.get('finish_reason')} error={item['error']}",
+            file=sys.stderr, flush=True,
+        )
+        if MALFORMED_RESPONSE_LOG_PATH:
+            with _MALFORMED_LOG_LOCK:
+                with open(MALFORMED_RESPONSE_LOG_PATH, "a", encoding="utf-8") as stream:
+                    stream.write(json.dumps(item, ensure_ascii=False) + "\n")
+
+
 def _sample_coordinated_future_set(
     sampler_tokenizer: Any,
     observed_source: str,
@@ -866,16 +930,22 @@ def _sample_coordinated_future_set(
     top_p: float,
     max_tokens: int,
     sampler_seed: Optional[int] = None,
+    sampler_context: str = "source-and-target",
+    fail_on_api_error: bool = False,
+    prompt_version: str = PROMPT_VERSION,
+    parse_retries: int = 2,
 ) -> Tuple[List[str], List[Dict[str, Any]], List[Dict[str, Any]]]:
     """Generate jointly planned plausible and contrastive lists in one response."""
     if not observed_source.strip() or num_futures <= 0:
         return [], [], []
 
+    sampler_committed = "" if sampler_context == "source-only" else committed_text
     messages = build_coordinated_future_messages(
         observed_source=observed_source,
         target_lang=target_lang,
-        committed_text=committed_text,
+        committed_text=sampler_committed,
         num_candidates=num_futures,
+        prompt_version=prompt_version,
     )
 
     # One response contains the whole list, allowing the instruction-tuned model
@@ -900,14 +970,54 @@ def _sample_coordinated_future_set(
     }
     if sampler_seed is not None:
         import zlib
-        payload["seed"] = (int(sampler_seed) + zlib.crc32(f"{observed_source}|{committed_text}|{api_model}".encode("utf-8"))) % (2**31)
-    try:
-        data = _http_json(f"{base}/completions", payload=payload, timeout=api_timeout)
-    except Exception:
-        return [], [], []
-    choices = data.get("choices", []) if isinstance(data, dict) else []
-    raw_response = str(choices[0].get("text", "")) if choices and isinstance(choices[0], dict) else ""
-    parsed = parse_method_a_output(raw_response, num_expected=num_futures)
+        payload["seed"] = (int(sampler_seed) + zlib.crc32(f"{observed_source}|{sampler_committed}|{api_model}".encode("utf-8"))) % (2**31)
+    failed_attempts: List[Dict[str, Any]] = []
+    grouped_candidates: List[Tuple[str, str]] = []
+    raw_response = ""
+    for attempt in range(1 + max(0, int(parse_retries))):
+        attempt_payload = dict(payload)
+        if attempt and "seed" in attempt_payload:
+            attempt_payload["seed"] = (attempt_payload["seed"] + 7919 * attempt) % (2**31)
+        try:
+            data = _http_json(f"{base}/completions", payload=attempt_payload, timeout=api_timeout)
+        except Exception:
+            if fail_on_api_error:
+                raise
+            return [], [], []
+        choices = data.get("choices", []) if isinstance(data, dict) else []
+        raw_response = str(choices[0].get("text", "")) if choices and isinstance(choices[0], dict) else ""
+        finish_reason = choices[0].get("finish_reason") if choices and isinstance(choices[0], dict) else None
+        if prompt_version != SUFFIX_ICL_PROMPT_VERSION:
+            break
+        try:
+            grouped_candidates = parse_grouped_future_output(
+                raw_response, num_candidates=num_futures, finish_reason=finish_reason,
+            )
+            break
+        except ValueError as exc:
+            failed_attempts.append({
+                "attempt": attempt + 1, "model": api_model, "prompt_version": prompt_version,
+                "observed_source": observed_source, "committed_text": sampler_committed,
+                "seed": attempt_payload.get("seed"), "finish_reason": finish_reason,
+                "error": str(exc), "raw_response": raw_response,
+            })
+    else:
+        # Every attempt was malformed: preserve the raw responses, then fail loudly.
+        _record_malformed_responses(failed_attempts, recovered=False)
+        last = failed_attempts[-1]
+        raise ValueError(
+            f"Invalid {prompt_version} response from {api_model} after {len(failed_attempts)} attempt(s): "
+            f"{last['error']}; raw={last['raw_response'][:400]!r}"
+        )
+    if failed_attempts:
+        _record_malformed_responses(failed_attempts, recovered=True)
+    if prompt_version != SUFFIX_ICL_PROMPT_VERSION:
+        parsed = parse_method_a_output(raw_response, num_expected=num_futures)
+        # Preserve the historical fixed-position interpretation, including missing slots.
+        grouped_candidates = [
+            ("plausible" if i < num_futures // 2 else "contrastive", parsed[i] if i < len(parsed) else "")
+            for i in range(num_futures)
+        ]
 
     # Build a normalized form of the partial (lowercased, punctuation/space
     # stripped) so the (c) regurgitation check can catch capitalized/reformatted
@@ -921,10 +1031,7 @@ def _sample_coordinated_future_set(
 
     candidates_by_mode: Dict[str, List[str]] = {"plausible": [], "contrastive": []}
     audit: List[Dict[str, Any]] = []
-    candidates_per_mode = num_futures // 2
-    for choice_index in range(num_futures):
-        mode = "plausible" if choice_index < candidates_per_mode else "contrastive"
-        raw = parsed[choice_index] if choice_index < len(parsed) else ""
+    for choice_index, (mode, raw) in enumerate(grouped_candidates):
         cleaned = clean_future_text(observed_source, raw)
         if not cleaned or not is_valid_future_text(cleaned):
             audit.append({
@@ -992,7 +1099,7 @@ def _sample_coordinated_future_set(
                 "model": api_model,
                 "mode": mode,
                 "future": cleaned,
-                "prompt_version": PROMPT_VERSION,
+                "prompt_version": prompt_version,
             })
     return futures, items_info, audit
 
@@ -1114,8 +1221,12 @@ def sample_source_futures_targeted_prefill(
     sampler2_api_timeout: float = 0.0,
     return_audit: bool = False,
     sampler_seed: Optional[int] = None,
+    sampler_context: str = "source-and-target",
+    fail_on_api_error: bool = False,
+    prompt_version: str = PROMPT_VERSION,
+    parse_retries: int = 2,
 ) -> Any:
-    """Generate one coordinated 50/50 plausible/contrastive set per model."""
+    """Generate a coordinated set per model with equal group budgets."""
     if not observed_source.strip():
         return ([], [], []) if return_audit else ([], [])
     if num_futures <= 0 or num_futures % 2:
@@ -1136,6 +1247,8 @@ def sample_source_futures_targeted_prefill(
                 api_base=model_base, api_model=model_name, api_timeout=model_timeout,
                 sample_temperature=sample_temperature, top_p=top_p, max_tokens=max_tokens,
                 sampler_seed=sampler_seed,
+                sampler_context=sampler_context, fail_on_api_error=fail_on_api_error,
+                prompt_version=prompt_version, parse_retries=parse_retries,
             ))
     else:
         batches.append(_sample_coordinated_future_set(
@@ -1145,6 +1258,8 @@ def sample_source_futures_targeted_prefill(
             api_base=api_base, api_model=api_model, api_timeout=api_timeout,
             sample_temperature=sample_temperature, top_p=top_p, max_tokens=max_tokens,
             sampler_seed=sampler_seed,
+            sampler_context=sampler_context, fail_on_api_error=fail_on_api_error,
+            prompt_version=prompt_version, parse_retries=parse_retries,
         ))
     # Preserve cross-model agreement as two independent votes. Each model's set
     # has already removed exact and near-duplicate candidates.
@@ -1586,8 +1701,9 @@ def force_complete_translation(
     api_timeout: float = 120.0,
     target_lang: str = "Chinese",
     max_tokens: int = 128,
+    terminal_mark: str = "",
 ) -> str:
-    prompt = build_final_completion_prompt(tokenizer, full_source, committed_text, target_lang=target_lang)
+    prompt = build_final_completion_prompt(tokenizer, full_source, committed_text, target_lang=target_lang, terminal_mark=terminal_mark)
     payload = {
         "model": api_model,
         "prompt": prompt,
@@ -1597,6 +1713,8 @@ def force_complete_translation(
     }
     data = _http_json(f"{normalize_api_base(api_base)}/completions", payload=payload, timeout=api_timeout) #call instruct model，带上已提交翻译前缀，让模型把剩余翻译补完
     choices = data.get("choices", [])
+    if terminal_mark and (not choices or choices[0].get("finish_reason") == "length"):
+        raise RuntimeError("Boundary completion missing or token-truncated; refusing to fabricate a closed sentence")
     if not choices:
         return ""
     return clean_model_text(str(choices[0].get("text", "")))
@@ -1717,6 +1835,8 @@ def run_one_utterance(
     committed_token_ids: List[int] = []
     target_deltas: List[str] = []
     actions: List[str] = []
+    boundary_audit: List[Dict[str, Any]] = []
+    sampling_audit: List[Dict[str, Any]] = []
 
     if args.top_p > 0:
         candidate_policy = f"top_p({args.top_p})"
@@ -1737,6 +1857,9 @@ def run_one_utterance(
         label = bs.get("name", f"spec_{si}")
         _vlog(verbose_log_file, f"# base_model[{label}]: api model={bs.get('api_model','')} base={bs.get('api_base','')} num_futures={bs.get('num_futures','')}")
     _vlog(verbose_log_file, "# instruct_backend: vllm_completion")
+    _vlog(verbose_log_file, f"# targeted_sampler_context: {args.targeted_sampler_context}")
+    _vlog(verbose_log_file, f"# targeted_prompt_version: {args.targeted_prompt_version}")
+    _vlog(verbose_log_file, f"# sentence_end_punctuation: {args.sentence_end_punctuation}")
     _vlog(verbose_log_file, "############################################################")
 
     last_unit_idx = -1
@@ -1757,17 +1880,45 @@ def run_one_utterance(
             observed_full=source_observed_full,
             num_units=window_units,
         )
+        if getattr(args, "future_source_window_mode", "fixed") == "sentence-anchor":
+            source_observed = sentence_anchored_prefix(
+                source_observed_full, getattr(args, "future_source_anchor_max_words", 128)
+            )
         _vlog(verbose_log_file, f"\n{'='*60}")
         _vlog(verbose_log_file, f"Chunk {t + 1}/{len(chunks)}")
         _vlog(verbose_log_file, f"source_observed: {current_source_chunk!r}")
         _vlog(verbose_log_file, f"future_source_prefix: {source_observed!r}")
-        if getattr(args, "future_source_window_mode", "fixed") != "fixed":
+        if getattr(args, "future_source_window_mode", "fixed") == "until-closed":
             _vlog(verbose_log_file, f"future_source_window_units: {window_units}")
+        if getattr(args, "future_source_window_mode", "fixed") == "sentence-anchor":
+            _vlog(verbose_log_file, "future_source_window_mode: sentence-anchor")
         if source_observed != source_observed_full:
             _vlog(verbose_log_file, f"source_observed_full: {source_observed_full!r}")
         _vlog(verbose_log_file, f"committed_before: {committed_text!r}")
 
+        def log_sampling(status: str, reason: str) -> None:
+            context = args.targeted_sampler_context if args.use_targeted_instruct_sampling else "source-only"
+            event = {
+                "chunk": t + 1, "status": status, "reason": reason,
+                "prepared_source_prefix": source_observed,
+                "input_source_prefix": source_observed if status == "invoked" else None,
+                "context_mode": context,
+                "prompt_version": args.targeted_prompt_version if args.use_targeted_instruct_sampling else None,
+                "window_mode": args.future_source_window_mode,
+                "committed_target_context": (
+                    committed_text.strip() if status == "invoked" and context == "source-and-target" else ""
+                ),
+                "evidence": "decoder_dispatch",
+            }
+            sampling_audit.append(event)
+            _vlog(verbose_log_file, f"[FutureSampling] {json.dumps(event, ensure_ascii=False)}")
+            # One flush per chunk exposes the input before slow model calls.
+            if verbose_log_file is not None:
+                verbose_log_file.flush()
+
         if t == len(chunks) - 1: #最后一个chunk，不再做共识，直接让instruct model把翻译补完
+            log_sampling("skipped", "final_chunk")
+            terminal = source_terminal_mark(source_observed_full) if args.sentence_end_punctuation == "match-source" else ""
             final_delta = force_complete_translation(
                 tokenizer=instruct_tokenizer,
                 full_source=source_observed_full,
@@ -1777,7 +1928,15 @@ def run_one_utterance(
                 api_timeout=args.instruct_api_timeout,
                 target_lang=args.target_lang,
                 max_tokens=args.final_max_tokens,
+                terminal_mark=terminal,
             )
+            if terminal:
+                raw_delta = final_delta
+                final_delta, reason = close_translation_delta(raw_delta, committed_text, terminal)
+                audit = {"chunk": t + 1, "terminal": terminal, "raw_delta": raw_delta,
+                         "delta": final_delta, "reason": reason, "source": source_observed_full}
+                boundary_audit.append(audit)
+                _vlog(verbose_log_file, f"[BoundaryClose] {json.dumps(audit, ensure_ascii=False)}")
             if final_delta:
                 committed_text += final_delta
                 target_deltas.append(final_delta)
@@ -1788,8 +1947,20 @@ def run_one_utterance(
             _vlog(verbose_log_file, f"  [Final] delta={final_delta!r}")
             continue
 
-        if getattr(args, "sentence_end_completion", False) and _SENTENCE_END_RE.search(current_source_chunk):
+        if args.sentence_end_punctuation == "match-source" and not current_source_chunk.strip():
+            log_sampling("skipped", "no_new_source")
+            target_deltas.append("")
+            actions.append("READ")
+            _vlog(verbose_log_file, "[NoNewSource] -> READ; no future sampling")
+            continue
+
+        sentence_end = bool(_SENTENCE_END_RE.search(current_source_chunk))
+        if getattr(args, "sentence_end_boundary_mode", "literal") == "conservative":
+            sentence_end = bool(current_source_chunk.strip()) and observed_sentence_is_complete(source_observed_full)
+        if getattr(args, "sentence_end_completion", False) and sentence_end:
+            log_sampling("skipped", "source_sentence_end")
             # The source sentence is complete: let the translator finish it instead of voting.
+            terminal = source_terminal_mark(source_observed_full) if args.sentence_end_punctuation == "match-source" else ""
             sentence_delta = force_complete_translation(
                 tokenizer=instruct_tokenizer,
                 full_source=source_observed_full,
@@ -1799,7 +1970,15 @@ def run_one_utterance(
                 api_timeout=args.instruct_api_timeout,
                 target_lang=args.target_lang,
                 max_tokens=args.final_max_tokens,
+                terminal_mark=terminal,
             )
+            if terminal:
+                raw_delta = sentence_delta
+                sentence_delta, reason = close_translation_delta(raw_delta, committed_text, terminal)
+                audit = {"chunk": t + 1, "terminal": terminal, "raw_delta": raw_delta,
+                         "delta": sentence_delta, "reason": reason, "source": source_observed_full}
+                boundary_audit.append(audit)
+                _vlog(verbose_log_file, f"[BoundaryClose] {json.dumps(audit, ensure_ascii=False)}")
             if sentence_delta:
                 committed_text += sentence_delta
                 committed_token_ids.extend(
@@ -1814,6 +1993,14 @@ def run_one_utterance(
             _vlog(verbose_log_file, f"-> {'WRITE' if sentence_delta else 'READ'} delta={sentence_delta!r}")
             _vlog(verbose_log_file, f"committed_after: {committed_text!r}")
             continue
+
+        if not source_observed.strip():
+            log_sampling("skipped", "empty_prefix")
+        elif not args.use_targeted_instruct_sampling and not any(int(spec.get("num_futures", 0) or 0) > 0 for spec in base_specs):
+            log_sampling("skipped", "no_samplers")
+        else:
+            # Dispatch is not a claim that the HTTP request succeeded.
+            log_sampling("invoked", "future_sampling")
 
         if getattr(args, "use_targeted_instruct_sampling", False):
             # Each instruction-tuned sampler sees the observed prefix and plans
@@ -1843,6 +2030,10 @@ def run_one_utterance(
                 sampler2_api_timeout=args.targeted_sampler2_api_timeout,
                 return_audit=True,
                 sampler_seed=getattr(args, "targeted_sampler_seed", None),
+                sampler_context=args.targeted_sampler_context,
+                fail_on_api_error=args.targeted_fail_on_api_error,
+                prompt_version=args.targeted_prompt_version,
+                parse_retries=args.targeted_parse_retries,
             )
         else:
             futures, future_infos = sample_source_futures_multi( #call base models，用当前observed source采样多条未来续写
@@ -1959,6 +2150,21 @@ def run_one_utterance(
         "actions": actions,
         "prediction": committed_text,
         "decoder_impl": {"candidate_policy": candidate_policy, "backend": "vllm_completion"},
+        "decoder_settings": {
+            "future_source_window_mode": args.future_source_window_mode,
+            "future_source_window_chunks": args.future_source_window_chunks,
+            "future_source_anchor_max_words": args.future_source_anchor_max_words,
+            "future_join_mode": args.future_join_mode,
+            "targeted_sampler_context": args.targeted_sampler_context,
+            "targeted_prompt_version": args.targeted_prompt_version,
+            "targeted_sampler_seed": args.targeted_sampler_seed,
+            "targeted_fail_on_api_error": args.targeted_fail_on_api_error,
+            "sentence_end_completion": args.sentence_end_completion,
+            "sentence_end_boundary_mode": args.sentence_end_boundary_mode,
+            "sentence_end_punctuation": args.sentence_end_punctuation,
+        },
+        "boundary_audit": boundary_audit,
+        "sampling_audit": sampling_audit,
     }
 
     reference_text = _extract_reference_text_from_row(row, target_lang=args.target_lang)
@@ -2074,6 +2280,7 @@ def main() -> None:
             print(f"[Sampler] targeted_instruct (same-model as probe): "
                   f"model={args.instruct_api_model} api={normalize_api_base(args.instruct_api_base)}")
         print(f"[Sampler] mode=coordinated_list per_model={args.targeted_num_futures} "
+              f"prompt_version={args.targeted_prompt_version} "
               f"temp={args.targeted_sample_temperature} top_p={args.targeted_top_p} "
               f"max_tokens={args.targeted_max_tokens}")
 
@@ -2107,6 +2314,13 @@ def main() -> None:
         os.makedirs(output_dir, exist_ok=True)
     if args.verbose and args.verbose_dir:
         os.makedirs(args.verbose_dir, exist_ok=True)
+    global MALFORMED_RESPONSE_LOG_PATH
+    if args.malformed_response_log:
+        MALFORMED_RESPONSE_LOG_PATH = args.malformed_response_log
+    elif args.verbose_dir:
+        MALFORMED_RESPONSE_LOG_PATH = os.path.join(args.verbose_dir, "malformed_sampler_responses.jsonl")
+    if MALFORMED_RESPONSE_LOG_PATH:
+        os.makedirs(os.path.dirname(MALFORMED_RESPONSE_LOG_PATH) or ".", exist_ok=True)
 
     existing_output_names: set[str] = set()
     if args.skip_existing and args.skip_existing_root:

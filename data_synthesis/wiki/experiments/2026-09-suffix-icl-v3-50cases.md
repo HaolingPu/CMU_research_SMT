@@ -1,0 +1,169 @@
+# Same-50-case suffix-ICL rerun and paired viewer
+
+## Scope
+
+Requested 2026-09-07: preserve the completed cases and rerun the same 50 with
+the revised prompt, including the nested-relative-clause and reduced-passive
+ambiguity examples. Do not run 40K or train a new model yet.
+
+- Run: `suffix-icl-v3-50cases-20260907-130701`.
+- Babel manifest: `/home/haolingp/slurm_runs/suffix-icl-v3-50cases-20260907-130701/run_manifest.json`.
+- Generation: `10345238`, array `0-3%4`, two GPUs per worker, maximum eight GPUs.
+- CPU validation/report/bundle: `10345239`, depends `afterok:10345238`.
+- Existing Simul-MuST-C production generation stays at 16 GPUs; later stages
+  do not overlap that generation and request at most 16. Combined maximum 24.
+- `preempt/preempt_qos`, eight-hour limit, requeue; CPU uses `preempt_cpu_qos`.
+- Confirmed prior/precautionary exclusions are copied from the current job;
+  `babel-n5-24` was also excluded because live node state reported a prolog error.
+- Remote `feature/home-checkout` was pulled `--ff-only` before staging.
+  The runtime is an explicit immutable copy of local uncommitted files, with
+  per-file hashes in the manifest, not a claim that HEAD contains these edits.
+
+## Paired treatment
+
+Old comparison arm: `source_only_boundary` from
+`source-only-sentence-boundary-50cases-20260907-023037`.
+Its complete 50-case output is reused, not regenerated.
+
+Input SHA256:
+`d0ba56e944c14f340a61146acf0658e3ae8548b5ee0f95c60ea6a1e4c4bae68d`.
+Exactly the old ordered selection, seed 42, sampler seed 1015.
+
+New arm `suffix_icl_v3` adds
+`--targeted-prompt-version future_set_v3_suffix_icl` to the unchanged old flags:
+
+```text
+--targeted-sampler-context source-only
+--future-source-window-mode sentence-anchor
+--sentence-end-completion
+--sentence-end-boundary-mode conservative
+--sentence-end-punctuation match-source
+```
+
+The treatment is the v3 prompt plus its variable-size grouped response parser.
+The prompt has five ambiguity demonstrations and prioritizes literal suffix
+fit, continuation of open grammatical structure, and realistic alternatives.
+It allows fewer than 20 candidates per sampler (up to 10 per group) instead of
+padding bad candidates. Strict malformed-response detection is not silent
+abstention. No Gemma removal, model replacement, new filter, consensus change,
+or training change is included.
+
+Models remain Gemma `gemma-4-E2B-it`, Qwen sampler `Qwen3.8-27B-FP8`, and
+translator `Qwen3.6-35B-A3B-FP8`. Each worker colocates both samplers on one GPU
+and serves the translator on the other. Same seed does not make vLLM probes
+bitwise deterministic. Treat differences as pilot diagnostics, not proof of
+downstream training improvement.
+
+Full prompt: [preview](2026-09-future-suffix-icl-prompt-preview.md).
+
+## Preservation and website
+
+Durable old archive (relative to the repository):
+`data_synthesis/outputs/trajectory_reviews/archives/source-only-sentence-boundary-50cases-20260907-023037`.
+All 416 copied files were SHA256-verified; the sibling `.sha256.json` is the
+hash index. It includes baseline and source-only output JSONs, verbose logs,
+traces, metrics, selection, audio and the original website assets.
+
+Served bundle: `/private/tmp/trajectory-viewer-source-only50-20260907`.
+Comparison: `http://127.0.0.1:8768/experiments.html#case=AUD0000000003_1015`.
+All three arms are listed in selectors. Old source-only is the default left
+arm and new v3 is the default right arm. The 8766/8767 viewers are unchanged.
+
+Until the new run completes, the right side explicitly waits. It must not show
+zero metrics or copy old results under a new label. Every case and regression
+remains visible. Input/ref/chunk mismatches stop the comparison.
+
+When report 10345239 is complete, retrieve its `review/` (under the manifest's
+run directory) to a durable local directory, then use
+`data_synthesis/tools/trajectory_viewer/manage_experiments.py publish` with the
+served bundle as `--root`. The gate verifies the run, input checksum, exact
+50-case coverage, recorded v3 settings, matching input/reference/chunks and
+raw prediction identity. No old raw/data file may be changed during publication.
+
+## Verification at submission
+
+49 future-sampling unit tests and 16 viewer/publish tests passed. Browser tests
+passed at desktop and mobile widths: pending is not zero, real historical
+regressions remain visible, same-case navigation survives switching tabs,
+exact prefix whitespace is preserved, HTML-like prefixes render literally,
+and mismatched source inputs are rejected. Browser fixtures are not real
+results and are never published.
+
+The first worker started on `babel-s5-32`; Qwen reported ready after 95 seconds,
+Gemma after another 62 seconds in the harness health sequence, and the
+translator was already ready. About 158 seconds elapsed before decoding.
+Real verbose logs began growing with v3 input auditing. This is a startup
+observation, not a completed 50-case result.
+
+By the end of this setup, logical workers 0 and 1 were running and workers
+2/3 were Priority pending. The first two utterance JSONs existed; row 0
+(`AUD0000000003_1015`) had passed the real guard and advanced to the next row.
+All 406 old served evidence/audio/summary files still matched their archive
+hashes after UI deployment. The existing three-hour monitor was extended to
+verify and publish this pilot as well as finish the Simul baseline; no duplicate
+automation was created and no schedule change was made.
+
+## Failure audit, 2026-09-07
+
+This pilot is NOT complete. An independent compute-node validation against the
+frozen TSV and decoder settings found 18 valid utterance JSONs, 32 missing, and
+zero invalid completed JSONs. Valid counts by logical worker0/1/2/3 are5/6/1/6.
+No `pilot_summary.json` or `review/READY.json` exists. Do not publish partial
+outputs as a completed 50-case comparison or compute a selected-subset headline.
+
+Slurm accounting shows workers10345238_0/_1/_2 FAILED with exit1. Worker3 is
+currently Priority pending with Restarts2; its log also contains a failed prior
+attempt. The report10345239 still depends on successful completion of the array.
+Original failed workers must not be described as completed merely because they
+disappeared from squeue.
+
+Failure sites are rows6,20,25,27. All four recorded exceptions come from the
+Qwen3.8 sampler response being rejected by the strict v3 grouped parser:
+`Invalid candidate line in future group: plausible`, or, for row25,
+`Empty future group must explicitly say None: contrastive`. This is not evidence
+of an OOM or that Gemma alone failed. The response text and finish reason are not
+included in the raised error, so the precise malformed text/truncation cause has
+not yet been established. Complete successful candidates in earlier steps are
+not the raw failed response.
+
+Preserve all18 validated outputs and frozen old/new runtime artifacts. Before
+resuming, diagnose the malformed response with explicit error-response logging;
+do not silently accept malformed groups as valid empty abstentions, weaken the
+comparison, or blindly requeue deterministic failing work. Any repair must record
+its runtime difference and preserve the total24-GPU limit, including the newly
+queued low-only training10345494_2. Repair dependencies must include all missing
+logical work before report/publication can pass.
+
+## Parser failure and resubmission (2026-09-07)
+
+All four decode tasks of `10345238` died with `Invalid future_set_v3_suffix_icl response
+from qwen38-sampler` after 18 of 50 cases (rows 6, 20, 25 and 27 were the crash points;
+row 27 failed identically on three requeues because the sampler seed is deterministic).
+No raw response was preserved by the old code, so the exact prefixes were re-queried with
+the same seed formula on a 1-GPU probe (`experimental/probe_v3_sampler_format.py`, jobs
+10345588 and 10345618, 176 responses from both samplers). Cause: on very short prefixes
+(`I`, `A`, `Most sure and`) Qwen3.8 writes the second heading as `Contrast` instead of
+`Contrastive`; the strict parser then treated it as a prose line under Plausible. The
+fourth crash was a response that ended right after the `Contrastive` heading
+(`finish_reason=stop`), rejected as "empty group must say None". Gemma never failed.
+
+Fix (runtime files replaced in place, hashes recorded under `resubmissions` in the run
+manifest; old copies kept as `*.pre-<timestamp>`):
+- `ambiguity_sampler_prompt.py`: `parse_grouped_future_output` tolerates benign format
+  variations (decorated or shortened headings, preamble, `<think>` blocks, `1)`/`(1)`/bullets,
+  bold or quoted items, `None.`/`(none)`/`N/A`/numbered `None`, an empty group followed by
+  the other heading, and a trailing empty group only when `finish_reason == "stop"`).
+  It still raises on missing/repeated headings, candidates before a heading, prose inside a
+  group, mixing `None` with items, duplicate numbers, over-budget groups, and truncation.
+- decoder: a malformed response is resampled up to `--targeted-parse-retries` (2) times with a
+  shifted seed; every malformed response is written verbatim to
+  `<verbose-dir>/malformed_sampler_responses.jsonl` (recovered or not) and to stderr; only if
+  every attempt is malformed does the case fail.
+- `run_single_case_ab.sbatch`: a failed case writes `FAILED.txt` and the task continues with
+  its remaining rows, then exits non-zero so the report job does not run on a partial set.
+All 176 probe responses parse under the new parser (mean 9.5 candidates per sampler,
+one legitimate all-`None` abstention); 37 unit tests pass.
+
+Resubmitted 2026-09-07 14:35 UTC: generation `10345647` (array 0-3, `--skip-existing`
+keeps the 18 verified cases), report `10345648` (`afterok`). Superseded report `10345239`
+cancelled. GPU budget unchanged: Simul generation 16 + pilot 8.

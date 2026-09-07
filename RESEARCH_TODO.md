@@ -53,9 +53,10 @@ Simul-tst-COMMON). A 2-hour watcher in the Claude Code session follows it.
   converted data kept under `east_lowonly/`.
 - [ ] Suffix-ICL v3 50-case pilot (`suffix-icl-v3-50cases-20260907-130701`): all four decode tasks
   of 10345238 died on the strict v3 response parser (Qwen3.8 on prefixes `I`, `A`, `Most sure and`
-  and one 60-word prefix; deterministic under the seed). Fix in progress: tolerant parser for benign
-  format variations, seeded resample on malformed output with every raw response preserved
-  (`malformed_sampler_responses.jsonl`), per-case failure isolation in the pilot sbatch.
+  and one 60-word prefix; deterministic under the seed). Cause: Qwen3.8 writes the heading
+  `Contrast` instead of `Contrastive` on short prefixes. Fixed (tolerant parser, seeded resample with
+  raw responses preserved, per-case failure isolation) and resubmitted 2026-09-07: generation
+  10345647, report 10345648. Then publish the paired viewer per the pilot page.
 
 ### P0 — right after decode reaches 40,000
 - [x] Run the verifier over rows 0–39,999 and build the one-JSON-per-utterance view.
