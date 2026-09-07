@@ -40,6 +40,13 @@ Simul-tst-COMMON). A 2-hour watcher in the Claude Code session follows it.
   single-case A/B (job 10333550) confirms `--sentence-end-completion` removes the 碎了一地
   carry-over. Do not change the frozen 40k method; run as a separate pilot root.
 
+- [ ] Simul-tst-COMMON repetition loops (found 2026-09-06, wiki experiment page section
+  "Simul-tst repetition loops"): the TED intro jingle/applause makes the model loop `嘘！嘘！…`;
+  matched-12,500 loses 4–10 BLEU per segment size to 1–5 runaway talks. First experiment:
+  inference-only loop brake in `scripts/infer/infinisst_omni.py` (drop repeated/interjection-only
+  turns from the history, return READ) and re-run Simul-tst for both checkpoints; metric to move:
+  runaway-talk count → 0, LongLAAL CU back to 2–3 s. Training-side non-speech turns later.
+
 ### P0 — right after decode reaches 40,000
 - [x] Run the verifier over rows 0–39,999 and build the one-JSON-per-utterance view.
   (Raw root: 40,000 unique, 0 missing, 1,793 duplicates from task_00/01. Dedup

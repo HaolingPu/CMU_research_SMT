@@ -78,12 +78,16 @@ pending (infer 10333150 + repair 10333556, eval 10333151).
 | system | BLEU | XCOMET | LongYAAL CU ms |
 |---|---|---|---|
 | **this run** | 20.8† / 42.8 / 45.0 / **45.9** | .769† / .840 / .857 / .860 | 15495† / 2078 / 2442 / 2884 |
+| **matched 12,500** (seed 42, eval 10333151) | 23.9‡ / 31.8‡ / 39.9‡ / 42.2‡ | .800 / .828 / .830 / .846 | 9768‡ / 16170‡ / 29340‡ / 4262‡ |
 | `top5-axis5` flagship | 27.5 / 32.1 / 34.1 / 34.2 | .831 / .859 / .867 / **.872** | 3535 / 1543 / 2409 / 2855 |
 | hibiki (ref-based) | 38.3 / 40.4 / 40.8 / 41.1 | .838 / .861 / .866 / .869 | 1282 / 1849 / 2429 / 2870 |
 | EAST-even | 40.1 / 43.7 / 44.2 / 43.6 | .765 / .817 / .837 / .846 | 1107 / 1900 / 2620 / 3243 |
 
 chrF this run: 28.3 / 36.7 / 38.7 / 39.0. † seg960 is degenerate (see hygiene) and should be
-excluded from any comparison.
+excluded from any comparison. ‡ every matched-12,500 segment size carries 1–5 runaway talks
+(repetition loops on non-speech audio, see "Simul-tst repetition loops" below); with the loops
+stripped the same outputs score 37.9 / 41.8 / 43.5 / 44.4 and with the runaway talks dropped
+37.1 / 42.2 / 45.3 / 46.1, i.e. on par with the 17,306-row run.
 
 ## Chunk-level SimulEval BLEU (second metric family, see [[chunk-bleu-streamlaal-scoreboard]])
 
@@ -234,6 +238,54 @@ Design options for the sampler prefix (decision pending, see RESEARCH_TODO):
 June history: win3 (3 units, fixed) was confounded with the ASR change and never isolated
 ([[2026-06-qwenasr-asr-regression-periodfix]]), so a wider *fixed* window has no clean
 evidence either way.
+
+## Simul-tst repetition loops (2026-09-06): why Simul-tst is bad while ACL is good
+
+Every MuST-C tst-COMMON wav opens with the same ~12 s TED intro jingle plus applause
+(the per-0.96 s RMS envelope of the first 15 s is identical, up to gain, across all 27 talks;
+the first yaml segment simply absorbs it). Talks also contain applause after "thank you",
+laughter and embedded video clips. The GigaSpeech training clips contain none of this, and
+nothing at inference brakes repetition (`--repetition-penalty` default 1.0, temp 0.6, top-p 0.95,
+every assistant turn appended to the chat history). On non-speech audio the model emits an
+interjection, the interjection enters the history, and the next chunk of non-speech continues it:
+
+| loop unit (verbatim) | where it starts | example |
+|---|---|---|
+| `嘘！嘘！嘘！…` | first writes at 2.9–9.6 s, inside the jingle | matched seg960 talks 0, 1, 7, 8, 10 (63–100 % of the talk's output) |
+| `谢谢。谢谢。…` | closing applause after 谢谢 | talk 0 (ted_1096) at ~205 s in both runs, 47 % of the talk at seg1920 |
+| `呼气，吸气，…`, `哦，我的天哪，…`, `是的，是的，…` | sound effects / video clip / applause | matched seg3840 talks 14, 22; full seg960 talk 5 |
+| `（掌声）`, `（音乐）`, `（音效）` | short, self-limiting | the 17,306-row run labels non-speech more often instead of looping |
+
+Loop census (a unit of 1–14 chars repeated 8+ times), talks with any loop / share of all output
+characters inside loops: matched 25/27 (35.8 %), 11/27 (27.6 %), 3/27 (12.3 %), 5/27 (11.2 %) for
+seg 960/1920/2880/3840; 17,306-row run 22/27 (17.0 %), 5/27 (2.1 %), 2/27 (0.7 %), 2/27 (0.8 %).
+Runaway talks (>50 % of the talk inside loops): matched 5 / 2 / 1 / 2, 17,306-row 3 / 0 / 0 / 0.
+seg960 loops most because the jingle is 12 chunks long before any speech arrives.
+
+Cost of the loops (char-BLEU recomputed from `instances.resegmented.jsonl`, reproduces the
+official numbers exactly; mean per-segment emission delay in ms):
+
+| run, seg | BLEU official | loops stripped | runaway talks dropped | emission all → w/o runaway |
+|---|---|---|---|---|
+| matched 960 | 23.9 | 37.9 | 37.1 | 12494 → 3961 |
+| matched 1920 | 31.8 | 41.8 | 42.2 | 18887 → 5078 |
+| matched 2880 | 39.9 | 43.5 | 45.3 | 31877 → 5080 |
+| matched 3840 | 42.2 | 44.4 | 46.1 | 6780 → 5515 |
+| 17,306 1920 | 42.8 | 43.9 | 42.8 | 4672 → 4672 |
+| 17,306 3840 | 45.9 | 46.2 | 45.9 | 5419 → 5419 |
+
+One runaway talk (8,000–17,000 characters of `嘘！`) is enough to sink corpus BLEU by 4–10 points
+and to push LongLAAL into the tens of seconds, because mwerSegmenter aligns the garbage across
+many reference segments. On clean speech the matched checkpoint is not worse than the
+17,306-row one; which talks spiral is sampling luck on the jingle. ACL 6060 dev has no jingle,
+no applause and no clips, so neither checkpoint loops there (rep-4gram ≤ 0.22 on all 5 talks).
+
+Outputs: `<ckpt>/evaluation/simul_tst_common/en-zh/seg<N>/instances.log`; local copies and the
+analysis scripts in the session scratchpad `tst_bundle/`, `tst_audio_rms.json`.
+Fix candidates (none applied yet; the inference agent is `scripts/infer/infinisst_omni.py`):
+history-level loop brake (drop a turn that repeats the previous turns or is interjection-only,
+return READ), `--repetition-penalty` > 1, an energy/VAD gate for non-speech chunks, and
+training turns with non-speech audio and empty targets.
 
 ## Next
 
