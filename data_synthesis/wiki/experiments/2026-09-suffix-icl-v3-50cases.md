@@ -245,3 +245,8 @@ then closes the sentence with `成了十几块碎片。` at the period, no early
 BLEU on these 8 cases while committing earlier. The JSON format is now the code path; the
 open question from the review stands: candidates per step (40 → 18 → 13.5) changes how easily
 strict consensus forms, so any v2-vs-v3 comparison must control the candidate budget.
+The 8 JSON-schema cases are published as a fourth, partial arm `suffix_icl_v3json` in the served
+comparison root (`manage_experiments.py add-arm`, commit 2225fc4; the UI now accepts partial arms
+and labels the 42 cases that were not generated). Compare v3 text vs v3 JSON at
+`http://127.0.0.1:8768/experiments.html#case=AUD0000000003_1015&left=suffix_icl_v3&right=suffix_icl_v3json`;
+trajectories at `http://127.0.0.1:8768/suffix_icl_v3json/index.html#case=<utt_id>`.
