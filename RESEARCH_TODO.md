@@ -48,6 +48,15 @@ Simul-tst-COMMON). A 2-hour watcher in the Claude Code session follows it.
   `scripts/infer/infinisst_omni.py`; candidate data-side fixes: non-speech turns with empty
   targets in the converter, delta-style audit vs hibiki targets.
 
+- [x] EAST low-only (multiplier 1–12) ablation cancelled 2026-09-07 at Haoling's request:
+  61 % single-chunk examples. If revisited, use low→1–2 (and high→1–2) so streaming turns survive;
+  converted data kept under `east_lowonly/`.
+- [ ] Suffix-ICL v3 50-case pilot (`suffix-icl-v3-50cases-20260907-130701`): all four decode tasks
+  of 10345238 died on the strict v3 response parser (Qwen3.8 on prefixes `I`, `A`, `Most sure and`
+  and one 60-word prefix; deterministic under the seed). Fix in progress: tolerant parser for benign
+  format variations, seeded resample on malformed output with every raw response preserved
+  (`malformed_sampler_responses.jsonl`), per-case failure isolation in the pilot sbatch.
+
 ### P0 — right after decode reaches 40,000
 - [x] Run the verifier over rows 0–39,999 and build the one-JSON-per-utterance view.
   (Raw root: 40,000 unique, 0 missing, 1,793 duplicates from task_00/01. Dedup
