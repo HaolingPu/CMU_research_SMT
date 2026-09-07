@@ -215,3 +215,33 @@ The decoder keeps the original exception on `--targeted-fail-on-api-error` and t
 (runtime hashes in the manifest); the fixed code is what any future pilot or 40k run stages.
 Decision unchanged: no v3 40k, no training-recipe change; next is a 200-case held-out comparison
 of v2-boundary vs v3 with XCOMET and step-level early-commit checks, candidate count controlled.
+
+## JSON-schema sampler output (2026-09-07 evening, commit dbfac56)
+
+Haoling asked for the root-cause fix instead of a tolerant parser: the v3 request now sends
+`structured_outputs={"json": schema}` to vLLM (0.19.1 in the sampler env), the prompt asks for
+`{"plausible": [...], "contrastive": [...]}`, and parsing is `json.loads` plus key/type/budget
+checks. The heading/bullet/`None` tolerance layer is deleted; the 3-attempt retry with immediate
+raw-response logging and the `finish_reason=length` rejection stay as the safety net.
+
+Checks (no change to the frozen 40k method):
+- Probe `10349882` (same 84 prefixes as the text-format probes, both samplers): 80/80 replies
+  parse, all `finish_reason=stop`, no HTTP errors. Candidates per reply: Qwen3.8 9.2 (text
+  format 13.6), Gemma 5.3 (5.6). The schema does not pad, so Qwen's lists got shorter.
+- End-to-end decode of pilot rows 0–7 (`10349883`, 2 GPUs, 24 min, output root
+  `consensus_decoding_pilots/v3json-8cases-20260907T2035Z`): 8/8 cases complete, 0 failed,
+  0 malformed replies. Same seed and flags as the text-format v3 arm.
+
+| arm (same 8 cases) | mean char-BLEU | mean word LAAL | raw candidates / step |
+|---|---|---|---|
+| baseline | 45.6 | 6.31 | – |
+| source-only boundary (v2 prompt) | 54.8 | 5.58 | 40.0 |
+| v3 text format | 48.3 | 5.15 | 18.4 |
+| **v3 JSON schema** | 50.8 | 4.99 | 13.5 |
+
+Per case the JSON arm beats the text-format arm on 1015 (66.0 vs 51.7; commits `叉子飞`,
+then closes the sentence with `成了十几块碎片。` at the period, no early `进了`), 140_489 and
+071_590, and loses on 225_11 (35.1 vs 47.2). Both v3 arms stay below source-only boundary on
+BLEU on these 8 cases while committing earlier. The JSON format is now the code path; the
+open question from the review stands: candidates per step (40 → 18 → 13.5) changes how easily
+strict consensus forms, so any v2-vs-v3 comparison must control the candidate budget.

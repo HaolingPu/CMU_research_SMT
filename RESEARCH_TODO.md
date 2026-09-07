@@ -59,8 +59,10 @@ Simul-tst-COMMON). A 2-hour watcher in the Claude Code session follows it.
   source-only boundary on the same 50 cases: char-BLEU −2.07 (16 up / 30 down), word LAAL −0.61
   (39 up / 10 down). Review 2026-09-07: v3 commits earlier but is not
   safer (1015 commits 进了 before the period; candidates per step 33.1 → 16.5). P1/P2 retry bugs
-  fixed with tests. No v3 40k. Next: 200 held-out cases, v2-boundary vs v3, XCOMET + step-level
-  early-commit audit, candidate count controlled separately.
+  fixed with tests. No v3 40k. v3 request switched to a vLLM JSON schema (commit dbfac56;
+  probe 80/80 parsed, 8-case decode clean, 1015 no longer commits 进了 early). Next: 200 held-out
+  cases, v2-boundary vs v3-JSON, XCOMET + step-level early-commit audit, candidate budget controlled
+  (40 → 13.5 raw candidates per step is itself a variable).
 
 ### P0 — right after decode reaches 40,000
 - [x] Run the verifier over rows 0–39,999 and build the one-JSON-per-utterance view.
