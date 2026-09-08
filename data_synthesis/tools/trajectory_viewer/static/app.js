@@ -18,6 +18,7 @@ const els = {
   casePosition: document.querySelector("#case-position"),
   caseId: document.querySelector("#case-id"),
   sourceFull: document.querySelector("#source-full"),
+  sourceUnits: document.querySelector("#source-units"),
   metricGrid: document.querySelector("#metric-grid"),
   audioPlayer: document.querySelector("#audio-player"),
   audioStatus: document.querySelector("#audio-status"),
@@ -53,7 +54,7 @@ function metricCard(label, value) {
 function renderMetrics(item) {
   const cards = [
     metricCard("CHAR BLEU", formatMetric(item.metrics.bleu_char)),
-    metricCard("LAAL", formatMetric(item.metrics.laal_text, 2)),
+    metricCard("TEXT LAAL (WORDS)", formatMetric(item.metrics.laal_text, 2)),
     metricCard("WRITE STEPS", String(item.write_steps)),
     metricCard("TOTAL STEPS", String(item.steps.length)),
   ];
@@ -203,6 +204,8 @@ function consensusPanel(step, detailStep) {
   const parts = [];
   if (summaryData) {
     if (summaryData.final_completion) parts.push("final chunk: translator completes without consensus");
+    else if (summaryData.sentence_completion) parts.push("English sentence end: direct translation, no futures");
+    else if (summaryData.no_new_source) parts.push("READ: no new source, no model calls");
     else if (summaryData.too_few_futures) parts.push("READ: too few futures to vote");
     else {
       parts.push(`next-token consensus: ${summaryData.accepted.length} accepted`);
@@ -262,9 +265,9 @@ function attachConsensus(item, detail) {
     const index = Number(row.dataset.step);
     const step = item.steps[index];
     const detailStep = detail ? detail.steps[index] : null;
-    row.querySelector(".consensus-details")?.remove();
+    row.nextElementSibling.querySelector(".consensus-details")?.remove();
     const panel = consensusPanel(step, detailStep);
-    if (panel) row.querySelector(".translation-cell").append(panel);
+    if (panel) row.nextElementSibling.querySelector(".translation-cell").append(panel);
   });
 }
 
@@ -275,34 +278,200 @@ function futureGroupElement(group) {
   const model = group.label || group.model || "Sampler";
   title.textContent = `${model} / ${group.mode}`;
   const list = document.createElement("ol");
-  for (const candidate of group.candidates || []) {
+  (group.candidates || []).forEach((candidate, i) => {
     const item = document.createElement("li");
     item.textContent = candidate;
+    const note = (group.notes || [])[i];
+    if (note) {
+      const tag = document.createElement("span");
+      tag.className = "fut-note";
+      tag.textContent = `resolves: ${note}`;
+      item.append(" ", tag);
+    }
     list.append(item);
-  }
+  });
   section.append(title, list);
   return section;
 }
 
-function renderStep(step, index) {
+function highlightDelta(element, text, previous = "", reset = false) {
+  element.replaceChildren();
+  if (!text) {
+    element.textContent = "(empty)";
+    element.classList.add("empty-chunk");
+    return;
+  }
+  const shared = !reset && text.startsWith(previous) ? previous.length : 0;
+  element.append(document.createTextNode(text.slice(0, shared)));
+  if (text.length > shared) {
+    const added = document.createElement("mark");
+    added.className = reset ? "delta-reset" : "delta-added";
+    added.textContent = text.slice(shared);
+    element.append(added);
+  }
+}
+
+function appendFuture(source, future) {
+  if (!source || !future) return source + future;
+  return source + (/\s$/.test(source) || /^[\s,.!?;:)\]}"']/.test(future) ? "" : " ") + future;
+}
+
+function inputField(container, label, text) {
+  const field = document.createElement("div");
+  field.className = "input-field";
+  const name = document.createElement("strong");
+  name.textContent = label;
+  const value = document.createElement("pre");
+  value.textContent = text ?? "Not recorded";
+  if (text === "") value.textContent = "(empty)";
+  field.append(name, value);
+  container.append(field);
+}
+
+function samplingFor(step) {
+  if (step?.sampling) return step.sampling;
+  const summary = step?.consensus_summary;
+  if (summary?.final_completion) return { status: "skipped", reason: "final_chunk" };
+  if (summary?.sentence_completion) return { status: "skipped", reason: "source_sentence_end" };
+  if (summary?.no_new_source) return { status: "skipped", reason: "no_new_source" };
+  if (summary?.raw_total != null || (step && selectedFutureCount(step))) {
+    return { status: "invoked", input_source_prefix: step.future_source_prefix, evidence: "legacy_verbose_branch" };
+  }
+  return { status: "unknown", reason: "not_recorded" };
+}
+
+function samplingSkipReason(reason) {
+  return ({ final_chunk: "最后一个 chunk", source_sentence_end: "英文句子已结束",
+    no_new_source: "没有新增英文", empty_prefix: "英文前缀为空", no_samplers: "未配置采样器" })[reason] || reason;
+}
+
+function translatorMode(step) {
+  const sampling = samplingFor(step);
+  if (sampling.status === "skipped" && ["final_chunk", "source_sentence_end"].includes(sampling.reason)) return "completion";
+  if (sampling.status === "skipped" && sampling.reason === "no_new_source") return "none";
+  if (step.consensus_summary?.too_few_futures) return "too_few";
+  if (selectedFutureCount(step) > 3) return "consensus";
+  return "unknown";
+}
+
+function renderLlmInputs(container, step, before) {
+  const sampling = samplingFor(step);
+  const mode = translatorMode(step);
+  const note = document.createElement("p");
+  note.className = "input-note";
+  note.textContent = "采样输入来自日志/审计记录，不用完整原文猜测。invoked 表示已进入采样调用，不代表 HTTP 成功。翻译器的拼接输入是按记录的模式重建的，不是 HTTP 抓包；逐 token 探测还会加上本步已通过共识的 pending tokens。";
+  container.append(note);
+  inputField(container, "Sampler / 调用状态", sampling.status === "skipped"
+    ? `未调用：${samplingSkipReason(sampling.reason)}` : sampling.status === "invoked" ? "已调用采样流程 (invoked)" : "日志不足，无法确定是否调用");
+  if (sampling.status === "invoked") {
+    inputField(container, "Sampler / 实际传入的英文 source prefix", sampling.input_source_prefix);
+    inputField(container, "精确字符串（保留前后空格和换行）", sampling.input_source_prefix == null ? null : JSON.stringify(sampling.input_source_prefix));
+    inputField(container, "Sampler / 中文上下文", sampling.context_mode === "source-only"
+      ? "不传入中文 (source-only)" : sampling.committed_target_context);
+  } else {
+    inputField(container, "预先计算的窗口（不能当作实际输入）", sampling.prepared_source_prefix ?? step.future_source_prefix);
+  }
+  inputField(container, "采样输入证据 / window mode", `${sampling.evidence || "not_recorded"} / ${sampling.window_mode || "not_recorded"}`);
+  inputField(container, `Translator / 已观察英文 (${step.source_input_provenance || "bundle data"})`, step.source_cumulative);
+  inputField(container, "Translator / 本步开始前已提交的中文", before);
+  if (step.boundary_close) {
+    inputField(container, "句末修正 / 模型原始 delta", step.boundary_close.raw_delta);
+    inputField(container, "句末修正 / 实际提交 delta", step.boundary_close.delta);
+    inputField(container, "目标句末符号 / 修正或冲突原因", `${step.boundary_close.terminal} / ${step.boundary_close.reason}`);
+  }
+  if (mode === "none" || mode === "too_few" || mode === "unknown") {
+    inputField(container, "Translator / 调用", mode === "none" ? "没有新英文，本步不调用翻译器。"
+      : mode === "too_few" ? "选中的 futures 不足，本步不做翻译共识探测。" : "日志不足，无法确认翻译器调用。请查看原始 verbose。");
+    return;
+  }
+  const candidates = (step.selected_futures || []).flatMap(group =>
+    (group.candidates || []).map((text, i) => ({ text, note: (group.notes || [])[i] || "", label: `${group.label || group.model} / ${group.mode}` })),
+  );
+  const completion = mode === "completion";
+  const entries = completion ? [{ text: "", label: "直接补完翻译 / 不加 future" }] : candidates;
+  entries.forEach((future, i) => {
+    const detail = document.createElement("details");
+    detail.className = "translator-probe";
+    const summary = document.createElement("summary");
+    summary.textContent = completion ? future.label : `Future ${i + 1} / ${future.label}: ${future.text}${future.note ? `  ⟨resolves: ${future.note}⟩` : ""}`;
+    detail.append(summary);
+    if (completion || step.future_join_mode === "space") {
+      inputField(detail, "Translator [INPUT] / 已观察英文 + 此 future", appendFuture(step.source_cumulative, future.text));
+    } else {
+      inputField(detail, "此 future（与上面的已观察英文一起使用）", future.text);
+      inputField(detail, "拼接规则", `${step.future_join_mode || "not_recorded"}：此查看器不猜测额外标点；请核对原始实现。`);
+    }
+    container.append(detail);
+  });
+}
+
+function renderStep(step, index, steps) {
   const fragment = els.stepTemplate.content.cloneNode(true);
   const row = fragment.querySelector(".trajectory-row");
   row.dataset.step = String(index);
   row.style.animationDelay = `${Math.min(index * 26, 420)}ms`;
-  fragment.querySelector(".step-number").textContent = `STEP ${String(step.step).padStart(2, "0")}`;
+  fragment.querySelector(".step-number").textContent = String(step.step);
+  const previous = steps[index - 1];
+  const before = step.committed_before ?? previous?.translation_cumulative ?? "";
+  const sampling = samplingFor(step);
 
   const sourceChunk = fragment.querySelector(".source-chunk");
   sourceChunk.textContent = step.source_chunk.trim() || "No new source audio text";
   if (!step.source_chunk.trim()) sourceChunk.classList.add("empty-chunk");
   fragment.querySelector(".source-cumulative").textContent = step.source_cumulative || "-";
+  const sampler = fragment.querySelector(".sampler-prefix");
+  const prefixStatus = fragment.querySelector(".prefix-status");
+  let oldPrefix = "";
+  for (let i = index - 1; i >= 0; i--) {
+    const prior = samplingFor(steps[i]);
+    if (prior.status === "invoked" && prior.input_source_prefix != null) {
+      oldPrefix = prior.input_source_prefix;
+      break;
+    }
+  }
+  const actualPrefix = sampling.input_source_prefix;
+  const reset = sampling.status === "invoked" && Boolean(oldPrefix.trim() && actualPrefix != null && !actualPrefix.trimStart().startsWith(oldPrefix.trimStart()));
+  if (sampling.status === "skipped") {
+    prefixStatus.textContent = "未调用 / NO SAMPLING";
+    sampler.textContent = samplingSkipReason(sampling.reason);
+  } else if (sampling.status === "unknown" || actualPrefix == null) {
+    prefixStatus.textContent = "输入未记录 / UNKNOWN";
+    sampler.textContent = "不能把计算好的窗口当作已传入模型的输入";
+  } else {
+    prefixStatus.textContent = `已调用 / ${reset ? "PREFIX RESET" : oldPrefix === actualPrefix ? "UNCHANGED" : "PREFIX EXTENDED"}`;
+    highlightDelta(sampler, actualPrefix, oldPrefix, reset);
+  }
+  row.classList.toggle("prefix-reset", reset);
+  row.classList.toggle("sampling-skipped", sampling.status === "skipped");
+  highlightDelta(fragment.querySelector(".translator-source"), step.source_cumulative, previous?.source_cumulative || "");
+  const futures = selectedFutureCount(step);
+  const mode = translatorMode(step);
+  fragment.querySelector(".translator-mode").textContent = mode === "completion"
+    ? "直接补完：已观察英文 + 已提交中文；不加 futures。"
+    : mode === "none" ? "无新增英文，本步不调用翻译器。"
+    : mode === "too_few" ? "Futures 不足，本步不做翻译探测。"
+    : mode === "consensus" ? `分别加上 ${futures} 条 futures + 本步之前的中文，进行共识探测。`
+    : "调用方式未记录，请查看原始日志。";
 
   const action = fragment.querySelector(".action-pill");
   action.textContent = step.action;
   action.classList.add(step.action === "WRITE" ? "action-write" : "action-read");
   const delta = fragment.querySelector(".translation-delta");
-  delta.textContent = step.translation_delta || "Wait for more source context";
+  delta.textContent = step.translation_delta || "No change";
   if (!step.translation_delta) delta.classList.add("empty-chunk");
-  fragment.querySelector(".translation-cumulative").textContent = step.translation_cumulative || "-";
+  if (step.boundary_close) {
+    const audit = document.createElement("p");
+    audit.className = "boundary-status";
+    audit.textContent = `句末审计 → ${step.boundary_close.terminal} / ${step.boundary_close.reason}`;
+    delta.after(audit);
+  }
+  highlightDelta(fragment.querySelector(".translation-cumulative"), step.translation_cumulative, before);
+  let inputsRendered = false;
+  fragment.querySelector(".llm-details").addEventListener("toggle", (event) => {
+    if (!event.target.open || inputsRendered) return;
+    inputsRendered = true;
+    renderLlmInputs(event.target.querySelector(".llm-inputs"), step, before);
+  });
 
   const details = fragment.querySelector(".future-details");
   const futureCount = selectedFutureCount(step);
@@ -312,7 +481,7 @@ function renderStep(step, index) {
     const rawCount = (step.raw_stats || []).reduce((sum, group) => sum + (group.requested || 0), 0);
     details.querySelector("summary").textContent = `${futureCount} futures used for consensus${rawCount ? ` / ${rawCount} raw` : ""}`;
     const prefix = details.querySelector(".future-prefix");
-    prefix.textContent = `Future source prefix: ${step.future_source_prefix || step.source_cumulative}`;
+    prefix.textContent = `实际 sampler source prefix: ${sampling.input_source_prefix ?? "Not recorded"}`;
     const groups = details.querySelector(".future-groups");
     for (const group of step.selected_futures || []) groups.append(futureGroupElement(group));
   }
@@ -328,6 +497,12 @@ function renderCase() {
   els.currentCaseLabel.textContent = `${String(item.display_order).padStart(3, "0")} / ${item.utt_id}`;
   els.caseId.textContent = item.utt_id;
   els.sourceFull.textContent = item.source_full_text;
+  const units = item.src_text_full ?? item.source_sentences ?? [];
+  els.sourceUnits.replaceChildren(...(Array.isArray(units) ? units : [units]).map(unit => {
+    const li = document.createElement("li");
+    li.textContent = unit;
+    return li;
+  }));
   els.finalPrediction.textContent = item.prediction || "No final prediction";
   els.referenceText.textContent = item.reference_text || "Reference unavailable";
   renderMetrics(item);
@@ -342,6 +517,7 @@ function renderCase() {
     els.sourceFull.insertAdjacentElement("afterend", link);
   }
   els.trajectory.replaceChildren(...item.steps.map(renderStep));
+  document.querySelector(".trajectory-scroll").scrollTo({ top: 0, left: 0, behavior: "instant" });
   attachConsensus(item, null);
   loadDetail(item).then((detail) => {
     if (state.filtered[state.caseIndex] !== item) return;

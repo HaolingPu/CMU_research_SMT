@@ -366,3 +366,8 @@ Findings:
   from 3.8 to 2.0 items per step (Gemma 1.8 → 2.1), accepted futures 12.6 → 11.3; reasons are
   distinct in 243/248 groups, some genuine readings, some contrived; ~7 % slower per case.
 Outputs: `consensus_decoding_pilots/v3json-{speed-50cases-20260908T0204Z,repeat-10cases-20260908T0256Z,speed-10cases-20260908T0158Z,notes-10cases-20260908T0158Z}`.
+The notes run is published as the partial arm `v3json_notes` (10 cases). The viewer now carries the
+`resolves` note per selected contrastive candidate (builder reads it from the raw block, page shows
+it as a tag next to the candidate and in the translator-probe rows); 513 of 2,031 selected
+candidates in the arm have one. Compare at
+`http://127.0.0.1:8768/experiments.html#case=AUD0000000003_1125&left=suffix_icl_v3json&right=v3json_notes`.

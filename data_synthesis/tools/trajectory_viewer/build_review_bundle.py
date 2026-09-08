@@ -38,11 +38,13 @@ GROUP_RE = re.compile(
     r"^\[(Raw|Selected) candidates\] (.*?) \| (plausible|contrastive) \| "
     r"model=(\S+) mode=(\S+) count=(\d+)$"
 )
-ITEM_RE = re.compile(r"^\s+\d+\.\s+(.*)$")
+ITEM_RE = re.compile(r"^\s+\d+\.\s+(.*?)(?:  resolves: (.*))?$")  # optional contrastive-notes field
 FILTER_RE = re.compile(r"^\s*Filter summary: kept=(\d+)/(\d+); dropped: (.*)$")
 ACTION_RE = re.compile(r"^-> (READ|WRITE) delta=(.*)$")
 TOO_FEW_RE = re.compile(r"^\s*-> READ \(too few futures\)\s*$")
 FINAL_RE = re.compile(r"^\s*\[Final\] delta=(.*)$")
+SENTENCE_END_RE = re.compile(r"^\s*\[SentenceEnd\] delta=(.*)$")
+SAMPLING_RE = re.compile(r"^\[Step 1-2\] future_sampling total=(\d+)$")
 AUDIO_RE = re.compile(r"^(.*):(\d+):(\d+)$")
 REPR = r"'(?:[^'\\]|\\.)*'|\"(?:[^\"\\]|\\.)*\""
 RAW_SAMPLING_RE = re.compile(r"^\[Step 1-1\] raw_future_sampling total=(\d+) accepted=(\d+)$")
@@ -59,6 +61,8 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input-tsv", default=None)
     parser.add_argument("--decode-root", default=None)
+    parser.add_argument("--pilot-arm", default=None,
+                        help="read row_*/<arm>/task_* inside --decode-root; build one bundle per arm")
     parser.add_argument("--raw-dir", default=None,
                         help="flat per_utt/ + verbose/ directory (alternative to --decode-root)")
     parser.add_argument("--order-from", default=None,
@@ -73,11 +77,17 @@ def parse_args() -> argparse.Namespace:
                         help="candidates kept per future per consensus step in the detail files")
     parser.add_argument("--max-intersection", type=int, default=24)
     parser.add_argument("--overwrite", action="store_true")
+    parser.add_argument("--require-complete", action="store_true",
+                        help="require all of the first --limit input rows, not just available outputs")
     args = parser.parse_args()
     if not args.decode_root and not args.raw_dir:
         parser.error("one of --decode-root or --raw-dir is required")
     if args.decode_root and not args.input_tsv:
         parser.error("--decode-root requires --input-tsv")
+    if args.decode_root and args.raw_dir:
+        parser.error("choose --decode-root or --raw-dir, not both")
+    if args.pilot_arm and (not args.decode_root or not re.fullmatch(r"[A-Za-z0-9_-]+", args.pilot_arm)):
+        parser.error("--pilot-arm requires --decode-root and a simple arm name")
     return args
 
 
@@ -116,6 +126,8 @@ def new_step(number: int, total: int) -> dict[str, Any]:
         "commit_after_trim": None,
         "too_few_futures": False,
         "final_completion": False,
+        "sentence_completion": False,
+        "no_new_source": False,
     }
 
 
@@ -124,6 +136,7 @@ def parse_future_log(path: Path, top_n: int = 8, max_intersection: int = 24) -> 
     current: dict[str, Any] | None = None
     active_group: dict[str, Any] | None = None
     active_cons: dict[str, Any] | None = None
+    notes_by_key: dict[tuple[str, str, str], str] = {}
 
     with path.open("r", encoding="utf-8", errors="replace") as stream:
         for raw_line in stream:
@@ -135,12 +148,31 @@ def parse_future_log(path: Path, top_n: int = 8, max_intersection: int = 24) -> 
                 current = new_step(int(chunk_match.group(1)), int(chunk_match.group(2)))
                 active_group = None
                 active_cons = None
+                notes_by_key = {}  # (model, mode, text) -> resolves note, from the raw block
                 continue
             if current is None:
                 continue
 
+            if line.startswith("[FutureSampling] ") or line.startswith("[BoundaryClose] "):
+                key = "sampling" if line.startswith("[FutureSampling]") else "boundary_close"
+                current[key] = json.loads(line.split(" ", 1)[1])
+                continue
+            if line.startswith("[NoNewSource]"):
+                current["no_new_source"] = True
+                current["action"], current["delta"] = "READ", ""
+                active_group = active_cons = None
+                continue
+            sampling_match = SAMPLING_RE.match(line)
+            if sampling_match:
+                current["sampling_total"] = int(sampling_match.group(1))
+                active_group = active_cons = None
+                continue
             if line.startswith("source_observed: "):
                 current["source_observed"] = literal(line.split(": ", 1)[1])
+                active_group = None
+                continue
+            if line.startswith("source_observed_full: "):
+                current["source_observed_full"] = literal(line.split(": ", 1)[1])
                 active_group = None
                 continue
             if line.startswith("future_source_prefix: "):
@@ -179,9 +211,15 @@ def parse_future_log(path: Path, top_n: int = 8, max_intersection: int = 24) -> 
 
             item_match = ITEM_RE.match(line)
             if item_match and active_group is not None and active_cons is None:
-                candidate = literal(item_match.group(1), item_match.group(1).strip())
+                candidate = str(literal(item_match.group(1), item_match.group(1).strip()))
+                key = (active_group["model"], active_group["mode"], candidate)
+                if item_match.group(2):
+                    notes_by_key[key] = str(literal(item_match.group(2), item_match.group(2).strip()))
                 if "candidates" in active_group:
-                    active_group["candidates"].append(str(candidate))
+                    active_group["candidates"].append(candidate)
+                    note = notes_by_key.get(key, "")
+                    if note or active_group.get("notes"):
+                        active_group.setdefault("notes", [""] * (len(active_group["candidates"]) - 1)).append(note)
                 continue
 
             filter_match = FILTER_RE.match(line)
@@ -272,12 +310,12 @@ def parse_future_log(path: Path, top_n: int = 8, max_intersection: int = 24) -> 
                 active_cons = None
                 continue
 
-            final_match = FINAL_RE.match(line)
-            if final_match:
-                delta = literal(final_match.group(1))
+            completion_match = FINAL_RE.match(line) or SENTENCE_END_RE.match(line)
+            if completion_match:
+                delta = literal(completion_match.group(1))
                 current["action"] = "WRITE" if delta else "READ"
                 current["delta"] = delta
-                current["final_completion"] = True
+                current["final_completion" if FINAL_RE.match(line) else "sentence_completion"] = True
                 active_group = None
                 active_cons = None
 
@@ -312,6 +350,44 @@ def summarize_consensus(step: dict[str, Any]) -> dict[str, Any]:
         "raw_accepted": step.get("raw_accepted"),
         "too_few_futures": bool(step.get("too_few_futures")),
         "final_completion": bool(step.get("final_completion")),
+        "sentence_completion": bool(step.get("sentence_completion")),
+        "no_new_source": bool(step.get("no_new_source")),
+    }
+
+
+def sampling_input(step: dict[str, Any], settings: dict[str, Any]) -> dict[str, Any]:
+    """Keep a prepared window separate from an invoked sampler's input.
+
+    Legacy branch markers prove dispatch, not HTTP success. Missing evidence
+    stays unknown; neither a prefix line nor READ alone proves sampling.
+    """
+    if isinstance(step.get("sampling"), dict):
+        return dict(step["sampling"])
+    status, reason = "unknown", "not_recorded"
+    for field, skip_reason in (("final_completion", "final_chunk"),
+                               ("sentence_completion", "source_sentence_end"),
+                               ("no_new_source", "no_new_source")):
+        if step.get(field):
+            status, reason = "skipped", skip_reason
+            break
+    else:
+        if "sampling_total" in step or step.get("raw_total") is not None or step.get("selected_futures"):
+            status, reason = "invoked", "future_sampling"
+            if step.get("future_source_prefix") is not None and not step["future_source_prefix"].strip():
+                status, reason = "skipped", "empty_prefix"
+    context = settings.get("targeted_sampler_context")
+    target = None
+    if context == "source-only" or status == "skipped":
+        target = ""
+    elif context == "source-and-target" and "committed_before" in step:
+        target = step["committed_before"].strip()
+    return {
+        "status": status, "reason": reason,
+        "input_source_prefix": step.get("future_source_prefix") if status == "invoked" else None,
+        "prepared_source_prefix": step.get("future_source_prefix"),
+        "context_mode": context, "committed_target_context": target,
+        "window_mode": settings.get("future_source_window_mode"),
+        "evidence": "legacy_verbose_branch" if status != "unknown" else "not_recorded",
     }
 
 
@@ -320,9 +396,10 @@ def task_number(path: Path) -> int:
     return int(match.group(1)) if match else 10**9
 
 
-def index_complete_cases(decode_root: Path) -> dict[str, tuple[Path, Path, str]]:
+def index_complete_cases(decode_root: Path, pilot_arm: str | None = None) -> dict[str, tuple[Path, Path, str]]:
     indexed: dict[str, tuple[Path, Path, str]] = {}
-    task_dirs = sorted(decode_root.glob("task_*"), key=task_number)
+    pattern = f"row_*/{pilot_arm}/task_*" if pilot_arm else "task_*"
+    task_dirs = sorted(decode_root.glob(pattern), key=task_number)
     for task_dir in task_dirs:
         per_utt = task_dir / "per_utt"
         verbose = task_dir / "verbose"
@@ -331,8 +408,10 @@ def index_complete_cases(decode_root: Path) -> dict[str, tuple[Path, Path, str]]
         for json_path in per_utt.glob("*.json"):
             utt_id = json_path.stem
             log_path = verbose / f"verbose_{utt_id}.log"
+            if pilot_arm and log_path.is_file() and utt_id in indexed:
+                raise ValueError(f"Duplicate pilot output for {utt_id} in arm {pilot_arm}")
             if log_path.is_file() and utt_id not in indexed:
-                indexed[utt_id] = (json_path, log_path, task_dir.name)
+                indexed[utt_id] = (json_path, log_path, str(task_dir.relative_to(decode_root)))
     return indexed
 
 
@@ -379,6 +458,9 @@ def merge_case(
     target_deltas = list(decoded.get("target_trajectory") or [])
     actions = list(decoded.get("actions") or [])
     parsed_by_step = {int(step["step"]) - 1: step for step in parsed_steps}
+    settings = decoded.get("decoder_settings") or {}
+    sampling_by_step = {int(event["chunk"]) - 1: event for event in decoded.get("sampling_audit") or []}
+    boundary_by_step = {int(event["chunk"]) - 1: event for event in decoded.get("boundary_audit") or []}
 
     steps: list[dict[str, Any]] = []
     detail_steps: list[dict[str, Any]] = []
@@ -389,19 +471,37 @@ def merge_case(
         chunk = str(source_chunks[index] if index < len(source_chunks) else "")
         delta = str(target_deltas[index] if index < len(target_deltas) else "")
         action = str(actions[index] if index < len(actions) else ("WRITE" if delta else "READ"))
-        source_so_far += chunk
+        # The decoder joins ASR word chunks with spaces; plain concatenation
+        # invents strings such as "forkflew". Prefer the actual logged input.
+        piece = chunk.strip()
+        if piece:
+            separator = " " if source_so_far and piece[0] not in ",.!?;:)]}\"'" else ""
+            source_so_far += separator + piece
+        committed_before = translation_so_far
         translation_so_far += delta
-        log_step = parsed_by_step.get(index, {})
+        log_step = dict(parsed_by_step.get(index, {}))
+        if index in sampling_by_step:
+            log_step["sampling"] = sampling_by_step[index]
+        sampling = sampling_input(log_step, settings)
+        boundary = boundary_by_step.get(index, log_step.get("boundary_close"))
         summary = summarize_consensus(log_step) if log_step else None
+        observed = log_step.get("source_observed_full", log_step.get("future_source_prefix"))
+        if observed is None:
+            observed = source_so_far
         steps.append(
             {
                 "step": index + 1,
                 "source_chunk": chunk,
-                "source_cumulative": source_so_far.strip(),
+                "source_cumulative": observed,
+                "source_input_provenance": "logged" if "future_source_prefix" in log_step or "source_observed_full" in log_step else "reconstructed from chunks",
+                "committed_before": log_step.get("committed_before", committed_before),
                 "translation_delta": delta,
                 "translation_cumulative": translation_so_far,
                 "action": action,
-                "future_source_prefix": log_step.get("future_source_prefix", ""),
+                "future_source_prefix": log_step.get("future_source_prefix"),
+                "sampling": sampling,
+                "boundary_close": boundary,
+                "future_join_mode": settings.get("future_join_mode"),
                 "selected_futures": log_step.get("selected_futures", []),
                 "raw_stats": log_step.get("raw_stats", []),
                 "consensus_summary": summary,
@@ -417,6 +517,9 @@ def merge_case(
                 "commit_after_trim": log_step.get("commit_after_trim"),
                 "too_few_futures": bool(log_step.get("too_few_futures")),
                 "final_completion": bool(log_step.get("final_completion")),
+                "sentence_completion": bool(log_step.get("sentence_completion")),
+                "sampling": sampling,
+                "boundary_close": boundary,
                 "committed_before": log_step.get("committed_before"),
             }
         )
@@ -438,6 +541,8 @@ def merge_case(
         "speaker": row.get("speaker", ""),
         "source_full_text": decoded.get("source_full_text", ""),
         "source_sentences": decoded.get("src_text_full", []),
+        "src_text_full": decoded.get("src_text_full", []),
+        "decoder_settings": settings,
         "prediction": decoded.get("prediction", ""),
         "reference_text": decoded.get("reference_text", ""),
         "metrics": metrics,
@@ -499,6 +604,9 @@ def main() -> None:
 
     output_dir = Path(args.output_dir)
     if output_dir.exists() and args.overwrite:
+        for source in (args.raw_dir, args.decode_root, args.order_from, args.input_tsv):
+            if source and Path(source).resolve().is_relative_to(output_dir.resolve()):
+                raise ValueError("Cannot overwrite a bundle containing the input data; choose a different output directory")
         shutil.rmtree(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -516,7 +624,7 @@ def main() -> None:
             shutil.copy2(source, output_dir / source.name)
 
     if args.decode_root:
-        complete = index_complete_cases(Path(args.decode_root))
+        complete = index_complete_cases(Path(args.decode_root), args.pilot_arm)
     else:
         complete = index_raw_dir(Path(args.raw_dir))
 
@@ -535,6 +643,13 @@ def main() -> None:
     else:
         order = [(i, {"id": u}) for i, u in enumerate(sorted(complete, key=natural_key))]
 
+    if args.require_complete:
+        expected = order[:args.limit]
+        missing = [row.get("id") for _, row in expected if str(row.get("id", "")) not in complete]
+        if len(expected) != args.limit or missing:
+            raise RuntimeError(f"Incomplete review: expected {args.limit} input rows; missing={missing}, rows={len(expected)}")
+        order = expected
+
     cases: list[dict[str, Any]] = []
     manifest_rows: list[dict[str, Any]] = []
     audio_failures: list[dict[str, str]] = []
@@ -550,6 +665,14 @@ def main() -> None:
         with json_path.open("r", encoding="utf-8") as stream:
             decoded = json.load(stream)
         parsed_steps = parse_future_log(log_path, args.top_candidates, args.max_intersection)
+        if args.require_complete:
+            chunks = decoded.get("src_trajectory") or []
+            deltas, actions = decoded.get("target_trajectory") or [], decoded.get("actions") or []
+            if (decoded.get("utt_id") != utt_id or not chunks
+                    or len(chunks) != len(deltas) or len(chunks) != len(actions)
+                    or decoded.get("prediction") != "".join(deltas)
+                    or [step["step"] for step in parsed_steps] != list(range(1, len(chunks) + 1))):
+                raise RuntimeError(f"Incomplete or mismatched JSON/verbose trajectory: {utt_id}")
         case, detail = merge_case(row_index, row, decoded, parsed_steps, task_name)
 
         audio_target = audio_dir / f"{utt_id}.mp3"
@@ -600,6 +723,7 @@ def main() -> None:
     payload = {
         "meta": {
             "run_name": args.run_name,
+            "pilot_arm": args.pilot_arm,
             "case_count": len(cases),
             "selection": "First complete cases in input TSV order with JSON and verbose log",
             "decode_root": str(args.decode_root or args.raw_dir),
