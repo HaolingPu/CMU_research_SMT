@@ -74,9 +74,14 @@ Simul-tst-COMMON). A 2-hour watcher in the Claude Code session follows it.
 - [ ] (parked, not to be implemented without a decision) Consensus voter floor: a minimum absolute
   number of voters in addition to the ratio, so fewer candidates (40 → 13.5 per step under the JSON
   schema) do not loosen strict consensus.
-- [ ] Speed-only items implemented (parallel Gemma/Qwen calls, `[Timing]`, `--probe-prompt-order
-  shared-first`) and the opt-in `--contrastive-notes` resolves field: 10-case jobs `v3json_speed` and
-  `v3json_notes` running 2026-09-08; read results before any 35k decision.
+- [x] Speed-only checks done 2026-09-08 (wiki, "Speed-only checks and the reproducibility finding"):
+  parallel samplers +5–6 % wall time; prompt reorder no speed gain; notes field quality-neutral but
+  shrinks Qwen contrastive 3.8 → 2.0 per step.
+- [ ] REPRODUCIBILITY: identical config decoded twice agrees on 2/10 predictions, 10-case mean BLEU
+  differs by 4.25, per-case swings up to 21 (probe logprob jitter flips low-margin unanimous votes).
+  Before any v2-vs-v3 or 35k decision: (a) at least 2 repeats per config on ≥ 50 cases, or the
+  200-case set; (b) decide whether a vote-margin requirement is acceptable (a logic change, needs
+  Haoling's call); (c) one more repeat pair to confirm shared-first order reproduces better (7/10).
 
 ### P0 — right after decode reaches 40,000
 - [x] Run the verifier over rows 0–39,999 and build the one-JSON-per-utterance view.

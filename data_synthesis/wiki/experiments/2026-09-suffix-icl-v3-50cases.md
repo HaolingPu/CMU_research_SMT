@@ -331,3 +331,38 @@ prefix caching covers everything up to the future. Suffix cap back to 200 charac
 Two 10-case jobs on rows 0–9, seed 1015: `v3json_speed` (shared-first only; must reproduce the
 v3-JSON arm up to probe jitter, and shows the timing gain) and `v3json_notes` (shared-first +
 contrastive notes).
+
+## Speed-only checks and the reproducibility finding (2026-09-08 04:00 UTC)
+
+Runs (all v3-JSON flags, seed 1015, 0 failed cases, 0 malformed replies across 70 cases):
+`v3json_speed50` (10352713, 50 cases, shared-first probe order), `v3json_speed` (10352650, rows 0–9,
+shared-first), `v3json_repeat` (10352950, rows 0–9, historical order = identical config to the
+reference v3-JSON arm), `v3json_notes` (10352651, rows 0–9, shared-first + `--contrastive-notes`).
+
+| comparison | identical predictions | mean BLEU | mean LAAL |
+|---|---|---|---|
+| A. speed-only 50 vs reference v3-JSON | 4 / 50 | 45.56 vs 45.73 | 5.32 vs 5.38 |
+| B. same-config repeat vs reference, rows 0–9 | 2 / 10 | 45.09 vs 49.34 | 5.27 vs 5.40 |
+| C. two shared-first runs, rows 0–9 | 7 / 10 | 46.06 vs 45.45 | 5.40 vs 5.48 |
+| D. notes vs reference, rows 0–9 | 1 / 10 | 49.62 vs 49.34 | 5.20 vs 5.40 |
+
+Findings:
+- **Reproducibility (B) is the real problem.** The identical configuration decoded twice agrees on
+  2 of 10 predictions; per-case char-BLEU moves by up to 21 points (1015: 66.0 → 44.6) and the
+  10-case mean by 4.25. The sampler side is seeded and byte-stable (raw candidate counts per
+  sampler/group identical to one decimal in every run); the divergence comes from probe logprob
+  jitter flipping low-margin unanimous votes, after which the trajectory never re-converges.
+  Consequence: 10-case comparisons are noise, and 50-case mean differences of about 1 BLEU (the
+  v3-JSON vs source-only gap) are inside run-to-run variation. Any decision needs repeats or a
+  much larger set.
+- **Speed.** Wall time per case 176 s vs 185 s (A) and 160 s vs 171 s (B): the 5–6 % gain is
+  present with historical order too, so it comes from the concurrent Gemma/Qwen calls. The
+  shared-first reorder gives no measurable probe gain (0.184 s/batch vs 0.163 s/batch historical
+  in B; probes are < 8 % of time). Sampling is 88 % of decode time in every run.
+- **Shared-first may improve reproducibility** (C: 7/10 identical across two runs vs 2/10 for
+  historical order in B), plausibly because the uncached tail per probe prompt is shorter. n = 10,
+  one pair each; needs a second historical repeat pair before it counts.
+- **Contrastive notes (D).** Quality unchanged within noise. Qwen's contrastive group shrinks
+  from 3.8 to 2.0 items per step (Gemma 1.8 → 2.1), accepted futures 12.6 → 11.3; reasons are
+  distinct in 243/248 groups, some genuine readings, some contrived; ~7 % slower per case.
+Outputs: `consensus_decoding_pilots/v3json-{speed-50cases-20260908T0204Z,repeat-10cases-20260908T0256Z,speed-10cases-20260908T0158Z,notes-10cases-20260908T0158Z}`.
