@@ -26,7 +26,7 @@ NUM_CONCURRENT_CASES="${NUM_CONCURRENT_CASES:-8}"
 # Task 0 is the controlled throughput canary. Existing array tasks keep the
 # submitted value until they are explicitly requeued.
 if [[ "${TASK_ID}" == "${AMBIGUITY_TUNING_TASK_ID:-0}" ]]; then
-  NUM_CONCURRENT_CASES="${AMBIGUITY_TUNING_CONCURRENCY:-12}"
+  NUM_CONCURRENT_CASES="${AMBIGUITY_TUNING_CONCURRENCY:-${NUM_CONCURRENT_CASES}}"
 fi
 TARGETED_NUM_FUTURES="${TARGETED_NUM_FUTURES:-20}"
 MIN_VOTERS_RATIO="${MIN_VOTERS_RATIO:-1.0}"
@@ -144,6 +144,6 @@ if (( actual != ROWS_PER_TASK )); then
   echo "[ERROR] wrote ${actual}/${ROWS_PER_TASK} outputs" >&2
   exit 1
 fi
-printf 'task=%s rows=%s elapsed_seconds=%s prompt=future_set_v2_two_groups\n' \
-  "${TASK_ID}" "${actual}" "$(( $(date +%s) - start_ts ))" >"${DONE_FILE}"
+printf 'task=%s rows=%s elapsed_seconds=%s prompt=%s\n' \
+  "${TASK_ID}" "${actual}" "$(( $(date +%s) - start_ts ))" "${PROMPT_VERSION:-future_set_v2_two_groups}" >"${DONE_FILE}"
 echo "[DONE] task ${TASK_ID}: ${actual} rows"
