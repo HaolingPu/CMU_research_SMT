@@ -13,7 +13,7 @@ RUNS_ROOT="/home/haolingp/slurm_runs"
 DATA_ROOT="/data/user_data/haolingp/data_synthesis/outputs/gigaspeech/consensus_decoding_prod"
 
 TOTAL_ROWS="${TOTAL_ROWS:-35000}"
-NUM_DECODE_TASKS="${NUM_DECODE_TASKS:-12}"
+NUM_DECODE_TASKS="${NUM_DECODE_TASKS:-24}"
 DECODE_CONCURRENCY="${DECODE_CONCURRENCY:-12}"
 NUM_CONCURRENT_CASES="${NUM_CONCURRENT_CASES:-16}"
 NUM_POST_SHARDS="${NUM_POST_SHARDS:-24}"
@@ -30,6 +30,11 @@ PROMPT_VERSION="future_set_v3_suffix_icl"
 SAMPLER_OUTPUT="json_schema_structured_outputs"
 PREFIX_NORMALIZATION="case-insensitive-word-boundary"
 VALIDATION_PILOT="suffix-icl-v3-50cases-20260907-130701 (text) + v3json-speed-50cases-20260908T0204Z (JSON)"
+# Nodes with confirmed vLLM/NCCL faults (pilot and inference exclusion lists, 2026-09).
+DECODE_EXCLUDE="${DECODE_EXCLUDE:-babel-o9-24,babel-q9-32,babel-t5-28,babel-v9-28,babel-p5-24,babel-o5-28,babel-p5-20,babel-o5-24,babel-q5-16,babel-q5-20,babel-n5-32,babel-p9-32,babel-p9-28,babel-m5-32}"
+INFER_EXCLUDE="${INFER_EXCLUDE:-babel-p9-32,babel-p9-28,babel-m5-32,babel-o5-24,babel-q5-16,babel-q5-20,babel-n5-32,babel-o5-16,babel-n5-28,babel-q5-32,babel-s5-24,babel-q5-24,babel-o5-28,babel-p5-20,babel-p5-24,babel-o9-24,babel-o9-28,babel-q9-32,babel-t5-28,babel-v9-28}"
+# Backfill windows shorter than this end in TIMEOUT, which Slurm does not requeue (40k lesson).
+DECODE_TIME_MIN="${DECODE_TIME_MIN:-08:00:00}"
 # Decoder flags beyond the frozen 40k set. No commas: they travel through --export.
 EXTRA_DECODER_ARGS="${EXTRA_DECODER_ARGS:---targeted-sampler-context source-only --future-source-window-mode sentence-anchor --sentence-end-completion --sentence-end-boundary-mode conservative --sentence-end-punctuation match-source --targeted-prompt-version future_set_v3_suffix_icl}"
 
@@ -63,6 +68,12 @@ validate_config() {
     die "DECODE_CONCURRENCY must be in [1, NUM_DECODE_TASKS]"
   (( 2 * DECODE_CONCURRENCY <= 24 )) || \
     die "decode requests $((2 * DECODE_CONCURRENCY)) GPUs; BABEL limit is 24"
+  local busy=0
+  if command -v squeue >/dev/null; then
+    busy=$(squeue -u haolingp -h -t RUNNING,PENDING -o "%b" 2>/dev/null | { grep -o "gpu[:a-zA-Z0-9]*:[0-9]*" || true; } | awk -F: '{s+=$NF} END {print s+0}')
+  fi
+  (( busy + 2 * DECODE_CONCURRENCY <= 24 )) || \
+    die "account already has ${busy} GPUs queued or running; decode would exceed the 24-GPU cap"
   (( NUM_CONCURRENT_CASES > 0 && NUM_CONCURRENT_CASES <= 16 )) || \
     die "NUM_CONCURRENT_CASES must be in [1, 16] to match the sampler servers"
   (( POST_CONCURRENCY > 0 && POST_CONCURRENCY <= NUM_POST_SHARDS )) || \
@@ -132,20 +143,22 @@ submit_run() {
   git_commit=$(git -C "${REPO}" rev-parse HEAD)
   local git_branch
   git_branch=$(git -C "${REPO}" branch --show-current)
+  local git_dirty
+  git_dirty=$(git -C "${REPO}" status --porcelain --untracked-files=no | wc -l | tr -d " ")
+  (( git_dirty == 0 )) || die "BABEL checkout has ${git_dirty} uncommitted tracked change(s); commit or stash before submitting"
   cat >"${manifest}" <<EOF
 run_tag=${run_tag}
 created=$(date --iso-8601=seconds)
 git_commit=${git_commit}
 git_branch=${git_branch}
+git_dirty_tracked_files=${git_dirty}
 prompt_version=${PROMPT_VERSION}
 sampler_output=${SAMPLER_OUTPUT}
 extra_decoder_args=${EXTRA_DECODER_ARGS}
-sampler_context=source-only
-future_source_window_mode=sentence-anchor
-sentence_end_completion=true
-sentence_end_punctuation=match-source
-probe_prompt_order=historical
-contrastive_notes=false
+decoder_settings_source=per-utterance JSON decoder_settings (authoritative; extra_decoder_args is the request)
+decode_exclude=${DECODE_EXCLUDE}
+decode_time_min=${DECODE_TIME_MIN}
+infer_exclude=${INFER_EXCLUDE}
 prefix_normalization=${PREFIX_NORMALIZATION}
 validation_pilot=${VALIDATION_PILOT}
 sampler_1=gemma-4-E2B-it
@@ -167,7 +180,7 @@ num_post_shards=${NUM_POST_SHARDS}
 post_concurrency=${POST_CONCURRENCY}
 qe_threshold=${QE_THRESHOLD}
 length_ratio_ref=${MIN_RATIO_REF}:${MAX_RATIO_REF}
-train_sample_n=${TRAIN_SAMPLE_N}
+train_sample_target=${TRAIN_SAMPLE_N}
 sample_seed=${SAMPLE_SEED}
 quality_metrics=BLEU,Unbabel/XCOMET-XL
 eval_sets=acl_6060_dev,simul_tst_common
@@ -182,14 +195,27 @@ EOF
 
   local decode_jid
   decode_jid=$(sbatch --parsable \
+    --job-name="v3json35k_decode" \
     --array="0-$((NUM_DECODE_TASKS - 1))%${DECODE_CONCURRENCY}" \
+    --time-min="${DECODE_TIME_MIN}" --exclude="${DECODE_EXCLUDE}" \
     --output="${log_dir}/decode_%A_%a.out" --error="${log_dir}/decode_%A_%a.err" \
-    --export="ALL,INPUT_TSV=${INPUT_TSV},OUTPUT_ROOT=${decode_root},TOTAL_ROWS=${TOTAL_ROWS},NUM_TASKS=${NUM_DECODE_TASKS},NUM_CONCURRENT_CASES=${NUM_CONCURRENT_CASES},AMBIGUITY_TUNING_CONCURRENCY=${NUM_CONCURRENT_CASES},TARGETED_NUM_FUTURES=${TARGETED_NUM_FUTURES},MIN_VOTERS_RATIO=${MIN_VOTERS_RATIO},FUTURE_SRC_WINDOW=1,PROMPT_VERSION=${PROMPT_VERSION},EXTRA_DECODER_ARGS=${EXTRA_DECODER_ARGS}" \
+    --export="ALL,INPUT_TSV=${INPUT_TSV},OUTPUT_ROOT=${decode_root},TOTAL_ROWS=${TOTAL_ROWS},ROW_OFFSET=0,NUM_TASKS=${NUM_DECODE_TASKS},NUM_CONCURRENT_CASES=${NUM_CONCURRENT_CASES},AMBIGUITY_TUNING_TASK_ID=0,AMBIGUITY_TUNING_CONCURRENCY=${NUM_CONCURRENT_CASES},TARGETED_NUM_FUTURES=${TARGETED_NUM_FUTURES},MIN_VOTERS_RATIO=${MIN_VOTERS_RATIO},FUTURE_SRC_WINDOW=1,PROMPT_VERSION=${PROMPT_VERSION},EXTRA_DECODER_ARGS=${EXTRA_DECODER_ARGS},QWEN38_MODEL=/data/user_data/haolingp/models/Qwen3.8-27B-FP8,GEMMA_MODEL=/data/user_data/haolingp/models/gemma-4-E2B-it,QWEN36_MODEL=/data/user_data/haolingp/models/Qwen3.6-35B-A3B-FP8" \
     "${FS}/run_ambiguity_q38_gemma_q36_preempt.sbatch")
   echo "decode=${decode_jid}" | tee -a "${manifest}"
 
+  # Gate 1: exactly TOTAL_ROWS distinct, loadable utterance JSONs decoded with PROMPT_VERSION,
+  # before any post-processing (40k lesson: verify the count, never assume it).
+  local decode_gate_jid
+  decode_gate_jid=$(sbatch --parsable --dependency="afterok:${decode_jid}" \
+    --partition=preempt --qos=preempt_cpu_qos --requeue --cpus-per-task=2 --mem=8G --time=00:30:00 \
+    --job-name="v3json35k_decode_gate" \
+    --output="${log_dir}/decode_gate_%j.out" --error="${log_dir}/decode_gate_%j.err" \
+    --export="ALL,DECODE_ROOT=${decode_root},TOTAL_ROWS=${TOTAL_ROWS},PROMPT_VERSION=${PROMPT_VERSION},MANIFEST=${manifest}" \
+    "${REPO}/scripts/verify_decode_root.sbatch")
+  echo "decode_gate=${decode_gate_jid}" | tee -a "${manifest}"
+
   local prep_jid
-  prep_jid=$(sbatch --parsable --dependency="afterok:${decode_jid}" \
+  prep_jid=$(sbatch --parsable --dependency="afterok:${decode_gate_jid}" \
     --partition=preempt --qos=preempt_cpu_qos --requeue \
     --output="${log_dir}/segale_prepare_%j.out" --error="${log_dir}/segale_prepare_%j.err" \
     --export="ALL,CONSENSUS_ROOT=${decode_root},OUT_ROOT=${post_root},NUM_DOCS=${TOTAL_ROWS},SYS_ID=${run_tag},NUM_SHARDS=${NUM_POST_SHARDS}" \
@@ -251,8 +277,18 @@ EOF
     "${REPO}/scripts/train/run_convert2swift_consensus.sbatch")
   echo "convert=${convert_jid}" | tee -a "${manifest}"
 
+  # Gate 2: the training manifest must hold exactly TRAIN_SAMPLE_N rows (count-matched control);
+  # the convert step silently keeps all survivors when the pool is smaller (40k lesson).
+  local train_gate_jid
+  train_gate_jid=$(sbatch --parsable --dependency="afterok:${convert_jid}" \
+    --partition=preempt --qos=preempt_cpu_qos --requeue --cpus-per-task=1 --mem=2G --time=00:10:00 \
+    --job-name="v3json35k_train_gate" \
+    --output="${log_dir}/train_gate_%j.out" --error="${log_dir}/train_gate_%j.err" \
+    --wrap="set -euo pipefail; D=/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests; T=\$D/train_s_zh-consensus-${run_tag}.jsonl; F=\$D/train_s_zh-consensus-${run_tag}_full.jsonl; rows=\$(wc -l < \$T); pool=\$( [ -f \$F ] && wc -l < \$F || echo \$rows ); printf 'survivor_pool=%s\ntrain_rows_actual=%s\ntraining_manifest=%s\n' \$pool \$rows \$T >> ${manifest}; if [ ${TRAIN_SAMPLE_N} -gt 0 ] && [ \$rows -ne ${TRAIN_SAMPLE_N} ]; then echo \"[GATE] training manifest has \$rows rows, expected ${TRAIN_SAMPLE_N} (pool \$pool)\" >&2; echo 'train_gate=FAILED_count_mismatch' >> ${manifest}; exit 1; fi; echo \"[GATE] \$rows rows from a pool of \$pool\"")
+  echo "train_gate=${train_gate_jid}" | tee -a "${manifest}"
+
   local train_jid
-  train_jid=$(sbatch --parsable --dependency="afterok:${convert_jid}" \
+  train_jid=$(sbatch --parsable --dependency="afterok:${train_gate_jid}" \
     --partition=preempt --qos=preempt_qos --requeue \
     --output="${log_dir}/train_%A_%a.out" --error="${log_dir}/train_%A_%a.err" \
     --export="ALL,VARIANT_TAG=${run_tag}" "${REPO}/scripts/train/train_consensus_s.sh")
@@ -262,7 +298,7 @@ EOF
   eval_launcher_jid=$(sbatch --parsable --dependency="afterok:${train_jid}" \
     --partition=preempt --qos=preempt_cpu_qos --requeue \
     --output="${log_dir}/eval_launcher_%j.out" --error="${log_dir}/eval_launcher_%j.err" \
-    --export="ALL,EXP=${exp},CHILD_PARTITION=preempt,CHILD_GPU_QOS=preempt_qos,CKPTS_FILE=${ckpts_file},RUN_SIMULTST=1,CKPTS_SIMULTST_FILE=${run_dir}/ckpts_simultst.txt,PIPELINE_MANIFEST=${manifest}" \
+    --export="ALL,EXP=${exp},CHILD_PARTITION=preempt,CHILD_GPU_QOS=preempt_qos,CHILD_EXCLUDE_ENCODED=${INFER_EXCLUDE//,/;},CKPTS_FILE=${ckpts_file},RUN_SIMULTST=1,CKPTS_SIMULTST_FILE=${run_dir}/ckpts_simultst.txt,PIPELINE_MANIFEST=${manifest}" \
     "${REPO}/scripts/infer/run_infer_after_train_generic.sbatch")
   echo "eval_launcher=${eval_launcher_jid}" | tee -a "${manifest}"
 

@@ -9,6 +9,7 @@ hypothesized full source, and consensus selects the committed target token.
 import argparse
 import ast
 import glob
+import http.client
 import json
 import math
 import os
@@ -431,10 +432,15 @@ class _TeeWriter:
 
 
 def write_pretty_json(path: str, data: Dict[str, Any]) -> None:
-    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
-    with open(path, "w", encoding="utf-8") as fh:
+    """Write atomically (temp file + rename) so a preempted worker never leaves a truncated
+    JSON that --skip-existing would later treat as complete."""
+    path = os.path.abspath(path)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    tmp = f"{path}.tmp.{os.getpid()}"
+    with open(tmp, "w", encoding="utf-8") as fh:
         json.dump(data, fh, ensure_ascii=False, indent=2)
         fh.write("\n")
+    os.replace(tmp, path)
 
 
 # ---------------------------------------------------------------------------
@@ -705,6 +711,10 @@ def _http_json(url: str, payload: Dict[str, Any], timeout: float) -> Dict[str, A
         raise RuntimeError(f"HTTP {e.code} from {url}: {e.read().decode('utf-8', errors='replace')}") from e
     except urllib.error.URLError as e:
         raise RuntimeError(f"Cannot reach {url}: {e}") from e
+    except (TimeoutError, OSError, http.client.HTTPException) as e:
+        # A read timeout or a server dropping mid-response surfaces as a bare OS error;
+        # name the endpoint so a failed row can be attributed to a server.
+        raise RuntimeError(f"Request to {url} failed after {timeout}s: {type(e).__name__}: {e}") from e
 
 
 def _http_get_json(url: str, timeout: float) -> Dict[str, Any]:
@@ -716,6 +726,8 @@ def _http_get_json(url: str, timeout: float) -> Dict[str, Any]:
         raise RuntimeError(f"HTTP {e.code} from {url}: {e.read().decode('utf-8', errors='replace')}") from e
     except urllib.error.URLError as e:
         raise RuntimeError(f"Cannot reach {url}: {e}") from e
+    except (TimeoutError, OSError, http.client.HTTPException) as e:
+        raise RuntimeError(f"Request to {url} failed after {timeout}s: {type(e).__name__}: {e}") from e
 
 
 def verify_api(api_base: str, timeout: float) -> List[str]:
@@ -995,9 +1007,10 @@ def _sample_coordinated_future_set(
             attempt_payload = {**payload, "seed": (payload["seed"] + 7919 * attempt) % (2**31)}
         try:
             data = _http_json(f"{base}/completions", payload=attempt_payload, timeout=api_timeout)
-        except Exception:
+        except Exception as exc:
             if fail_on_api_error:
                 raise
+            print(f"[SamplerUnavailable] model={api_model} attempt={attempt + 1} error={exc}", file=sys.stderr, flush=True)
             raise _SamplerUnavailable() from None
         choices = data.get("choices") if isinstance(data, dict) else None
         choice = choices[0] if choices and isinstance(choices[0], dict) else {}
