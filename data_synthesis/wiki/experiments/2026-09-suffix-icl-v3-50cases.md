@@ -268,3 +268,25 @@ Test: pilot rows 0–9, same seed 1015, all three method flags on, output root
 `consensus_decoding_pilots/v3json-all-10cases-20260907T2327Z`, 2 GPUs. Compare against the v3-JSON
 arm (rows 0–7 done, rows 8–9 from array 10350658) and source-only boundary. The 42-case v3-JSON
 array 10350658 is still running (tasks preempted and requeued twice).
+
+## v3-JSON on all 50 cases (array 10350658 completed 2026-09-08 00:56 UTC)
+
+50/50 complete, 0 failed, 0 malformed replies. Published as the complete `suffix_icl_v3json` arm
+(replacing the 8-case partial one); archive `data_synthesis/outputs/trajectory_reviews/archives/v3json-50cases-20260907`.
+
+| arm (50 cases) | mean char-BLEU | mean word LAAL |
+|---|---|---|
+| baseline | 45.02 | 7.33 |
+| source-only boundary (v2 prompt) | 46.95 | 6.23 |
+| v3 text format | 44.88 | 5.62 |
+| **v3 JSON schema** | 45.73 | 5.38 |
+
+Paired: vs source-only boundary BLEU −1.21 (19 up / 23 down), LAAL −0.86 (42 earlier / 7 later);
+vs v3 text +0.85 BLEU (23 up / 24 down), LAAL −0.24; vs baseline +0.71 BLEU, LAAL −1.95.
+Largest losses vs source-only: `AUD0000000003_1125` 63.7→54.5, `AUD0000000225_11` 44.4→35.1,
+`AUD0000000140_489` 57.3→49.3. Reading: the JSON format recovers most of the text-format v3 loss
+and is the earliest arm, but on synthesis BLEU it still sits 1.2 below the v2 source-only arm; the
+combined-changes test (heard-guessed probe, voter floor 10, contrastive notes) is the next data point.
+First submission of that test (10351383) failed in `pilot_case_guard.py`, which rejected the new
+flags; allowlist extended and resubmitted as `10352105` (rows 0–9, root
+`v3json-all-10cases-20260908T0059Z`).
