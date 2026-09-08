@@ -290,3 +290,29 @@ combined-changes test (heard-guessed probe, voter floor 10, contrastive notes) i
 First submission of that test (10351383) failed in `pilot_case_guard.py`, which rejected the new
 flags; allowlist extended and resubmitted as `10352105` (rows 0–9, root
 `v3json-all-10cases-20260908T0059Z`).
+
+## Combined-changes result (job 10352105, 2026-09-08 01:38 UTC): negative
+
+10/10 complete, 0 failed, 0 malformed. With heard-guessed probe + voter floor 10 + contrastive
+notes on together, the same 10 cases fall from 49.3 to **36.9** char-BLEU while LAAL drops from 5.40
+to **3.14** (9 of 10 cases lose BLEU; 8 of 10 commit earlier; write steps 11–18 per case vs 6–12).
+The predictions are literal, word-order-preserving translations committed chunk by chunk, e.g. 1015:
+`还有叉子飞进了十几块碎片。这个巨人甚至更愤怒比第一个，和词是刚刚来到殴打，当第三个巨人再次介入。`
+Mechanism (from the trajectories): telling the translator to "translate only what was heard" removes
+the signal that the sentence is still open. Every future then yields the same eager translation of
+the heard prefix, the vote is unanimous, and the decoder commits a calque at almost every chunk. The
+joined input, where the future is glued on, was doing real work: it makes the probe treat the
+sentence as unfinished and produce fluent Chinese, and it is the disagreement between futures that
+gates commits. The voter floor cannot help when every future agrees (11.3 accepted per step ≥ 10).
+Published as the partial arm `v3json_all_changes` on the comparison site for inspection.
+
+Measured time split (first run with `[Timing]`): sampling 1657 s over 179 steps (9.3 s/step, both
+samplers in parallel), probes 154 s over 615 batches (0.25 s/batch), completions 4 s. Sampler
+generation is 91 % of decode time; probes 8 %; completions negligible. `max_tokens` for completions
+is irrelevant to speed; the only levers are sampler concurrency (production already runs 8 cases
+per worker) and sampler output length.
+
+Attribution: one-flag ablations on the same 10 cases submitted 2026-09-08 (`v3abl_floor10`,
+`v3abl_notes`, `v3abl_heard`; roots `consensus_decoding_pilots/v3json-ablate-<flag>-10cases-*`).
+Expected: the heard-guessed flag alone reproduces the collapse; floor and notes alone stay near
+v3-JSON.
