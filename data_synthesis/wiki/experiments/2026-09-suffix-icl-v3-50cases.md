@@ -316,3 +316,18 @@ Attribution: one-flag ablations on the same 10 cases submitted 2026-09-08 (`v3ab
 `v3abl_notes`, `v3abl_heard`; roots `consensus_decoding_pilots/v3json-ablate-<flag>-10cases-*`).
 Expected: the heard-guessed flag alone reproduces the collapse; floor and notes alone stay near
 v3-JSON.
+
+## Correction (2026-09-08): scope reset to speed-only plus the resolves field
+
+Haoling's instruction: no changes to the sampling or translation logic; only speed work
+(parallelism, prompt-prefix order, token caps), plus trying the `resolves` field on contrastive
+candidates. Accordingly (commit after b1d54b1): `--probe-input-mode` and `--min-voters-abs` are
+removed from the code; the `v3json_all_changes` arm is retired from the comparison site (the negative
+result above stays on record); the three one-flag ablations were cancelled before producing results.
+Kept: concurrent Gemma/Qwen sampler calls, `[Timing]` lines, `--contrastive-notes` (opt-in), and a
+new speed-only `--probe-prompt-order shared-first` that reorders the probe prompt sections
+([TASK][IMPORTANT][INPUT] instead of [TASK][INPUT][IMPORTANT]) with byte-identical wording so
+prefix caching covers everything up to the future. Suffix cap back to 200 characters.
+Two 10-case jobs on rows 0–9, seed 1015: `v3json_speed` (shared-first only; must reproduce the
+v3-JSON arm up to probe jitter, and shows the timing gain) and `v3json_notes` (shared-first +
+contrastive notes).

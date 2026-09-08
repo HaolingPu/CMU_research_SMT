@@ -64,19 +64,19 @@ Simul-tst-COMMON). A 2-hour watcher in the Claude Code session follows it.
   cases, v2-boundary vs v3-JSON, XCOMET + step-level early-commit audit, candidate budget controlled
   (40 → 13.5 raw candidates per step is itself a variable).
 
-- [x] NEGATIVE (10352105): heard-guessed probe input collapses to literal chunk-by-chunk
-  translation (BLEU 49.3 → 36.9 on 10 cases). The glued future is what keeps the probe waiting.
-  One-flag ablations running (v3abl_floor10 / notes / heard). Original idea: today the future is glued onto the
+- [x] NEGATIVE and withdrawn (10352105): heard-guessed probe input collapses to literal
+  chunk-by-chunk translation (BLEU 49.3 → 36.9 on 10 cases); code removed at Haoling's request
+  (no sampling/translation logic changes). Ablations cancelled. Original idea: today the future is glued onto the
   observed English as if heard, so the translator commits content only the futures imply
   (`进了` in 1015). Change the probe prompt to `[HEARD] ... [POSSIBLE CONTINUATION] ...` and
   instruct it to translate only the heard part, using the continuation as context. Prompt-only;
   test on the same 50 cases against v3-JSON.
-- [ ] Consensus voter floor: require a minimum absolute number of voters (or both samplers) in
-  addition to the ratio, so fewer candidates (40 → 13.5 per step under the JSON schema) do not
-  loosen strict consensus. Test with the item above.
-- [ ] Schema field for contrastive candidates naming the reading each one resolves (strip before
-  use); probe prompt reordering for prefix-cache hits; `--num-concurrent-cases` > 1 and parallel
-  Gemma/Qwen sampler calls for throughput (see wiki notes 2026-09-07).
+- [ ] (parked, not to be implemented without a decision) Consensus voter floor: a minimum absolute
+  number of voters in addition to the ratio, so fewer candidates (40 → 13.5 per step under the JSON
+  schema) do not loosen strict consensus.
+- [ ] Speed-only items implemented (parallel Gemma/Qwen calls, `[Timing]`, `--probe-prompt-order
+  shared-first`) and the opt-in `--contrastive-notes` resolves field: 10-case jobs `v3json_speed` and
+  `v3json_notes` running 2026-09-08; read results before any 35k decision.
 
 ### P0 — right after decode reaches 40,000
 - [x] Run the verifier over rows 0–39,999 and build the one-JSON-per-utterance view.
