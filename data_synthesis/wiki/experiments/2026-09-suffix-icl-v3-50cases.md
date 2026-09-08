@@ -371,3 +371,24 @@ The notes run is published as the partial arm `v3json_notes` (10 cases). The vie
 it as a tag next to the candidate and in the translator-probe rows); 513 of 2,031 selected
 candidates in the arm have one. Compare at
 `http://127.0.0.1:8768/experiments.html#case=AUD0000000003_1125&left=suffix_icl_v3json&right=v3json_notes`.
+
+## 35k production run submitted (2026-09-08, run tag `v3json-boundary-q38-gemma-q36-strict-35k-20260908`)
+
+Config: v3 suffix-ICL prompt with vLLM JSON-schema output, source-only sampler context,
+sentence-anchor window, sentence-end completion (conservative, match-source punctuation), no
+`resolves` field, historical probe order; 35,000 rows, 24 decode tasks × 2 GPUs at 12 concurrent
+(24-GPU cap), 16 cases per worker; SEGALE → MetricX QE ≤ 3.0 → length 0.7–1.5 → sample 12,500
+(seed 42) → train → ACL + Simul-tst eval. Commit b357879 on `feature/home-checkout`, pushed and
+pulled on BABEL. Smoke (job 10354000, 64 rows, 16 cases, one worker): 36 min, 0 failures, 0
+malformed replies, ≈106 rows/hour/worker (40k run: ≈40 at 8 cases).
+Pre-launch review (workflow, 3 lenses; 5 findings verified before a usage-limit stop) led to:
+decode gate (exact 35,000 distinct loadable JSONs with the v3 prompt version) before SEGALE,
+training-count gate (exactly 12,500 rows, real counts appended to the manifest) before training,
+`--time-min 08:00:00`, current bad-node exclusions for decode and inference, pinned env values,
+refusal on a dirty checkout or above the GPU cap, endpoint-attributed request failures, logged
+sampler outages, atomic per-utterance JSON writes. Jobs: decode 10356205, decode_gate 10356206,
+segale 10356207–10356209, qe 10356210–10356212, length 10356213, convert 10356214, train_gate
+10356215, train 10356216, eval_launcher 10356217. Manifest:
+`/home/haolingp/slurm_runs/v3json-boundary-q38-gemma-q36-strict-35k-20260908/run_manifest.txt`.
+A 3-hourly babysit is scheduled in the Claude session (repairs limited to resubmitting dead decode
+tasks and re-chaining; gates are never bypassed).

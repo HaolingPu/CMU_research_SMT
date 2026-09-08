@@ -83,6 +83,12 @@ Simul-tst-COMMON). A 2-hour watcher in the Claude Code session follows it.
   200-case set; (b) decide whether a vote-margin requirement is acceptable (a logic change, needs
   Haoling's call); (c) one more repeat pair to confirm shared-first order reproduces better (7/10).
 
+- [ ] 35k v3-JSON + boundary run `v3json-boundary-q38-gemma-q36-strict-35k-20260908` submitted
+  2026-09-08 (decode 10356205, chain through eval_launcher 10356217; manifest in slurm_runs).
+  Watch: decode gate must PASS with 35,000; train gate must report 12,500 (pool ≈ 15k expected at
+  the 40k run's 43 % survival; if the pool is short, decode 5k more rows into the same root rather
+  than training on fewer). Results go to the wiki scoreboard with the matched-12,500 control.
+
 ### P0 — right after decode reaches 40,000
 - [x] Run the verifier over rows 0–39,999 and build the one-JSON-per-utterance view.
   (Raw root: 40,000 unique, 0 missing, 1,793 duplicates from task_00/01. Dedup
