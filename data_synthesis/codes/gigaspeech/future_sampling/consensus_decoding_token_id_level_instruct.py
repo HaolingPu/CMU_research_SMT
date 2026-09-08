@@ -1177,7 +1177,8 @@ def format_raw_future_groups(audit: List[Dict[str, Any]]) -> List[str]:
         )
         for index, item in enumerate(items, 1):
             shown = item.get("future") or item.get("raw") or ""
-            lines.append(f"  {index:02d}. {shown!r}")
+            note = item.get("note") or ""
+            lines.append(f"  {index:02d}. {shown!r}" + (f"  resolves: {note!r}" if note else ""))
         reasons = Counter(
             str(item.get("reason", "unknown"))
             for item in items
