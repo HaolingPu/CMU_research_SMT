@@ -67,6 +67,8 @@ and the probe/sampler swap are both unresolved confounds.
 | hibiki (ref-based) | – / – / – / 46.8 | .780 / .812 / .814 / .820 | – / – / – / 3326 |
 | EAST-even | – / – / – / 46.8 | – / – / – / .789 | – / – / – / 3533 |
 | EAST-Qwen3.6 teacher (12,500, seed 42, ckpt `v0-20260907-153451-hf`, eval 10343935) | 38.6 / 43.6 / 46.3 / 47.8 | .681 / .733 / .758 / .781 | 1241 / 2024 / 2805 / 3561 |
+| Simul-MuST-C-Qwen3.6 teacher (12,500, seed 42, ckpt `v0-20260908-082137-hf`, eval 10352244) | 38.0 / 43.6 / 44.5 / 44.4 | .670 / .726 / .735 / .732 | 1149 / 1946 / 2514 / 2981 |
+| hibiki (full, re-read from scores.tsv) | 43.0 / 45.7 / 46.2 / 46.8 | .780 / .812 / .814 / .820 | 1484 / 2109 / 2748 / 3430 |
 
 chrF this run: 36.1 / 39.8 / 40.5 / 40.7. chrF matched 12,500: 36.5 / 40.4 / 41.3 / 41.6.
 EAST-Qwen3.6 teacher control (2026-09-07, other session; review in
@@ -90,6 +92,7 @@ pending (infer 10333150 + repair 10333556, eval 10333151).
 | hibiki (ref-based) | 38.3 / 40.4 / 40.8 / 41.1 | .838 / .861 / .866 / .869 | 1282 / 1849 / 2429 / 2870 |
 | EAST-even | 40.1 / 43.7 / 44.2 / 43.6 | .765 / .817 / .837 / .846 | 1107 / 1900 / 2620 / 3243 |
 | EAST-Qwen3.6 teacher (eval 10343937) | 40.1 / 45.3 / 46.5 / 46.7 | .755 / .806 / .832 / .843 | 1108 / 1920 / 2722 / 3390 |
+| Simul-MuST-C-Qwen3.6 teacher (eval 10352246) | 40.2 / 45.1 / 45.6 / 45.7 | .773 / .813 / .818 / .819 | 1156 / 1932 / 2411 / 2862 |
 
 chrF this run: 28.3 / 36.7 / 38.7 / 39.0. † seg960 is degenerate (see hygiene) and should be
 excluded from any comparison. ‡ every matched-12,500 segment size carries 1–5 runaway talks
@@ -330,7 +333,11 @@ loop / runaway talks, seg 960 / 1920 / 2880 / 3840):
 | consensus bestof4refsel / bestof5refsel | 15.5 / 17.6 / 0.0 / 0.0 and 24.8 / 0.1 / 0.3 / 0.3 | 2 / 1 / 0 / 0 and 2 / 0 / 0 / 0 |
 | ambiguity 17,306 (this run) | 17.0 / 2.1 / 0.7 / 0.8 | 3 / 0 / 0 / 0 |
 | ambiguity matched 12,500 | 35.8 / 27.6 / 12.3 / 11.2 | 5 / 2 / 1 / 2 |
+| Simul-MuST-C-Qwen3.6 teacher (added 2026-09-08) | 0.0 / 0.0 / 0.0 / 0.0 | 0 / 0 / 0 / 0 |
 
+Both Qwen3.6-teacher controls (EAST and Simul-MuST-C) are loop-free at every segment size, so all
+four reference-target systems now sit at 0 runaway talks while every consensus-family checkpoint
+loops: the target-side conclusion holds with the second control in hand.
 Hibiki at seg960 emits `嘘！` in 23 talks but only ~2 per talk and recovers at once. Every
 consensus-family checkpoint loops; the two reference-target baselines never run away. The
 susceptibility is therefore a property of the synthesized training targets, not of the

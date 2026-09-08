@@ -89,6 +89,9 @@ Simul-tst-COMMON). A 2-hour watcher in the Claude Code session follows it.
   the 40k run's 43 % survival; if the pool is short, decode 5k more rows into the same root rather
   than training on fewer). Results go to the wiki scoreboard with the matched-12,500 control.
 
+- [x] Simul-MuST-C Qwen3.6 teacher control finished 2026-09-08 (train 10329392_2, ACL eval 10352244,
+  Simul-tst eval 10352246): the two-method teacher study is complete; both controls are loop-free.
+
 ### P0 — right after decode reaches 40,000
 - [x] Run the verifier over rows 0–39,999 and build the one-JSON-per-utterance view.
   (Raw root: 40,000 unique, 0 missing, 1,793 duplicates from task_00/01. Dedup
