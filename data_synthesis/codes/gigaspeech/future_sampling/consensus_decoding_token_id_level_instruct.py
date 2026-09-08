@@ -140,11 +140,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--contrastive-notes", action="store_true",
                    help="v3 JSON only: each contrastive item must also name the reading it resolves "
                         "(object with suffix and resolves); the note is kept in the audit, not in the future.")
-    p.add_argument("--probe-input-mode", choices=["joined", "heard-guessed"], default="joined",
-                   help="'joined' (historical): future glued onto the observed English. 'heard-guessed': the "
-                        "probe sees [HEARD] observed text and [POSSIBLE CONTINUATION] future, translates only the heard part.")
-    p.add_argument("--min-voters-abs", type=int, default=0,
-                   help="Minimum absolute number of futures that must back a token, in addition to --min-voters-ratio.")
+    p.add_argument("--probe-prompt-order", choices=["historical", "shared-first"], default="historical",
+                   help="Order of the probe prompt sections. 'shared-first' puts the fixed [IMPORTANT] instruction "
+                        "before [INPUT] so vLLM prefix caching covers everything up to the future; wording is identical.")
     p.add_argument("--targeted-parse-retries", type=int, default=2,
                    help="Resample a sampler whose grouped (v3) response is malformed, up to this many "
                         "extra attempts with a shifted seed; every malformed response is logged verbatim.")
@@ -609,40 +607,23 @@ def build_translation_probe_prompt_prefix_token_ids(
     full_source: str,
     has_target_prefix: bool,
     target_lang: str = "Chinese",
-    guessed_continuation: Optional[str] = None,
+    shared_first: bool = False,
 ) -> List[int]:
-    if guessed_continuation is not None:
-        # Heard-vs-guessed probe input. Everything shared across futures comes first so
-        # vLLM prefix caching covers it; only the continuation and the target prefix differ.
-        continuation_rule = (
-            f"A partial {target_lang} translation is already committed at the start of the assistant reply. "
-            "You must continue from that exact prefix and produce only the continuation."
-            if has_target_prefix else
-            f"Start the {target_lang} translation from the beginning and output only the next continuation token(s)."
-        )
-        messages = [{"role": "user", "content": (
-            f"[TASK]\nTranslate the [HEARD] English into {target_lang}.\n\n"
-            f"[HEARD]\n{full_source}\n\n"
-            "[IMPORTANT]\nThe speaker has only said the [HEARD] text so far. The [POSSIBLE CONTINUATION] below is one plausible "
-            "guess of what comes next: use it only to resolve ambiguity in the heard text. Translate only what was heard; "
-            f"do not translate the continuation itself. {continuation_rule}\n\n"
-            f"[POSSIBLE CONTINUATION]\n{guessed_continuation}"
-        )}]
-    elif not has_target_prefix:
-        messages = [{"role": "user", "content": (
-            f"[TASK]\nTranslate the [INPUT] text into {target_lang}.\n\n"
-            f"[INPUT]\n{full_source}\n\n"
-            f"[IMPORTANT]\nStart the {target_lang} translation from the beginning "
-            "and output only the next continuation token(s)."
-        )}]
-    else:
-        messages = [{"role": "user", "content": (
-            f"[TASK]\nTranslate the [INPUT] text into {target_lang}.\n\n"
-            f"[INPUT]\n{full_source}\n\n"
-            f"[IMPORTANT]\nA partial {target_lang} translation is already committed "
-            "at the start of the assistant reply. You must continue from that "
-            "exact prefix and produce only the continuation."
-        )}]
+    task = f"[TASK]\nTranslate the [INPUT] text into {target_lang}."
+    source = f"[INPUT]\n{full_source}"
+    rule = (
+        f"[IMPORTANT]\nA partial {target_lang} translation is already committed "
+        "at the start of the assistant reply. You must continue from that "
+        "exact prefix and produce only the continuation."
+        if has_target_prefix else
+        f"[IMPORTANT]\nStart the {target_lang} translation from the beginning "
+        "and output only the next continuation token(s)."
+    )
+    # Historical order is [TASK][INPUT][IMPORTANT]. shared_first moves the fixed
+    # instruction ahead of the source so vLLM prefix caching covers everything up
+    # to the future-specific tail; the wording is unchanged.
+    parts = (task, rule, source) if shared_first else (task, source, rule)
+    messages = [{"role": "user", "content": "\n\n".join(parts)}]
     prompt_ids = tokenizer.apply_chat_template(
         messages,
         add_generation_prompt=True,
@@ -1367,6 +1348,7 @@ def batch_get_next_token_distributions(
     api_timeout: float = 120.0,
     target_lang: str = "Chinese",
     min_logprobs: int = 0,
+    shared_first: bool = False,
 ) -> List[Tuple[Dict[int, float], Dict[str, Any]]]:
 # Step 1: 用 chat template 把翻译指令编码成 token IDs
 #         → [<|im_start|>, user, \n, [TASK], Translate..., <|im_end|>]
@@ -1379,10 +1361,10 @@ def batch_get_next_token_distributions(
     prompts = [
         build_translation_probe_prompt_prefix_token_ids(
             tokenizer,
-            src[0] if isinstance(src, tuple) else src,
+            src,
             has_target_prefix=bool(target_prefix_token_ids),
             target_lang=target_lang,
-            guessed_continuation=src[1] if isinstance(src, tuple) else None,
+            shared_first=shared_first,
         ) + list(target_prefix_token_ids) # Step 3
         for src in full_sources
     ]
@@ -1486,7 +1468,6 @@ def choose_consensus_token(
     soft_vote_min_p: float = 0.1,
     soft_vote_threshold: float = 0.0,  # deprecated, unused
     min_voters_ratio: float = 0.75,
-    min_voters_abs: int = 0,
 ) -> Tuple[Optional[int], Dict[str, Any]]:
     # Looser-than-intersection majority vote.
     # Per future:  filter dist to {tok : p >= soft_vote_min_p}, then take top-K.
@@ -1509,9 +1490,7 @@ def choose_consensus_token(
         for tok, p in filtered:
             per_token_voters[tok] += 1
             agg_score[tok] += p
-    # The ratio scales with how many futures survived; the absolute floor keeps a thin
-    # candidate set (e.g. 8 futures) from reaching unanimity too cheaply.
-    min_voters = max(1, math.ceil(num_futures * min_voters_ratio), int(min_voters_abs))
+    min_voters = max(1, math.ceil(num_futures * min_voters_ratio))
     eligible = {tok: agg_score[tok] for tok, v in per_token_voters.items() if v >= min_voters}
     base_meta = {
         "candidate_lists": candidate_lists,
@@ -1653,8 +1632,7 @@ def extend_pending_tokens(
     soft_vote_threshold: float = 0.8,
     min_voters_ratio: float = 0.75,
     future_join_mode: str = "space",
-    min_voters_abs: int = 0,
-    probe_input_mode: str = "joined",
+    probe_shared_first: bool = False,
 ) -> Tuple[List[int], List[Dict[str, Any]]]:
     pending_token_ids: List[int] = []
     grow_logs: List[Dict[str, Any]] = []
@@ -1662,10 +1640,7 @@ def extend_pending_tokens(
     for step_idx in range(max_consensus_steps): #最多32 步
         # 2a) 每条 future 拼成完整 source，问 instruct 模型："给定这个完整英文 + 已有中文前缀，下一个中文 token 是啥？"
         target_prefix_token_ids = list(committed_token_ids) + list(pending_token_ids)
-        if probe_input_mode == "heard-guessed":
-            full_sources: List[Any] = [(source_observed, f) for f in futures]
-        else:
-            full_sources = [join_future_to_source(source_observed, f, future_join_mode) for f in futures]
+        full_sources = [join_future_to_source(source_observed, f, future_join_mode) for f in futures]
         probe_started = time.perf_counter()
 
         batch_results = batch_get_next_token_distributions(
@@ -1680,6 +1655,7 @@ def extend_pending_tokens(
             api_timeout=instruct_api_timeout,
             target_lang=target_lang,
             min_logprobs=soft_vote_top_k,
+            shared_first=probe_shared_first,
         )
 
         distributions: List[Dict[int, float]] = []
@@ -1709,7 +1685,6 @@ def extend_pending_tokens(
             soft_vote_min_p=soft_vote_min_p,
             soft_vote_threshold=soft_vote_threshold,
             min_voters_ratio=min_voters_ratio,
-            min_voters_abs=min_voters_abs,
         )
         probe_elapsed = round(time.perf_counter() - probe_started, 3)
         if consensus_token_id is None: #没有共识token，停止本轮生长
@@ -1906,7 +1881,7 @@ def run_one_utterance(
     _vlog(verbose_log_file, "# instruct_backend: vllm_completion")
     _vlog(verbose_log_file, f"# targeted_sampler_context: {args.targeted_sampler_context}")
     _vlog(verbose_log_file, f"# targeted_prompt_version: {args.targeted_prompt_version}")
-    _vlog(verbose_log_file, f"# probe_input_mode: {args.probe_input_mode} min_voters_abs: {args.min_voters_abs} contrastive_notes: {args.contrastive_notes}")
+    _vlog(verbose_log_file, f"# probe_prompt_order: {args.probe_prompt_order} contrastive_notes: {args.contrastive_notes}")
     _vlog(verbose_log_file, f"# sentence_end_punctuation: {args.sentence_end_punctuation}")
     _vlog(verbose_log_file, "############################################################")
 
@@ -2136,8 +2111,7 @@ def run_one_utterance(
             soft_vote_min_p=args.soft_vote_min_p,
             soft_vote_threshold=args.soft_vote_threshold,
             min_voters_ratio=args.min_voters_ratio,
-            min_voters_abs=args.min_voters_abs,
-            probe_input_mode=args.probe_input_mode,
+            probe_shared_first=args.probe_prompt_order == "shared-first",
         )
         _vlog(verbose_log_file, f"[Timing] probe_batches={sum(1 for g in grow_logs if 'elapsed_s' in g)} "
                                 f"total={sum(g.get('elapsed_s', 0.0) for g in grow_logs):.2f}s")
@@ -2216,8 +2190,7 @@ def run_one_utterance(
             "future_join_mode": args.future_join_mode,
             "targeted_sampler_context": args.targeted_sampler_context,
             "targeted_prompt_version": args.targeted_prompt_version,
-            "probe_input_mode": args.probe_input_mode,
-            "min_voters_abs": args.min_voters_abs,
+            "probe_prompt_order": args.probe_prompt_order,
             "contrastive_notes": args.contrastive_notes,
             "targeted_sampler_seed": args.targeted_sampler_seed,
             "targeted_fail_on_api_error": args.targeted_fail_on_api_error,

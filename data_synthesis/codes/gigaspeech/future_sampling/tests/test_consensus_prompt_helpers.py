@@ -348,26 +348,19 @@ class ConsensusPromptHelpersTest(unittest.TestCase):
                 self.assertIn('# targeted_prompt_version: future_set_v3_suffix_icl', verbose.getvalue())
 
 
-class ProbeAndVoteChangesTest(unittest.TestCase):
-    def test_heard_guessed_probe_prompt_puts_shared_text_before_the_future(self):
+class ProbePromptOrderTest(unittest.TestCase):
+    def test_shared_first_reorders_sections_without_changing_wording(self):
         tokenizer = FakeTokenizer()
-        decoder.build_translation_probe_prompt_prefix_token_ids(
-            tokenizer, "And the fork flew into a", True, guessed_continuation="dozen pieces on the floor.")
-        content = tokenizer.messages[0]["content"]
-        self.assertIn("[HEARD]\nAnd the fork flew into a", content)
-        self.assertIn("Translate only what was heard", content)
-        self.assertTrue(content.endswith("[POSSIBLE CONTINUATION]\ndozen pieces on the floor."))
-        self.assertLess(content.index("[IMPORTANT]"), content.index("[POSSIBLE CONTINUATION]"))
-        decoder.build_translation_probe_prompt_prefix_token_ids(tokenizer, "And the fork flew into a", True)
-        self.assertNotIn("[HEARD]", tokenizer.messages[0]["content"])
-
-    def test_absolute_voter_floor_blocks_thin_unanimity(self):
-        distributions = [{7: 0.9, 8: 0.1}] * 4
-        token, meta = decoder.choose_consensus_token(distributions, min_voters_ratio=1.0)
-        self.assertEqual(token, 7)
-        token, meta = decoder.choose_consensus_token(distributions, min_voters_ratio=1.0, min_voters_abs=10)
-        self.assertIsNone(token)
-        self.assertEqual(meta["min_voters"], 10)
+        decoder.build_translation_probe_prompt_prefix_token_ids(tokenizer, "And the fork flew into a dozen", True)
+        historical = tokenizer.messages[0]["content"]
+        decoder.build_translation_probe_prompt_prefix_token_ids(tokenizer, "And the fork flew into a dozen", True, shared_first=True)
+        reordered = tokenizer.messages[0]["content"]
+        self.assertEqual(historical, "[TASK]\nTranslate the [INPUT] text into Chinese.\n\n[INPUT]\nAnd the fork flew into a dozen\n\n"
+                         "[IMPORTANT]\nA partial Chinese translation is already committed at the start of the assistant reply. "
+                         "You must continue from that exact prefix and produce only the continuation.")
+        self.assertEqual(sorted(historical.split("\n\n")), sorted(reordered.split("\n\n")))
+        self.assertLess(reordered.index("[IMPORTANT]"), reordered.index("[INPUT]\nAnd the fork"))
+        self.assertTrue(reordered.endswith("[INPUT]\nAnd the fork flew into a dozen"))
 
 
 if __name__ == "__main__":

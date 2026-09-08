@@ -202,7 +202,7 @@ Respond with one JSON object of the form {{"plausible": ["<suffix>", ...], "cont
 
 
 GROUP_KEYS = ("plausible", "contrastive")
-MAX_SUFFIX_CHARS = 120  # the prompt asks for 4-15 words; this only trims runaway tails
+MAX_SUFFIX_CHARS = 200
 MAX_NOTE_CHARS = 120
 
 

@@ -103,7 +103,7 @@ def expected_settings(extra, seed, window):
         "targeted_prompt_version": "future_set_v2_two_groups",
         "targeted_fail_on_api_error": True, "sentence_end_completion": False,
         "sentence_end_boundary_mode": "literal", "sentence_end_punctuation": "off",
-        "probe_input_mode": "joined", "min_voters_abs": 0, "contrastive_notes": False,
+        "probe_prompt_order": "historical", "contrastive_notes": False,
     }
     tokens = iter(shlex.split(extra))
     for token in tokens:
