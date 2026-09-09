@@ -392,3 +392,29 @@ segale 10356207–10356209, qe 10356210–10356212, length 10356213, convert 103
 `/home/haolingp/slurm_runs/v3json-boundary-q38-gemma-q36-strict-35k-20260908/run_manifest.txt`.
 A 3-hourly babysit is scheduled in the Claude session (repairs limited to resubmitting dead decode
 tasks and re-chaining; gates are never bypassed).
+
+## Boundary-completion failures in the 35k run are translator repetition loops (2026-09-09)
+
+Three rows of 35,000 died on the sentence-end guard
+(`Boundary completion missing or token-truncated; refusing to fabricate a closed sentence`,
+`force_complete_translation`): row 619 (task 2), row 639 (task 23) and row 942 (task 17).
+Row 639 passed on retry; row 942 (`AUD0000000233_363`, global row 25,745) failed three times.
+
+Reproduced on one GPU (job 10371576) at the exact failing step, chunk 4/28, observed source
+`Will consist in keeping two or three of LUPIN's men busy.`, empty committed prefix, terminal `。`,
+prompt 123 tokens. The translator returns a degenerate loop and never stops:
+
+```
+将 consists in keeping two or three of LUPIN's men busy. 将 consists in keeping two or three of
+LUPIN's men busy. 将 consists in keeping two or three of LUPIN's men busy. ...
+```
+
+`finish_reason=length` at max_tokens 128, 256 and 512 alike, so **the token cap is not the cause and
+raising `--final-max-tokens` does not help.** This is the same repetition-loop failure mode
+documented on Simul-tst-COMMON, here inside the *synthesis* translator rather than the trained
+model, triggered by a subject-less sentence fragment (`Will consist in ...`) that the ASR split
+produced. The guard is behaving correctly: it refuses a degenerate completion instead of writing it.
+
+Options (decision pending, no method change made): accept 34,999 of 35,000 rows and let the decode
+gate allow that one named row; or add a repetition brake (presence/frequency penalty) to the
+completion call only, which is a synthesis-method change and would need its own validation.

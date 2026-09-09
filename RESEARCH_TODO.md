@@ -92,6 +92,12 @@ Simul-tst-COMMON). A 2-hour watcher in the Claude Code session follows it.
 - [x] Simul-MuST-C Qwen3.6 teacher control finished 2026-09-08 (train 10329392_2, ACL eval 10352244,
   Simul-tst eval 10352246): the two-method teacher study is complete; both controls are loop-free.
 
+- [ ] DECIDE: 35k run row `AUD0000000233_363` (global row 25,745) fails the sentence-end guard
+  deterministically because the synthesis translator emits a repetition loop on a subject-less
+  fragment (diagnosed job 10371576; max_tokens 128/256/512 all loop). Either let the decode gate
+  accept 34,999 with that row named, or add a repetition brake to `force_complete_translation`
+  (method change, needs validation). Until decided the decode gate stays unsatisfied.
+
 ### P0 — right after decode reaches 40,000
 - [x] Run the verifier over rows 0–39,999 and build the one-JSON-per-utterance view.
   (Raw root: 40,000 unique, 0 missing, 1,793 duplicates from task_00/01. Dedup
