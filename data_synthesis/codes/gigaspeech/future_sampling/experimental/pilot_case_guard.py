@@ -104,6 +104,8 @@ def expected_settings(extra, seed, window):
         "targeted_fail_on_api_error": True, "sentence_end_completion": False,
         "sentence_end_boundary_mode": "literal", "sentence_end_punctuation": "off",
         "probe_prompt_order": "historical", "contrastive_notes": False,
+        "oracle_future_audit": False, "oracle_future_vote": False,
+        "probe_temperature": 0.0, "probe_top_p": 0.0, "probe_top_k": 0,
     }
     tokens = iter(shlex.split(extra))
     for token in tokens:
@@ -114,7 +116,14 @@ def expected_settings(extra, seed, window):
             expected[key] = True
         else:
             value = next(tokens)
-            expected[key] = int(value) if isinstance(expected[key], int) else value
+            if isinstance(expected[key], bool):
+                expected[key] = True
+            elif isinstance(expected[key], float):
+                expected[key] = float(value)
+            elif isinstance(expected[key], int):
+                expected[key] = int(value)
+            else:
+                expected[key] = value
     return expected
 
 

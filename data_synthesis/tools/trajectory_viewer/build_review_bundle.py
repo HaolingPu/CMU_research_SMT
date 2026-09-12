@@ -35,7 +35,7 @@ from typing import Any, Iterable
 
 CHUNK_RE = re.compile(r"^Chunk (\d+)/(\d+)$")
 GROUP_RE = re.compile(
-    r"^\[(Raw|Selected) candidates\] (.*?) \| (plausible|contrastive) \| "
+    r"^\[(Raw|Selected) candidates\] (.*?) \| (plausible|contrastive|oracle) \| "
     r"model=(\S+) mode=(\S+) count=(\d+)$"
 )
 ITEM_RE = re.compile(r"^\s+\d+\.\s+(.*?)(?:  resolves: (.*))?$")  # optional contrastive-notes field

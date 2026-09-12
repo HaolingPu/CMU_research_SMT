@@ -28,6 +28,7 @@ import pandas as pd
 from transformers import AutoTokenizer
 
 from ambiguity_sampler_prompt import (
+    MAX_SUFFIX_CHARS,
     PROMPT_VERSION, PROMPT_VERSIONS, SUFFIX_ICL_PROMPT_VERSION,
     build_coordinated_future_messages, parse_grouped_future_output, sample_grouped_futures,
     structured_output_extras,
@@ -138,9 +139,32 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--targeted-sampler-context", choices=["source-and-target", "source-only"],
                    default="source-and-target",
                    help="Opt-in source-only removes committed target text from both sampler prompt and seed.")
+    p.add_argument("--max-dropped-rows", type=int, default=0,
+                   help="Rows whose decode raises (e.g. the sentence-end guard refusing a degenerate "
+                        "completion) are recorded and skipped instead of failing the task, as long as "
+                        "no more than this many are dropped. 0 keeps the historical fail-fast behaviour.")
+    p.add_argument("--dropped-rows-log", default="",
+                   help="JSONL file receiving one record per dropped row (default: "
+                        "<verbose-dir>/dropped_rows.jsonl when --verbose-dir is set).")
     p.add_argument("--contrastive-notes", action="store_true",
                    help="v3 JSON only: each contrastive item must also name the reading it resolves "
                         "(object with suffix and resolves); the note is kept in the audit, not in the future.")
+    p.add_argument("--oracle-future-vote", action="store_true",
+                   help="Let the true source continuation cast a vote as future N+1 (implies "
+                        "--oracle-future-audit). NOTE: with --min-voters-ratio 1.0 this gives one "
+                        "draw the same veto power as the whole sampled set.")
+    p.add_argument("--probe-temperature", type=float, default=0.0,
+                   help="Sampling temperature on the probe /completions request. 0.0 (default) "
+                        "keeps the historical greedy/unscaled distribution.")
+    p.add_argument("--probe-top-p", type=float, default=0.0,
+                   help="top_p on the probe request; 0 = omit.")
+    p.add_argument("--probe-top-k", type=int, default=0,
+                   help="top_k on the probe request; 0 = omit.")
+    p.add_argument("--oracle-future-audit", action="store_true",
+                   help="Audit only, never changes a commit: probe the TRUE source continuation "
+                        "alongside the sampled futures and record whether it would have vetoed the "
+                        "token the sampled futures unanimously committed. Measures how often the "
+                        "sampler misses the real ambiguity.")
     p.add_argument("--probe-prompt-order", choices=["historical", "shared-first"], default="historical",
                    help="Order of the probe prompt sections. 'shared-first' puts the fixed [IMPORTANT] instruction "
                         "before [INPUT] so vLLM prefix caching covers everything up to the future; wording is identical.")
@@ -298,6 +322,38 @@ def build_source_observed_recent_units(
         prev_full = full_through_unit
 
     return observed_full
+
+
+def oracle_future_suffix(source_units: List[str], observed_full: str,
+                         max_chars: int = MAX_SUFFIX_CHARS) -> str:
+    """The TRUE continuation of the source, on the same budget a sampled future gets.
+
+    A sampled future is a suffix of up to MAX_SUFFIX_CHARS that the sampler is told to
+    carry past the end of the open grammatical structure. The oracle has to span the
+    same horizon or the comparison is rigged: about half the units of `src_text_full`
+    end at a comma rather than a sentence end, so stopping at the unit boundary would
+    hand the oracle a systematically shorter view than the futures it is being
+    compared against, and it would under-veto. So this walks THROUGH unit boundaries
+    and cuts on the same character budget, backing off to a word boundary rather than
+    splitting a token.
+
+    This is for the audit in `extend_pending_tokens`. It is never a voter: the decoder
+    must stay a function of what the student can see, or the targets teach a policy the
+    student cannot reproduce. Returns "" when the prefix already covers everything.
+    """
+    if not source_units or not observed_full:
+        return ""
+    full = ""
+    for unit in source_units:
+        full = append_text_continuation(full, unit)
+    if not full.startswith(observed_full):
+        return ""
+    remainder = full[len(observed_full):].strip()
+    if len(remainder) <= max_chars:
+        return remainder
+    cut = remainder[:max_chars]
+    space = cut.rfind(" ")
+    return (cut[:space] if space > max_chars // 2 else cut).rstrip()
 
 
 def current_unit_index(source_units: List[str], observed_full: str) -> int:
@@ -1362,6 +1418,9 @@ def batch_get_next_token_distributions(
     api_timeout: float = 120.0,
     target_lang: str = "Chinese",
     min_logprobs: int = 0,
+    probe_temperature: float = 0.0,
+    probe_top_p: float = 0.0,
+    probe_top_k: int = 0,
     shared_first: bool = False,
 ) -> List[Tuple[Dict[int, float], Dict[str, Any]]]:
 # Step 1: 用 chat template 把翻译指令编码成 token IDs
@@ -1390,11 +1449,19 @@ def batch_get_next_token_distributions(
         "model": api_model,
         "prompt": prompts,
         "max_tokens": 1,
-        "temperature": 0.0,
+        "temperature": probe_temperature,
         "logprobs": logprobs_n,
         "return_tokens_as_token_ids": True,
         "return_token_ids": True,
     }
+    # Only sent when explicitly asked for, so the historical request shape is unchanged
+    # by default. These reshape the *reported distribution* the consensus vote reads --
+    # they do not make the probe "sample", because max_tokens=1 and the code consumes
+    # top_logprobs, never the drawn token.
+    if probe_top_p and probe_top_p > 0:
+        payload["top_p"] = probe_top_p
+    if probe_top_k and probe_top_k > 0:
+        payload["top_k"] = probe_top_k
     data = _http_json(f"{normalize_api_base(api_base)}/completions", payload=payload, timeout=api_timeout) #call instruct model，传token ID列表，只生成1个token，拿top-k logprobs分布
     choices = data.get("choices", []) #vllm做batch处理，每个choice对应一个future的next-token分布
     results: List[Tuple[Dict[int, float], Dict[str, Any]]] = []
@@ -1647,6 +1714,11 @@ def extend_pending_tokens(
     min_voters_ratio: float = 0.75,
     future_join_mode: str = "space",
     probe_shared_first: bool = False,
+    oracle_future: str = "",
+    oracle_votes: bool = False,
+    probe_temperature: float = 0.0,
+    probe_top_p: float = 0.0,
+    probe_top_k: int = 0,
 ) -> Tuple[List[int], List[Dict[str, Any]]]:
     pending_token_ids: List[int] = []
     grow_logs: List[Dict[str, Any]] = []
@@ -1655,6 +1727,17 @@ def extend_pending_tokens(
         # 2a) 每条 future 拼成完整 source，问 instruct 模型："给定这个完整英文 + 已有中文前缀，下一个中文 token 是啥？"
         target_prefix_token_ids = list(committed_token_ids) + list(pending_token_ids)
         full_sources = [join_future_to_source(source_observed, f, future_join_mode) for f in futures]
+        # The oracle rides along in the same batch (no extra round trip) but is sliced
+        # off before the vote. It only ever answers "would the true continuation have
+        # rejected what we just committed?".
+        n_voting = len(full_sources)
+        if oracle_future:
+            full_sources.append(join_future_to_source(source_observed, oracle_future, future_join_mode))
+            if oracle_votes:
+                # The oracle is future N+1: it counts toward num_futures, so under
+                # min_voters_ratio=1.0 the true continuation must also agree before a
+                # token can commit.
+                n_voting = len(full_sources)
         probe_started = time.perf_counter()
 
         batch_results = batch_get_next_token_distributions(
@@ -1670,20 +1753,36 @@ def extend_pending_tokens(
             target_lang=target_lang,
             min_logprobs=soft_vote_top_k,
             shared_first=probe_shared_first,
+            probe_temperature=probe_temperature,
+            probe_top_p=probe_top_p,
+            probe_top_k=probe_top_k,
         )
+
+        if oracle_future and oracle_votes:
+            oracle_result = batch_results[n_voting - 1] if len(batch_results) >= n_voting else None
+        else:
+            oracle_result = batch_results[n_voting] if oracle_future and len(batch_results) > n_voting else None
+        batch_results = batch_results[:n_voting]
 
         distributions: List[Dict[int, float]] = []
         per_future: List[Dict[str, Any]] = []
+        # When the oracle votes it is voter N+1, so batch_results is one longer than
+        # `futures`. Label by position against a list that includes it, or `futures[i]`
+        # runs off the end on the last voter.
+        voter_labels = list(futures)
+        if oracle_future and oracle_votes:
+            voter_labels.append(f"[oracle] {oracle_future}")
         for i, (dist, dist_debug) in enumerate(batch_results):
+            label = voter_labels[i] if i < len(voter_labels) else f"[voter {i}]"
             if not dist:
                 grow_logs.append({"step": step_idx, "stop": "empty_distribution",
-                                  "future": futures[i], "dist_debug": dist_debug})
+                                  "future": label, "dist_debug": dist_debug})
                 return pending_token_ids, grow_logs
             distributions.append(dist)
             # select 3 policies: topk, topp, minp
             candidate_ids = _select_candidates(dist, top_p=top_p, min_p=min_p, top_k=soft_vote_top_k)
             per_future.append({
-                "future": futures[i],
+                "future": label,
                 "candidate_texts": [_single_token_text(instruct_tokenizer, t) for t in candidate_ids],
                 "candidate_probs": [dist.get(t, 0.0) for t in candidate_ids],
                 "num_candidates": len(candidate_ids),
@@ -1701,9 +1800,27 @@ def extend_pending_tokens(
             min_voters_ratio=min_voters_ratio,
         )
         probe_elapsed = round(time.perf_counter() - probe_started, 3)
+
+        oracle_audit: Optional[Dict[str, Any]] = None
+        if oracle_result is not None:
+            odist = oracle_result[0] or {}
+            oracle_audit = {"oracle_future": oracle_future, "has_dist": bool(odist),
+                            "voted": bool(oracle_votes)}
+            if odist:
+                ocands = set(_select_candidates(odist, top_p=top_p, min_p=min_p, top_k=soft_vote_top_k))
+                otop = max(odist, key=odist.get)
+                oracle_audit["oracle_top_token"] = _single_token_text(instruct_tokenizer, otop)
+                if consensus_token_id is not None:
+                    oracle_audit["committed_token"] = _single_token_text(instruct_tokenizer, consensus_token_id)
+                    # would_veto: the sampled futures were unanimous, but the true
+                    # continuation would not have voted for this token.
+                    oracle_audit["would_veto"] = consensus_token_id not in ocands
+                    oracle_audit["committed_prob_under_oracle"] = round(odist.get(consensus_token_id, 0.0), 5)
+
         if consensus_token_id is None: #没有共识token，停止本轮生长
             grow_logs.append({"step": step_idx, "stop": "no_consensus_token",
-                              "per_future": per_future, "meta": meta, "elapsed_s": probe_elapsed})
+                              "per_future": per_future, "meta": meta, "elapsed_s": probe_elapsed,
+                              **({"oracle_audit": oracle_audit} if oracle_audit else {})})
             break
 
         pending_token_ids.append(consensus_token_id) #共识成功，追加到pending buffer，继续下一步
@@ -1719,6 +1836,8 @@ def extend_pending_tokens(
             "per_future": per_future,
             "meta": meta,
         }
+        if oracle_audit:
+            log_entry["oracle_audit"] = oracle_audit
         grow_logs.append(log_entry)
 
     return pending_token_ids, grow_logs
@@ -2096,9 +2215,25 @@ def run_one_utterance(
             for line in format_raw_future_groups(future_audit):
                 _vlog(verbose_log_file, line)
         _vlog(verbose_log_file, f"[Step 1-2] future_sampling total={len(futures)}")
+        # The true source continuation. Computed here (not inline at the probe call) so the
+        # verbose log can list it alongside the sampled futures -- the review bundle builds
+        # its future list by parsing these group lines, so anything not logged here is
+        # invisible downstream even when it voted.
+        oracle_future_text = (
+            oracle_future_suffix(source_units, source_observed_full)
+            if (getattr(args, "oracle_future_audit", False)
+                or getattr(args, "oracle_future_vote", False))
+            else ""
+        )
         if verbose_log_file is not None:
             for line in format_selected_future_groups(futures, future_infos):
                 _vlog(verbose_log_file, line)
+            if oracle_future_text:
+                mode = "oracle"
+                _vlog(verbose_log_file,
+                      f"[Selected candidates] [ORACLE] source continuation | {mode} | "
+                      f"model=oracle mode={mode} count=1")
+                _vlog(verbose_log_file, f"  01. {oracle_future_text!r}")
 
         if len(futures) <= 3: #future太少无法做共识，等待更多源语言输入
             target_deltas.append("")
@@ -2126,6 +2261,11 @@ def run_one_utterance(
             soft_vote_threshold=args.soft_vote_threshold,
             min_voters_ratio=args.min_voters_ratio,
             probe_shared_first=args.probe_prompt_order == "shared-first",
+            oracle_future=oracle_future_text,
+            oracle_votes=getattr(args, "oracle_future_vote", False),
+            probe_temperature=args.probe_temperature,
+            probe_top_p=args.probe_top_p,
+            probe_top_k=args.probe_top_k,
         )
         _vlog(verbose_log_file, f"[Timing] probe_batches={sum(1 for g in grow_logs if 'elapsed_s' in g)} "
                                 f"total={sum(g.get('elapsed_s', 0.0) for g in grow_logs):.2f}s")
@@ -2168,6 +2308,11 @@ def run_one_utterance(
                         probs = pf.get("candidate_probs", [])
                         pairs = ", ".join(f"{t!r}:{p:.3f}" for t, p in zip(texts, probs))
                         _vlog(verbose_log_file, f"    future[{idx}] candidates={len(texts)}: [{pairs}]")
+                oa = gl.get("oracle_audit")
+                if oa:
+                    # One machine-parseable line per step so the audit can be aggregated
+                    # without re-parsing the human-readable block above.
+                    _vlog(verbose_log_file, f"  [ORACLE] {json.dumps({'step': step, **oa}, ensure_ascii=False)}")
 
         new_committed, delta, committed_delta_token_ids, finalize_meta = finalize_external_commit( #修剪pending tokens，只提交解码后没有乱码的前缀部分
             tokenizer=instruct_tokenizer,
@@ -2211,6 +2356,11 @@ def run_one_utterance(
             "sentence_end_completion": args.sentence_end_completion,
             "sentence_end_boundary_mode": args.sentence_end_boundary_mode,
             "sentence_end_punctuation": args.sentence_end_punctuation,
+            "oracle_future_audit": bool(getattr(args, "oracle_future_audit", False)),
+            "oracle_future_vote": bool(getattr(args, "oracle_future_vote", False)),
+            "probe_temperature": args.probe_temperature,
+            "probe_top_p": args.probe_top_p,
+            "probe_top_k": args.probe_top_k,
         },
         "boundary_audit": boundary_audit,
         "sampling_audit": sampling_audit,
@@ -2429,25 +2579,53 @@ def main() -> None:
     num_concurrent = max(1, args.num_concurrent_cases)
     row_items = [(idx, s.to_dict()) for idx, (_, s) in enumerate(rows.iterrows())]
     failures: List[str] = []
+    drops_path = args.dropped_rows_log or (
+        os.path.join(args.verbose_dir, "dropped_rows.jsonl") if args.verbose_dir else None)
+
+    def record_failure(row_idx: int, row_dict: Dict[str, Any], exc: BaseException) -> None:
+        """One unusable row must not cost the other rows in this task."""
+        utt = str(row_dict.get(args.id_column, row_dict.get("id", f"row_{row_idx}")))
+        print(f"[ERROR] Row {row_idx} ({utt}) raised: {exc}", file=sys.stderr, flush=True)
+        failures.append(f"Row {row_idx} ({utt}): {exc}")
+        if drops_path:
+            os.makedirs(os.path.dirname(drops_path) or ".", exist_ok=True)
+            with open(drops_path, "a", encoding="utf-8") as stream:
+                stream.write(json.dumps({
+                    "row_idx": row_idx, "utt_id": utt, "reason": str(exc),
+                    "error_type": type(exc).__name__,
+                    "recorded_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                }, ensure_ascii=False) + "\n")
 
     if num_concurrent <= 1:
         for row_idx, row_dict in row_items:
-            _process_one_row(row_idx, row_dict)
+            try:
+                _process_one_row(row_idx, row_dict)
+            except Exception as exc:
+                record_failure(row_idx, row_dict, exc)
     else:
         print(f"[Concurrent] {len(row_items)} rows, {num_concurrent} workers")
         with ThreadPoolExecutor(max_workers=num_concurrent) as executor:
-            futs = {executor.submit(_process_one_row, ri, rd): ri for ri, rd in row_items}
+            futs = {executor.submit(_process_one_row, ri, rd): (ri, rd) for ri, rd in row_items}
             for fut in as_completed(futs):
+                row_idx, row_dict = futs[fut]
                 try:
                     fut.result()
                 except Exception as exc:
-                    row_id = futs[fut]
-                    print(f"[ERROR] Row {row_id} raised: {exc}", file=sys.stderr)
-                    failures.append(f"Row {row_id}: {exc}")
+                    record_failure(row_idx, row_dict, exc)
 
     if failures:
-        print(f"[FATAL] {len(failures)} row(s) failed", file=sys.stderr)
-        raise SystemExit(1)
+        allowed = max(0, int(args.max_dropped_rows))
+        where = f" (recorded in {drops_path})" if drops_path else ""
+        if len(failures) > allowed:
+            print(f"[FATAL] {len(failures)} row(s) failed, more than --max-dropped-rows={allowed}{where}",
+                  file=sys.stderr)
+            for item in failures[:20]:
+                print(f"  {item}", file=sys.stderr)
+            raise SystemExit(1)
+        print(f"[DROPPED] {len(failures)} row(s) dropped, within --max-dropped-rows={allowed}{where}",
+              file=sys.stderr)
+        for item in failures:
+            print(f"  {item}", file=sys.stderr)
 
 
 if __name__ == "__main__":

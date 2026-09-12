@@ -13,6 +13,10 @@ SAMPLER_SERVER="${FS}/scripts/qwen38/serve_qwen38_gemma_colocated.sh"
 TRANSLATOR_SERVER="${FS}/scripts/qwen36/serve_qwen36_35b.sh"
 DECODER="${FS}/consensus_decoding_token_id_level_instruct.py"
 
+# Per-future next-token distributions are only written when compact verbose is OFF.
+# Default keeps the historical (compact) behaviour; set COMPACT_VERBOSE=0 to keep them.
+COMPACT_VERBOSE="${COMPACT_VERBOSE:-1}"
+if [[ "${COMPACT_VERBOSE}" == "0" ]]; then COMPACT_VERBOSE_FLAG=""; else COMPACT_VERBOSE_FLAG="--compact-verbose"; fi
 QWEN38_MODEL="${QWEN38_MODEL:-/data/user_data/haolingp/models/Qwen3.8-27B-FP8}"
 GEMMA_MODEL="${GEMMA_MODEL:-/data/user_data/haolingp/models/gemma-4-E2B-it}"
 QWEN36_MODEL="${QWEN36_MODEL:-/data/user_data/haolingp/models/Qwen3.6-35B-A3B-FP8}"
@@ -31,6 +35,8 @@ fi
 TARGETED_NUM_FUTURES="${TARGETED_NUM_FUTURES:-20}"
 MIN_VOTERS_RATIO="${MIN_VOTERS_RATIO:-1.0}"
 FUTURE_SRC_WINDOW="${FUTURE_SRC_WINDOW:-1}"
+# Rows the decoder may skip (recorded in dropped_rows.jsonl) rather than failing the whole task.
+MAX_DROPPED_ROWS="${MAX_DROPPED_ROWS:-0}"
 
 ROWS_PER_TASK=$(( (TOTAL_ROWS + NUM_TASKS - 1) / NUM_TASKS ))
 START_ROW=$(( ROW_OFFSET + TASK_ID * ROWS_PER_TASK ))
@@ -133,16 +139,24 @@ start_ts=$(date +%s)
   --row-idx "${START_ROW}" \
   --max-rows "${ROWS_PER_TASK}" \
   --num-concurrent-cases "${NUM_CONCURRENT_CASES}" \
+  --max-dropped-rows "${MAX_DROPPED_ROWS}" \
   --skip-existing \
   --output-jsonl "${TASK_DIR}/per_utt/_.jsonl" \
-  --verbose --compact-verbose --verbose-dir "${TASK_DIR}/verbose" \
+  --verbose ${COMPACT_VERBOSE_FLAG} --verbose-dir "${TASK_DIR}/verbose" \
   ${EXTRA_DECODER_ARGS:-} \
   2>&1 | tee -a "${TASK_DIR}/run.log"
 
 actual=$(find "${TASK_DIR}/per_utt" -maxdepth 1 -name '*.json' -type f | wc -l)
-if (( actual != ROWS_PER_TASK )); then
-  echo "[ERROR] wrote ${actual}/${ROWS_PER_TASK} outputs" >&2
+dropped=0
+if [[ -f "${TASK_DIR}/verbose/dropped_rows.jsonl" ]]; then
+  dropped=$(sort -u "${TASK_DIR}/verbose/dropped_rows.jsonl" | wc -l)
+fi
+if (( actual + dropped != ROWS_PER_TASK )); then
+  echo "[ERROR] wrote ${actual}/${ROWS_PER_TASK} outputs (${dropped} dropped)" >&2
   exit 1
+fi
+if (( dropped > 0 )); then
+  echo "[WARN] ${dropped} row(s) dropped; see ${TASK_DIR}/verbose/dropped_rows.jsonl" >&2
 fi
 printf 'task=%s rows=%s elapsed_seconds=%s prompt=%s\n' \
   "${TASK_ID}" "${actual}" "$(( $(date +%s) - start_ts ))" "${PROMPT_VERSION:-future_set_v2_two_groups}" >"${DONE_FILE}"

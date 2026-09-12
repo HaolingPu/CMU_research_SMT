@@ -32,7 +32,7 @@ PREFIX_NORMALIZATION="case-insensitive-word-boundary"
 VALIDATION_PILOT="suffix-icl-v3-50cases-20260907-130701 (text) + v3json-speed-50cases-20260908T0204Z (JSON)"
 # Nodes with confirmed vLLM/NCCL faults (pilot and inference exclusion lists, 2026-09).
 DECODE_EXCLUDE="${DECODE_EXCLUDE:-babel-o9-24,babel-q9-32,babel-t5-28,babel-v9-28,babel-p5-24,babel-o5-28,babel-p5-20,babel-o5-24,babel-q5-16,babel-q5-20,babel-n5-32,babel-p9-32,babel-p9-28,babel-m5-32}"
-INFER_EXCLUDE="${INFER_EXCLUDE:-babel-p9-32,babel-p9-28,babel-m5-32,babel-o5-24,babel-q5-16,babel-q5-20,babel-n5-32,babel-o5-16,babel-n5-28,babel-q5-32,babel-s5-24,babel-q5-24,babel-o5-28,babel-p5-20,babel-p5-24,babel-o9-24,babel-o9-28,babel-q9-32,babel-t5-28,babel-v9-28}"
+INFER_EXCLUDE="${INFER_EXCLUDE:-babel-p9-32,babel-p9-28,babel-m5-32,babel-o5-24,babel-q5-16,babel-q5-20,babel-n5-32,babel-o5-16,babel-n5-28,babel-q5-32,babel-s5-24,babel-q5-24,babel-o5-28,babel-p5-20,babel-p5-24,babel-o9-24,babel-o9-28,babel-q9-32,babel-t5-28,babel-v9-28,babel-o5-32,babel-o5-20,babel-p5-28,babel-q5-28,babel-p5-16,babel-o9-20}"
 # Backfill windows shorter than this end in TIMEOUT, which Slurm does not requeue (40k lesson).
 DECODE_TIME_MIN="${DECODE_TIME_MIN:-08:00:00}"
 # Decoder flags beyond the frozen 40k set. No commas: they travel through --export.

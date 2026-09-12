@@ -6,7 +6,9 @@
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=128GB
 #SBATCH --gres=gpu:L40S:4
-#SBATCH --partition=general
+#SBATCH --partition=preempt
+#SBATCH --qos=preempt_qos
+#SBATCH --requeue
 #SBATCH --exclude=babel-p9-32,babel-p5-24,babel-t9-16
 #SBATCH --time=1-00:00:00
 ##SBATCH --dependency=afterok:job_id
@@ -30,6 +32,26 @@ WANDB_MODE=${WANDB_MODE:-disabled}
 EXP_NAME=gigaspeech-zh-EAST-even-s-bsz4
 TRAIN_DATASET=/data/group_data/li_lab/siqiouya/datasets/gigaspeech/manifests/train_s_zh-EAST-even12500.jsonl
 
+# Stock ms-swift gives an empty assistant turn no loss at all: its <|im_end|> is
+# never labelled, so "wait" is never supervised (wiki/entities/megatron-swift.md).
+# LOSS_SCALE selects one of Siqi's plugins, vendored under scripts/train/plugins/:
+#   assistant_turn_end   every assistant end token at weight 1
+#   empty_turn_end_w<w>  only an EMPTY turn's end token at w (ends after content stay 1)
+#   turn_end_w<w>        every assistant end token at w        (w in .1 .2 .25 .5 .75)
+# Use empty_turn_end_w0.5 unless you have a reason not to: weight 1 over-waits in
+# their m=1 sweep. Default keeps the stock (buggy) behaviour.
+LOSS_SCALE="${LOSS_SCALE:-default}"
+PLUGIN_DIR="${PLUGIN_DIR:-/home/haolingp/CMU_research_SMT/scripts/train/plugins}"
+PLUGIN_PATHS="${PLUGIN_PATHS:-${PLUGIN_DIR}/assistant_turn_end.py ${PLUGIN_DIR}/weighted_turn_end.py}"
+# A non-default loss_scale changes the LABELS, not just the weights. Re-use of a
+# tokenized cache built under the stock scale would silently train the old labels
+# and make the fix a no-op, so a non-default scale always re-tokenizes.
+CACHE_TOKENIZED="${CACHE_TOKENIZED:-true}"
+if [[ "${LOSS_SCALE}" != "default" ]]; then
+  EXP_NAME="${EXP_NAME}-${LOSS_SCALE}"
+  CACHE_TOKENIZED=false
+fi
+
 apptainer exec \
   --nv \
   --env "MODELSCOPE_CACHE=/home/haolingp/.cache/modelscope/" \
@@ -41,6 +63,9 @@ apptainer exec \
   --env "EXP_NAME=${EXP_NAME}" \
   --env "train_dataset=${TRAIN_DATASET}" \
   --env "SSL_CERT_FILE=/home/haolingp/CMU_research_SMT/scripts/train/cacert.pem" \
+  --env "LOSS_SCALE=${LOSS_SCALE}" \
+  --env "PLUGIN_PATHS=${PLUGIN_PATHS}" \
+  --env "CACHE_TOKENIZED=${CACHE_TOKENIZED}" \
   docker://modelscope-registry.us-west-1.cr.aliyuncs.com/modelscope-repo/modelscope:ubuntu22.04-cuda12.8.1-py311-torch2.8.0-vllm0.11.0-modelscope1.31.0-swift3.9.1 \
   bash -c '
 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
@@ -50,8 +75,10 @@ ENABLE_AUDIO_OUTPUT=False \
 megatron sft \
     --load /data/user_data/haolingp/ckpts/pretrained/llm/Qwen3-Omni-30B-A3B-Instruct-mcore/ \
     --dataset ${train_dataset} \
+    --external_plugins ${PLUGIN_PATHS} \
+    --loss_scale ${LOSS_SCALE} \
     --split_dataset_ratio 0.01 \
-    --load_from_cache_file true \
+    --load_from_cache_file ${CACHE_TOKENIZED} \
     --train_type lora \
     --lora_rank 32 \
     --lora_alpha 32 \

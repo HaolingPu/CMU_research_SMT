@@ -6,7 +6,12 @@
 #SBATCH --mem=64GB
 #SBATCH --gres=gpu:L40S:2
 #SBATCH --partition=general
-#SBATCH --exclude=babel-p9-32,babel-p9-28,babel-m5-32,babel-o5-24,babel-q5-16,babel-n5-32,babel-o5-16,babel-n5-28,babel-q5-32,babel-s5-24,babel-q5-24
+# 2026-09-10 node census: these six accounted for ALL 12 inference failures of the
+# turn-end retrain (36 completions / 0 failures across 17 other nodes). Symptom is a
+# corrupt /dev/shm: vLLM logs 'No available shared memory broadcast block' every 60 s,
+# processes zero instances, and the wrapper's 5400 s watchdog burns 90 min per attempt.
+# babel-o5-32 alone: 0 completions, 4 failures, 2 hangs. See wiki/entities/babel-cluster.md
+#SBATCH --exclude=babel-p9-32,babel-p9-28,babel-m5-32,babel-o5-24,babel-q5-16,babel-n5-32,babel-o5-16,babel-n5-28,babel-q5-32,babel-s5-24,babel-q5-24,babel-o5-32,babel-o5-20,babel-p5-28,babel-q5-28,babel-p5-16,babel-o9-20
 #SBATCH --time=1-00:00:00
 #SBATCH --array=1-4
 #SBATCH --mail-type=ALL
