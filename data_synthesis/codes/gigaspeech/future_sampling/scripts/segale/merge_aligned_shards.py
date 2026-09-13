@@ -1,53 +1,31 @@
 #!/usr/bin/env python3
-"""Merge per-shard aligned_spacy_system.jsonl into one file."""
-from __future__ import annotations
-
+"""Concatenate the per-shard SEGALE alignments (shard_NN/system/aligned_spacy_system.jsonl) into one file."""
 import argparse
 import json
 from pathlib import Path
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--shards-root", required=True,
-                    help="Dir with shard_NN/ subdirs (each having system/aligned_spacy_system.jsonl).")
-    ap.add_argument("--output", required=True, help="Merged jsonl output path")
-    ap.add_argument("--num-shards", type=int, default=8)
-    args = ap.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--shards-root", required=True, help="Directory with shard_NN/system/aligned_spacy_system.jsonl.")
+    parser.add_argument("--output", required=True, help="Merged jsonl.")
+    parser.add_argument("--num-shards", type=int, required=True)
+    args = parser.parse_args()
 
-    shards_root = Path(args.shards_root).resolve()
     output = Path(args.output).resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
-
-    total = 0
-    docs = set()
-    missing = []
-    with output.open("w", encoding="utf-8") as fout:
-        for sid in range(args.num_shards):
-            shard_aligned = shards_root / f"shard_{sid:02d}" / "system" / "aligned_spacy_system.jsonl"
-            if not shard_aligned.is_file():
-                missing.append(str(shard_aligned))
-                continue
-            with shard_aligned.open("r", encoding="utf-8") as fin:
-                for line in fin:
-                    line = line.rstrip("\n")
-                    if not line:
-                        continue
-                    fout.write(line + "\n")
-                    try:
-                        d = json.loads(line)
-                        docs.add(d.get("doc_id", ""))
-                    except Exception:
-                        pass
-                    total += 1
-
-    print(f"Merged: {total} rows from {args.num_shards - len(missing)}/{args.num_shards} shards")
-    print(f"Unique docs: {len(docs)}")
-    if missing:
-        print(f"MISSING shards ({len(missing)}):")
-        for m in missing:
-            print(f"  - {m}")
-    print(f"Output: {output}")
+    rows = 0
+    doc_ids = set()
+    with output.open("w", encoding="utf-8") as merged:
+        for shard_id in range(args.num_shards):
+            # Opening a missing shard raises: every shard must be aligned before the merge.
+            shard_path = Path(args.shards_root) / f"shard_{shard_id:02d}" / "system" / "aligned_spacy_system.jsonl"
+            for line in shard_path.read_text(encoding="utf-8").splitlines():
+                if line:
+                    merged.write(line + "\n")
+                    doc_ids.add(json.loads(line)["doc_id"])
+                    rows += 1
+    print(f"Merged {rows} rows ({len(doc_ids)} docs) from {args.num_shards} shards -> {output}")
 
 
 if __name__ == "__main__":
