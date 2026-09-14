@@ -1,0 +1,49 @@
+diff --git a/omnisteval/data.py b/omnisteval/data.py
+index 6967f45..fbb4282 100644
+--- a/omnisteval/data.py
++++ b/omnisteval/data.py
+@@ -143,7 +143,7 @@ def load_reference(
+         seg["offset"] = seg["offset"] * 1000
+ 
+     with open(ref_sentences_file, "r", encoding="utf-8") as f:
+-        reference_sentences = [line.strip() for line in f]
++        reference_sentences = [unicode_normalize(line.strip()) for line in f]
+     if char_level:
+         reference_sentences = [s.replace(" ", "") for s in reference_sentences]
+ 
+@@ -499,7 +499,7 @@ def load_text_segmentation(
+                 ) from e
+ 
+     with open(ref_sentences_file, "r", encoding="utf-8") as f:
+-        reference_sentences = [line.strip() for line in f]
++        reference_sentences = [unicode_normalize(line.strip()) for line in f]
+     if char_level:
+         reference_sentences = [s.replace(" ", "") for s in reference_sentences]
+ 
+diff --git a/omnisteval/io.py b/omnisteval/io.py
+index e11426f..79fce39 100644
+--- a/omnisteval/io.py
++++ b/omnisteval/io.py
+@@ -18,6 +18,7 @@ from .data import (
+     get_segmentation_order,
+     load_hypothesis_simulstream,
+ )
++from .tokenization import unicode_normalize
+ from . import __version__
+ 
+ logger = logging.getLogger(__name__)
+@@ -46,12 +47,12 @@ def load_shortform_instances(
+                 "The reference sentences from the file will be used instead of those in the hypothesis lines."
+             )
+         with open(ref_sentences_file, "r", encoding="utf-8") as f:
+-            ref_sentences = [line.strip() for line in f]
++            ref_sentences = [unicode_normalize(line.strip()) for line in f]
+         assert len(ref_sentences) == len(hyp_lines), (
+             f"Number of references ({len(ref_sentences)}) does not match number of hypothesis lines ({len(hyp_lines)})."
+         )
+     elif all_have_reference:
+-        ref_sentences = [h["reference"].strip() for h in hyp_lines] 
++        ref_sentences = [unicode_normalize(h["reference"].strip()) for h in hyp_lines]
+     else:
+         raise ValueError("No reference sentences provided. Each hypothesis line must contain a 'reference' field, or a separate reference sentences file must be provided.")
+ 
