@@ -44,6 +44,11 @@ DEFAULT_INSTRUCT_API_BASE = os.environ.get("INSTRUCT_API_BASE", "")
 DEFAULT_INSTRUCT_API_MODEL = os.environ.get("INSTRUCT_API_MODEL", "qwen3-instruct")
 TOP_K = 6
 MIN_P = 0.0
+# Probe tokens with ASCII letters used to be dropped before the vote and at commit, so an English term (CDC, Kubernetes,
+# iPhone) could never be voted in and the decoder waited until the unfiltered sentence-end completion or final flush
+# (wiki experiments/2026-09-latin-hold-ascii-filter.md). Since 2026-09-29 they are allowed; --block-latin-tokens
+# restores the old rule. Set once from the command line in main().
+BLOCK_LATIN_TOKENS = False
 
 
 def setup_env() -> None:
@@ -149,6 +154,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--contrastive-notes", action="store_true",
                    help="v3 JSON only: each contrastive item must also name the reading it resolves "
                         "(object with suffix and resolves); the note is kept in the audit, not in the future.")
+    p.add_argument("--block-latin-tokens", action="store_true",
+                   help="Drop probe tokens that contain ASCII letters, in the vote and at commit (the rule before "
+                        "2026-09-29). Default: English terms can be voted in on time.")
     p.add_argument("--oracle-future-vote", action="store_true",
                    help="Let the true source continuation cast a vote as future N+1 (implies "
                         "--oracle-future-audit). NOTE: with --min-voters-ratio 1.0 this gives one "
@@ -810,7 +818,11 @@ def _disallowed_generation_token_reason(tokenizer: Any, tok_id: int) -> Optional
             return "special_token_text"
     if any(ch in token_text for ch in ("*", "`")):
         return "markdown_token"
-    if re.search(r"[A-Za-z]", token_text):
+    # Qwen's added tag tokens (<think>, </tool_call>, <|fim_prefix|> ...) are not in all_special_ids; the ASCII rule used
+    # to drop them by accident, so they need their own rule now that English tokens are allowed.
+    if re.fullmatch(r"\s*(</?[A-Za-z_]+>|<\|[A-Za-z_]+\|>)\s*", token_text):
+        return "special_token_text"
+    if BLOCK_LATIN_TOKENS and re.search(r"[A-Za-z]", token_text):
         return "ascii_letters"
     # NOTE: Do NOT filter replacement_char (U+FFFD) here. Byte-level BPE tokens
     # for rare characters (e.g. Japanese kanji "繰") decode to U+FFFD individually
@@ -1872,7 +1884,15 @@ def force_complete_translation(
         raise RuntimeError("Boundary completion missing or token-truncated; refusing to fabricate a closed sentence")
     if not choices:
         return ""
-    return clean_model_text(str(choices[0].get("text", "")))
+    raw_completion = str(choices[0].get("text", ""))
+    completion = clean_model_text(raw_completion)
+    # A commit can now end on an English word ("我们用 Visual"); keep the space the model put before the next English
+    # word, which clean_model_text strips, so the target does not read "VisualStudio Code".
+    if (completion and raw_completion[:1].isspace() and re.search(r"[A-Za-z0-9]$", committed_text)
+            and re.match(r"[A-Za-z0-9]", completion)):
+        return " " + completion
+    else:
+        return completion
 
 
 # ---------------------------------------------------------------------------
@@ -2361,6 +2381,7 @@ def run_one_utterance(
             "probe_temperature": args.probe_temperature,
             "probe_top_p": args.probe_top_p,
             "probe_top_k": args.probe_top_k,
+            "block_latin_tokens": args.block_latin_tokens,
         },
         "boundary_audit": boundary_audit,
         "sampling_audit": sampling_audit,
@@ -2420,8 +2441,10 @@ def select_rows(df: pd.DataFrame, args: argparse.Namespace) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 
 def main() -> None:
+    global BLOCK_LATIN_TOKENS
     setup_env()
     args = parse_args()
+    BLOCK_LATIN_TOKENS = args.block_latin_tokens
 
     if args.use_targeted_instruct_sampling:
         # Targeted instruct sampling bypasses base-LM future sampling entirely.

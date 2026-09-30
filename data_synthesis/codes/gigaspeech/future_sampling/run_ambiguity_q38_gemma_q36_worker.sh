@@ -52,7 +52,9 @@ fi
 TASK_DIR="${OUTPUT_ROOT}/task_$(printf '%02d' "${TASK_ID}")"
 LOG_DIR="${OUTPUT_ROOT}/serve_logs/task_$(printf '%02d' "${TASK_ID}")"
 DONE_FILE="${TASK_DIR}/DONE.txt"
-PORT_BASE=$(( 8600 + 4 * TASK_ID ))
+# DECODE_PORT_BASE gives each concurrently running decode run its own ports: task i of two runs on one node would
+# otherwise share 8600+4i and the serve scripts' stop step (lsof -ti :PORT | kill) would kill the other run's servers.
+PORT_BASE=$(( ${DECODE_PORT_BASE:-8600} + 4 * TASK_ID ))
 QWEN38_PORT=${PORT_BASE}
 GEMMA_PORT=$(( PORT_BASE + 1 ))
 QWEN36_PORT=$(( PORT_BASE + 2 ))
@@ -78,6 +80,14 @@ cleanup() {
   GPU=1 PORT="${QWEN36_PORT}" PID_FILE="${QWEN36_PID_FILE}" \
     "${TRANSLATOR_SERVER}" stop
 }
+for port in "${QWEN38_PORT}" "${GEMMA_PORT}" "${QWEN36_PORT}"; do
+  if curl -fsS -m 2 "http://127.0.0.1:${port}/health" >/dev/null 2>&1; then
+    echo "[ERROR] port ${port} is already serving on $(hostname); not starting (would share or kill another job's server)" >&2
+    exit 1
+  else
+    :
+  fi
+done
 trap cleanup EXIT INT TERM
 
 wait_health() {
