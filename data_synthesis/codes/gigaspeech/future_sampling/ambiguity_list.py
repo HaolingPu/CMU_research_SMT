@@ -145,16 +145,68 @@ Word: bank — 1. financial institution (银行); 2. side of a river (河岸)
 Answer: {"possible": [2]}   ("of the river" rules out the financial institution)"""
 
 
-def check_messages(prefix: str, word: str, readings: list[str]) -> list[dict[str, str]]:
+CHECK_SYSTEM_STRICT = """You help a simultaneous English-to-Chinese interpreter, who has heard only the words below and nothing after them.
+
+For the given word, which was heard earlier, decide which of the listed meanings a listener who has heard these words would still seriously consider. Drop a meaning as soon as the words heard so far point clearly to another one, even if the dropped meaning is not strictly impossible. Keep two or more meanings only while nothing heard so far favours one of them.
+
+Examples (illustrative, not answers to the actual input):
+Heard so far: We walked down to the bank and
+Word: bank — 1. financial institution (银行); 2. side of a river (河岸)
+Answer: {"possible": [1, 2]}   (nothing heard yet favours either meaning)
+Heard so far: We walked down to the bank and watched the ducks
+Word: bank — 1. financial institution (银行); 2. side of a river (河岸)
+Answer: {"possible": [2]}   (ducks point clearly to the river, although a bank building is not impossible)
+Heard so far: I finally met Jordan, and she
+Word: Jordan — 1. the country (约旦); 2. a person named Jordan (乔丹)
+Answer: {"possible": [2]}   ("met ... she" points to a person)"""
+
+
+def check_messages(prefix: str, word: str, readings: list[str], strict: bool = False) -> list[dict[str, str]]:
     meanings = "; ".join(f"{index}. {reading}" for index, reading in enumerate(readings, 1))
     user = (f"Heard so far: {prefix}\nWord: {word} — {meanings}\n\nRespond with one JSON object "
             '{"possible": [<meaning numbers>]} and nothing else.')
-    return [{"role": "system", "content": CHECK_SYSTEM}, {"role": "user", "content": user}]
+    return [{"role": "system", "content": CHECK_SYSTEM_STRICT if strict else CHECK_SYSTEM}, {"role": "user", "content": user}]
 
 
 def check_schema(count: int) -> dict:   # xgrammar: no uniqueItems
     return {"type": "object", "properties": {"possible": {"type": "array", "maxItems": count,
             "items": {"type": "integer", "minimum": 1, "maximum": count}}}, "required": ["possible"], "additionalProperties": False}
+
+
+DECIDE_SYSTEM = """You help a simultaneous English-to-Chinese interpreter, who has heard only the words below and nothing after them.
+
+The interpreter has to choose a translation for the given word, which was heard earlier. Say which of the listed meanings the speaker means, judging only from what the speaker has said so far, and how sure a careful listener can be at this point:
+- "certain": the words heard so far make this meaning clear; another listed meaning would now come as a surprise, even if it is not strictly impossible.
+- "likely": the words heard so far favour this meaning, but another listed meaning could still easily follow.
+- "unsure": nothing heard so far favours one meaning over another; give 0 as the meaning.
+Do not favour a meaning only because it is more common in general. When two listed meanings are the same meaning in different words, give either of them.
+
+Examples (illustrative, not answers to the actual input):
+Heard so far: We walked down to the bank and
+Word: bank — 1. financial institution (银行); 2. side of a river (河岸)
+Answer: {"meaning": 0, "confidence": "unsure"}   (nothing heard yet favours either meaning)
+Heard so far: I stopped by the bank this morning and
+Word: bank — 1. financial institution (银行); 2. side of a river (河岸)
+Answer: {"meaning": 1, "confidence": "likely"}   (a morning stop sounds like an errand, but "and sat by the water" could still follow)
+Heard so far: We walked down to the bank and watched the ducks
+Word: bank — 1. financial institution (银行); 2. side of a river (河岸)
+Answer: {"meaning": 2, "confidence": "certain"}   (ducks make the river side clear)
+Heard so far: We lost the match because our goalkeeper
+Word: match — 1. a game or contest (比赛); 2. a sports fixture (赛事); 3. a stick for lighting a fire (火柴)
+Answer: {"meaning": 1, "confidence": "certain"}   (a goalkeeper makes the game clear; 1 and 2 are the same meaning, so 2 would also be right)"""
+
+
+def decide_messages(prefix: str, word: str, readings: list[str]) -> list[dict[str, str]]:
+    meanings = "; ".join(f"{index}. {reading}" for index, reading in enumerate(readings, 1))
+    user = (f"Heard so far: {prefix}\nWord: {word} — {meanings}\n\nRespond with one JSON object "
+            '{"meaning": <meaning number, 0 if unsure>, "confidence": "certain" | "likely" | "unsure"} and nothing else.')
+    return [{"role": "system", "content": DECIDE_SYSTEM}, {"role": "user", "content": user}]
+
+
+def decide_schema(count: int) -> dict:
+    return {"type": "object", "properties": {"meaning": {"type": "integer", "minimum": 0, "maximum": count},
+                                             "confidence": {"type": "string", "enum": ["certain", "likely", "unsure"]}},
+            "required": ["meaning", "confidence"], "additionalProperties": False}
 
 
 def readings_block(words: list[tuple[str, list[str]]]) -> str:

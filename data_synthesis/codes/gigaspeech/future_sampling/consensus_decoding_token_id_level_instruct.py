@@ -36,7 +36,7 @@ from ambiguity_sampler_prompt import (
     structured_output_extras,
 )
 from ambiguity_list import (
-    check_messages, check_schema, extend_to_sentence, natural_messages, natural_schema, open_entries, request as list_request, sample_messages,
+    check_messages, check_schema, decide_messages, decide_schema, extend_to_sentence, natural_messages, natural_schema, open_entries, request as list_request, sample_messages,
     sample_schema,
 )
 from transformers import PreTrainedTokenizerBase
@@ -144,6 +144,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--list-natural", choices=["qwen", "gemma", "none"], default="qwen",
                    help="--future-roles list: which sampler writes the natural continuations (qwen = sampler 2).")
     p.add_argument("--list-natural-n", type=int, default=6)
+    p.add_argument("--prefix-only-voter", action="store_true",
+                   help="The only voter is the heard source with no continuation (see patch_prefixonly.py).")
     p.add_argument("--list-per-reading", type=int, default=2)
     p.add_argument("--list-targeted-thinking", action="store_true",
                    help="--future-roles list: targeted continuations with thinking, --list-think-budget reasoning tokens "
@@ -152,11 +154,31 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--anchor-reference", action="store_true",
                    help="Write the row's reference translation; the futures only decide when (see patch_anchor.py).")
     p.add_argument("--anchor-min-p", type=float, default=0.02)
+    p.add_argument("--anchor-hold", action="store_true",
+                   help="Hold the reference span of a listed word while it is open (see patch_hold.py).")
+    p.add_argument("--no-targeted", action="store_true",
+                   help="--future-roles list: run the reading check but write no per-reading continuations.")
+    p.add_argument("--min-futures", type=int, default=4,
+                   help="Read (wait) when fewer sampled futures than this survive the filter (the old hard-coded rule = 4).")
+    p.add_argument("--resolved-note", action="store_true",
+                   help="After a listed word is confirmed resolved, every translator call gets its reading as a [NOTE].")
+    p.add_argument("--check-mode", choices=["greedy", "think", "vote5", "decide", "decide-likely"], default="greedy",
+                   help="decide / decide-likely: which meaning and how sure; resolved when certain / certain or likely (patch_decide.py).")
+    p.add_argument("--check-think-budget", type=int, default=600)
+    p.add_argument("--check-strict", action="store_true",
+                   help="The reading check keeps a meaning only while a listener would still seriously consider it.")
+    p.add_argument("--check-confirm", type=int, default=2,
+                   help="--anchor-hold: chunks in a row the reading check must find a word resolved before it closes.")
     p.add_argument("--anchor-ratio-floor", type=float, default=0.0,
                    help="--anchor-ratio yardstick = max(P(token | true continuation), this floor).")
     p.add_argument("--anchor-ratio", type=float, default=0.0,
                    help="With --anchor-reference: > 0 writes a reference token iff every sampled future gives it at least "
                         "this fraction of the true continuation's probability (exact, prompt_logprobs; see patch_ratio.py).")
+    p.add_argument("--anchor-ratio-targeted", type=float, default=None,
+                   help="With --anchor-ratio: the fraction a targeted (per-reading) future must give instead of --anchor-ratio; "
+                        "natural futures keep --anchor-ratio (patch_targeted_ratio.py). Default: --anchor-ratio for every future.")
+    p.add_argument("--close-at-settled", action="store_true",
+                   help="A listed word stays open until the chunk before the detection's settled_chunk (patch_settled.py).")
     p.add_argument("--list-reading-check", action="store_true",
                    help="--future-roles list: a separate call per open word keeps only the readings still possible.")
     p.add_argument("--list-probe-hint", action="store_true",
@@ -772,7 +794,7 @@ def build_translation_probe_prompt_prefix_token_ids(
 
 
 def build_final_completion_prompt(tokenizer: Any, full_source: str, committed_text: str, target_lang: str = "Chinese", terminal_mark: str = "",
-                                  enable_thinking: bool = False, append_committed: bool = True) -> str:
+                                  enable_thinking: bool = False, append_committed: bool = True, note: str = "") -> str:
     if not str(committed_text or "").strip():
         messages = [{"role": "user", "content": (
             f"[TASK]\nTranslate the [INPUT] text into {target_lang}.\n\n"
@@ -799,6 +821,10 @@ def build_final_completion_prompt(tokenizer: Any, full_source: str, committed_te
             "before any closing quotation mark. Do not invent a following sentence or any unobserved content. "
             "If only the terminal punctuation is missing, output that punctuation only."
         )
+    if note:   # --resolved-note, after every instruction
+        messages[0]["content"] += f"\n\n[NOTE]\n{note}"
+    else:
+        pass
     prompt = tokenizer.apply_chat_template(
         messages,
         add_generation_prompt=True,
@@ -1459,7 +1485,9 @@ SamplerSpec = Tuple[PreTrainedTokenizerBase, str, str, float]
 def sample_list_futures(observed_source: str, list_prefix: str, list_open: List[Dict[str, Any]], natural_spec: SamplerSpec,
                         targeted_spec: SamplerSpec, natural: str, natural_n: int, per_reading: int, targeted_thinking: bool,
                         think_budget: int, skip_ruled_out: bool = False,
-                        reading_check: bool = False, observed_full: str = "") -> Tuple[List[str], List[Dict[str, Any]], List[Dict[str, Any]]]:
+                        reading_check: bool = False, observed_full: str = "",
+                        check_strict: bool = False, check_mode: str = "greedy",
+                        check_think_budget: int = 600, no_targeted: bool = False) -> Tuple[List[str], List[Dict[str, Any]], List[Dict[str, Any]]]:
     """design v3: natural continuations of the sentence-anchored prefix, plus continuations of the (extended) prefix per
     reading of every open listed word. Both go through the coordinated sampler's filter; each request's status goes to
     the audit (a failed request would otherwise leave no trace)."""
@@ -1484,12 +1512,40 @@ def sample_list_futures(observed_source: str, list_prefix: str, list_open: List[
         if reading_check:   # keep only the readings still possible given the whole prefix; close a word left with < 2
             checked = []
             for word, readings in words:
-                results, _ = list_request(base, model, tokenizer, check_messages(observed_full, word, readings), False, 1,
-                                          check_schema(len(readings)), 60, timeout, temperature=0.0)
-                answer = results[0]["answer"]
-                possible = sorted({n for n in answer.get("possible", []) if 1 <= n <= len(readings)}) if isinstance(answer, dict) else list(range(1, len(readings) + 1))
+                everything = set(range(1, len(readings) + 1))
+                if check_mode in ("decide", "decide-likely"):   # patch_decide.py: which meaning, and how sure
+                    results, _ = list_request(base, model, tokenizer, decide_messages(observed_full, word, readings), True, 1,
+                                              decide_schema(len(readings)), check_think_budget, timeout)
+                    answer = results[0]["answer"] if isinstance(results[0]["answer"], dict) else {}
+                    levels = ("certain",) if check_mode == "decide" else ("certain", "likely")
+                    if type(answer.get("meaning")) is int and answer["meaning"] in everything and answer.get("confidence") in levels:
+                        possible = [answer["meaning"]]
+                    else:
+                        possible = sorted(everything)
+                else:
+                    messages = check_messages(observed_full, word, readings, check_strict)
+                    if check_mode == "think":
+                        results, _ = list_request(base, model, tokenizer, messages, True, 1, check_schema(len(readings)),
+                                                  check_think_budget, timeout)
+                    elif check_mode == "vote5":
+                        results, _ = list_request(base, model, tokenizer, messages, False, 5, check_schema(len(readings)), 60,
+                                                  timeout, temperature=0.7)
+                    else:
+                        results, _ = list_request(base, model, tokenizer, messages, False, 1, check_schema(len(readings)), 60,
+                                                  timeout, temperature=0.0)
+                    votes = []   # one set per answer; an answer that is missing or malformed keeps every meaning
+                    for r in results:
+                        listed = r["answer"].get("possible") if isinstance(r["answer"], dict) else None
+                        if isinstance(listed, list):
+                            votes.append({n for n in listed if isinstance(n, int) and 1 <= n <= len(readings)})
+                        else:
+                            votes.append(everything)
+                    # a meaning stays if a strict majority of all answers keeps it (one answer unless vote5)
+                    possible = sorted(n for n in everything if 2 * sum(n in v for v in votes) > len(votes))
                 check_audit.append({"model": model, "mode": "check_request", "status": results[0]["status"], "accepted": None,
-                                    "word": word, "possible": possible})
+                                    "word": word, "possible": possible, "readings": readings,
+                                    "answer": results[0]["answer"] if check_mode in ("decide", "decide-likely") else None,
+                                    "reasoning_tail": results[0]["reasoning_tail"][-600:]})
                 if len(possible) >= 2:
                     checked.append((word, [readings[n - 1] for n in possible]))
                 else:
@@ -1497,7 +1553,7 @@ def sample_list_futures(observed_source: str, list_prefix: str, list_open: List[
             words = checked
         else:
             pass
-        if not words:
+        if not words or no_targeted:   # --no-targeted: the check (above) still runs, no per-reading continuations
             return [], [], check_audit
         else:
             pass
@@ -1565,6 +1621,10 @@ def sample_source_futures_targeted_prefill(
     list_skip_ruled_out: bool = False,
     list_reading_check: bool = False,
     list_observed_full: str = "",
+    list_check_strict: bool = False,
+    list_check_mode: str = "greedy",
+    list_check_think_budget: int = 600,
+    list_no_targeted: bool = False,
 ) -> Any:
     """Generate a coordinated set per model with equal group budgets (or, with future_roles, the role-split set)."""
     if not observed_source.strip():
@@ -1578,7 +1638,8 @@ def sample_source_futures_targeted_prefill(
             targeted_spec=(sampler2_tokenizer, sampler2_api_base, sampler2_api_model, s2_timeout), natural=list_natural,
             natural_n=list_natural_n, per_reading=list_per_reading, targeted_thinking=list_targeted_thinking,
             think_budget=list_think_budget, skip_ruled_out=list_skip_ruled_out, reading_check=list_reading_check,
-            observed_full=list_observed_full,
+            observed_full=list_observed_full, check_strict=list_check_strict, check_mode=list_check_mode,
+            check_think_budget=list_check_think_budget, no_targeted=list_no_targeted,
         )
         return result if return_audit else result[:2]
     elif future_roles != "off":
@@ -2108,12 +2169,17 @@ def finalize_external_commit(
 def anchor_ratio_commit(tokenizer: Any, source_observed: str, futures: List[str], oracle_future: str, future_join_mode: str,
                         committed_token_ids: List[int], anchor_ids: List[int], ratio: float, max_tokens: int,
                         future_notes: Optional[List[str]], api_base: str, api_model: str, api_timeout: float,
-                        target_lang: str, shared_first: bool, floor: float = 0.0) -> Tuple[List[int], List[Dict[str, Any]]]:
+                        target_lang: str, shared_first: bool, floor: float = 0.0,
+                        hold_tokens: Optional[int] = None,
+                        future_ratios: Optional[List[float]] = None) -> Tuple[List[int], List[Dict[str, Any]]]:
     """--anchor-ratio: the longest prefix of the remaining reference (at most max_tokens tokens) whose every token gets,
-    under every sampled future, at least `ratio` times its probability under the true continuation."""
-    remaining = list(anchor_ids[len(committed_token_ids):len(committed_token_ids) + max_tokens])
+    under every sampled future, at least `ratio` times its probability under the true continuation. `future_ratios`
+    (patch_targeted_ratio.py): one ratio per sampled future instead of `ratio` for all."""
+    limit = len(committed_token_ids) + max_tokens if hold_tokens is None else min(hold_tokens, len(committed_token_ids) + max_tokens)
+    remaining = list(anchor_ids[len(committed_token_ids):limit])
     if not remaining or not oracle_future:
-        return [], [{"step": 0, "stop": "reference_end" if not remaining else "no_oracle"}]
+        stop = "no_oracle" if remaining else ("held" if hold_tokens is not None and hold_tokens < len(anchor_ids) else "reference_end")
+        return [], [{"step": 0, "stop": stop}]
     else:
         sources = [join_future_to_source(source_observed, f, future_join_mode) for f in futures]
         sources.append(join_future_to_source(source_observed, oracle_future, future_join_mode))
@@ -2135,10 +2201,14 @@ def anchor_ratio_commit(tokenizer: Any, source_observed: str, futures: List[str]
         oracle_lp = [max(lp, math.log(floor)) for lp in oracle_lp]
     else:
         pass
-    threshold = math.log(ratio)
+    if future_ratios is None:
+        thresholds = [math.log(ratio)] * len(future_lps)
+    else:
+        assert len(future_ratios) == len(future_lps), (len(future_ratios), len(future_lps))
+        thresholds = [math.log(future_ratio) for future_ratio in future_ratios]
     accepted = 0
     for j in range(len(remaining)):
-        if all(lp[j] - oracle_lp[j] >= threshold for lp in future_lps):
+        if all(lp[j] - oracle_lp[j] >= threshold for lp, threshold in zip(future_lps, thresholds)):
             accepted = j + 1
         else:
             break
@@ -2149,14 +2219,23 @@ def anchor_ratio_commit(tokenizer: Any, source_observed: str, futures: List[str]
                      "accepted_token_text": _single_token_text(tokenizer, remaining[j]),
                      "pending_text": decode_token_ids_to_text(tokenizer, remaining[:j + 1]), "per_future": [],
                      "meta": {"anchor_ratio": True, "min_voter_p": min(math.exp(lp[j]) for lp in future_lps),
+                              "future_p": [float(f"{math.exp(lp[j]):.3g}") for lp in future_lps],
+                              "true_p": float(f"{math.exp(logprobs[-1][j]):.3g}"),
+                              "yardstick_p": float(f"{math.exp(oracle_lp[j]):.3g}"),
+                              "future_over_yardstick": [float(f"{math.exp(lp[j] - oracle_lp[j]):.3g}") for lp in future_lps],
                               "oracle_p": round(math.exp(oracle_lp[j]), 5),
                               "min_ratio": round(min(math.exp(lp[j] - oracle_lp[j]) for lp in future_lps), 5)}})
     if accepted < len(remaining):
         j = accepted
         logs.append({"step": j, "stop": "ratio_veto", "elapsed_s": elapsed if j == 0 else 0.0, "per_future": [],
                      "meta": {"candidate": _single_token_text(tokenizer, remaining[j]), "oracle_p": round(math.exp(oracle_lp[j]), 5),
+                              "future_p": [float(f"{math.exp(lp[j]):.3g}") for lp in future_lps],
+                              "true_p": float(f"{math.exp(logprobs[-1][j]):.3g}"),
+                              "yardstick_p": float(f"{math.exp(oracle_lp[j]):.3g}"),
+                              "future_over_yardstick": [float(f"{math.exp(lp[j] - oracle_lp[j]):.3g}") for lp in future_lps],
                               "ratios": [round(math.exp(lp[j] - oracle_lp[j]), 5) for lp in future_lps],
-                              "vetoing": [futures[i] for i, lp in enumerate(future_lps) if lp[j] - oracle_lp[j] < threshold][:4],
+                              "vetoing": [futures[i] for i, (lp, threshold) in enumerate(zip(future_lps, thresholds))
+                                          if lp[j] - oracle_lp[j] < threshold][:4],
                               "intersection": []}})
     else:
         pass
@@ -2197,6 +2276,8 @@ def extend_pending_tokens(
     anchor_min_p: float = 0.02,
     anchor_ratio: float = 0.0,
     anchor_ratio_floor: float = 0.0,
+    anchor_hold_tokens: Optional[int] = None,
+    anchor_future_ratios: Optional[List[float]] = None,
 ) -> Tuple[List[int], List[Dict[str, Any]]]:
     pending_token_ids: List[int] = []
     grow_logs: List[Dict[str, Any]] = []
@@ -2204,7 +2285,8 @@ def extend_pending_tokens(
         return anchor_ratio_commit(
             instruct_tokenizer, source_observed, futures, oracle_future, future_join_mode, committed_token_ids,
             anchor_ids, anchor_ratio, max_consensus_steps, future_notes, instruct_api_base, instruct_api_model,
-            instruct_api_timeout, target_lang, probe_shared_first, anchor_ratio_floor)
+            instruct_api_timeout, target_lang, probe_shared_first, anchor_ratio_floor, anchor_hold_tokens,
+            anchor_future_ratios)
     else:
         pass
 
@@ -2400,16 +2482,18 @@ def force_complete_translation(
     terminal_mark: str = "",
     thinking: bool = False,
     thinking_max_tokens: int = 8192,
+    note: str = "",
 ) -> str:
     if thinking:
         # Completion thinking (Haoling 2026-10-06): reason first under the same user turn, then complete the committed
         # prefix after the reasoning, greedy as before.
         head = build_final_completion_prompt(tokenizer, full_source, committed_text, target_lang=target_lang,
-                                             terminal_mark=terminal_mark, enable_thinking=True, append_committed=False)
+                                             terminal_mark=terminal_mark, enable_thinking=True, append_committed=False, note=note)
         reasoning = generate_reasonings([head], api_base, api_model, thinking_max_tokens)[0]["text"]
         prompt = head + reasoning + "\n</think>\n\n" + str(committed_text or "")
     else:
-        prompt = build_final_completion_prompt(tokenizer, full_source, committed_text, target_lang=target_lang, terminal_mark=terminal_mark)
+        prompt = build_final_completion_prompt(tokenizer, full_source, committed_text, target_lang=target_lang, terminal_mark=terminal_mark,
+                                               note=note)
     payload = {
         "model": api_model,
         "prompt": prompt,
@@ -2564,6 +2648,32 @@ def run_one_utterance(
             anchor_sentence_ends.append(next((n for n, length in enumerate(anchor_prefix_lengths) if length >= search_from), len(anchor_ids)))
     else:
         anchor_ids, anchor_prefix_lengths, anchor_sentence_ends = None, [], []
+    check_streak: Dict[str, int] = {}   # --anchor-hold: consecutive chunks the reading check found a word resolved
+    resolved_reading: Dict[str, str] = {}   # --resolved-note: the single reading of the latest resolved check per word
+    resolved_notes: Dict[str, str] = {}     # --resolved-note: notes of the words confirmed resolved
+
+    def _word_open(entry: Dict[str, Any], chunk_number: int) -> bool:
+        return entry["chunk"] <= chunk_number and check_streak.get(entry["word"].lower(), 0) < args.check_confirm
+
+    def _hold_tokens(chunk_number: int) -> int:
+        """Reference tokens before the first span translating a still-open listed word (all of them if none)."""
+        start = anchor_prefix_lengths[len(committed_token_ids)]
+        spans = []
+        for entry in ambiguity_list:
+            for reading in entry["readings"] if _word_open(entry, chunk_number) else []:
+                # the full word first (基地 must stay 基地), then without an adjectival 的 / 地 if two characters remain
+                full = reading["zh"].strip()
+                stripped = re.sub(r"[的地]$", "", full)
+                positions = [anchor_text.find(zh, start) for zh in dict.fromkeys((full, stripped)) if len(zh) >= 2]
+                found = [position for position in positions if position >= 0]
+                if found:
+                    spans.append(min(found))
+                else:
+                    continue
+        if not spans:
+            return len(anchor_ids)
+        else:
+            return max(n for n, length in enumerate(anchor_prefix_lengths) if length <= min(spans))
 
     committed_text = ""
     committed_token_ids: List[int] = []
@@ -2595,6 +2705,14 @@ def run_one_utterance(
     _vlog(verbose_log_file, f"# targeted_prompt_version: {args.targeted_prompt_version}")
     _vlog(verbose_log_file, f"# probe_prompt_order: {args.probe_prompt_order} contrastive_notes: {args.contrastive_notes}")
     _vlog(verbose_log_file, f"# sentence_end_punctuation: {args.sentence_end_punctuation}")
+    if args.anchor_reference:   # patch_verbose.py: the text the decoder writes, and the listed words
+        _vlog(verbose_log_file, f"# reference (the decoder writes exactly this text, in pieces): {anchor_text}")
+    else:
+        pass
+    for entry in ambiguity_list:
+        _vlog(verbose_log_file, f"# listed word: {entry['word']} (heard by chunk {entry['chunk']}): "
+                                + "; ".join(f"{index}. {reading['gloss']} ({reading['zh']})"
+                                            for index, reading in enumerate(entry["readings"], 1)))
     _vlog(verbose_log_file, "############################################################")
 
     last_unit_idx = -1
@@ -2678,6 +2796,7 @@ def run_one_utterance(
                 terminal_mark=terminal,
                 thinking=args.completion_thinking,
                 thinking_max_tokens=args.probe_thinking_max_tokens,
+                note=" ".join(resolved_notes.values()) if args.resolved_note else "",
             )
             if terminal:
                 raw_delta = final_delta
@@ -2716,6 +2835,10 @@ def run_one_utterance(
                     through = append_text_continuation(through, unit)
                 unit_done = bool(anchor_sentence_ends) and through.strip() == source_observed_full.strip()
                 target_tokens = max(done_tokens, anchor_sentence_ends[unit_index]) if unit_done else done_tokens
+                if args.anchor_hold:
+                    target_tokens = max(done_tokens, min(target_tokens, _hold_tokens(t + 1)))
+                else:
+                    pass
                 anchor_delta = instruct_tokenizer.decode(anchor_ids[:target_tokens])[anchor_prefix_lengths[done_tokens]:]
                 committed_text += anchor_delta
                 committed_token_ids = list(anchor_ids[:target_tokens])
@@ -2740,6 +2863,7 @@ def run_one_utterance(
                 terminal_mark=terminal,
                 thinking=args.completion_thinking,
                 thinking_max_tokens=args.probe_thinking_max_tokens,
+                note=" ".join(resolved_notes.values()) if args.resolved_note else "",
             )
             if terminal:
                 raw_delta = sentence_delta
@@ -2775,7 +2899,16 @@ def run_one_utterance(
         # design v3: listed words heard by this chunk whose sentence is unfinished (sentence-end completion fixes the
         # word's translation when its sentence ends), and the sampler prefix extended back to the start of the sentence
         # holding the earliest of them (only differs when a chunk spans a sentence end)
-        list_open = open_entries(source_observed_full, ambiguity_list, t + 1)
+        if args.anchor_hold and args.anchor_reference:
+            list_open = [entry for entry in ambiguity_list if _word_open(entry, t + 1)]
+        elif args.anchor_hold:   # reference-free: the sentence-end completion fixes the word, so its sentence end closes it too
+            list_open = [entry for entry in open_entries(source_observed_full, ambiguity_list, t + 1) if _word_open(entry, t + 1)]
+        else:
+            list_open = open_entries(source_observed_full, ambiguity_list, t + 1)
+        if args.close_at_settled:   # patch_settled.py: the whole-sentence detection says when the word is settled
+            list_open = [entry for entry in list_open if entry["settled_chunk"] is None or t + 1 < entry["settled_chunk"]]
+        else:
+            pass
         if list_open:
             earliest = min(len(join_source_chunks(chunks[:entry["chunk"] - 1]).strip()) for entry in list_open)
             list_prefix = extend_to_sentence(source_observed_full, source_observed, earliest)
@@ -2833,6 +2966,10 @@ def run_one_utterance(
                 list_skip_ruled_out=args.list_skip_ruled_out,
                 list_reading_check=args.list_reading_check,
                 list_observed_full=source_observed_full,
+                list_check_strict=args.check_strict,
+                list_check_mode=args.check_mode,
+                list_check_think_budget=args.check_think_budget,
+                list_no_targeted=args.no_targeted,
             )
         else:
             futures, future_infos = sample_source_futures_multi( #call base models，用当前observed source采样多条未来续写
@@ -2847,8 +2984,45 @@ def run_one_utterance(
             _vlog(verbose_log_file, f"[Timing] sampling={time.perf_counter() - sampling_started:.2f}s")
         # ── verbose: list futures ──
         request_items = [item for item in future_audit if str(item.get("mode", "")).endswith("_request")]
+        for item in request_items if args.anchor_hold else []:
+            if item["mode"] == "check_request":
+                word = item["word"].lower()
+                single = item["readings"][item["possible"][0] - 1] if len(item["possible"]) == 1 else None
+                if len(item["possible"]) >= 2:
+                    check_streak[word] = 0
+                elif single is not None and resolved_reading.get(word) not in (None, single):
+                    check_streak[word] = 1   # resolved to another reading than last time: the count restarts
+                else:
+                    check_streak[word] = check_streak.get(word, 0) + 1
+                if single is not None:
+                    resolved_reading[word] = single
+                else:
+                    resolved_reading.pop(word, None)
+                if (args.resolved_note and check_streak[word] >= args.check_confirm and word in resolved_reading
+                        and word not in resolved_notes):
+                    gloss = resolved_reading[word].rsplit(" (", 1)[0]
+                    resolved_notes[word] = f'In this text, "{item["word"]}" means: {gloss}.'
+                    _vlog(verbose_log_file, "[Resolved] " + json.dumps({"word": item["word"], "reading": resolved_reading[word],
+                                                                         "chunk": t + 1}, ensure_ascii=False))
+                else:
+                    pass
+            else:
+                continue
+        if args.anchor_hold and args.anchor_reference and request_items:
+            hold_tokens = _hold_tokens(t + 1)
+            held_from = instruct_tokenizer.decode(anchor_ids[:hold_tokens + 6])[anchor_prefix_lengths[hold_tokens]:]
+            _vlog(verbose_log_file, "[Hold] " + json.dumps({"streak": check_streak, "hold_tokens": hold_tokens,
+                                                            "committed_tokens": len(committed_token_ids), "held_from": held_from},
+                                                           ensure_ascii=False))
+        else:
+            pass
         for item in request_items:
+            check_reasoning_tail = item.pop("reasoning_tail") if item["mode"] == "check_request" else ""   # patch_verbose.py
             _vlog(verbose_log_file, "[ListRequest] " + json.dumps(item, ensure_ascii=False))
+            if check_reasoning_tail:
+                _vlog(verbose_log_file, f"[CheckThinking] {item['word']} (end of the thinking): " + " ".join(check_reasoning_tail.split()))
+            else:
+                pass
         future_audit = [item for item in future_audit if not str(item.get("mode", "")).endswith("_request")]
         if future_audit:
             accepted_raw = sum(bool(item.get("accepted")) for item in future_audit)
@@ -2877,7 +3051,12 @@ def run_one_utterance(
                       f"model=oracle mode={mode} count=1")
                 _vlog(verbose_log_file, f"  01. {oracle_future_text!r}")
 
-        if len(futures) <= 3: #future太少无法做共识，等待更多源语言输入
+        if args.prefix_only_voter:   # patch_prefixonly.py: one voter that sees only the heard source, no future
+            futures, future_infos = [""], [{"model": "prefix-only", "mode": "prefix-only"}]
+            _vlog(verbose_log_file, "[PrefixOnly] the only voter is the heard source itself (no sampled future)")
+        else:
+            pass
+        if len(futures) < args.min_futures: #future太少无法做共识，等待更多源语言输入 (--min-futures, default 4 = the old rule)
             target_deltas.append("")
             actions.append("READ")
             _vlog(verbose_log_file, "  -> READ (too few futures)")
@@ -2916,8 +3095,15 @@ def run_one_utterance(
             anchor_min_p=args.anchor_min_p,
             anchor_ratio=args.anchor_ratio,
             anchor_ratio_floor=args.anchor_ratio_floor,
-            future_notes=([f'In this text, "{info["word"]}" means: {info["reading"].rsplit(" (", 1)[0]}.' if info.get("word") else ""
-                           for info in future_infos] if args.list_probe_hint else None),
+            anchor_hold_tokens=_hold_tokens(t + 1) if args.anchor_hold and anchor_ids is not None else None,
+            # patch_targeted_ratio.py: targeted futures (info["word"] set) need --anchor-ratio-targeted
+            anchor_future_ratios=([args.anchor_ratio_targeted if info.get("word") else args.anchor_ratio for info in future_infos]
+                                  if args.anchor_ratio_targeted is not None else None),
+            future_notes=([" ".join(list(resolved_notes.values())
+                                    + ([f'In this text, "{info["word"]}" means: {info["reading"].rsplit(" (", 1)[0]}.']
+                                       if args.list_probe_hint and info.get("word") else []))
+                           for info in future_infos] + [" ".join(resolved_notes.values())]
+                          if args.list_probe_hint or resolved_notes else None),
         )
         thinking_log = grow_logs[0].get("thinking") if grow_logs else None
         if thinking_log:
@@ -2968,10 +3154,25 @@ def run_one_utterance(
                 if stop:
                     intersection_texts = [_single_token_text(instruct_tokenizer, tid) for tid in intersection] if intersection else []
                     _vlog(verbose_log_file, f"  step={step} stop={stop} intersection={intersection_texts} pending={decode_token_ids_to_text(instruct_tokenizer, pending_token_ids)!r}")
+                    if stop == "ratio_veto":   # patch_verbose.py / patch_verbose2.py
+                        _vlog(verbose_log_file, f"      next reference token {meta['candidate']!r}: P | futures {meta['future_p']}, "
+                                                f"P | true continuation {meta['true_p']}" + (f", yardstick max(P | true continuation, {args.anchor_ratio_floor}) {meta['yardstick_p']}" if args.anchor_ratio_floor > 0 else "")
+                                                + f"; future / yardstick {meta['future_over_yardstick']}, one below {args.anchor_ratio} "
+                                                f"-> stop. Vetoing: {meta['vetoing']}"
+                                                + (f" (targeted futures: {args.anchor_ratio_targeted})" if args.anchor_ratio_targeted is not None else ""))
+                    else:
+                        pass
                 else:
                     accepted = gl.get("accepted_token_text", "?")
                     pending = gl.get("pending_text", "")
                     _vlog(verbose_log_file, f"  step={step} accepted={accepted!r} pending={pending!r}")
+                    if args.anchor_reference and args.anchor_ratio > 0:   # patch_verbose.py / patch_verbose2.py
+                        _vlog(verbose_log_file, f"      P | futures {meta['future_p']}, P | true continuation {meta['true_p']}"
+                                                + (f", yardstick max(P | true continuation, {args.anchor_ratio_floor}) {meta['yardstick_p']}" if args.anchor_ratio_floor > 0 else "")
+                                                + f"; future / yardstick {meta['future_over_yardstick']}, all >= {args.anchor_ratio} -> write"
+                                                + (f" (targeted futures: {args.anchor_ratio_targeted})" if args.anchor_ratio_targeted is not None else ""))
+                    else:
+                        pass
                 if not args.compact_verbose:
                     per_future = gl.get("per_future", [])
                     for idx, pf in enumerate(per_future):
@@ -3029,7 +3230,18 @@ def run_one_utterance(
             "anchor_min_p": args.anchor_min_p if args.anchor_reference and not args.anchor_ratio else None,
             "anchor_ratio": args.anchor_ratio if args.anchor_reference else None,
             "anchor_ratio_floor": args.anchor_ratio_floor if args.anchor_reference and args.anchor_ratio else None,
-            "list_reading_check_mode": "greedy, whole observed text" if args.list_reading_check else None,
+            "close_at_settled": args.close_at_settled,
+            "anchor_ratio_targeted": args.anchor_ratio_targeted if args.anchor_reference and args.anchor_ratio else None,
+            "anchor_hold": args.anchor_hold,
+            "check_confirm": args.check_confirm if args.anchor_hold else None,
+            "check_strict": args.check_strict,
+            "check_mode": args.check_mode,
+            "resolved_note": args.resolved_note,
+            "min_futures": args.min_futures,
+            "prefix_only_voter": args.prefix_only_voter,
+            "no_targeted": args.no_targeted,
+            "check_think_budget": args.check_think_budget if args.check_mode in ("think", "decide", "decide-likely") else None,
+            "list_reading_check_mode": f"{args.check_mode}, whole observed text" if args.list_reading_check else None,
             "soft_vote_min_p": args.soft_vote_min_p,
             "min_voters_ratio": args.min_voters_ratio,
             "role_plausible_n": args.role_plausible_n if args.future_roles != "off" else None,
