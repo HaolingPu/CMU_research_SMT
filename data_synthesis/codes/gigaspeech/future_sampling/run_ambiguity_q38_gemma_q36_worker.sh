@@ -4,7 +4,7 @@
 set -euo pipefail
 
 TASK_ID="${SLURM_ARRAY_TASK_ID:-0}"
-REPO="/home/haolingp/CMU_research_SMT"
+REPO="/home/haolingp/slurm_runs/consensus_think_20261006/code"   # consensus_think_20261006 snapshot (2026-10-07)
 FS="${REPO}/data_synthesis/codes/gigaspeech/future_sampling"
 ENV="/data/user_data/haolingp/conda_envs/gemma4"
 PYTHON="${ENV}/bin/python"
@@ -121,7 +121,7 @@ sampler_launcher_pid=$!
 
 GPU=1 PORT="${QWEN36_PORT}" MODEL="${QWEN36_MODEL}" \
 SERVED_MODEL_NAME=qwen36-translator PID_FILE="${QWEN36_PID_FILE}" \
-MAX_LEN=4096 MAX_NUM_SEQS=64 GPU_MEM_UTIL=0.85 \
+MAX_LEN=16384 MAX_NUM_SEQS=64 GPU_MEM_UTIL=0.85 \
 "${TRANSLATOR_SERVER}" >"${LOG_DIR}/translator.out" 2>"${LOG_DIR}/translator.err" &
 translator_launcher_pid=$!
 

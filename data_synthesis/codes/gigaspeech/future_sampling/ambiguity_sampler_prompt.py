@@ -146,6 +146,19 @@ def _build_suffix_icl_messages(
                          if contrastive_notes else '"<suffix>"')
     notes_rule = ("\nEach contrastive item must name a different reading in its \"resolves\" field; do not list two suffixes that settle the same reading."
                   if contrastive_notes else "")
+    # 2026-10-09 vote test (Haoling: "为什么要写着'不要营造歧义'？就是得有歧义啊"): with contrastive notes the rule asks the
+    # sampler itself to look for an observed word whose meaning is still open and to give each other reading its own
+    # contrastive suffix. No word list is given, so it stays general.
+    if contrastive_notes:
+        rule6 = ("6. Plausible candidates are likely natural continuations. Contrastive candidates are less obvious but still "
+                 "realistic continuations that resolve a genuine uncertainty in the observed prefix differently. First check "
+                 "whether an already observed word can still mean different things here (a word with several common senses, "
+                 "a name that could be a person, place or brand, a pronoun with several possible referents). If so, give each "
+                 "other plausible reading of that word its own contrastive suffix, so that a careful translator would "
+                 "translate the word differently. Otherwise contrast another open relation (attachment, scope, who did what). "
+                 "Merely changing the later action, adjective, or intensity under the same reading is not enough.")
+    else:
+        rule6 = "6. Plausible candidates are likely natural continuations. Contrastive candidates are less obvious but still realistic continuations that resolve a genuine uncertainty differently. Prefer contrasts that change how already observed words or relations could be translated. Merely changing the later action, adjective, or intensity under the same reading is not enough. If there is no good contrastive continuation, leave that group empty; do not force an ambiguity."
     system = f"""You predict short English speech continuations for a simultaneous English-to-{target_lang} interpreter.
 
 The observed prefix is the exact speech heard so far, not a topic for a new sentence. Return only the new words that can come immediately after it.
@@ -156,7 +169,7 @@ Rules, in priority order:
 3. Silently check PREFIX + one space + SUFFIX. This exact concatenation must be grammatical and coherent, without editing the prefix or relying on an unseen comma or period. Do not insert punctuation merely to abandon an unfinished construction. A comma in the prefix is not a sentence boundary.
 4. Stay grounded in the observed topic and register. Do not invent unrelated settings, implausible events, or exaggerated reactions just to make candidates different.
 5. Prefer a few good candidates to a full list of weak ones. Return at most {num_candidates} candidates total: up to {per_group} Plausible and up to {per_group} Contrastive. Either group may be shorter or empty. Never pad a list to meet a quota.
-6. Plausible candidates are likely natural continuations. Contrastive candidates are less obvious but still realistic continuations that resolve a genuine uncertainty differently. Prefer contrasts that change how already observed words or relations could be translated. Merely changing the later action, adjective, or intensity under the same reading is not enough. If there is no good contrastive continuation, leave that group empty; do not force an ambiguity.
+{rule6}
 7. Seek meaningful diversity only after grammatical fit and plausibility. It is okay to share necessary opening words. Omit redundant candidates instead of distorting the sentence to make them different.
 8. Each suffix should contain 4-15 new English words. Output English suffixes only, as a JSON object with the two group lists. No reasoning, translations, full rewritten sentences, or copies of the examples.
 
@@ -295,3 +308,77 @@ def sample_grouped_futures(request, num_candidates: int, retries: int, record):
         return items, raw_text
     record("exhausted", attempt, raw_text, finish_reason, str(error))
     raise ValueError(f"malformed grouped response after {attempt + 1} attempt(s): {error}")
+
+
+# ---------------------------------------------------------------------------
+# Role-split sampling (2026-10-09 vote test)
+# ---------------------------------------------------------------------------
+
+SUFFIX_RULES = """Rules:
+1. The observed prefix is the exact speech heard so far. Return only the new words that come immediately after it. Do not
+repeat, rewrite or correct any part of the prefix.
+2. Continue the unfinished sentence before starting another one; PREFIX + one space + SUFFIX must be grammatical and coherent.
+3. Stay realistic and grounded in the prefix's topic and register.
+4. Each suffix has 4-15 new English words. English only."""
+
+
+def build_plausible_messages(observed_source: str, num_candidates: int) -> list[dict[str, str]]:
+    """Natural continuations only (the weaker sampler's role)."""
+    system = ("You predict short English speech continuations for a simultaneous interpreter.\n\n" + SUFFIX_RULES +
+              f"\n5. Return exactly {num_candidates} different, likely, natural continuations.")
+    user = (f"Observed English prefix:\n{observed_source}\n\nRespond with one JSON object "
+            '{"plausible": ["<suffix>", ...]} and nothing else.')
+    return [{"role": "system", "content": system}, {"role": "user", "content": user}]
+
+
+def plausible_schema(num_candidates: int) -> dict:
+    suffix = {"type": "string", "minLength": 1, "maxLength": 200}
+    return {"type": "object", "properties": {"plausible": {"type": "array", "maxItems": num_candidates, "items": suffix}},
+            "required": ["plausible"], "additionalProperties": False}
+
+
+def build_open_word_messages(observed_source: str, max_words: int, max_readings: int) -> list[dict[str, str]]:
+    """Layer 1: which observed words still have an open meaning, and their readings."""
+    system = ("You help a simultaneous English-to-Chinese interpreter decide what is still uncertain.\n\n"
+              "Read the observed English prefix. List the already observed words or short phrases whose meaning, and "
+              "therefore their Chinese translation, is still open given ONLY this prefix: a word with several common "
+              "senses (bank: financial institution / river bank), a name that could be a person, place or brand, a "
+              "pronoun with several possible referents. Include a word only if at least two readings are realistic here. "
+              f"List at most {max_words} words, the most consequential first, and for each 2-{max_readings} readings as "
+              "short English glosses. If nothing is open, return an empty list.")
+    user = (f"Observed English prefix:\n{observed_source}\n\nRespond with one JSON object "
+            '{"open_words": [{"word": "<word as observed>", "readings": ["<gloss>", "<gloss>"]}]} and nothing else.')
+    return [{"role": "system", "content": system}, {"role": "user", "content": user}]
+
+
+def open_word_schema(max_words: int, max_readings: int) -> dict:
+    item = {"type": "object", "properties": {
+        "word": {"type": "string", "minLength": 1, "maxLength": 60},
+        "readings": {"type": "array", "minItems": 2, "maxItems": max_readings,
+                     "items": {"type": "string", "minLength": 1, "maxLength": 80}}},
+        "required": ["word", "readings"], "additionalProperties": False}
+    return {"type": "object", "properties": {"open_words": {"type": "array", "maxItems": max_words, "items": item}},
+            "required": ["open_words"], "additionalProperties": False}
+
+
+def build_reading_messages(observed_source: str, open_words: list[dict], per_reading: int) -> list[dict[str, str]]:
+    """Layer 2: continuations that settle each reading of each open word."""
+    listing = "\n".join(f'- "{w["word"]}": ' + " / ".join(w["readings"]) for w in open_words)
+    system = ("You predict short English speech continuations for a simultaneous English-to-Chinese interpreter. The "
+              "interpreter must know which reading of an already observed word the speaker means.\n\n" + SUFFIX_RULES +
+              f"\n5. For EVERY open word and EVERY one of its readings, write exactly {per_reading} different realistic "
+              "continuations that make that reading clear, so that a careful translator would translate the word that "
+              "way. Do not skip a reading because it is less likely; make the continuation natural for it.")
+    user = (f"Observed English prefix:\n{observed_source}\n\nOpen words and their readings:\n{listing}\n\nRespond with "
+            'one JSON object {"futures": [{"word": "<word>", "reading": "<reading>", "suffix": "<suffix>"}, ...]} and nothing else.')
+    return [{"role": "system", "content": system}, {"role": "user", "content": user}]
+
+
+def reading_schema(max_items: int) -> dict:
+    item = {"type": "object", "properties": {
+        "word": {"type": "string", "minLength": 1, "maxLength": 60},
+        "reading": {"type": "string", "minLength": 1, "maxLength": 80},
+        "suffix": {"type": "string", "minLength": 1, "maxLength": 200}},
+        "required": ["word", "reading", "suffix"], "additionalProperties": False}
+    return {"type": "object", "properties": {"futures": {"type": "array", "maxItems": max_items, "items": item}},
+            "required": ["futures"], "additionalProperties": False}

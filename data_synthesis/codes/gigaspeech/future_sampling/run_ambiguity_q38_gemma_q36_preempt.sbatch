@@ -18,4 +18,4 @@
 #SBATCH --mail-user=haolingp@andrew.cmu.edu
 
 set -euo pipefail
-exec bash /home/haolingp/CMU_research_SMT/data_synthesis/codes/gigaspeech/future_sampling/run_ambiguity_q38_gemma_q36_worker.sh
+exec bash /home/haolingp/slurm_runs/consensus_think_20261006/code/data_synthesis/codes/gigaspeech/future_sampling/run_ambiguity_q38_gemma_q36_worker.sh

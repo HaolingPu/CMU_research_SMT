@@ -28,11 +28,18 @@ import pandas as pd
 from transformers import AutoTokenizer
 
 from ambiguity_sampler_prompt import (
+    build_open_word_messages, build_plausible_messages, build_reading_messages, open_word_schema, plausible_schema,
+    reading_schema,
     MAX_SUFFIX_CHARS,
     PROMPT_VERSION, PROMPT_VERSIONS, SUFFIX_ICL_PROMPT_VERSION,
     build_coordinated_future_messages, parse_grouped_future_output, sample_grouped_futures,
     structured_output_extras,
 )
+from ambiguity_list import (
+    check_messages, check_schema, extend_to_sentence, natural_messages, natural_schema, open_entries, request as list_request, sample_messages,
+    sample_schema,
+)
+from transformers import PreTrainedTokenizerBase
 from sentence_boundary_helpers import (
     close_translation_delta, observed_sentence_is_complete,
     sentence_anchored_prefix, source_terminal_mark,
@@ -128,6 +135,49 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--targeted-sampler2-api-timeout", type=float, default=0.0,
                    help="Timeout for 2nd sampler API. 0 or negative → fall back to --instruct-api-timeout.")
     p.add_argument("--max-consensus-steps", type=int, default=12)
+    p.add_argument("--vote-match", choices=["exact", "prefix", "prefix_semantic"], default="exact",
+                   help="2026-10-09 vote test. exact: every voter must list the same token id. prefix: a voter also "
+                        "supports token A when one of its candidates' text starts with A's text (理由是 supports 理由). "
+                        "prefix_semantic: in addition, a candidate whose LaBSE cosine with A is >= --semantic-threshold "
+                        "supports A (女子 / 妇女).")
+    p.add_argument("--semantic-model", default="/data/user_data/haolingp/models/LaBSE")
+    p.add_argument("--list-natural", choices=["qwen", "gemma", "none"], default="qwen",
+                   help="--future-roles list: which sampler writes the natural continuations (qwen = sampler 2).")
+    p.add_argument("--list-natural-n", type=int, default=6)
+    p.add_argument("--list-per-reading", type=int, default=2)
+    p.add_argument("--list-targeted-thinking", action="store_true",
+                   help="--future-roles list: targeted continuations with thinking, --list-think-budget reasoning tokens "
+                        "then the answer is forced.")
+    p.add_argument("--list-think-budget", type=int, default=2000)
+    p.add_argument("--anchor-reference", action="store_true",
+                   help="Write the row's reference translation; the futures only decide when (see patch_anchor.py).")
+    p.add_argument("--anchor-min-p", type=float, default=0.02)
+    p.add_argument("--anchor-ratio-floor", type=float, default=0.0,
+                   help="--anchor-ratio yardstick = max(P(token | true continuation), this floor).")
+    p.add_argument("--anchor-ratio", type=float, default=0.0,
+                   help="With --anchor-reference: > 0 writes a reference token iff every sampled future gives it at least "
+                        "this fraction of the true continuation's probability (exact, prompt_logprobs; see patch_ratio.py).")
+    p.add_argument("--list-reading-check", action="store_true",
+                   help="--future-roles list: a separate call per open word keeps only the readings still possible.")
+    p.add_argument("--list-probe-hint", action="store_true",
+                   help="--future-roles list: the translator probe gets each targeted future's reading as a [NOTE].")
+    p.add_argument("--list-skip-ruled-out", action="store_true",
+                   help="--future-roles list: the targeted sampler skips readings the prefix already rules out.")
+    p.add_argument("--future-roles", choices=["off", "two_layer", "given_word", "list"], default="off",
+                   help="2026-10-09 vote test. two_layer: sampler 1 (Gemma) returns --role-plausible-n natural "
+                        "continuations; sampler 2 (Qwen3.8) first lists the observed words whose meaning is still open "
+                        "with their readings, then writes --role-per-reading continuations per reading. given_word: "
+                        "sampler 2 skips the first step and uses the row's ambiguous_word / ambiguous_readings once the "
+                        "word has been heard.")
+    p.add_argument("--role-plausible-n", type=int, default=10)
+    p.add_argument("--role-per-reading", type=int, default=2)
+    p.add_argument("--role-max-words", type=int, default=2)
+    p.add_argument("--role-max-readings", type=int, default=3)
+    p.add_argument("--semantic-threshold", type=float, default=0.93)
+    p.add_argument("--single-token-filter", action="store_true",
+                   help="2026-10-09 vote test, with --min-consensus-horizon 1: a lone agreed token is committed unless it "
+                        "is punctuation only or its lowest voter probability is below --single-token-min-p.")
+    p.add_argument("--single-token-min-p", type=float, default=0.05)
     p.add_argument("--min-consensus-horizon", type=int, default=2,
                    help="Minimum number of consensus-confirmed tokens required before committing. "
                         "If the pending buffer ends up shorter than this (after consensus breaks), "
@@ -166,6 +216,14 @@ def parse_args() -> argparse.Namespace:
                         "keeps the historical greedy/unscaled distribution.")
     p.add_argument("--probe-top-p", type=float, default=0.0,
                    help="top_p on the probe request; 0 = omit.")
+    p.add_argument("--probe-thinking", choices=["off", "all", "oracle"], default="off",
+                   help="Probe thinking (2026-10-06): once per chunk, generate a reasoning (Qwen3.6 thinking mode, THINKING_SAMPLING) for "
+                        "every probe source (all) or only the true continuation (oracle); every probe step of the "
+                        "chunk then reads the next-token distribution after that reasoning. off = historical probe.")
+    p.add_argument("--probe-thinking-max-tokens", type=int, default=8192,
+                   help="Token cap of one reasoning (probe and completion); a reasoning cut there is used as it is.")
+    p.add_argument("--completion-thinking", action="store_true",
+                   help="The sentence-end and final completions reason first (thinking mode), then complete greedily.")
     p.add_argument("--probe-top-k", type=int, default=0,
                    help="top_k on the probe request; 0 = omit.")
     p.add_argument("--oracle-future-audit", action="store_true",
@@ -678,6 +736,8 @@ def build_translation_probe_prompt_prefix_token_ids(
     has_target_prefix: bool,
     target_lang: str = "Chinese",
     shared_first: bool = False,
+    enable_thinking: bool = False,
+    note: str = "",
 ) -> List[int]:
     task = f"[TASK]\nTranslate the [INPUT] text into {target_lang}."
     source = f"[INPUT]\n{full_source}"
@@ -693,12 +753,16 @@ def build_translation_probe_prompt_prefix_token_ids(
     # instruction ahead of the source so vLLM prefix caching covers everything up
     # to the future-specific tail; the wording is unchanged.
     parts = (task, rule, source) if shared_first else (task, source, rule)
+    if note:   # --list-probe-hint: the reading the sampler wrote this future for
+        parts = parts + (f"[NOTE]\n{note}",)
+    else:
+        pass
     messages = [{"role": "user", "content": "\n\n".join(parts)}]
     prompt_ids = tokenizer.apply_chat_template(
         messages,
         add_generation_prompt=True,
         tokenize=True,
-        enable_thinking=False,
+        enable_thinking=enable_thinking,
     )
     if isinstance(prompt_ids, dict):
         prompt_ids = prompt_ids.get("input_ids", [])
@@ -707,7 +771,8 @@ def build_translation_probe_prompt_prefix_token_ids(
     return list(prompt_ids)
 
 
-def build_final_completion_prompt(tokenizer: Any, full_source: str, committed_text: str, target_lang: str = "Chinese", terminal_mark: str = "") -> str:
+def build_final_completion_prompt(tokenizer: Any, full_source: str, committed_text: str, target_lang: str = "Chinese", terminal_mark: str = "",
+                                  enable_thinking: bool = False, append_committed: bool = True) -> str:
     if not str(committed_text or "").strip():
         messages = [{"role": "user", "content": (
             f"[TASK]\nTranslate the [INPUT] text into {target_lang}.\n\n"
@@ -738,10 +803,12 @@ def build_final_completion_prompt(tokenizer: Any, full_source: str, committed_te
         messages,
         add_generation_prompt=True,
         tokenize=False,
-        enable_thinking=False,
+        enable_thinking=enable_thinking,
     )
-    if str(committed_text or "").strip():
+    if append_committed and str(committed_text or "").strip():
         prompt += committed_text
+    else:
+        pass
     return prompt
 
 
@@ -1290,7 +1357,173 @@ def format_selected_future_groups(
             f"model={model} mode={mode} count={len(items)}"
         )
         lines.extend(f"  {index:02d}. {future!r}" for index, future in enumerate(items, 1))
+    tagged = [(future, info) for future, info in zip(futures, future_infos) if info.get("word")]
+    lines.extend(f"  [tag] {info['word']} = {info['reading']}: {future!r}" for future, info in tagged)
     return lines
+
+
+def request_role_json(tokenizer: Any, messages: List[Dict[str, str]], schema: Dict[str, Any], api_base: str,
+                      api_model: str, api_timeout: float, temperature: float, top_p: float, max_tokens: int,
+                      retries: int = 2) -> Optional[Dict[str, Any]]:
+    """One structured-output request of the role-split sampler; None if every attempt fails to parse."""
+    prompt = tokenizer.apply_chat_template(messages, add_generation_prompt=True, tokenize=False, enable_thinking=False)
+    payload = {"model": api_model, "prompt": prompt, "max_tokens": max_tokens, "temperature": temperature, "top_p": top_p,
+               "n": 1, "stop": ["<|im_end|>", "<end_of_turn>", "<|endoftext|>", "<|eot_id|>"],
+               "structured_outputs": {"json": schema}}
+    for attempt in range(1 + retries):
+        try:
+            data = _http_json(f"{normalize_api_base(api_base)}/completions", payload=payload, timeout=api_timeout)
+            return json.loads(data["choices"][0]["text"])
+        except (RuntimeError, ValueError, KeyError, IndexError) as exc:   # _http_json wraps transport errors in RuntimeError
+            print(f"[RoleSampler] model={api_model} attempt={attempt + 1} error={exc}", file=sys.stderr, flush=True)
+            continue
+    return None
+
+
+def filter_role_futures(observed_source: str, items: List[Tuple[str, str, Dict[str, Any]]], api_model: str,
+                        ) -> Tuple[List[str], List[Dict[str, Any]], List[Dict[str, Any]]]:
+    """The coordinated sampler's checks (cleaning, validity, >= 3 words, no restated prefix) plus its diversity filter
+    within each (mode, word, reading) group."""
+    partial_norm = re.sub(r"[^a-z0-9]+", "", observed_source.lower())
+    groups: Dict[Tuple[str, str, str], List[str]] = {}
+    audit: List[Dict[str, Any]] = []
+    for mode, raw, extra in items:
+        cleaned = clean_future_text(observed_source, raw)
+        if not cleaned or not is_valid_future_text(cleaned):
+            reason = "missing_or_invalid"
+        elif len(re.findall(r"[A-Za-z0-9']+", cleaned)) < 3:
+            reason = "too_short"
+        elif len(partial_norm) >= max(8, len(partial_norm) // 2) and partial_norm in re.sub(r"[^a-z0-9]+", "", cleaned.lower()):
+            reason = "repeats_observed_prefix"
+        else:
+            reason = "kept"
+            groups.setdefault((mode, extra.get("word", ""), extra.get("reading", "")), []).append(cleaned)
+        audit.append({"model": api_model, "mode": mode, "raw": raw.strip(), "future": cleaned, "accepted": reason == "kept",
+                      "reason": reason, **extra})
+    futures: List[str] = []
+    infos: List[Dict[str, Any]] = []
+    for (mode, word, reading), candidates in groups.items():
+        for future in select_diverse_futures(candidates):
+            futures.append(future)
+            infos.append({"source": "role_future", "path": api_model, "model": api_model, "mode": mode, "future": future,
+                          "word": word, "reading": reading, "prompt_version": "role_split_20261009"})
+    return futures, infos, audit
+
+
+def sample_role_futures(observed_source: str, plausible_spec: Tuple[Any, str, str, float], targeted_spec: Tuple[Any, str, str, float],
+                        roles: str, ambiguity_hint: Optional[Dict[str, Any]], plausible_n: int, per_reading: int,
+                        max_words: int, max_readings: int, temperature: float, top_p: float,
+                        ) -> Tuple[List[str], List[Dict[str, Any]], List[Dict[str, Any]]]:
+    """Gemma: natural continuations. Qwen3.8: open words (layer 1, or the given word) -> continuations per reading."""
+    def plausible() -> Tuple[List[str], List[Dict[str, Any]], List[Dict[str, Any]]]:
+        tokenizer, base, model, timeout = plausible_spec
+        reply = request_role_json(tokenizer, build_plausible_messages(observed_source, plausible_n), plausible_schema(plausible_n),
+                                  base, model, timeout, temperature, top_p, max_tokens=60 * plausible_n)
+        suffixes = (reply or {}).get("plausible", [])
+        return filter_role_futures(observed_source, [("plausible", x, {}) for x in suffixes if isinstance(x, str)], model)
+
+    def targeted() -> Tuple[List[str], List[Dict[str, Any]], List[Dict[str, Any]]]:
+        tokenizer, base, model, timeout = targeted_spec
+        if roles == "given_word":
+            heard = ambiguity_hint is not None and re.search(rf"\b{re.escape(ambiguity_hint['word'])}\b", observed_source, re.I)
+            open_words = [{"word": ambiguity_hint["word"], "readings": ambiguity_hint["readings"]}] if heard else []
+            layer1 = {"given": bool(heard)}
+        else:
+            reply = request_role_json(tokenizer, build_open_word_messages(observed_source, max_words, max_readings),
+                                      open_word_schema(max_words, max_readings), base, model, timeout, temperature, top_p,
+                                      max_tokens=400)
+            open_words = [w for w in (reply or {}).get("open_words", [])
+                          if isinstance(w, dict) and w.get("word") and len(w.get("readings", [])) >= 2][:max_words]
+            layer1 = {"open_words": open_words}
+        if not open_words:
+            return [], [], [{"model": model, "mode": "layer1", "accepted": None, **layer1}]
+        else:
+            max_items = per_reading * sum(len(w["readings"]) for w in open_words)
+            reply = request_role_json(tokenizer, build_reading_messages(observed_source, open_words, per_reading),
+                                      reading_schema(max_items), base, model, timeout, temperature, top_p,
+                                      max_tokens=80 * max_items)
+            items = [("contrastive", f["suffix"], {"word": f.get("word", ""), "reading": f.get("reading", "")})
+                     for f in (reply or {}).get("futures", []) if isinstance(f, dict) and isinstance(f.get("suffix"), str)]
+            futures, infos, audit = filter_role_futures(observed_source, items, model)
+            return futures, infos, [{"model": model, "mode": "layer1", "accepted": None, **layer1}] + audit
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        plausible_job, targeted_job = pool.submit(plausible), pool.submit(targeted)
+        batches = [plausible_job.result(), targeted_job.result()]
+    return ([f for b in batches for f in b[0]], [i for b in batches for i in b[1]], [a for b in batches for a in b[2]])
+
+
+SamplerSpec = Tuple[PreTrainedTokenizerBase, str, str, float]
+
+
+def sample_list_futures(observed_source: str, list_prefix: str, list_open: List[Dict[str, Any]], natural_spec: SamplerSpec,
+                        targeted_spec: SamplerSpec, natural: str, natural_n: int, per_reading: int, targeted_thinking: bool,
+                        think_budget: int, skip_ruled_out: bool = False,
+                        reading_check: bool = False, observed_full: str = "") -> Tuple[List[str], List[Dict[str, Any]], List[Dict[str, Any]]]:
+    """design v3: natural continuations of the sentence-anchored prefix, plus continuations of the (extended) prefix per
+    reading of every open listed word. Both go through the coordinated sampler's filter; each request's status goes to
+    the audit (a failed request would otherwise leave no trace)."""
+    def _natural() -> Tuple[List[str], List[Dict[str, Any]], List[Dict[str, Any]]]:
+        if natural == "none":
+            return [], [], []
+        else:
+            tokenizer, base, model, timeout = natural_spec
+        results, _ = list_request(base, model, tokenizer, natural_messages(observed_source, natural_n), False, 1,
+                                  natural_schema(natural_n), 60 * natural_n, timeout)
+        suffixes = (results[0]["answer"] or {"plausible": []})["plausible"]
+        futures, infos, audit = filter_role_futures(observed_source, [("natural", suffix, {}) for suffix in suffixes], model)
+        return futures, infos, [{"model": model, "mode": "natural_request", "status": results[0]["status"], "accepted": None}] + audit
+
+    def _targeted() -> Tuple[List[str], List[Dict[str, Any]], List[Dict[str, Any]]]:
+        if not list_open:
+            return [], [], []
+        else:
+            tokenizer, base, model, timeout = targeted_spec
+        words = [(entry["word"], [f"{r['gloss']} ({r['zh']})" for r in entry["readings"]]) for entry in list_open]
+        check_audit = []
+        if reading_check:   # keep only the readings still possible given the whole prefix; close a word left with < 2
+            checked = []
+            for word, readings in words:
+                results, _ = list_request(base, model, tokenizer, check_messages(observed_full, word, readings), False, 1,
+                                          check_schema(len(readings)), 60, timeout, temperature=0.0)
+                answer = results[0]["answer"]
+                possible = sorted({n for n in answer.get("possible", []) if 1 <= n <= len(readings)}) if isinstance(answer, dict) else list(range(1, len(readings) + 1))
+                check_audit.append({"model": model, "mode": "check_request", "status": results[0]["status"], "accepted": None,
+                                    "word": word, "possible": possible})
+                if len(possible) >= 2:
+                    checked.append((word, [readings[n - 1] for n in possible]))
+                else:
+                    continue
+            words = checked
+        else:
+            pass
+        if not words:
+            return [], [], check_audit
+        else:
+            pass
+        max_items = per_reading * sum(len(readings) for _, readings in words)
+        results, _ = list_request(base, model, tokenizer, sample_messages(list_prefix, words, per_reading, skip_ruled_out), targeted_thinking, 1,
+                                  sample_schema(max_items, max(len(readings) for _, readings in words)),
+                                  think_budget if targeted_thinking else 80 * max_items, timeout)
+        answer = results[0]["answer"]
+        by_word = {word.lower(): (word, readings) for word, readings in words}
+        items = []
+        for future in answer.get("futures", []) if isinstance(answer, dict) else []:
+            word, readings = by_word.get(str(future.get("word", "")).lower(), ("", []))
+            number = future.get("reading")
+            if isinstance(future.get("suffix"), str) and isinstance(number, int) and 1 <= number <= len(readings):
+                items.append(("targeted", future["suffix"], {"word": word, "reading": readings[number - 1]}))
+            else:
+                continue
+        futures, infos, audit = filter_role_futures(list_prefix, items, model)
+        request_audit = {"model": model, "mode": "targeted_request", "status": results[0]["status"], "accepted": None,
+                         "returned": len(answer.get("futures", [])) if isinstance(answer, dict) else 0, "valid": len(items)}
+        return futures, infos, check_audit + [request_audit] + audit
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        natural_job, targeted_job = pool.submit(_natural), pool.submit(_targeted)
+        batches = [natural_job.result(), targeted_job.result()]
+    return ([f for b in batches for f in b[0]], [i for b in batches for i in b[1]], [a for b in batches for a in b[2]])
 
 
 def sample_source_futures_targeted_prefill(
@@ -1316,10 +1549,50 @@ def sample_source_futures_targeted_prefill(
     prompt_version: str = PROMPT_VERSION,
     parse_retries: int = 2,
     contrastive_notes: bool = False,
+    future_roles: str = "off",
+    ambiguity_hint: Optional[Dict[str, Any]] = None,
+    role_plausible_n: int = 10,
+    role_per_reading: int = 2,
+    role_max_words: int = 2,
+    role_max_readings: int = 3,
+    list_open: Optional[List[Dict[str, Any]]] = None,
+    list_prefix: str = "",
+    list_natural: str = "qwen",
+    list_natural_n: int = 6,
+    list_per_reading: int = 2,
+    list_targeted_thinking: bool = False,
+    list_think_budget: int = 2000,
+    list_skip_ruled_out: bool = False,
+    list_reading_check: bool = False,
+    list_observed_full: str = "",
 ) -> Any:
-    """Generate a coordinated set per model with equal group budgets."""
+    """Generate a coordinated set per model with equal group budgets (or, with future_roles, the role-split set)."""
     if not observed_source.strip():
         return ([], [], []) if return_audit else ([], [])
+    elif future_roles == "list":
+        s2_timeout = sampler2_api_timeout if sampler2_api_timeout and sampler2_api_timeout > 0 else api_timeout
+        result = sample_list_futures(
+            observed_source=observed_source, list_prefix=list_prefix, list_open=list_open or [],
+            natural_spec=((sampler2_tokenizer, sampler2_api_base, sampler2_api_model, s2_timeout) if list_natural == "qwen"
+                          else (sampler_tokenizer, api_base, api_model, api_timeout)),
+            targeted_spec=(sampler2_tokenizer, sampler2_api_base, sampler2_api_model, s2_timeout), natural=list_natural,
+            natural_n=list_natural_n, per_reading=list_per_reading, targeted_thinking=list_targeted_thinking,
+            think_budget=list_think_budget, skip_ruled_out=list_skip_ruled_out, reading_check=list_reading_check,
+            observed_full=list_observed_full,
+        )
+        return result if return_audit else result[:2]
+    elif future_roles != "off":
+        s2_timeout = sampler2_api_timeout if sampler2_api_timeout and sampler2_api_timeout > 0 else api_timeout
+        result = sample_role_futures(
+            observed_source=observed_source,
+            plausible_spec=(sampler_tokenizer, api_base, api_model, api_timeout),
+            targeted_spec=(sampler2_tokenizer, sampler2_api_base, sampler2_api_model, s2_timeout),
+            roles=future_roles, ambiguity_hint=ambiguity_hint, plausible_n=role_plausible_n, per_reading=role_per_reading,
+            max_words=role_max_words, max_readings=role_max_readings, temperature=sample_temperature, top_p=top_p,
+        )
+        return result if return_audit else result[:2]
+    else:
+        pass
     if num_futures <= 0 or num_futures % 2:
         raise ValueError("num_futures must be a positive even number")
     use_ensemble = bool(sampler2_tokenizer and sampler2_api_base and sampler2_api_model)
@@ -1434,6 +1707,8 @@ def batch_get_next_token_distributions(
     probe_top_p: float = 0.0,
     probe_top_k: int = 0,
     shared_first: bool = False,
+    reasonings: Optional[List[Optional[str]]] = None,
+    notes: Optional[List[str]] = None,
 ) -> List[Tuple[Dict[int, float], Dict[str, Any]]]:
 # Step 1: 用 chat template 把翻译指令编码成 token IDs
 #         → [<|im_start|>, user, \n, [TASK], Translate..., <|im_end|>]
@@ -1443,16 +1718,21 @@ def batch_get_next_token_distributions(
         
 # Step 3: 拼上已提交翻译的 token IDs
 #         → 上面 + [32108, 45621]
-    prompts = [
-        build_translation_probe_prompt_prefix_token_ids(
-            tokenizer,
-            src,
-            has_target_prefix=bool(target_prefix_token_ids),
-            target_lang=target_lang,
-            shared_first=shared_first,
-        ) + list(target_prefix_token_ids) # Step 3
-        for src in full_sources
-    ]
+    # Probe thinking (2026-10-06): a source with a reasoning gets the thinking template, its reasoning and the closing
+    # </think> before the committed prefix, so the next-token distribution reads the reasoning.
+    prompts = []
+    for i, src in enumerate(full_sources):
+        if reasonings is not None and reasonings[i] is not None:
+            prompt_ids = build_translation_probe_prompt_prefix_token_ids(
+                tokenizer, src, has_target_prefix=bool(target_prefix_token_ids), target_lang=target_lang,
+                shared_first=shared_first, enable_thinking=True,
+            ) + tokenizer.encode(reasonings[i] + "\n</think>\n\n", add_special_tokens=False)
+        else:
+            prompt_ids = build_translation_probe_prompt_prefix_token_ids(
+                tokenizer, src, has_target_prefix=bool(target_prefix_token_ids), target_lang=target_lang,
+                shared_first=shared_first, note=notes[i] if notes else "",
+            )
+        prompts.append(prompt_ids + list(target_prefix_token_ids))  # Step 3
     # [user task tokens] + [assistant prefix tokens] + [already committed target prefix tokens]
     if not prompts:
         return []
@@ -1511,6 +1791,43 @@ def batch_get_next_token_distributions(
     return results
 
 
+# Thinking sampling (Haoling 2026-10-06: temperature 0.6 for every reasoning, so the voters do not drift apart): the
+# Qwen3.6 model card's thinking setting for precise tasks, the setting of the translator check (translator_check_20261006).
+THINKING_SAMPLING = {"temperature": 0.6, "top_p": 0.95, "top_k": 20}
+
+
+def generate_reasonings(prompts: List[Any], api_base: str, api_model: str, max_tokens: int) -> List[Dict[str, Any]]:
+    """One reasoning per prompt (token ids or text ending in the thinking template's <think>), stopped at </think>; a
+    reasoning cut at max_tokens is kept as it is and marked."""
+    payload = {"model": api_model, "prompt": prompts, "max_tokens": max_tokens, **THINKING_SAMPLING, "stop": ["</think>"]}
+    data = _http_json(f"{normalize_api_base(api_base)}/completions", payload=payload, timeout=3600.0)
+    return [{"text": choice["text"].strip(), "cut": choice["finish_reason"] == "length"} for choice in data["choices"]]
+
+
+def generate_probe_reasonings(
+    tokenizer: Any,
+    full_sources: List[str],
+    has_target_prefix: bool,
+    api_base: str,
+    api_model: str,
+    target_lang: str,
+    shared_first: bool,
+    max_tokens: int,
+) -> List[Dict[str, Any]]:
+    """Probe thinking (Haoling 2026-10-06): one reasoning per probe source, generated once per chunk with thinking on and
+    reused by every probe step of that chunk. The user turn is the probe's own, with the has_target_prefix of the chunk
+    start: if the first token of an utterance commits in this chunk, the later steps of the chunk ask with the
+    'partial translation committed' rule after a reasoning made under the 'from the beginning' rule."""
+    prompts = [
+        build_translation_probe_prompt_prefix_token_ids(
+            tokenizer, src, has_target_prefix=has_target_prefix, target_lang=target_lang, shared_first=shared_first,
+            enable_thinking=True,
+        )
+        for src in full_sources
+    ]
+    return generate_reasonings(prompts, api_base, api_model, max_tokens)
+
+
 # ---------------------------------------------------------------------------
 # Consensus logic
 # ---------------------------------------------------------------------------
@@ -1550,6 +1867,87 @@ def _select_candidates(dist: Dict[int, float], top_p: float = 0.0,
     if min_p > 0:
         return minp_token_ids(dist, min_p)
     return topk_token_ids(dist, top_k)
+
+
+def make_semantic_matcher(model_path: str, threshold: float) -> Any:
+    """Near-synonym test for the tolerant vote (2026-10-09): LaBSE pooled embeddings on CPU, cached per string; both
+    strings must contain a CJK character."""
+    import torch
+    from transformers import AutoModel
+
+    tokenizer = AutoTokenizer.from_pretrained(model_path)
+    model = AutoModel.from_pretrained(model_path).eval()
+    cache: Dict[str, Any] = {}
+    lock = threading.Lock()
+
+    def vector(text: str) -> Any:
+        if text not in cache:
+            batch = tokenizer([text], return_tensors="pt", truncation=True, max_length=16)
+            with torch.no_grad():
+                pooled = model(**batch).pooler_output[0]
+            cache[text] = torch.nn.functional.normalize(pooled, dim=-1)
+        else:
+            pass
+        return cache[text]
+
+    def similar(a: str, b: str) -> bool:
+        if not (re.search(r"[\u4e00-\u9fff]", a) and re.search(r"[\u4e00-\u9fff]", b)):
+            return False
+        else:
+            with lock:
+                return float(vector(a) @ vector(b)) >= threshold
+
+    return similar
+
+
+def choose_consensus_token_tolerant(
+    distributions: List[Dict[int, float]],
+    token_text: Any,
+    similar: Any,
+    soft_vote_top_k: int,
+    soft_vote_min_p: float,
+    min_voters_ratio: float,
+) -> Tuple[Optional[int], Dict[str, Any]]:
+    """Tolerant vote (2026-10-09 test). A voter supports candidate A when one of its own candidates (p >= soft_vote_min_p,
+    top K) is A, starts with A's text, or (similar given) is a near-synonym of A. Its support is the highest probability
+    among those. Eligibility (enough supporting voters), ranking (summed support) and the unique-winner rule are the
+    exact vote's."""
+    voter_lists = []
+    for dist in distributions:
+        filtered = sorted(((tok, p) for tok, p in dist.items() if p >= soft_vote_min_p), key=lambda kv: kv[1], reverse=True)
+        voter_lists.append([(tok, p, token_text(tok).strip()) for tok, p in filtered[:soft_vote_top_k]])
+    pool = {tok: text for candidates in voter_lists for tok, _, text in candidates}
+    own = Counter()
+    for candidates in voter_lists:
+        for tok, p, _ in candidates:
+            own[tok] += p
+    support: Dict[int, List[float]] = {}
+    for tok, text in pool.items():
+        per_voter = []
+        for candidates in voter_lists:
+            per_voter.append(max((p for other, p, other_text in candidates
+                                  if other == tok
+                                  or (text and other_text.startswith(text))
+                                  or (similar is not None and text and other_text and similar(text, other_text))),
+                                 default=0.0))
+        support[tok] = per_voter
+    num_futures = len(distributions)
+    min_voters = max(1, math.ceil(num_futures * min_voters_ratio))
+    eligible = {tok: (sum(v), own[tok]) for tok, v in support.items() if sum(1 for p in v if p > 0) >= min_voters}
+    base_meta = {"num_futures": num_futures, "min_voters": min_voters, "soft_vote_min_p": soft_vote_min_p, "vote_match": "tolerant"}
+    if not eligible:
+        close = sorted(support.items(), key=lambda kv: (sum(1 for p in kv[1] if p > 0), sum(kv[1])), reverse=True)
+        return None, {"reason": "no_token_with_enough_voters", "intersection": [t for t, _ in close[:soft_vote_top_k]], **base_meta}
+    else:
+        ranked = sorted(eligible.items(), key=lambda kv: kv[1], reverse=True)
+        top_tok, top_score = ranked[0]
+        second_score = ranked[1][1] if len(ranked) > 1 else (0.0, 0.0)
+        base_meta = {**base_meta, "intersection": [tok for tok, _ in ranked[:soft_vote_top_k]],
+                     "min_voter_p": min(support[top_tok])}
+        if top_score <= second_score:
+            return None, {"reason": "tied_top", **base_meta}
+        else:
+            return top_tok, {"reason": "ok", "avg_score": top_score[0] / num_futures, **base_meta}
 
 
 def choose_consensus_token(
@@ -1609,6 +2007,7 @@ def choose_consensus_token(
     return top_tok, {
         "reason": "ok",
         "avg_score": top_score / num_futures,
+        "min_voter_p": min(dist.get(top_tok, 0.0) for dist in distributions),
         **base_meta,
     }
 
@@ -1706,6 +2105,64 @@ def finalize_external_commit(
 # Core consensus loop
 # ---------------------------------------------------------------------------
 
+def anchor_ratio_commit(tokenizer: Any, source_observed: str, futures: List[str], oracle_future: str, future_join_mode: str,
+                        committed_token_ids: List[int], anchor_ids: List[int], ratio: float, max_tokens: int,
+                        future_notes: Optional[List[str]], api_base: str, api_model: str, api_timeout: float,
+                        target_lang: str, shared_first: bool, floor: float = 0.0) -> Tuple[List[int], List[Dict[str, Any]]]:
+    """--anchor-ratio: the longest prefix of the remaining reference (at most max_tokens tokens) whose every token gets,
+    under every sampled future, at least `ratio` times its probability under the true continuation."""
+    remaining = list(anchor_ids[len(committed_token_ids):len(committed_token_ids) + max_tokens])
+    if not remaining or not oracle_future:
+        return [], [{"step": 0, "stop": "reference_end" if not remaining else "no_oracle"}]
+    else:
+        sources = [join_future_to_source(source_observed, f, future_join_mode) for f in futures]
+        sources.append(join_future_to_source(source_observed, oracle_future, future_join_mode))
+    notes = list(future_notes or []) + [""] * (len(sources) - len(future_notes or []))
+    prompts = [build_translation_probe_prompt_prefix_token_ids(tokenizer, src, has_target_prefix=bool(committed_token_ids),
+                                                              target_lang=target_lang, shared_first=shared_first, note=note)
+               + list(committed_token_ids) + remaining
+               for src, note in zip(sources, notes)]
+    started = time.perf_counter()
+    data = _http_json(f"{normalize_api_base(api_base)}/completions",
+                      payload={"model": api_model, "prompt": prompts, "max_tokens": 1, "temperature": 0.0, "prompt_logprobs": 0},
+                      timeout=api_timeout)
+    logprobs = []   # per voter, the log-probability of each remaining reference token
+    for choice in data["choices"]:
+        tail = choice["prompt_logprobs"][-len(remaining):]
+        logprobs.append([entry[str(token)]["logprob"] for entry, token in zip(tail, remaining)])
+    oracle_lp, future_lps = logprobs[-1], logprobs[:-1]
+    if floor > 0:   # --anchor-ratio-floor: the yardstick never drops below the floor
+        oracle_lp = [max(lp, math.log(floor)) for lp in oracle_lp]
+    else:
+        pass
+    threshold = math.log(ratio)
+    accepted = 0
+    for j in range(len(remaining)):
+        if all(lp[j] - oracle_lp[j] >= threshold for lp in future_lps):
+            accepted = j + 1
+        else:
+            break
+    elapsed = round(time.perf_counter() - started, 3)
+    logs: List[Dict[str, Any]] = []
+    for j in range(accepted):
+        logs.append({"step": j, "elapsed_s": elapsed if j == 0 else 0.0, "accepted_token_id": remaining[j],
+                     "accepted_token_text": _single_token_text(tokenizer, remaining[j]),
+                     "pending_text": decode_token_ids_to_text(tokenizer, remaining[:j + 1]), "per_future": [],
+                     "meta": {"anchor_ratio": True, "min_voter_p": min(math.exp(lp[j]) for lp in future_lps),
+                              "oracle_p": round(math.exp(oracle_lp[j]), 5),
+                              "min_ratio": round(min(math.exp(lp[j] - oracle_lp[j]) for lp in future_lps), 5)}})
+    if accepted < len(remaining):
+        j = accepted
+        logs.append({"step": j, "stop": "ratio_veto", "elapsed_s": elapsed if j == 0 else 0.0, "per_future": [],
+                     "meta": {"candidate": _single_token_text(tokenizer, remaining[j]), "oracle_p": round(math.exp(oracle_lp[j]), 5),
+                              "ratios": [round(math.exp(lp[j] - oracle_lp[j]), 5) for lp in future_lps],
+                              "vetoing": [futures[i] for i, lp in enumerate(future_lps) if lp[j] - oracle_lp[j] < threshold][:4],
+                              "intersection": []}})
+    else:
+        pass
+    return remaining[:accepted], logs
+
+
 def extend_pending_tokens(
     instruct_tokenizer: Any,
     source_observed: str,
@@ -1731,25 +2188,72 @@ def extend_pending_tokens(
     probe_temperature: float = 0.0,
     probe_top_p: float = 0.0,
     probe_top_k: int = 0,
+    probe_thinking: str = "off",
+    probe_thinking_max_tokens: int = 8192,
+    vote_match: str = "exact",
+    semantic_matcher: Any = None,
+    future_notes: Optional[List[str]] = None,
+    anchor_ids: Optional[List[int]] = None,
+    anchor_min_p: float = 0.02,
+    anchor_ratio: float = 0.0,
+    anchor_ratio_floor: float = 0.0,
 ) -> Tuple[List[int], List[Dict[str, Any]]]:
     pending_token_ids: List[int] = []
     grow_logs: List[Dict[str, Any]] = []
+    if anchor_ids is not None and anchor_ratio > 0:
+        return anchor_ratio_commit(
+            instruct_tokenizer, source_observed, futures, oracle_future, future_join_mode, committed_token_ids,
+            anchor_ids, anchor_ratio, max_consensus_steps, future_notes, instruct_api_base, instruct_api_model,
+            instruct_api_timeout, target_lang, probe_shared_first, anchor_ratio_floor)
+    else:
+        pass
+
+    # 2a) 每条 future 拼成完整 source（本 chunk 内不变），问 instruct 模型："给定这个完整英文 + 已有中文前缀，下一个中文 token 是啥？"
+    full_sources = [join_future_to_source(source_observed, f, future_join_mode) for f in futures]
+    # The oracle rides along in the same batch (no extra round trip) but is sliced
+    # off before the vote. It only ever answers "would the true continuation have
+    # rejected what we just committed?".
+    n_voting = len(full_sources)
+    if oracle_future:
+        full_sources.append(join_future_to_source(source_observed, oracle_future, future_join_mode))
+        if oracle_votes:
+            # The oracle is future N+1: it counts toward num_futures, so under
+            # min_voters_ratio=1.0 the true continuation must also agree before a
+            # token can commit.
+            n_voting = len(full_sources)
+
+    # Probe thinking (2026-10-06): reasoning once per chunk, for every probe source (all) or only the true
+    # continuation (oracle), reused by every probe step below.
+    if probe_thinking == "all":
+        thinking_indices = list(range(len(full_sources)))
+    elif probe_thinking == "oracle" and oracle_future:
+        thinking_indices = [len(full_sources) - 1]
+    else:
+        thinking_indices = []
+    reasonings: Optional[List[Optional[str]]] = None
+    thinking_log: Dict[str, Any] = {}
+    if thinking_indices:
+        thinking_started = time.perf_counter()
+        generated = generate_probe_reasonings(
+            instruct_tokenizer, [full_sources[i] for i in thinking_indices], has_target_prefix=bool(committed_token_ids),
+            api_base=instruct_api_base, api_model=instruct_api_model, target_lang=target_lang,
+            shared_first=probe_shared_first, max_tokens=probe_thinking_max_tokens,
+        )
+        reasonings = [None] * len(full_sources)
+        for i, g in zip(thinking_indices, generated):
+            reasonings[i] = g["text"]
+        thinking_log = {
+            "mode": probe_thinking,
+            "elapsed_s": round(time.perf_counter() - thinking_started, 3),
+            "reasoning_chars": [len(g["text"]) for g in generated],
+            "cut": sum(g["cut"] for g in generated),
+            "oracle_reasoning": reasonings[-1] if oracle_future else None,
+        }
+    else:
+        pass
 
     for step_idx in range(max_consensus_steps): #最多32 步
-        # 2a) 每条 future 拼成完整 source，问 instruct 模型："给定这个完整英文 + 已有中文前缀，下一个中文 token 是啥？"
         target_prefix_token_ids = list(committed_token_ids) + list(pending_token_ids)
-        full_sources = [join_future_to_source(source_observed, f, future_join_mode) for f in futures]
-        # The oracle rides along in the same batch (no extra round trip) but is sliced
-        # off before the vote. It only ever answers "would the true continuation have
-        # rejected what we just committed?".
-        n_voting = len(full_sources)
-        if oracle_future:
-            full_sources.append(join_future_to_source(source_observed, oracle_future, future_join_mode))
-            if oracle_votes:
-                # The oracle is future N+1: it counts toward num_futures, so under
-                # min_voters_ratio=1.0 the true continuation must also agree before a
-                # token can commit.
-                n_voting = len(full_sources)
         probe_started = time.perf_counter()
 
         batch_results = batch_get_next_token_distributions(
@@ -1768,6 +2272,8 @@ def extend_pending_tokens(
             probe_temperature=probe_temperature,
             probe_top_p=probe_top_p,
             probe_top_k=probe_top_k,
+            reasonings=reasonings,
+            notes=(future_notes + [""] * (len(full_sources) - len(future_notes))) if future_notes else None,
         )
 
         if oracle_future and oracle_votes:
@@ -1789,6 +2295,7 @@ def extend_pending_tokens(
             if not dist:
                 grow_logs.append({"step": step_idx, "stop": "empty_distribution",
                                   "future": label, "dist_debug": dist_debug})
+                grow_logs[0].update({"thinking": thinking_log} if thinking_log else {})
                 return pending_token_ids, grow_logs
             distributions.append(dist)
             # select 3 policies: topk, topp, minp
@@ -1801,16 +2308,37 @@ def extend_pending_tokens(
             })
 
         # 共识选 token
-        consensus_token_id, meta = choose_consensus_token(
-            distributions,
-            min_p=min_p,
-            candidate_top_k=candidate_top_k,
-            top_p=top_p,
-            soft_vote_top_k=soft_vote_top_k,
-            soft_vote_min_p=soft_vote_min_p,
-            soft_vote_threshold=soft_vote_threshold,
-            min_voters_ratio=min_voters_ratio,
-        )
+        if anchor_ids is not None:
+            position = len(committed_token_ids) + len(pending_token_ids)
+            if position >= len(anchor_ids):
+                consensus_token_id, meta = None, {"anchor": True, "stop_reason": "reference_end", "min_voter_p": 0.0, "intersection": []}
+            else:
+                voter_probs = [dist.get(anchor_ids[position], 0.0) for dist in distributions]
+                accepted = min(voter_probs) >= anchor_min_p
+                consensus_token_id = anchor_ids[position] if accepted else None
+                meta = {"anchor": True, "candidate": _single_token_text(instruct_tokenizer, anchor_ids[position]),
+                        "voter_probs": [round(p, 4) for p in voter_probs], "min_voter_p": min(voter_probs),
+                        "intersection": [anchor_ids[position]] if accepted else []}
+        elif vote_match == "exact":
+            consensus_token_id, meta = choose_consensus_token(
+                distributions,
+                min_p=min_p,
+                candidate_top_k=candidate_top_k,
+                top_p=top_p,
+                soft_vote_top_k=soft_vote_top_k,
+                soft_vote_min_p=soft_vote_min_p,
+                soft_vote_threshold=soft_vote_threshold,
+                min_voters_ratio=min_voters_ratio,
+            )
+        else:
+            consensus_token_id, meta = choose_consensus_token_tolerant(
+                distributions,
+                token_text=lambda t: _single_token_text(instruct_tokenizer, t),
+                similar=semantic_matcher if vote_match == "prefix_semantic" else None,
+                soft_vote_top_k=soft_vote_top_k,
+                soft_vote_min_p=soft_vote_min_p,
+                min_voters_ratio=min_voters_ratio,
+            )
         probe_elapsed = round(time.perf_counter() - probe_started, 3)
 
         oracle_audit: Optional[Dict[str, Any]] = None
@@ -1852,6 +2380,7 @@ def extend_pending_tokens(
             log_entry["oracle_audit"] = oracle_audit
         grow_logs.append(log_entry)
 
+    grow_logs[0].update({"thinking": thinking_log} if thinking_log else {})
     return pending_token_ids, grow_logs
 
 
@@ -1869,8 +2398,18 @@ def force_complete_translation(
     target_lang: str = "Chinese",
     max_tokens: int = 128,
     terminal_mark: str = "",
+    thinking: bool = False,
+    thinking_max_tokens: int = 8192,
 ) -> str:
-    prompt = build_final_completion_prompt(tokenizer, full_source, committed_text, target_lang=target_lang, terminal_mark=terminal_mark)
+    if thinking:
+        # Completion thinking (Haoling 2026-10-06): reason first under the same user turn, then complete the committed
+        # prefix after the reasoning, greedy as before.
+        head = build_final_completion_prompt(tokenizer, full_source, committed_text, target_lang=target_lang,
+                                             terminal_mark=terminal_mark, enable_thinking=True, append_committed=False)
+        reasoning = generate_reasonings([head], api_base, api_model, thinking_max_tokens)[0]["text"]
+        prompt = head + reasoning + "\n</think>\n\n" + str(committed_text or "")
+    else:
+        prompt = build_final_completion_prompt(tokenizer, full_source, committed_text, target_lang=target_lang, terminal_mark=terminal_mark)
     payload = {
         "model": api_model,
         "prompt": prompt,
@@ -2002,9 +2541,29 @@ def run_one_utterance(
     verbose_log_file: Optional[Any] = None,
 ) -> Dict[str, Any]:
     utt_id = str(row.get(args.id_column, row.get("id", f"row_{args.row_idx}")))
+    # 2026-10-09 vote test: the known ambiguous word and its readings, for --future-roles given_word only
+    if args.future_roles == "given_word":
+        ambiguity_hint = {"word": str(row["ambiguous_word"]), "readings": json.loads(row["ambiguous_readings"])}
+    else:
+        ambiguity_hint = None
+    # 2026-10-10 design v3: the utterance's ambiguity list, built before decoding (build_ambiguity_tsv.py)
+    ambiguity_list = json.loads(row["ambiguity_list"]) if args.future_roles == "list" else []
     chunks = parse_trajectory(row["src_trajectory"])
     source_units = parse_source_units(row.get("src_text_full"))
     full_source_text = get_full_source_text(row)
+    if args.anchor_reference:
+        anchor_text = _extract_reference_text_from_row(row, target_lang=args.target_lang)
+        anchor_ids = instruct_tokenizer.encode(anchor_text, add_special_tokens=False)
+        anchor_prefix_lengths = [len(instruct_tokenizer.decode(anchor_ids[:n])) for n in range(len(anchor_ids) + 1)]
+        reference_units = parse_source_units(row.get("llm_reference_text_list"))
+        anchor_sentence_ends = []   # token count at the end of reference sentence k (one per source unit)
+        search_from = 0
+        for unit in reference_units if len(reference_units) == len(source_units) else []:
+            found = anchor_text.find(unit.strip(), search_from)
+            search_from = found + len(unit.strip()) if found >= 0 else search_from
+            anchor_sentence_ends.append(next((n for n, length in enumerate(anchor_prefix_lengths) if length >= search_from), len(anchor_ids)))
+    else:
+        anchor_ids, anchor_prefix_lengths, anchor_sentence_ends = None, [], []
 
     committed_text = ""
     committed_token_ids: List[int] = []
@@ -2094,6 +2653,17 @@ def run_one_utterance(
 
         if t == len(chunks) - 1: #最后一个chunk，不再做共识，直接让instruct model把翻译补完
             log_sampling("skipped", "final_chunk")
+            if args.anchor_reference:   # anchor mode: the rest of the reference
+                done_tokens = len(committed_token_ids)
+                anchor_delta = instruct_tokenizer.decode(anchor_ids)[anchor_prefix_lengths[done_tokens]:]
+                committed_text += anchor_delta
+                committed_token_ids = list(anchor_ids)
+                target_deltas.append(anchor_delta)
+                actions.append("WRITE" if anchor_delta else "READ")
+                _vlog(verbose_log_file, f"  [AnchorCommit] final delta={anchor_delta!r}")
+                continue
+            else:
+                pass
             terminal = source_terminal_mark(source_observed_full) if args.sentence_end_punctuation == "match-source" else ""
             completion_started = time.perf_counter()
             final_delta = force_complete_translation(
@@ -2106,6 +2676,8 @@ def run_one_utterance(
                 target_lang=args.target_lang,
                 max_tokens=args.final_max_tokens,
                 terminal_mark=terminal,
+                thinking=args.completion_thinking,
+                thinking_max_tokens=args.probe_thinking_max_tokens,
             )
             if terminal:
                 raw_delta = final_delta
@@ -2136,6 +2708,23 @@ def run_one_utterance(
             sentence_end = bool(current_source_chunk.strip()) and observed_sentence_is_complete(source_observed_full)
         if getattr(args, "sentence_end_completion", False) and sentence_end:
             log_sampling("skipped", "source_sentence_end")
+            if args.anchor_reference:   # anchor mode: the reference to the end of the source unit just completed
+                done_tokens = len(committed_token_ids)
+                unit_index = current_unit_index(source_units, source_observed_full)
+                through = ""
+                for unit in source_units[:unit_index + 1]:
+                    through = append_text_continuation(through, unit)
+                unit_done = bool(anchor_sentence_ends) and through.strip() == source_observed_full.strip()
+                target_tokens = max(done_tokens, anchor_sentence_ends[unit_index]) if unit_done else done_tokens
+                anchor_delta = instruct_tokenizer.decode(anchor_ids[:target_tokens])[anchor_prefix_lengths[done_tokens]:]
+                committed_text += anchor_delta
+                committed_token_ids = list(anchor_ids[:target_tokens])
+                target_deltas.append(anchor_delta)
+                actions.append("WRITE" if anchor_delta else "READ")
+                _vlog(verbose_log_file, f"  [AnchorCommit] sentence end unit={unit_index} done={unit_done} delta={anchor_delta!r}")
+                continue
+            else:
+                pass
             # The source sentence is complete: let the translator finish it instead of voting.
             terminal = source_terminal_mark(source_observed_full) if args.sentence_end_punctuation == "match-source" else ""
             completion_started = time.perf_counter()
@@ -2149,6 +2738,8 @@ def run_one_utterance(
                 target_lang=args.target_lang,
                 max_tokens=args.final_max_tokens,
                 terminal_mark=terminal,
+                thinking=args.completion_thinking,
+                thinking_max_tokens=args.probe_thinking_max_tokens,
             )
             if terminal:
                 raw_delta = sentence_delta
@@ -2180,6 +2771,17 @@ def run_one_utterance(
         else:
             # Dispatch is not a claim that the HTTP request succeeded.
             log_sampling("invoked", "future_sampling")
+
+        # design v3: listed words heard by this chunk whose sentence is unfinished (sentence-end completion fixes the
+        # word's translation when its sentence ends), and the sampler prefix extended back to the start of the sentence
+        # holding the earliest of them (only differs when a chunk spans a sentence end)
+        list_open = open_entries(source_observed_full, ambiguity_list, t + 1)
+        if list_open:
+            earliest = min(len(join_source_chunks(chunks[:entry["chunk"] - 1]).strip()) for entry in list_open)
+            list_prefix = extend_to_sentence(source_observed_full, source_observed, earliest)
+            _vlog(verbose_log_file, "[ListOpen] " + json.dumps({"open": list_open, "prefix": list_prefix}, ensure_ascii=False))
+        else:
+            list_prefix = source_observed
 
         if getattr(args, "use_targeted_instruct_sampling", False):
             # Each instruction-tuned sampler sees the observed prefix and plans
@@ -2215,6 +2817,22 @@ def run_one_utterance(
                 prompt_version=args.targeted_prompt_version,
                 parse_retries=args.targeted_parse_retries,
                 contrastive_notes=args.contrastive_notes,
+                future_roles=args.future_roles,
+                ambiguity_hint=ambiguity_hint,
+                role_plausible_n=args.role_plausible_n,
+                role_per_reading=args.role_per_reading,
+                role_max_words=args.role_max_words,
+                role_max_readings=args.role_max_readings,
+                list_open=list_open,
+                list_prefix=list_prefix,
+                list_natural=args.list_natural,
+                list_natural_n=args.list_natural_n,
+                list_per_reading=args.list_per_reading,
+                list_targeted_thinking=args.list_targeted_thinking,
+                list_think_budget=args.list_think_budget,
+                list_skip_ruled_out=args.list_skip_ruled_out,
+                list_reading_check=args.list_reading_check,
+                list_observed_full=source_observed_full,
             )
         else:
             futures, future_infos = sample_source_futures_multi( #call base models，用当前observed source采样多条未来续写
@@ -2228,6 +2846,10 @@ def run_one_utterance(
         if args.use_targeted_instruct_sampling:
             _vlog(verbose_log_file, f"[Timing] sampling={time.perf_counter() - sampling_started:.2f}s")
         # ── verbose: list futures ──
+        request_items = [item for item in future_audit if str(item.get("mode", "")).endswith("_request")]
+        for item in request_items:
+            _vlog(verbose_log_file, "[ListRequest] " + json.dumps(item, ensure_ascii=False))
+        future_audit = [item for item in future_audit if not str(item.get("mode", "")).endswith("_request")]
         if future_audit:
             accepted_raw = sum(bool(item.get("accepted")) for item in future_audit)
             _vlog(verbose_log_file,
@@ -2286,7 +2908,24 @@ def run_one_utterance(
             probe_temperature=args.probe_temperature,
             probe_top_p=args.probe_top_p,
             probe_top_k=args.probe_top_k,
+            probe_thinking=args.probe_thinking,
+            probe_thinking_max_tokens=args.probe_thinking_max_tokens,
+            vote_match=args.vote_match,
+            semantic_matcher=args.semantic_matcher,
+            anchor_ids=anchor_ids,
+            anchor_min_p=args.anchor_min_p,
+            anchor_ratio=args.anchor_ratio,
+            anchor_ratio_floor=args.anchor_ratio_floor,
+            future_notes=([f'In this text, "{info["word"]}" means: {info["reading"].rsplit(" (", 1)[0]}.' if info.get("word") else ""
+                           for info in future_infos] if args.list_probe_hint else None),
         )
+        thinking_log = grow_logs[0].get("thinking") if grow_logs else None
+        if thinking_log:
+            _vlog(verbose_log_file, f"[Thinking] mode={thinking_log['mode']} elapsed={thinking_log['elapsed_s']}s "
+                                    f"reasoning_chars={thinking_log['reasoning_chars']} cut={thinking_log['cut']}")
+            _vlog(verbose_log_file, f"[Thinking] oracle reasoning: {thinking_log['oracle_reasoning']!r}")
+        else:
+            pass
         _vlog(verbose_log_file, f"[Timing] probe_batches={sum(1 for g in grow_logs if 'elapsed_s' in g)} "
                                 f"total={sum(g.get('elapsed_s', 0.0) for g in grow_logs):.2f}s")
 
@@ -2305,6 +2944,18 @@ def run_one_utterance(
                               "horizon": len(pending_token_ids),
                               "min_horizon": args.min_consensus_horizon})
             pending_token_ids = []
+        elif args.single_token_filter and len(pending_token_ids) == 1:
+            first = next(gl for gl in grow_logs if "accepted_token_id" in gl)
+            single_text = first["accepted_token_text"].strip()
+            single_min_p = first["meta"]["min_voter_p"]
+            if not single_text or all(unicodedata.category(c)[0] in "PSZ" for c in single_text) or single_min_p < args.single_token_min_p:
+                _vlog(verbose_log_file, f"[Step 5.5] single_token_filter: dropped {single_text!r} (min voter p {single_min_p:.3f}) -> READ")
+                grow_logs.append({"step": "filter", "stop": "single_token_filter", "token": single_text, "min_voter_p": single_min_p})
+                pending_token_ids = []
+            else:
+                pass
+        else:
+            pass
 
         # ── verbose: consensus steps ──
         if verbose_log_file is not None and grow_logs:
@@ -2363,6 +3014,31 @@ def run_one_utterance(
         "prediction": committed_text,
         "decoder_impl": {"candidate_policy": candidate_policy, "backend": "vllm_completion"},
         "decoder_settings": {
+            "future_roles": args.future_roles,
+            "list_natural": args.list_natural if args.future_roles == "list" else None,
+            "list_natural_n": args.list_natural_n if args.future_roles == "list" else None,
+            "list_per_reading": args.list_per_reading if args.future_roles == "list" else None,
+            "list_targeted_thinking": args.list_targeted_thinking if args.future_roles == "list" else None,
+            "list_think_budget": args.list_think_budget if args.future_roles == "list" and args.list_targeted_thinking else None,
+            "list_sampling": ("no thinking 1.0 / 0.98; thinking 0.6 / 0.95 / top-k 20 with a forced answer"
+                              if args.future_roles == "list" else None),
+            "list_probe_hint": args.list_probe_hint if args.future_roles == "list" else None,
+            "list_skip_ruled_out": args.list_skip_ruled_out if args.future_roles == "list" else None,
+            "list_reading_check": args.list_reading_check if args.future_roles == "list" else None,
+            "anchor_reference": args.anchor_reference,
+            "anchor_min_p": args.anchor_min_p if args.anchor_reference and not args.anchor_ratio else None,
+            "anchor_ratio": args.anchor_ratio if args.anchor_reference else None,
+            "anchor_ratio_floor": args.anchor_ratio_floor if args.anchor_reference and args.anchor_ratio else None,
+            "list_reading_check_mode": "greedy, whole observed text" if args.list_reading_check else None,
+            "soft_vote_min_p": args.soft_vote_min_p,
+            "min_voters_ratio": args.min_voters_ratio,
+            "role_plausible_n": args.role_plausible_n if args.future_roles != "off" else None,
+            "role_per_reading": args.role_per_reading if args.future_roles != "off" else None,
+            "vote_match": args.vote_match,
+            "semantic_threshold": args.semantic_threshold if args.vote_match == "prefix_semantic" else None,
+            "min_consensus_horizon": args.min_consensus_horizon,
+            "single_token_filter": args.single_token_filter,
+            "single_token_min_p": args.single_token_min_p if args.single_token_filter else None,
             "future_source_window_mode": args.future_source_window_mode,
             "future_source_window_chunks": args.future_source_window_chunks,
             "future_source_anchor_max_words": args.future_source_anchor_max_words,
@@ -2381,6 +3057,10 @@ def run_one_utterance(
             "probe_temperature": args.probe_temperature,
             "probe_top_p": args.probe_top_p,
             "probe_top_k": args.probe_top_k,
+            "probe_thinking": args.probe_thinking,
+            "probe_thinking_max_tokens": args.probe_thinking_max_tokens,
+            "completion_thinking": args.completion_thinking,
+            "thinking_sampling": THINKING_SAMPLING,
             "block_latin_tokens": args.block_latin_tokens,
         },
         "boundary_audit": boundary_audit,
@@ -2445,6 +3125,11 @@ def main() -> None:
     setup_env()
     args = parse_args()
     BLOCK_LATIN_TOKENS = args.block_latin_tokens
+    # one LaBSE matcher shared by every concurrent row (2026-10-09 vote test)
+    if args.vote_match == "prefix_semantic":
+        args.semantic_matcher = make_semantic_matcher(args.semantic_model, args.semantic_threshold)
+    else:
+        args.semantic_matcher = None
 
     if args.use_targeted_instruct_sampling:
         # Targeted instruct sampling bypasses base-LM future sampling entirely.
